@@ -1,0 +1,949 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9227F5452BCB49EE00A29074 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9227F5442BCB49EE00A29074 /* EclipseKit */; };
+		922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78932BC23CB100695252 /* EmulationMenuView.swift */; };
+		922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78952BC23D5900695252 /* TouchControlsView.swift */; };
+		922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */; };
+		922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A62BC0C26600B419D7 /* Persistence.swift */; };
+		922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A82BC0C26600B419D7 /* EclipseEmu.xcdatamodeld */; };
+		922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00AB2BC0C26600B419D7 /* LibraryView.swift */; };
+		922F00AE2BC0C26700B419D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922F00AD2BC0C26700B419D7 /* Assets.xcassets */; };
+		922F00B22BC0C26700B419D7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922F00B12BC0C26700B419D7 /* Preview Assets.xcassets */; };
+		922F00BC2BC0C26700B419D7 /* EclipseEmuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */; };
+		922F00C62BC0C26700B419D7 /* EclipseEmuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */; };
+		922F00C82BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */; };
+		922F00D52BC0C2EB00B419D7 /* System.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00D42BC0C2EB00B419D7 /* System.swift */; };
+		922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00D72BC0C75000B419D7 /* Game+CoreDataClass.swift */; };
+		922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */; };
+		923E37FB2BC98D8000ECC973 /* FrameBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */; };
+		923E37FD2BC9AE0D00ECC973 /* GameRenderer2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */; };
+		923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */; };
+		923E38042BC9C3FA00ECC973 /* GameRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38032BC9C3FA00ECC973 /* GameRenderer.swift */; };
+		923E38072BC9E0F200ECC973 /* DummyCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38062BC9E0F200ECC973 /* DummyCore.swift */; };
+		925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EA2BC9E90F00AD7257 /* GameScreen.swift */; };
+		925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */; };
+		925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */; };
+		928237042BCB5005001E27B3 /* FileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237032BCB5005001E27B3 /* FileStorage.swift */; };
+		928237072BCB77B5001E27B3 /* View+modify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+modify.swift */; };
+		92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+version.swift */; };
+		92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */; };
+		9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */; };
+		9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */; };
+		9294E5DC2BC1A9AB00B174E1 /* SettingsBackupsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5DB2BC1A9AB00B174E1 /* SettingsBackupsView.swift */; };
+		9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5DE2BC1BFB700B174E1 /* SettingsGamepadView.swift */; };
+		9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E22BC1D0BE00B174E1 /* Touch.swift */; };
+		9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */; };
+		9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E82BC1D82000B174E1 /* Bindings.swift */; };
+		92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */; };
+		92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB7912BC190C30093B2E3 /* AppIconView.swift */; };
+		92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */; };
+		92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D3712BC0DF1700F1116C /* MD5.swift */; };
+		92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */; };
+		92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7232BC1003B00659C37 /* SectionHeader.swift */; };
+		92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7252BC1007900659C37 /* GameGridItem.swift */; };
+		92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7272BC103BC00659C37 /* SettingsView.swift */; };
+		92D5D72B2BC1723700659C37 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72A2BC1723700659C37 /* GameView.swift */; };
+		92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72C2BC1724E00659C37 /* EmulationView.swift */; };
+		92D5D7312BC17C2800659C37 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* CloseButton.swift */; };
+		92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		922F00B82BC0C26700B419D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 922F00992BC0C26600B419D7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 922F00A02BC0C26600B419D7;
+			remoteInfo = EclipseEmu;
+		};
+		922F00C22BC0C26700B419D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 922F00992BC0C26600B419D7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 922F00A02BC0C26600B419D7;
+			remoteInfo = EclipseEmu;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9227F5432BCB49E200A29074 /* EclipseKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = EclipseKit; sourceTree = "<group>"; };
+		922D78932BC23CB100695252 /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
+		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
+		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuApp.swift; sourceTree = "<group>"; };
+		922F00A62BC0C26600B419D7 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		922F00A92BC0C26600B419D7 /* EclipseEmu.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = EclipseEmu.xcdatamodel; sourceTree = "<group>"; };
+		922F00AB2BC0C26600B419D7 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		922F00AD2BC0C26700B419D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		922F00AF2BC0C26700B419D7 /* EclipseEmu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EclipseEmu.entitlements; sourceTree = "<group>"; };
+		922F00B12BC0C26700B419D7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuTests.swift; sourceTree = "<group>"; };
+		922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuUITests.swift; sourceTree = "<group>"; };
+		922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		922F00D42BC0C2EB00B419D7 /* System.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = System.swift; sourceTree = "<group>"; };
+		922F00D72BC0C75000B419D7 /* Game+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+CoreDataClass.swift"; sourceTree = "<group>"; };
+		922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameBuffer.swift; sourceTree = "<group>"; };
+		923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRenderer2D.swift; sourceTree = "<group>"; };
+		923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreCoordinator.swift; sourceTree = "<group>"; };
+		923E38032BC9C3FA00ECC973 /* GameRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRenderer.swift; sourceTree = "<group>"; };
+		923E38062BC9E0F200ECC973 /* DummyCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyCore.swift; sourceTree = "<group>"; };
+		925B14EA2BC9E90F00AD7257 /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
+		925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Numeric.swift"; sourceTree = "<group>"; };
+		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+bytesPerPixel.swift"; sourceTree = "<group>"; };
+		928237032BCB5005001E27B3 /* FileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorage.swift; sourceTree = "<group>"; };
+		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		928237062BCB77B5001E27B3 /* View+modify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+modify.swift"; sourceTree = "<group>"; };
+		92875E9A2BCADDB900EABD63 /* Bundle+version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+version.swift"; sourceTree = "<group>"; };
+		92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreRegistry.swift; sourceTree = "<group>"; };
+		9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGeneralView.swift; sourceTree = "<group>"; };
+		9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsControlsView.swift; sourceTree = "<group>"; };
+		9294E5DB2BC1A9AB00B174E1 /* SettingsBackupsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackupsView.swift; sourceTree = "<group>"; };
+		9294E5DD2BC1AF7800B174E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9294E5DE2BC1BFB700B174E1 /* SettingsGamepadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGamepadView.swift; sourceTree = "<group>"; };
+		9294E5E22BC1D0BE00B174E1 /* Touch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Touch.swift; sourceTree = "<group>"; };
+		9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gamepad.swift; sourceTree = "<group>"; };
+		9294E5E82BC1D82000B174E1 /* Bindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindings.swift; sourceTree = "<group>"; };
+		92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayGameAction.swift; sourceTree = "<group>"; };
+		92BFB7912BC190C30093B2E3 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
+		92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = FrameBuffer.metal; sourceTree = "<group>"; };
+		92D5D3712BC0DF1700F1116C /* MD5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MD5.swift; sourceTree = "<group>"; };
+		92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameKeepPlayingItem.swift; sourceTree = "<group>"; };
+		92D5D7232BC1003B00659C37 /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		92D5D7252BC1007900659C37 /* GameGridItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameGridItem.swift; sourceTree = "<group>"; };
+		92D5D7272BC103BC00659C37 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		92D5D72A2BC1723700659C37 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		92D5D72C2BC1724E00659C37 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
+		92D5D7302BC17C2800659C37 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
+		92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEmulationView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		922F009E2BC0C26600B419D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9227F5452BCB49EE00A29074 /* EclipseKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00B42BC0C26700B419D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00BE2BC0C26700B419D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9227F53E2BCB490700A29074 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		922D78922BC23CA500695252 /* Emulation */ = {
+			isa = PBXGroup;
+			children = (
+				92D5D72C2BC1724E00659C37 /* EmulationView.swift */,
+				922D78932BC23CB100695252 /* EmulationMenuView.swift */,
+				922D78952BC23D5900695252 /* TouchControlsView.swift */,
+				925B14EA2BC9E90F00AD7257 /* GameScreen.swift */,
+			);
+			path = Emulation;
+			sourceTree = "<group>";
+		};
+		922F00982BC0C26600B419D7 = {
+			isa = PBXGroup;
+			children = (
+				928237052BCB540C001E27B3 /* README.md */,
+				9227F5432BCB49E200A29074 /* EclipseKit */,
+				929AD0192BCB46C6001BC106 /* Cores */,
+				922F00A32BC0C26600B419D7 /* EclipseEmu */,
+				922F00BA2BC0C26700B419D7 /* EclipseEmuTests */,
+				922F00C42BC0C26700B419D7 /* EclipseEmuUITests */,
+				922F00A22BC0C26600B419D7 /* Products */,
+				9227F53E2BCB490700A29074 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		922F00A22BC0C26600B419D7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				922F00A12BC0C26600B419D7 /* EclipseEmu.app */,
+				922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */,
+				922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		922F00A32BC0C26600B419D7 /* EclipseEmu */ = {
+			isa = PBXGroup;
+			children = (
+				925B14EC2BCA487400AD7257 /* Extensions */,
+				92BBAADA2BC4680700B09755 /* Shaders */,
+				92CC9CF82BC3930B00D668DB /* Emulation */,
+				92D5D7292BC1722600659C37 /* Logic */,
+				92D5D71F2BC0FF9800659C37 /* Views */,
+				922F00D62BC0C2EE00B419D7 /* Model */,
+				922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */,
+				922F00A62BC0C26600B419D7 /* Persistence.swift */,
+				9294E5DD2BC1AF7800B174E1 /* Info.plist */,
+				922F00AD2BC0C26700B419D7 /* Assets.xcassets */,
+				922F00AF2BC0C26700B419D7 /* EclipseEmu.entitlements */,
+				922F00A82BC0C26600B419D7 /* EclipseEmu.xcdatamodeld */,
+				922F00B02BC0C26700B419D7 /* Preview Content */,
+				923E38062BC9E0F200ECC973 /* DummyCore.swift */,
+			);
+			path = EclipseEmu;
+			sourceTree = "<group>";
+		};
+		922F00B02BC0C26700B419D7 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				922F00B12BC0C26700B419D7 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		922F00BA2BC0C26700B419D7 /* EclipseEmuTests */ = {
+			isa = PBXGroup;
+			children = (
+				922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */,
+			);
+			path = EclipseEmuTests;
+			sourceTree = "<group>";
+		};
+		922F00C42BC0C26700B419D7 /* EclipseEmuUITests */ = {
+			isa = PBXGroup;
+			children = (
+				922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */,
+				922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */,
+			);
+			path = EclipseEmuUITests;
+			sourceTree = "<group>";
+		};
+		922F00D62BC0C2EE00B419D7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				9294E5E12BC1D0AF00B174E1 /* Controls */,
+				922F00DB2BC0C75B00B419D7 /* Game */,
+				922F00D42BC0C2EB00B419D7 /* System.swift */,
+				928237032BCB5005001E27B3 /* FileStorage.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		922F00DB2BC0C75B00B419D7 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				922F00D72BC0C75000B419D7 /* Game+CoreDataClass.swift */,
+				922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		923E38022BC9C34700ECC973 /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */,
+				923E38032BC9C3FA00ECC973 /* GameRenderer.swift */,
+				923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */,
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
+		925B14EC2BCA487400AD7257 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */,
+				925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */,
+				92875E9A2BCADDB900EABD63 /* Bundle+version.swift */,
+				928237062BCB77B5001E27B3 /* View+modify.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		9294E5D52BC1A71E00B174E1 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				9294E5E02BC1BFBC00B174E1 /* Controls */,
+				92D5D7272BC103BC00659C37 /* SettingsView.swift */,
+				9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */,
+				9294E5DB2BC1A9AB00B174E1 /* SettingsBackupsView.swift */,
+				92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		9294E5D62BC1A72900B174E1 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				922F00AB2BC0C26600B419D7 /* LibraryView.swift */,
+				92D5D72A2BC1723700659C37 /* GameView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		9294E5E02BC1BFBC00B174E1 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */,
+				9294E5DE2BC1BFB700B174E1 /* SettingsGamepadView.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		9294E5E12BC1D0AF00B174E1 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				9294E5E22BC1D0BE00B174E1 /* Touch.swift */,
+				9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */,
+				9294E5E82BC1D82000B174E1 /* Bindings.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		929AD0192BCB46C6001BC106 /* Cores */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Cores;
+			sourceTree = "<group>";
+		};
+		92BBAADA2BC4680700B09755 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		92CC9CF82BC3930B00D668DB /* Emulation */ = {
+			isa = PBXGroup;
+			children = (
+				923E38022BC9C34700ECC973 /* Video */,
+				923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */,
+			);
+			path = Emulation;
+			sourceTree = "<group>";
+		};
+		92D5D71F2BC0FF9800659C37 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				922D78922BC23CA500695252 /* Emulation */,
+				9294E5D62BC1A72900B174E1 /* Library */,
+				9294E5D52BC1A71E00B174E1 /* Settings */,
+				92D5D7202BC0FFA000659C37 /* Supporting */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		92D5D7202BC0FFA000659C37 /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */,
+				92D5D7252BC1007900659C37 /* GameGridItem.swift */,
+				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
+				92D5D7302BC17C2800659C37 /* CloseButton.swift */,
+				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
+			);
+			path = Supporting;
+			sourceTree = "<group>";
+		};
+		92D5D7292BC1722600659C37 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				92D5D3712BC0DF1700F1116C /* MD5.swift */,
+				92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */,
+				92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		922F00A02BC0C26600B419D7 /* EclipseEmu */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 922F00CB2BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmu" */;
+			buildPhases = (
+				922F009D2BC0C26600B419D7 /* Sources */,
+				922F009E2BC0C26600B419D7 /* Frameworks */,
+				922F009F2BC0C26600B419D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EclipseEmu;
+			packageProductDependencies = (
+				9227F5442BCB49EE00A29074 /* EclipseKit */,
+			);
+			productName = EclipseEmu;
+			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
+			productType = "com.apple.product-type.application";
+		};
+		922F00B62BC0C26700B419D7 /* EclipseEmuTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 922F00CE2BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmuTests" */;
+			buildPhases = (
+				922F00B32BC0C26700B419D7 /* Sources */,
+				922F00B42BC0C26700B419D7 /* Frameworks */,
+				922F00B52BC0C26700B419D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				922F00B92BC0C26700B419D7 /* PBXTargetDependency */,
+			);
+			name = EclipseEmuTests;
+			productName = EclipseEmuTests;
+			productReference = 922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		922F00C02BC0C26700B419D7 /* EclipseEmuUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 922F00D12BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmuUITests" */;
+			buildPhases = (
+				922F00BD2BC0C26700B419D7 /* Sources */,
+				922F00BE2BC0C26700B419D7 /* Frameworks */,
+				922F00BF2BC0C26700B419D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				922F00C32BC0C26700B419D7 /* PBXTargetDependency */,
+			);
+			name = EclipseEmuUITests;
+			productName = EclipseEmuUITests;
+			productReference = 922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		922F00992BC0C26600B419D7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					922F00A02BC0C26600B419D7 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					922F00B62BC0C26700B419D7 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 922F00A02BC0C26600B419D7;
+					};
+					922F00C02BC0C26700B419D7 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 922F00A02BC0C26600B419D7;
+					};
+				};
+			};
+			buildConfigurationList = 922F009C2BC0C26600B419D7 /* Build configuration list for PBXProject "EclipseEmu" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 922F00982BC0C26600B419D7;
+			packageReferences = (
+			);
+			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				922F00A02BC0C26600B419D7 /* EclipseEmu */,
+				922F00B62BC0C26700B419D7 /* EclipseEmuTests */,
+				922F00C02BC0C26700B419D7 /* EclipseEmuUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		922F009F2BC0C26600B419D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				922F00B22BC0C26700B419D7 /* Preview Assets.xcassets in Resources */,
+				922F00AE2BC0C26700B419D7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00B52BC0C26700B419D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00BF2BC0C26700B419D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		922F009D2BC0C26600B419D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */,
+				922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */,
+				92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */,
+				923E38042BC9C3FA00ECC973 /* GameRenderer.swift in Sources */,
+				92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */,
+				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
+				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
+				923E38072BC9E0F200ECC973 /* DummyCore.swift in Sources */,
+				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
+				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
+				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
+				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
+				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
+				922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */,
+				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
+				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
+				922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */,
+				925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */,
+				925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */,
+				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
+				923E37FB2BC98D8000ECC973 /* FrameBuffer.swift in Sources */,
+				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,
+				922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */,
+				922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */,
+				9294E5DC2BC1A9AB00B174E1 /* SettingsBackupsView.swift in Sources */,
+				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
+				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
+				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
+				9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */,
+				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
+				925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */,
+				92D5D7312BC17C2800659C37 /* CloseButton.swift in Sources */,
+				928237042BCB5005001E27B3 /* FileStorage.swift in Sources */,
+				923E37FD2BC9AE0D00ECC973 /* GameRenderer2D.swift in Sources */,
+				928237072BCB77B5001E27B3 /* View+modify.swift in Sources */,
+				922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */,
+				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
+				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
+				92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */,
+				9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00B32BC0C26700B419D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				922F00BC2BC0C26700B419D7 /* EclipseEmuTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		922F00BD2BC0C26700B419D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				922F00C82BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift in Sources */,
+				922F00C62BC0C26700B419D7 /* EclipseEmuUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		922F00B92BC0C26700B419D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 922F00A02BC0C26600B419D7 /* EclipseEmu */;
+			targetProxy = 922F00B82BC0C26700B419D7 /* PBXContainerItemProxy */;
+		};
+		922F00C32BC0C26700B419D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 922F00A02BC0C26600B419D7 /* EclipseEmu */;
+			targetProxy = 922F00C22BC0C26700B419D7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		922F00C92BC0C26700B419D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		922F00CA2BC0C26700B419D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		922F00CC2BC0C26700B419D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EclipseEmu/EclipseEmu.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"EclipseEmu/Preview Content\"";
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EclipseEmu/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		922F00CD2BC0C26700B419D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EclipseEmu/EclipseEmu.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"EclipseEmu/Preview Content\"";
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EclipseEmu/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		922F00CF2BC0C26700B419D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EclipseEmu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EclipseEmu";
+			};
+			name = Debug;
+		};
+		922F00D02BC0C26700B419D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EclipseEmu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EclipseEmu";
+			};
+			name = Release;
+		};
+		922F00D22BC0C26700B419D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmuUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EclipseEmu;
+			};
+			name = Debug;
+		};
+		922F00D32BC0C26700B419D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = F7F5H2QUCJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmuUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EclipseEmu;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		922F009C2BC0C26600B419D7 /* Build configuration list for PBXProject "EclipseEmu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				922F00C92BC0C26700B419D7 /* Debug */,
+				922F00CA2BC0C26700B419D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		922F00CB2BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				922F00CC2BC0C26700B419D7 /* Debug */,
+				922F00CD2BC0C26700B419D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		922F00CE2BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmuTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				922F00CF2BC0C26700B419D7 /* Debug */,
+				922F00D02BC0C26700B419D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		922F00D12BC0C26700B419D7 /* Build configuration list for PBXNativeTarget "EclipseEmuUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				922F00D22BC0C26700B419D7 /* Debug */,
+				922F00D32BC0C26700B419D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9227F5442BCB49EE00A29074 /* EclipseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EclipseKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		922F00A82BC0C26600B419D7 /* EclipseEmu.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				922F00A92BC0C26600B419D7 /* EclipseEmu.xcdatamodel */,
+			);
+			currentVersion = 922F00A92BC0C26600B419D7 /* EclipseEmu.xcdatamodel */;
+			path = EclipseEmu.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 922F00992BC0C26600B419D7 /* Project object */;
+}
