@@ -75,7 +75,7 @@ struct SettingsView: View {
                 }.buttonStyle(.plain)
                 
                 Section {
-                    Link(destination: URL(string: "https://discord.gg/")!) {
+                    Link(destination: URL(string: "https://discord.gg/Mx2W9nec4Z")!) {
                         HStack {
                             Label("Discord", systemImage: "app.dashed")
                                 .labelStyle(SettingsLabelStyle())
