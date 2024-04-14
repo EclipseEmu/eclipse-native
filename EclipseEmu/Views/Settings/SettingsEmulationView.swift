@@ -21,7 +21,9 @@ struct SettingsEmulationView: View {
             } footer: {
                 Text("When enabled, game audio will play with your device's Silent Mode on.")
             }
+            #if os(macOS)
             Spacer()
+            #endif
         }
         .navigationTitle("Emulation")
     }

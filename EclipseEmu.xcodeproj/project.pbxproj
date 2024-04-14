@@ -211,7 +211,6 @@
 				922F00AF2BC0C26700B419D7 /* EclipseEmu.entitlements */,
 				922F00A82BC0C26600B419D7 /* EclipseEmu.xcdatamodeld */,
 				922F00B02BC0C26700B419D7 /* Preview Content */,
-				923E38062BC9E0F200ECC973 /* DummyCore.swift */,
 			);
 			path = EclipseEmu;
 			sourceTree = "<group>";
@@ -325,6 +324,7 @@
 		929AD0192BCB46C6001BC106 /* Cores */ = {
 			isa = PBXGroup;
 			children = (
+				923E38062BC9E0F200ECC973 /* DummyCore.swift */,
 			);
 			path = Cores;
 			sourceTree = "<group>";
