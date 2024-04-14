@@ -8,7 +8,7 @@ protocol GameCoreCoordinatorTouchControlsDelegate {
     var valueChangedHandler: ((UInt32) -> Void)? { get set }
 }
 
-class GameCoreCoordinator: NSObject, ObservableObject {
+class GameCoreCoordinator: NSObject, ObservableObject, GameCoreDelegate {
     enum Failure: Error {
         case failedToGetMetalDevice
         case failedToCreateFullscreenQuad
@@ -24,12 +24,12 @@ class GameCoreCoordinator: NSObject, ObservableObject {
     let core: GameCore
     var inputs: [UInt32] = [0]
     var touchControlsDelegate: GameCoreCoordinatorTouchControlsDelegate?
-
-    // rendering properties
-    private var renderer: GameRenderer!
+    
+    private var audio: GameAudio
+    
+    private var renderer: GameRenderer
     var renderingSurface: CAMetalLayer!
 
-    // frame timer properties
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private(set) var rate: Double = 1.0
@@ -70,6 +70,8 @@ class GameCoreCoordinator: NSObject, ObservableObject {
             try self.renderer.update()
             break
         }
+        
+        self.audio = GameAudio(core: core)
         
         super.init()
     }
@@ -114,6 +116,16 @@ class GameCoreCoordinator: NSObject, ObservableObject {
     func renderFrame() {
         self.renderer.render(in: self.renderingSurface)
     }
+    
+    // MARK: Core Delegate methods
+    
+    func coreRenderAudio(samples: UnsafeRawPointer, size: Int) {
+        print(samples, size)
+    }
+    
+    func coreDidSave(at path: URL) {
+        print(path)
+    }
 
     // MARK: Frame Timing
 
@@ -130,24 +142,22 @@ class GameCoreCoordinator: NSObject, ObservableObject {
     func startFrameTimer() {
         self.frameTimerTask?.cancel()
         self.frameTimerTask = Task(priority: .userInitiated) {
-            let refreshRateDouble: Double = 1.0 / 60.0
-            let renderThreshold: ContinuousClock.Duration = .seconds(refreshRateDouble)
-            let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * refreshRateDouble)
-            
             let initialTime: ContinuousClock.Instant = .now
             var time: ContinuousClock.Duration = .zero
+            let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
             var nextRenderTime: ContinuousClock.Duration = .zero
-            
+
             while !Task.isCancelled {
                 let start: ContinuousClock.Instant = .now
                 let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+                let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
                 let expectedTime = start - initialTime
                 time = max(time, expectedTime - maxCatchupRate)
 
                 while time <= expectedTime {
                     time += frameDuration
                     let doRender = time >= expectedTime && expectedTime >= nextRenderTime
-                    nextRenderTime = doRender ? expectedTime + renderThreshold : nextRenderTime
+                    nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
                     
                     self.core.executeFrame(processVideo: doRender)
                     if doRender {

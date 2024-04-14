@@ -30,6 +30,8 @@
 		925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EA2BC9E90F00AD7257 /* GameScreen.swift */; };
 		925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */; };
 		925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */; };
+		9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */; };
+		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
 		928237042BCB5005001E27B3 /* FileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237032BCB5005001E27B3 /* FileStorage.swift */; };
 		928237072BCB77B5001E27B3 /* View+modify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+modify.swift */; };
 		92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+version.swift */; };
@@ -100,6 +102,8 @@
 		925B14EA2BC9E90F00AD7257 /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
 		925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Numeric.swift"; sourceTree = "<group>"; };
 		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+bytesPerPixel.swift"; sourceTree = "<group>"; };
+		9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAudio.swift; sourceTree = "<group>"; };
+		9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewView.swift; sourceTree = "<group>"; };
 		928237032BCB5005001E27B3 /* FileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorage.swift; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		928237062BCB77B5001E27B3 /* View+modify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+modify.swift"; sourceTree = "<group>"; };
@@ -260,16 +264,6 @@
 			path = Game;
 			sourceTree = "<group>";
 		};
-		923E38022BC9C34700ECC973 /* Video */ = {
-			isa = PBXGroup;
-			children = (
-				923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */,
-				923E38032BC9C3FA00ECC973 /* GameRenderer.swift */,
-				923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */,
-			);
-			path = Video;
-			sourceTree = "<group>";
-		};
 		925B14EC2BCA487400AD7257 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,6 +292,7 @@
 			children = (
 				922F00AB2BC0C26600B419D7 /* LibraryView.swift */,
 				92D5D72A2BC1723700659C37 /* GameView.swift */,
+				9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -340,8 +335,11 @@
 		92CC9CF82BC3930B00D668DB /* Emulation */ = {
 			isa = PBXGroup;
 			children = (
-				923E38022BC9C34700ECC973 /* Video */,
+				923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */,
 				923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */,
+				923E38032BC9C3FA00ECC973 /* GameRenderer.swift */,
+				923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */,
+				9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */,
 			);
 			path = Emulation;
 			sourceTree = "<group>";
@@ -531,7 +529,9 @@
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */,
+				9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */,
 				925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */,
+				9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
 				923E37FB2BC98D8000ECC973 /* FrameBuffer.swift in Sources */,

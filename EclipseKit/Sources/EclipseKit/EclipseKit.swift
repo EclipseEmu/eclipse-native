@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 import Metal
 
 @objc(ECGameCoreRenderFormat)
@@ -6,24 +7,41 @@ public enum GameCoreRenderFormat: UInt8 {
     case frameBuffer
 }
 
+@objc(ECGameCoreDelegate)
+public protocol GameCoreDelegate {
+    func coreRenderAudio(samples: UnsafeRawPointer, size: Int) -> Void
+    func coreDidSave(at path: URL) -> Void
+}
+
 @objc(ECGameCore)
 public protocol GameCore {
     static var id: String { get }
     static var name: String { get }
-
+    
+    var delegate: GameCoreDelegate! { get set }
+    
+    /// Initialize basic info of the game
     func setup() -> Void
+    /// Emulation is about to stop completely, handle any deallocations and other things here.
     func takedown() -> Void
 
     func getDesiredFrameRate() -> Double
-    
+
     // MARK: Video
-    
+
     func getVideoPixelFormat() -> MTLPixelFormat
     func getVideoRenderingType() -> GameCoreRenderFormat
     func getVideoWidth() -> Int
     func getVideoHeight() -> Int
     func canSetVideoBufferPointer() -> Bool
+    /// Get a pointer to the video buffer. Ideally you'd use the pointer given by `setPointer` as the video buffer. If you cannot, return false in the `canSetVideoBufferPointer` method.
     func getVideoBuffer(setPointer: UnsafeRawPointer?) -> UnsafeRawPointer
+
+    // MARK: Audio
+
+    func getAudioFormat() -> AVAudioFormat?
+
+    // MARK: General lifecycle
 
     /// Starts the game at the specified path
     func start(url: URL) -> Bool
@@ -42,6 +60,8 @@ public protocol GameCore {
 
     /// Emulates a single frame, optionally handling any additional video processing required to render the frame
     func executeFrame(processVideo: Bool) -> Void
+    
+    // MARK: Save States
     
     func saveState(url: URL) -> Bool
     func loadState(url: URL) -> Bool

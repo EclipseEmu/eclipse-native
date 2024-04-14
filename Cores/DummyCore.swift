@@ -2,8 +2,11 @@ import Foundation
 import SwiftUI
 import Metal
 import EclipseKit
+import AVFoundation
 
 final class DummyCore: GameCore {
+    var delegate: GameCoreDelegate!
+    
     static var id: String = "dev.magnetar.dummycore"
     static var name: String = "Dummy Core"
     
@@ -40,6 +43,10 @@ final class DummyCore: GameCore {
     func getVideoBuffer(setPointer: UnsafeRawPointer?) -> UnsafeRawPointer {
         self.videoBuffer = setPointer
         return setPointer!
+    }
+    
+    func getAudioFormat() -> AVAudioFormat? {
+        return AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 32700, channels: 2, interleaved: true)
     }
     
     // MARK: Emulation lifecycle
