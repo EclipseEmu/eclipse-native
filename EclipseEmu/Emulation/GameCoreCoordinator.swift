@@ -35,8 +35,6 @@ class GameCoreCoordinator: NSObject, ObservableObject {
     private(set) var rate: Double = 1.0
     private var frameTimerTask: Task<Void, Never>?
     
-    private var useAdaptiveSync = true
-    
     init(core: GameCore) throws {
         self.core = core
         
@@ -125,35 +123,45 @@ class GameCoreCoordinator: NSObject, ObservableObject {
         #if canImport(AppKit)
         self.renderingSurface.displaySyncEnabled = !enabled
         #endif
+        self.renderer.useAdaptiveSync = !enabled
         self.frameDuration = (1.0 / desiredFrameRate) / rate
     }
     
     func startFrameTimer() {
         self.frameTimerTask?.cancel()
         self.frameTimerTask = Task(priority: .userInitiated) {
-            // TODO: seperate refresh rate from core frame duration
             let refreshRateDouble: Double = 1.0 / 60.0
+            let renderThreshold: ContinuousClock.Duration = .seconds(refreshRateDouble)
             let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * refreshRateDouble)
             
             let initialTime: ContinuousClock.Instant = .now
             var time: ContinuousClock.Duration = .zero
-            let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+            var renderTime: ContinuousClock.Duration = .zero
+            var lastFrameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
             
             while !Task.isCancelled {
                 let start: ContinuousClock.Instant = .now
-                
                 let expectedTime = start - initialTime
                 time = max(time, expectedTime - maxCatchupRate)
-                
+
+                let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+                if frameDuration != lastFrameDuration {
+                    lastFrameDuration = frameDuration
+                    renderTime = .zero
+                }
+
                 while time <= expectedTime {
-                    let doRender = time + frameDuration >= expectedTime
+                    let doRender = time + frameDuration >= expectedTime && renderTime >= renderThreshold
                     time += frameDuration
                     self.core.executeFrame(processVideo: doRender)
                     if doRender {
                         self.renderFrame()
+                        renderTime = .zero
                     }
                 }
                 
+                renderTime += frameDuration
+
                 let now: ContinuousClock.Instant = .now
                 let sleepTime = frameDuration - (now - start)
                 if sleepTime > .zero {

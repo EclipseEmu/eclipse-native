@@ -14,7 +14,7 @@ final class DummyCore: GameCore {
     func takedown() {}
     
     func getDesiredFrameRate() -> Double {
-        return 1.0
+        return 30.0
     }
     
     func getVideoPixelFormat() -> MTLPixelFormat {
