@@ -13,7 +13,8 @@ extension Game {
     @NSManaged public var savePath: URL?
     @NSManaged public var md5: String
     @NSManaged public var coverArt: URL?
-    @NSManaged public var dateAdded: Date?
+    @NSManaged public var dateAdded: Date
+    @NSManaged public var datePlayed: Date?
 }
 
 extension Game : Identifiable {}

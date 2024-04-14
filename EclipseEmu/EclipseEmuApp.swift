@@ -2,7 +2,8 @@ import SwiftUI
 
 @main
 struct EclipseEmuApp: App {
-    let persistenceController = PersistenceController.shared
+    // FIXME: once the models are finalized, make this use shared
+    let persistenceController = PersistenceController.preview
     @StateObject var playGameAction = PlayGameAction()
     
     var body: some Scene {
