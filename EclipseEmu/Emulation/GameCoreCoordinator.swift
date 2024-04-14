@@ -136,36 +136,28 @@ class GameCoreCoordinator: NSObject, ObservableObject {
             
             let initialTime: ContinuousClock.Instant = .now
             var time: ContinuousClock.Duration = .zero
-            var renderTime: ContinuousClock.Duration = .zero
-            var lastFrameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+            var nextRenderTime: ContinuousClock.Duration = .zero
             
             while !Task.isCancelled {
                 let start: ContinuousClock.Instant = .now
+                let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
                 let expectedTime = start - initialTime
                 time = max(time, expectedTime - maxCatchupRate)
 
-                let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
-                if frameDuration != lastFrameDuration {
-                    lastFrameDuration = frameDuration
-                    renderTime = .zero
-                }
-
                 while time <= expectedTime {
-                    let doRender = time + frameDuration >= expectedTime && renderTime >= renderThreshold
                     time += frameDuration
+                    let doRender = time >= expectedTime && expectedTime >= nextRenderTime
+                    nextRenderTime = doRender ? expectedTime + renderThreshold : nextRenderTime
+                    
                     self.core.executeFrame(processVideo: doRender)
                     if doRender {
                         self.renderFrame()
-                        renderTime = .zero
                     }
                 }
-                
-                renderTime += frameDuration
 
-                let now: ContinuousClock.Instant = .now
-                let sleepTime = frameDuration - (now - start)
-                if sleepTime > .zero {
-                    try? await Task.sleep(until: now + sleepTime)
+                let framesTime: ContinuousClock.Duration = .now - start
+                if framesTime < frameDuration {
+                    try? await Task.sleep(until: start + frameDuration)
                 } else {
                     await Task.yield()
                 }
