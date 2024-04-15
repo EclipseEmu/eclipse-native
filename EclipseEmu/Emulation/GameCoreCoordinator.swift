@@ -8,7 +8,7 @@ protocol GameCoreCoordinatorTouchControlsDelegate {
     var valueChangedHandler: ((UInt32) -> Void)? { get set }
 }
 
-class GameCoreCoordinator: NSObject, ObservableObject, GameCoreDelegate {
+class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
     enum Failure: Error {
         case failedToGetMetalDevice
         case failedToCreateFullscreenQuad
@@ -37,7 +37,7 @@ class GameCoreCoordinator: NSObject, ObservableObject, GameCoreDelegate {
     
     init(core: GameCore) throws {
         self.core = core
-        
+
         core.setup()
         
         self.desiredFrameRate = core.getDesiredFrameRate()
@@ -72,8 +72,7 @@ class GameCoreCoordinator: NSObject, ObservableObject, GameCoreDelegate {
         }
         
         self.audio = GameAudio(core: core)
-        
-        super.init()
+        self.core.delegate = self
     }
     
     deinit {
