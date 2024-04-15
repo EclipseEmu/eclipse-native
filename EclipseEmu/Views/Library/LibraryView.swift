@@ -3,7 +3,14 @@ import CoreData
 import UniformTypeIdentifiers
 
 struct LibraryView: View {
-    static let fileTypes: [UTType] = [.data]
+    static let romFileTypes: [UTType] = [
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gb"),
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gbc"),
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gba"),
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.nes"),
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes"),
+    ]
+    
     static let recentlyPlayedRequest = {
         let request = Game.fetchRequest()
         request.fetchLimit = 10
@@ -13,12 +20,13 @@ struct LibraryView: View {
     }()
     
     @Environment(\.managedObjectContext) private var viewContext
-    @State var searchQuery: String = ""
-    @State var isRomPickerOpen: Bool = false
-    @State var selectedGame: Game? = nil
-    @State var isSettingsOpen = false
-    
     @Environment(\.playGame) private var playGame
+    @State var searchQuery: String = ""
+    @State var selectedGame: Game? = nil
+    @State var isRomPickerOpen: Bool = false
+    @State var isSettingsOpen = false
+    @State var isUnknownSystemDialogShown = false
+    @State var isTargeted = false
     
     @FetchRequest(
         fetchRequest: Self.recentlyPlayedRequest,
@@ -64,6 +72,7 @@ struct LibraryView: View {
                     .menuIndicator(.hidden)
                     .fixedSize()
                 }.padding([.horizontal, .top])
+                
                 if games.count != 0 {
                     LazyVGrid(columns: [.init(.adaptive(minimum: 140.0, maximum: 240.0))]) {
                         ForEach(games) { item in
@@ -103,6 +112,14 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("Library")
+            .searchable(text: $searchQuery)
+            .fileImporter(isPresented: $isRomPickerOpen, allowedContentTypes: Self.romFileTypes, onCompletion: self.fileImported)
+            .alert(isPresented: $isUnknownSystemDialogShown, content: {
+                Alert(
+                    title: Text("Failed to add game"),
+                    message: Text("The game you tried to upload has an invalid file type and is not supported by Eclipse.")
+                )
+            })
             .toolbar {
                 ToolbarItem(placement: .navigation) {
                     Button {
@@ -126,15 +143,14 @@ struct LibraryView: View {
                     }
                 }
             }
-            .searchable(text: $searchQuery)
             .onChange(of: searchQuery) { newValue in
                 games.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS %@", newValue)
             }
-            .fileImporter(isPresented: $isRomPickerOpen, allowedContentTypes: Self.fileTypes, onCompletion: self.fileImported)
             .sheet(item: $selectedGame) { game in
-                NavigationStack {
-                    GameView(game: game)
-                }
+                GameView(game: game)
+                #if os(macOS)
+                    .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
+                #endif
             }
             .sheet(isPresented: $isSettingsOpen) {
                 SettingsView()
@@ -148,21 +164,25 @@ struct LibraryView: View {
     func fileImported(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            let fileName = url.lastPathComponent
-            guard let fileExtensionIndex = fileName.firstIndex(of: ".") else {
-                return
-            }
-            
-            let fileExtension = fileName[fileExtensionIndex...]
-            let system: GameSystem = switch fileExtension {
-            case ".gb": .gb
-            case ".gbc": .gbc
-            default: .unknown
+            let system = if
+                let resource = try? url.resourceValues(forKeys: [.contentTypeKey]),
+                let fileType = resource.contentType
+            {
+                GameSystem.from(fileType: fileType)
+            } else {
+                GameSystem.unknown
             }
             
             guard system != .unknown else {
-                print("invalid system")
+                self.isUnknownSystemDialogShown = true
                 return
+            }
+
+            let fileName = url.lastPathComponent
+            let name = if let fileExtensionIndex = fileName.firstIndex(of: ".") {
+                String(fileName.prefix(upTo: fileExtensionIndex))
+            } else {
+                fileName
             }
             
             Task {
@@ -171,6 +191,7 @@ struct LibraryView: View {
                         print("access denied")
                         return
                     }
+                    
                     defer { url.stopAccessingSecurityScopedResource() }
                     let bytes = try Data(contentsOf: url)
                     let md5Digest = try await MD5Hasher().hash(data: bytes)
@@ -179,16 +200,19 @@ struct LibraryView: View {
                     await MainActor.run {
                         withAnimation {
                             let newGame = Game(context: self.viewContext)
-                            newGame.name = String(fileName.prefix(upTo: fileExtensionIndex))
+                            newGame.name = name
                             newGame.system = system
-                            newGame.dateAdded = Date.now
                             newGame.md5 = md5
-                            
+                            newGame.rom = bytes
+                            newGame.save = nil
+                            newGame.coverArt = nil
+                            newGame.dateAdded = Date.now
+                            newGame.datePlayed = nil
+
                             do {
                                 try viewContext.save()
                             } catch {
-                                // Replace this implementation with code to handle the error appropriately.
-                                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                                // FIXME: Handle
                                 let nsError = error as NSError
                                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
                             }

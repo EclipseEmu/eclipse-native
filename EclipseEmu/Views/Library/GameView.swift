@@ -22,6 +22,7 @@ struct GameViewHeader: View {
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
                 }
+                .multilineTextAlignment(.center)
                 .padding(.vertical, 8.0)
                 
                 Button(action: self.play) {

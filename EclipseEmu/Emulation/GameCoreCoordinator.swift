@@ -28,7 +28,7 @@ class GameCoreCoordinator: NSObject, ObservableObject, GameCoreDelegate {
     private var audio: GameAudio
     
     private var renderer: GameRenderer
-    var renderingSurface: CAMetalLayer!
+    var renderingSurface: CAMetalLayer
 
     private let desiredFrameRate: Double
     private var frameDuration: Double

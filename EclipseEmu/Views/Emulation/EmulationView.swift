@@ -77,12 +77,14 @@ struct EmulationView: View {
         .onDisappear {
             self.menuModel.coreCoordinator.pause()
         }
-        .confirmationDialog("Are you sure you want to quit? Any unsaved progress will be lost.", isPresented: $menuModel.isQuitDialogShown) {
-            Button("Quit") {
+        .confirmationDialog("Quit Game", isPresented: $menuModel.isQuitDialogShown) {
+            Button("Quit", role: .destructive) {
                 Task {
                     await playGame.closeGame()
                 }
             }
+        } message: {
+            Text("Any unsaved progress will be lost.")
         }
     }
 }

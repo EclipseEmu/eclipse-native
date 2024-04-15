@@ -141,7 +141,11 @@ final class GameRenderer2D: GameRenderer {
         encoder.endEncoding()
 
         if useAdaptiveSync {
+            #if !targetEnvironment(simulator)
             commandBuffer.present(drawable, afterMinimumDuration: 1 / self.desiredFrameRate)
+            #else
+            commandBuffer.present(drawable)
+            #endif
         } else {
             commandBuffer.present(drawable)
         }

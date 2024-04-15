@@ -14,6 +14,7 @@ struct GameGridItem: View {
                     .aspectRatio(1.0, contentMode: .fit)
                 VStack(alignment: .leading) {
                     Text(game.name ?? "Unknown Game")
+                        .lineLimit(2)
                     Text(game.system.string)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
