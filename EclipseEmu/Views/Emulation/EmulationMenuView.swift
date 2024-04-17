@@ -42,11 +42,11 @@ struct EmulationMenuViewBar: View {
             
             HStack(spacing: 8.0) {
                 Button {
-                    withAnimation {
+                    Task(priority: .userInitiated) {
                         if model.coreCoordinator.isRunning {
-                            model.coreCoordinator.pause()
+                            await model.coreCoordinator.pause()
                         } else {
-                            model.coreCoordinator.play()
+                            await model.coreCoordinator.play()
                         }
                     }
                 } label: {

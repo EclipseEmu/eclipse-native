@@ -14,7 +14,7 @@ class EmulationViewModel: ObservableObject {
 
     init(core: GameCore) {
         self.coreCoordinator = try! GameCoreCoordinator(core: core)
-        anyCancellable = coreCoordinator.objectWillChange.sink { [weak self] (_) in
+        anyCancellable = coreCoordinator.objectWillChange.receive(on: RunLoop.main).sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
     }
@@ -63,19 +63,28 @@ struct EmulationView: View {
         .onChange(of: scenePhase) { newPhase in
             switch newPhase {
             case .active:
-                self.menuModel.coreCoordinator.play()
+                Task {
+                    await self.menuModel.coreCoordinator.play()
+                }
             default:
-                self.menuModel.coreCoordinator.pause()
+                Task {
+                    await self.menuModel.coreCoordinator.pause()
+                }
             }
         }
         .onAppear {
             focused = true
         }
+        .firstTask {
+            await self.menuModel.coreCoordinator.start(gameUrl: URL(string: "https://hi.com")!)
+        }
         .task {
-            self.menuModel.coreCoordinator.play()
+            await self.menuModel.coreCoordinator.play()
         }
         .onDisappear {
-            self.menuModel.coreCoordinator.pause()
+            Task {
+                await self.menuModel.coreCoordinator.pause()
+            }
         }
         .confirmationDialog("Quit Game", isPresented: $menuModel.isQuitDialogShown) {
             Button("Quit", role: .destructive) {

@@ -9,7 +9,7 @@ public enum GameCoreRenderFormat: UInt8 {
 
 @objc(ECGameCoreDelegate)
 public protocol GameCoreDelegate {
-    func coreRenderAudio(samples: UnsafeRawPointer, size: Int) -> Void
+    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: Int) -> Bool
     func coreDidSave(at path: URL) -> Void
 }
 

@@ -8,7 +8,7 @@ struct EclipseEmuApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if playGameAction.game != nil {
+            if let game = playGameAction.game {
                 EmulationView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)

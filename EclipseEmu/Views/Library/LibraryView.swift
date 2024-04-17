@@ -164,35 +164,42 @@ struct LibraryView: View {
     func fileImported(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            let system = if
-                let resource = try? url.resourceValues(forKeys: [.contentTypeKey]),
-                let fileType = resource.contentType
-            {
-                GameSystem.from(fileType: fileType)
-            } else {
-                GameSystem.unknown
-            }
-            
-            guard system != .unknown else {
-                self.isUnknownSystemDialogShown = true
-                return
-            }
-
-            let fileName = url.lastPathComponent
-            let name = if let fileExtensionIndex = fileName.firstIndex(of: ".") {
-                String(fileName.prefix(upTo: fileExtensionIndex))
-            } else {
-                fileName
-            }
-            
             Task {
                 do {
                     guard url.startAccessingSecurityScopedResource() else {
                         print("access denied")
                         return
                     }
-                    
                     defer { url.stopAccessingSecurityScopedResource() }
+
+
+                    var resource: URLResourceValues?
+                    do {
+                        resource = try url.resourceValues(forKeys: [.contentTypeKey])
+                    } catch {
+                        print(error)
+                    }
+                    let fileType = resource?.contentType
+                    
+                    let system = if let fileType {
+                        GameSystem.from(fileType: fileType)
+                    } else {
+                        GameSystem.unknown
+                    }
+                    
+                    
+                    guard system != .unknown else {
+                        self.isUnknownSystemDialogShown = true
+                        return
+                    }
+
+                    let fileName = url.lastPathComponent
+                    let name = if let fileExtensionIndex = fileName.firstIndex(of: ".") {
+                        String(fileName.prefix(upTo: fileExtensionIndex))
+                    } else {
+                        fileName
+                    }
+
                     let bytes = try Data(contentsOf: url)
                     let md5Digest = try await MD5Hasher().hash(data: bytes)
                     let md5 = MD5Hasher.stringFromDigest(digest: md5Digest)

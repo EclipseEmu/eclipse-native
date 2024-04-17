@@ -71,7 +71,7 @@ class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
             break
         }
         
-        self.audio = GameAudio(core: core)
+        self.audio = try GameAudio(core: core)
         self.core.delegate = self
     }
     
@@ -81,32 +81,33 @@ class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
         core.takedown()
     }
     
-    func setupGameRendering() throws {}
-    
-    func start(gameUrl: URL) {
-        guard self.core.start(url: gameUrl) else {
-            print("failed to start game, L")
-            return
-        }
-        self.play()
+    func start(gameUrl: URL) async {
+        guard self.core.start(url: gameUrl) else { return }
+        await self.audio.start()
+        await self.play()
     }
     
-    func stop() {
-        self.pause()
+    func stop() async {
+        await self.pause()
         self.core.stop()
         self.stopListeningForInputs()
+        await self.audio.stop()
     }
     
-    func play() {
+    func play() async {
+        guard !self.isRunning else { return }
         self.startListeningForInputs()
         self.core.play()
         self.startFrameTimer()
+        await self.audio.resume()
         self.isRunning = true
     }
     
-    func pause() {
+    func pause() async {
+        guard self.isRunning else { return }
         self.core.pause()
         self.stopListeningForInputs()
+        await self.audio.pause()
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
         self.isRunning = false
@@ -118,8 +119,8 @@ class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
     
     // MARK: Core Delegate methods
     
-    func coreRenderAudio(samples: UnsafeRawPointer, size: Int) {
-        print(samples, size)
+    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: Int) -> Bool {
+        return self.audio.write(samples: samples, count: byteSize)
     }
     
     func coreDidSave(at path: URL) {

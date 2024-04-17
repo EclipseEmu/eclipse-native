@@ -10,9 +10,12 @@ final class DummyCore: GameCore {
     static var id: String = "dev.magnetar.dummycore"
     static var name: String = "Dummy Core"
     
+    var audioSampleBuffer: UnsafeMutableBufferPointer<Int16>!
     var videoBuffer: UnsafeRawPointer!
     
-    func setup() {}
+    func setup() {
+        audioSampleBuffer = .allocate(capacity: 4096)
+    }
     
     func takedown() {}
     
@@ -37,7 +40,7 @@ final class DummyCore: GameCore {
     }
     
     func canSetVideoBufferPointer() -> Bool {
-        true
+        return true
     }
 
     func getVideoBuffer(setPointer: UnsafeRawPointer?) -> UnsafeRawPointer {
@@ -46,9 +49,9 @@ final class DummyCore: GameCore {
     }
     
     func getAudioFormat() -> AVAudioFormat? {
-        return AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 32700, channels: 2, interleaved: true)
+        return AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 44100.0, channels: 2, interleaved: true)
     }
-    
+
     // MARK: Emulation lifecycle
     
     func start(url: URL) -> Bool {
@@ -64,20 +67,27 @@ final class DummyCore: GameCore {
     func restart() {}
     
     func executeFrame(processVideo: Bool) {
+        for i in stride(from: 0, to: audioSampleBuffer.count, by: 2) {
+            let value = Int16.random(in: Int16.min...Int16.max)
+            audioSampleBuffer[i + 0] = value
+            audioSampleBuffer[i + 1] = value
+        }
+        
+        if let ptr = audioSampleBuffer.baseAddress {
+            let _ = self.delegate.coreRenderAudio(samples: ptr, byteSize: self.audioSampleBuffer.count * MemoryLayout<Int16>.stride)
+        }
+        
         guard processVideo else { return }
         
-        var i = 0
         let count = self.getVideoWidth() * self.getVideoHeight() * self.getVideoPixelFormat().bytesPerPixel
         
         let out = UnsafeMutableRawBufferPointer(start: UnsafeMutableRawPointer(mutating: self.videoBuffer), count: count)
         
-        while i < count {
+        for i in stride(from: 0, to: count, by: 4) {
             let color: UInt8 = Bool.random() ? 255 : 0
             out[i + 0] = color
             out[i + 1] = color
             out[i + 2] = color
-            
-            i += 4
         }
     }
     

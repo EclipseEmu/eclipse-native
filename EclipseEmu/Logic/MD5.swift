@@ -193,7 +193,7 @@ struct MD5Hasher: ~Copyable {
         buffer[3] &+= d
     }
 
-    @inline(__always)
+    @inlinable
     mutating func readByte(byte: UInt8) {
         size += 1
         inputBytes[Int(offset)] = byte

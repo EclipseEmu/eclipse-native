@@ -27,11 +27,15 @@
 		923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */; };
 		923E38042BC9C3FA00ECC973 /* GameRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38032BC9C3FA00ECC973 /* GameRenderer.swift */; };
 		923E38072BC9E0F200ECC973 /* DummyCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38062BC9E0F200ECC973 /* DummyCore.swift */; };
+		924B2DE52BD00A3D0052D217 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 924B2DE42BD00A3D0052D217 /* Atomics */; };
 		925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EA2BC9E90F00AD7257 /* GameScreen.swift */; };
 		925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */; };
 		925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */; };
 		9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */; };
 		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
+		9281CCAE2BCDC4F300E4FE48 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAD2BCDC4F300E4FE48 /* RingBuffer.swift */; };
+		9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */; };
+		9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */; };
 		928237072BCB77B5001E27B3 /* View+modify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+modify.swift */; };
 		92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+version.swift */; };
 		92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */; };
@@ -103,6 +107,9 @@
 		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+bytesPerPixel.swift"; sourceTree = "<group>"; };
 		9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAudio.swift; sourceTree = "<group>"; };
 		9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewView.swift; sourceTree = "<group>"; };
+		9281CCAD2BCDC4F300E4FE48 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
+		9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioCommonFormat+bytesPerSample.swift"; sourceTree = "<group>"; };
+		9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+onFirstAppear.swift"; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		928237062BCB77B5001E27B3 /* View+modify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+modify.swift"; sourceTree = "<group>"; };
 		92875E9A2BCADDB900EABD63 /* Bundle+version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+version.swift"; sourceTree = "<group>"; };
@@ -135,6 +142,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9227F5452BCB49EE00A29074 /* EclipseKit in Frameworks */,
+				924B2DE52BD00A3D0052D217 /* Atomics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,10 +272,12 @@
 		925B14EC2BCA487400AD7257 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */,
 				925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */,
-				925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */,
 				92875E9A2BCADDB900EABD63 /* Bundle+version.swift */,
+				925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */,
 				928237062BCB77B5001E27B3 /* View+modify.swift */,
+				9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -333,6 +343,7 @@
 			isa = PBXGroup;
 			children = (
 				923E37FA2BC98D8000ECC973 /* FrameBuffer.swift */,
+				9281CCAD2BCDC4F300E4FE48 /* RingBuffer.swift */,
 				923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */,
 				923E38032BC9C3FA00ECC973 /* GameRenderer.swift */,
 				923E37FC2BC9AE0D00ECC973 /* GameRenderer2D.swift */,
@@ -392,6 +403,7 @@
 			name = EclipseEmu;
 			packageProductDependencies = (
 				9227F5442BCB49EE00A29074 /* EclipseKit */,
+				924B2DE42BD00A3D0052D217 /* Atomics */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
@@ -466,6 +478,7 @@
 			);
 			mainGroup = 922F00982BC0C26600B419D7;
 			packageReferences = (
+				924B2DE32BD00A120052D217 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -514,7 +527,9 @@
 				92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */,
 				923E38042BC9C3FA00ECC973 /* GameRenderer.swift in Sources */,
 				92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */,
+				9281CCAE2BCDC4F300E4FE48 /* RingBuffer.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
+				9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
 				923E38072BC9E0F200ECC973 /* DummyCore.swift in Sources */,
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
@@ -541,6 +556,7 @@
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
 				9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */,
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
+				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */,
 				925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */,
 				92D5D7312BC17C2800659C37 /* CloseButton.swift in Sources */,
 				923E37FD2BC9AE0D00ECC973 /* GameRenderer2D.swift in Sources */,
@@ -921,10 +937,26 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		924B2DE32BD00A120052D217 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		9227F5442BCB49EE00A29074 /* EclipseKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EclipseKit;
+		};
+		924B2DE42BD00A3D0052D217 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 924B2DE32BD00A120052D217 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
 		};
 /* End XCSwiftPackageProductDependency section */
 
