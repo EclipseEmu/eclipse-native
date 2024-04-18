@@ -2,18 +2,21 @@ import Foundation
 import EclipseKit
 
 class GameCoreRegistry {
-    static let shared = GameCoreRegistry()
-    private var registered = [GameSystem:GameCore]()
     var allCores = [GameCore]()
-    
-    func get(for system: GameSystem) -> GameCore? {
-        self.registered[system]
+    private var systemToCore = [GameSystem:Int]()
+
+    init(cores: [GameCore]) {
+        self.allCores = cores
     }
     
-    func register<T: GameCore>(core: T, for system: GameSystem) -> Void {
-        self.registered[system] = core
-        if !self.allCores.contains(where: { type(of: $0).id == T.id }) {
-            self.allCores.append(core)
-        }
+    func get(for game: Game) -> GameCore? {
+        // NOTE: in the future this should also look at the game's settings to resolve the core to use.
+        guard let index = self.systemToCore[game.system] else { return nil }
+        return self.allCores[index]
+    }
+    
+    func registerDefaults(id: String, for system: GameSystem) -> Void {
+        guard let index = self.allCores.firstIndex(where: { $0.id == id }) else { return }
+        self.systemToCore[system] = index
     }
 }

@@ -35,10 +35,10 @@ class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
     private(set) var rate: Double = 1.0
     private var frameTimerTask: Task<Void, Never>?
     
-    init(core: GameCore) throws {
+    init(core: GameCore, system: GameSystem) throws {
         self.core = core
 
-        core.setup()
+        core.setup(system: system)
         
         self.desiredFrameRate = core.getDesiredFrameRate()
         self.frameDuration = 1.0 / desiredFrameRate
@@ -92,6 +92,20 @@ class GameCoreCoordinator: ObservableObject, GameCoreDelegate {
         self.core.stop()
         self.stopListeningForInputs()
         await self.audio.stop()
+    }
+    
+    func restart() async {
+        if self.isRunning {
+            await self.audio.pause()
+            self.frameTimerTask?.cancel()
+            self.frameTimerTask = nil
+        }
+        self.stopListeningForInputs()
+        self.core.restart()
+        self.startListeningForInputs()
+        self.startFrameTimer()
+        await self.audio.resume()
+        self.isRunning = true
     }
     
     func play() async {

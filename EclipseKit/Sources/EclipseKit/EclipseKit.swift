@@ -13,15 +13,44 @@ public protocol GameCoreDelegate {
     func coreDidSave(at path: URL) -> Void
 }
 
+
+@objc(ECGameSystem)
+public enum GameSystem: Int16 {
+    case unknown = 0
+    case gb = 1
+    case gbc = 2
+    case gba = 3
+    case nes = 4
+    case snes = 5
+    
+    public var string: String {
+        return switch self {
+        case .unknown:
+            "Unknown System"
+        case .gb:
+            "Game Boy"
+        case .gbc:
+            "Game Boy Color"
+        case .gba:
+            "Game Boy Advance"
+        case .nes:
+            "Nintendo Entertainment System"
+        case .snes:
+            "Super Nintendo Entertainment System"
+        }
+    }
+}
+
+/// You should not do any allocations or setup in the init block. None of the functions will be called until after setup is done.
 @objc(ECGameCore)
 public protocol GameCore {
-    static var id: String { get }
-    static var name: String { get }
+    var id: String { get }
+    var name: String { get }
     
     var delegate: GameCoreDelegate! { get set }
     
     /// Initialize basic info of the game
-    func setup() -> Void
+    func setup(system: GameSystem) -> Void
     /// Emulation is about to stop completely, handle any deallocations and other things here.
     func takedown() -> Void
 

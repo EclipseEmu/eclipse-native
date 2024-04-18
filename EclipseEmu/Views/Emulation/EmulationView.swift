@@ -12,8 +12,8 @@ class EmulationViewModel: ObservableObject {
     
     private var anyCancellable: AnyCancellable? = nil
 
-    init(core: GameCore) {
-        self.coreCoordinator = try! GameCoreCoordinator(core: core)
+    init(core: GameCore, game: Game) {
+        self.coreCoordinator = try! GameCoreCoordinator(core: core, system: game.system)
         anyCancellable = coreCoordinator.objectWillChange.receive(on: RunLoop.main).sink { [weak self] (_) in
             self?.objectWillChange.send()
         }
@@ -24,7 +24,11 @@ struct EmulationView: View {
     @FocusState var focused: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.playGame) var playGame
-    @StateObject var menuModel = EmulationViewModel(core: DummyCore())
+    @StateObject var menuModel: EmulationViewModel
+    
+    init(game: Game, core: GameCore) {
+        self._menuModel = StateObject(wrappedValue: EmulationViewModel(core: core, game: game))
+    }
     
     var body: some View {
         ZStack {
@@ -96,8 +100,4 @@ struct EmulationView: View {
             Text("Any unsaved progress will be lost.")
         }
     }
-}
-
-#Preview {
-    EmulationView()
 }

@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import UniformTypeIdentifiers
+import EclipseKit
 
 struct LibraryView: View {
     static let romFileTypes: [UTType] = [

@@ -1,6 +1,6 @@
 import Foundation
 import CoreData
-
+import EclipseKit
 
 extension Game {
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Game> {

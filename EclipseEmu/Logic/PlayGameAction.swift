@@ -1,19 +1,31 @@
-import Foundation
 import SwiftUI
+import EclipseKit
 
 final class PlayGameAction: ObservableObject {
-    @Published var game: Game?
+    @Published var context: EmulationContext?
+    
+    struct EmulationContext {
+        var core: GameCore
+        var game: Game
+    }
+    
+    enum Failure: Error {
+        case missingCore
+    }
     
     @MainActor
     public func callAsFunction(game: Game) async throws {
-        await MainActor.run {
-            self.game = game
+        try await MainActor.run {
+            guard let core = EclipseEmuApp.cores.get(for: game) else {
+                throw Failure.missingCore
+            }
+            self.context = EmulationContext(core: core, game: game)
         }
     }
     
     public func closeGame() async {
         await MainActor.run {
-            self.game = nil
+            self.context = nil
         }
     }
 }

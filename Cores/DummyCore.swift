@@ -7,13 +7,13 @@ import AVFoundation
 final class DummyCore: GameCore {
     var delegate: GameCoreDelegate!
     
-    static var id: String = "dev.magnetar.dummycore"
-    static var name: String = "Dummy Core"
+    var id: String = "dev.magnetar.dummycore"
+    var name: String = "Dummy Core"
     
     var audioSampleBuffer: UnsafeMutableBufferPointer<Int16>!
     var videoBuffer: UnsafeRawPointer!
     
-    func setup() {
+    func setup(system: GameSystem) {
         audioSampleBuffer = .allocate(capacity: 4096)
     }
     
