@@ -1,7 +1,6 @@
 import Foundation
 import EclipseKit
 
-// FIXME: this doesn't really reflect the way GCExtendedGamepad works
 struct GamepadBinding {
     var kind: Kind
     var id: String
