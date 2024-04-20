@@ -19,6 +19,10 @@ final class DummyCore: GameCore {
     
     func takedown() {}
     
+    func getMaxPlayers() -> UInt8 {
+        return 2
+    }
+    
     func getDesiredFrameRate() -> Double {
         return 30.0
     }
@@ -74,7 +78,7 @@ final class DummyCore: GameCore {
         }
         
         if let ptr = audioSampleBuffer.baseAddress {
-            let _ = self.delegate.coreRenderAudio(samples: ptr, byteSize: self.audioSampleBuffer.count * MemoryLayout<Int16>.stride)
+            let _ = self.delegate.coreRenderAudio(samples: ptr, byteSize: UInt64(self.audioSampleBuffer.count * MemoryLayout<Int16>.stride))
         }
         
         guard processVideo else { return }
@@ -103,11 +107,11 @@ final class DummyCore: GameCore {
     
     // MARK: Controls
     
-    func playerConnected() -> Int {
-        return 0
+    func playerConnected(player: UInt8) -> Bool {
+        return true
     }
     
-    func playerDisconnected(player: Int) {}
+    func playerDisconnected(player: UInt8) {}
     
-    func playerSetInputs(player: Int, value: UInt32) {}
+    func playerSetInputs(player: UInt8, value: UInt32) {}
 }

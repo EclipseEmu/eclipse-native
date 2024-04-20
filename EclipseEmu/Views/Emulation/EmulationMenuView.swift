@@ -9,7 +9,9 @@ struct EmulationMenuView: View {
         NavigationStack {
             ScrollView {
                 Button("Fast Foward") {
-                    model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
+                    Task {
+                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -43,7 +45,7 @@ struct EmulationMenuViewBar: View {
             HStack(spacing: 8.0) {
                 Button {
                     Task(priority: .userInitiated) {
-                        if model.coreCoordinator.isRunning {
+                        if await model.coreCoordinator.isRunning {
                             await model.coreCoordinator.pause()
                         } else {
                             await model.coreCoordinator.play()

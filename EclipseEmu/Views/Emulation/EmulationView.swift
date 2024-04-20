@@ -4,42 +4,52 @@ import Combine
 import EclipseKit
 
 class EmulationViewModel: ObservableObject {
-    @Published var coreCoordinator: GameCoreCoordinator
+    var coreCoordinator: GameCoreCoordinator
+    var game: Game
+    
+    @Published var width: CGFloat = 0.0
+    @Published var height: CGFloat = 0.0
+    
     @Published var isMenuVisible = false
     @Published var isQuitDialogShown = false
     @Published var isRestartDialogShown = false
     @Published var volume: Float = 0.0
     
-    private var anyCancellable: AnyCancellable? = nil
-
     init(core: GameCore, game: Game) {
+        self.game = game
         self.coreCoordinator = try! GameCoreCoordinator(core: core, system: game.system)
-        anyCancellable = coreCoordinator.objectWillChange.receive(on: RunLoop.main).sink { [weak self] (_) in
-            self?.objectWillChange.send()
-        }
     }
 }
 
-struct EmulationView: View {
+fileprivate struct ReorderingControllersRequest: Identifiable {
+    var id = UUID()
+    var maxPlayers: UInt8
+    var players: [GameInputCoordinator.Player]
+    var finish: ([GameInputCoordinator.Player]) -> Void
+}
+
+struct EmulationView: View, GameInputCoordinatorDelegate {
     @FocusState var focused: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.playGame) var playGame
-    @StateObject var menuModel: EmulationViewModel
+    @StateObject var model: EmulationViewModel
+    @State fileprivate var reorderingControllersRequest: ReorderingControllersRequest?
+    
     
     init(game: Game, core: GameCore) {
-        self._menuModel = StateObject(wrappedValue: EmulationViewModel(core: core, game: game))
+        self._model = StateObject(wrappedValue: EmulationViewModel(core: core, game: game))
     }
     
     var body: some View {
         ZStack {
-            EmulationGameScreen(emulation: menuModel.coreCoordinator)
+            EmulationGameScreen(emulation: model.coreCoordinator)
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                .aspectRatio(menuModel.coreCoordinator.width / menuModel.coreCoordinator.height, contentMode: .fit)
+                .aspectRatio(model.width / model.height, contentMode: .fit)
             
             #if canImport(UIKit)
             TouchControlsView($menuModel.isMenuVisible, coreCoordinator: menuModel.coreCoordinator).opacity(0.6)
             #elseif os(macOS)
-            EmulationMenuViewBar(model: menuModel)
+            EmulationMenuViewBar(model: model)
             #endif
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -60,7 +70,7 @@ struct EmulationView: View {
         #else
         .onHover { state in
             withAnimation {
-                self.menuModel.isMenuVisible = state
+                self.model.isMenuVisible = state
             }
         }
         #endif
@@ -68,11 +78,11 @@ struct EmulationView: View {
             switch newPhase {
             case .active:
                 Task {
-                    await self.menuModel.coreCoordinator.play()
+                    await self.model.coreCoordinator.play()
                 }
             default:
                 Task {
-                    await self.menuModel.coreCoordinator.pause()
+                    await self.model.coreCoordinator.pause()
                 }
             }
         }
@@ -80,17 +90,22 @@ struct EmulationView: View {
             focused = true
         }
         .firstTask {
-            await self.menuModel.coreCoordinator.start(gameUrl: URL(string: "https://hi.com")!)
+            guard let romPath = self.model.game.romPath else {
+                return
+            }
+            await self.model.coreCoordinator.start(gameUrl: romPath)
+            self.model.width = await self.model.coreCoordinator.width
+            self.model.height = await self.model.coreCoordinator.height
         }
         .task {
-            await self.menuModel.coreCoordinator.play()
+            await self.model.coreCoordinator.play()
         }
         .onDisappear {
             Task {
-                await self.menuModel.coreCoordinator.pause()
+                await self.model.coreCoordinator.pause()
             }
         }
-        .confirmationDialog("Quit Game", isPresented: $menuModel.isQuitDialogShown) {
+        .confirmationDialog("Quit Game", isPresented: $model.isQuitDialogShown) {
             Button("Quit", role: .destructive) {
                 Task {
                     await playGame.closeGame()
@@ -99,5 +114,29 @@ struct EmulationView: View {
         } message: {
             Text("Any unsaved progress will be lost.")
         }
+        .sheet(item: $reorderingControllersRequest) {
+            if let request = self.reorderingControllersRequest {
+                request.finish(request.players)
+            }
+        } content: { request in
+            ScrollView {
+                ForEach(request.players) { player in
+                    Text(player.displayName)
+                }
+            }
+        }
+    }
+    
+    func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
+        await self.model.coreCoordinator.pause()
+        
+        // TODO: present UI and await for it to close to handle the reordering of the players
+        players = await withCheckedContinuation { continuation in
+            self.reorderingControllersRequest = .init(maxPlayers: maxPlayers, players: players, finish: { newPlayers in
+                continuation.resume(returning: newPlayers)
+            })
+        }
+        
+        await self.model.coreCoordinator.play()
     }
 }

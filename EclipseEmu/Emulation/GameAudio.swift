@@ -8,18 +8,19 @@ actor GameAudio {
     enum Failure: Error {
         case failedToGetAudioFormat
         case unknownSampleFormat
+        case failedToInitializeRingBuffer
     }
     
-    // SAFTEY: the ring buffer itself is thread-safe
-    nonisolated(unsafe) var ringBuffer: RingBuffer
-    weak var core: GameCore?
     let audio = AVAudioEngine()
-    var sourceNode: AVAudioSourceNode?
-    let inputFormat: AVAudioFormat
-    var outputFormat: AVAudioFormat
-    var sampleRateRatio: Int
     var running = false
-
+    
+    private nonisolated(unsafe) var ringBuffer: OpaquePointer
+    private var sourceNode: AVAudioSourceNode?
+    private let inputFormat: AVAudioFormat
+    private var outputFormat: AVAudioFormat
+    private var sampleRateRatio: Int
+    private var hardwareObserver: Any?
+    
     @usableFromInline
     var volume: Float {
         get {
@@ -30,30 +31,39 @@ actor GameAudio {
         }
     }
     
-    public init(core: GameCore) throws {
-        self.core = core
-        guard let format = core.getAudioFormat() else { throw Failure.failedToGetAudioFormat }
+    public init(format: AVAudioFormat?) throws {
+        guard let format else { throw Failure.failedToGetAudioFormat }
         
         let bytesPerSample = format.commonFormat.bytesPerSample
         guard bytesPerSample != -1 else { throw Failure.unknownSampleFormat }
         
         let ringBufferSize = Int(format.sampleRate * Double(format.channelCount * 2))
         self.inputFormat = format
+        
+        guard let ringBuffer = ring_buffer_init(UInt64(ringBufferSize)) else {
+            throw Failure.failedToInitializeRingBuffer
+        }
+        self.ringBuffer = ringBuffer
+        
         self.outputFormat = self.audio.outputNode.outputFormat(forBus: 0)
-        self.ringBuffer = RingBuffer(capacity: ringBufferSize, alignment: bytesPerSample)
         self.sampleRateRatio = Int((inputFormat.sampleRate / outputFormat.sampleRate).rounded(.up))
     }
     
     deinit {
         Task {
             await self.stop()
+            await self.removeListeners()
         }
     }
     
     func start() {
-        var lastAvailableRead: Int = -1
-        let sourceNode = AVAudioSourceNode(format: self.inputFormat) { [inputFormat, ringBuffer, sampleRateRatio] isSilence, timestamp, frameCount, audioBufferList in
-            defer { lastAvailableRead = ringBuffer.availableRead() }
+        if !self.running {
+            self.addListeners()
+        }
+        
+        var lastAvailableRead: UInt64? = nil
+        let sourceNode = AVAudioSourceNode(format: self.inputFormat) { [inputFormat, sampleRateRatio] isSilence, timestamp, frameCount, audioBufferList in
+            defer { lastAvailableRead = ring_buffer_available_read(self.ringBuffer) }
             
             let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
             guard let buffer = buffers[0].mData else {
@@ -61,16 +71,22 @@ actor GameAudio {
             }
             
             let requested = Int(frameCount * inputFormat.streamDescription.pointee.mBytesPerFrame)
-            let availableRead = ringBuffer.availableRead()
-            guard availableRead >= requested * sampleRateRatio && availableRead >= lastAvailableRead && availableRead >= requested else {
+            let availableRead = ring_buffer_available_read(self.ringBuffer)
+            guard 
+                availableRead >= requested * sampleRateRatio,
+                availableRead >= requested,
+                let lastAvailableRead,
+                availableRead >= lastAvailableRead
+            else {
                 return kAudioFileStreamError_DataUnavailable
             }
             
-            guard ringBuffer.read(into: UnsafeMutableRawBufferPointer(start: buffer, count: requested)) else {
+            let amountRead = ring_buffer_read(self.ringBuffer, buffer, UInt64(requested));
+            guard amountRead != 0 else {
                 return kAudioFileStreamError_DataUnavailable
             }
             
-            buffers[0].mDataByteSize = UInt32(requested)
+            buffers[0].mDataByteSize = UInt32(amountRead)
             return noErr
         }
         
@@ -86,23 +102,72 @@ actor GameAudio {
             self.audio.detach(sourceNode)
         }
         self.sourceNode = nil
+        self.running = false
     }
 
     func pause() {
         self.audio.pause()
+        self.running = false
     }
     
     func resume() {
         do {
             let _ = self.audio.mainMixerNode
             try self.audio.start()
+            self.running = true
         } catch {
             print("failed to start audio", error)
         }
     }
     
+    func addListeners() {
+        self.hardwareObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: self.audio, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            Task {
+                await self.handleHardwareChange()
+            }
+        }
+    }
+    
+    func removeListeners() {
+        guard let observer = self.hardwareObserver else { return }
+        NotificationCenter.default.removeObserver(observer)
+    }
+    
+    func handleHardwareChange() {
+        self.stop()
+        
+        self.outputFormat = self.audio.outputNode.outputFormat(forBus: 0)
+        self.sampleRateRatio = Int((self.inputFormat.sampleRate / self.outputFormat.sampleRate).rounded(.up))
+        
+        self.start()
+        self.audio.prepare()
+        if self.running && !self.audio.isRunning {
+            self.resume()
+        }
+    }
+    
+    func clear() -> Void {
+        ring_buffer_clear(self.ringBuffer)
+    }
+    
+    #if os(iOS)
+    nonisolated func setRequireRinger(requireRinger: Bool) -> Void {
+        do {
+            if requireRinger {
+                try AVAudioSession.sharedInstance().setCategory(.playback)
+            } else {
+                try AVAudioSession.sharedInstance().setCategory(.ambient)
+            }
+        } catch {
+            print("failed to set audio category", error)
+        }
+    }
+    #endif
+
+    /// NOTE: this
     @inlinable
-    nonisolated func write(samples: UnsafeRawPointer, count: Int) -> Bool {
-        return self.ringBuffer.write(from: UnsafeRawBufferPointer(start: samples, count: count))
+    nonisolated func write(samples: UnsafeRawPointer, count: UInt64) -> UInt64 {
+        return ring_buffer_write(self.ringBuffer, samples, UInt64(count))
     }
 }

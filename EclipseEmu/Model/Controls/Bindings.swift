@@ -2,6 +2,8 @@ import Foundation
 import GameController
 import EclipseKit
 
+typealias KeyboardBindings = [GCKeyCode:GameInput]
+
 struct ControllerBindings {
     var id: UUID
     var system: GameSystem
@@ -12,6 +14,6 @@ struct ControllerBindings {
     enum Bindings {
         case touch(TouchLayout)
         case gamepad([GamepadBinding])
-        case keyboard([GCKeyCode:GameInput])
+        case keyboard(KeyboardBindings)
     }
 }

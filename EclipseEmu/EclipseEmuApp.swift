@@ -28,6 +28,9 @@ struct EclipseEmuApp: App {
                 LibraryView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)
+                    .onAppear {
+                        print("page size", getpagesize())
+                    }
             }
         }
     }

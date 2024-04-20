@@ -1,9 +1,10 @@
 import Foundation
 import EclipseKit
 
+// FIXME: this doesn't really reflect the way GCExtendedGamepad works
 struct GamepadBinding {
     var kind: Kind
-    var index: UInt32
+    var id: String
     var direction: Direction
     var deadZone: Float32
     var input: GameInput

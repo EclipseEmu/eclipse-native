@@ -211,9 +211,9 @@ struct LibraryView: View {
                             newGame.name = name
                             newGame.system = system
                             newGame.md5 = md5
-                            newGame.rom = bytes
-                            newGame.save = nil
-                            newGame.coverArt = nil
+                            newGame.romPath = url
+                            newGame.savePath = nil
+                            newGame.coverArtPath = nil
                             newGame.dateAdded = Date.now
                             newGame.datePlayed = nil
 

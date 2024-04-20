@@ -11,13 +11,13 @@
         <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Game" inverseName="collections" inverseEntity="Game"/>
     </entity>
     <entity name="Game" representedClassName="Game" syncable="YES">
-        <attribute name="coverArt" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="coverArtPath" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="datePlayed" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="md5" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rom" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="save" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="romPath" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="savePath" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="system" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Cheat" inverseName="game" inverseEntity="Cheat"/>
         <relationship name="collections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Collection" inverseName="games" inverseEntity="Collection"/>
@@ -25,8 +25,9 @@
     </entity>
     <entity name="SaveStates" representedClassName="SaveStates" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="file" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="path" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="previewPath" optional="YES" attributeType="URI"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="saveStates" inverseEntity="Game"/>
     </entity>
 </model>

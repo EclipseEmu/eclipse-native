@@ -9,10 +9,9 @@ public enum GameCoreRenderFormat: UInt8 {
 
 @objc(ECGameCoreDelegate)
 public protocol GameCoreDelegate {
-    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: Int) -> Bool
+    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: UInt64) -> UInt64
     func coreDidSave(at path: URL) -> Void
 }
-
 
 @objc(ECGameSystem)
 public enum GameSystem: Int16 {
@@ -39,70 +38,6 @@ public enum GameSystem: Int16 {
             "Super Nintendo Entertainment System"
         }
     }
-}
-
-/// You should not do any allocations or setup in the init block. None of the functions will be called until after setup is done.
-@objc(ECGameCore)
-public protocol GameCore {
-    var id: String { get }
-    var name: String { get }
-    
-    var delegate: GameCoreDelegate! { get set }
-    
-    /// Initialize basic info of the game
-    func setup(system: GameSystem) -> Void
-    /// Emulation is about to stop completely, handle any deallocations and other things here.
-    func takedown() -> Void
-
-    func getDesiredFrameRate() -> Double
-
-    // MARK: Video
-
-    func getVideoPixelFormat() -> MTLPixelFormat
-    func getVideoRenderingType() -> GameCoreRenderFormat
-    func getVideoWidth() -> Int
-    func getVideoHeight() -> Int
-    func canSetVideoBufferPointer() -> Bool
-    /// Get a pointer to the video buffer. Ideally you'd use the pointer given by `setPointer` as the video buffer. If you cannot, return false in the `canSetVideoBufferPointer` method.
-    func getVideoBuffer(setPointer: UnsafeRawPointer?) -> UnsafeRawPointer
-
-    // MARK: Audio
-
-    func getAudioFormat() -> AVAudioFormat?
-
-    // MARK: General lifecycle
-
-    /// Starts the game at the specified path
-    func start(url: URL) -> Bool
-    
-    /// Stops emulation
-    func stop() -> Void
-    
-    /// Resumes playback of the game
-    func play() -> Void
-    
-    /// Pauses playback of the game
-    func pause() -> Void
-    
-    /// Restarts the game
-    func restart() -> Void
-
-    /// Emulates a single frame, optionally handling any additional video processing required to render the frame
-    func executeFrame(processVideo: Bool) -> Void
-    
-    // MARK: Save States
-    
-    func saveState(url: URL) -> Bool
-    func loadState(url: URL) -> Bool
-    
-    // MARK: Controls
-    
-    /// Notifies that a new player has connected
-    func playerConnected() -> Int
-    /// Notifies that a player has disconnected
-    func playerDisconnected(player: Int)
-    /// Sets the inputs for a player
-    func playerSetInputs(player: Int, value: UInt32)
 }
 
 @objc(ECGameInput)
@@ -200,4 +135,69 @@ public enum GameInput: UInt32, RawRepresentable {
         "Mic"
     }
     }
+}
+
+/// You should not do any allocations or setup in the init block. None of the functions will be called until after `setup` is called.
+@objc(ECGameCore)
+public protocol GameCore {
+    var id: String { get }
+    var name: String { get }
+    
+    var delegate: GameCoreDelegate! { get set }
+    
+    /// Initialize basic info for the system, and perform any known-sized allocations here.
+    func setup(system: GameSystem) -> Void
+    /// Emulation is about to stop completely, handle any deallocations and other things here.
+    func takedown() -> Void
+    
+    func getMaxPlayers() -> UInt8
+    func getDesiredFrameRate() -> Double
+
+    // MARK: Video
+
+    func getVideoPixelFormat() -> MTLPixelFormat
+    func getVideoRenderingType() -> GameCoreRenderFormat
+    func getVideoWidth() -> Int
+    func getVideoHeight() -> Int
+    func canSetVideoBufferPointer() -> Bool
+    /// Get a pointer to the video buffer. Ideally you'd use the pointer given by `setPointer` as the video buffer. If you cannot, return false in the `canSetVideoBufferPointer` method.
+    func getVideoBuffer(setPointer: UnsafeRawPointer?) -> UnsafeRawPointer
+
+    // MARK: Audio
+
+    func getAudioFormat() -> AVAudioFormat?
+
+    // MARK: General lifecycle
+
+    /// Starts the game at the specified path
+    func start(url: URL) -> Bool
+    
+    /// Stops emulation
+    func stop() -> Void
+    
+    /// Resumes playback of the game
+    func play() -> Void
+    
+    /// Pauses playback of the game
+    func pause() -> Void
+    
+    /// Restarts the game
+    func restart() -> Void
+
+    /// Emulates a single frame, optionally handling any additional video processing required to render the frame
+    func executeFrame(processVideo: Bool) -> Void
+    
+    // MARK: Save States
+    
+    func saveState(url: URL) -> Bool
+    func loadState(url: URL) -> Bool
+    
+    // MARK: Controls
+    
+    /// Notifies that a new player has connected
+    func playerConnected(player: UInt8) -> Bool
+    /// Notifies that a player has disconnected
+    func playerDisconnected(player: UInt8) -> Void
+    /// Sets the inputs for a player
+    func playerSetInputs(player: UInt8, value: UInt32)
 }
