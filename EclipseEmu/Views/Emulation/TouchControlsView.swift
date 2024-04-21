@@ -2,16 +2,12 @@ import SwiftUI
 import EclipseKit
 
 #if canImport(UIKit)
-protocol TouchControlsControllerDelegate {
-    func menuButtonPressed() -> Void
-}
-
 fileprivate let borderWidth = 2.0
 fileprivate let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
-class TouchControlsController: UIViewController, GameInputCoordinatorTouchDelegate {
-    var state: UInt32 = 0
-    var delegate: TouchControlsControllerDelegate?
+class TouchControlsController: UIViewController {
+    var state: GameInput.RawValue = 0
+    weak var delegate: TouchControlsView.Coordinator?
     
     private var feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var touchControlsSubview = UIView()
@@ -264,7 +260,7 @@ struct TouchControlsView: UIViewControllerRepresentable {
         self.coreCoordinator = coreCoordinator
     }
     
-    class Coordinator: NSObject, TouchControlsControllerDelegate {
+    class Coordinator: NSObject {
         var parent: TouchControlsView
         
         init(_ parent: TouchControlsView) {

@@ -16,6 +16,7 @@ struct RingBuffer {
 typedef struct RingBuffer RingBuffer;
 
 extern RingBuffer *ring_buffer_init(uint64_t capacity);
+extern void ring_buffer_deinit(RingBuffer *self);
 extern inline uint64_t ring_buffer_available_read_preloaded(RingBuffer *self, uint64_t tail, uint64_t head);
 extern inline uint64_t ring_buffer_available_write_preloaded(RingBuffer *self, uint64_t tail, uint64_t head);
 extern inline uint64_t ring_buffer_available_read(RingBuffer *self);

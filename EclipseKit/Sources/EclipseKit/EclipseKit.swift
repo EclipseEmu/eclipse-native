@@ -7,12 +7,6 @@ public enum GameCoreRenderFormat: UInt8 {
     case frameBuffer
 }
 
-@objc(ECGameCoreDelegate)
-public protocol GameCoreDelegate {
-    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: UInt64) -> UInt64
-    func coreDidSave(at path: URL) -> Void
-}
-
 @objc(ECGameSystem)
 public enum GameSystem: Int16 {
     case unknown = 0
@@ -39,6 +33,9 @@ public enum GameSystem: Int16 {
         }
     }
 }
+
+// FIXME: figure out a way to have associated values to inputs, i.e. for touch: the coordinate. 
+//  Since this is a fixed sized list, an array could probably be used (though with an intermediary enum probably).
 
 @objc(ECGameInput)
 public enum GameInput: UInt32, RawRepresentable {
@@ -71,70 +68,12 @@ public enum GameInput: UInt32, RawRepresentable {
     case touchNegY            = 0b00000010_00000000_00000000_00000000
     case lid                  = 0b00000100_00000000_00000000_00000000
     case mic                  = 0b00001000_00000000_00000000_00000000
-    
-    // NOTE: as more systems are added, this should take a naming convention argument
-    func toString() -> String {
-    return switch self {
-    case .none:
-        "None"
-    case .faceButtonUp:
-        "X"
-    case .faceButtonDown:
-        "B"
-    case .faceButtonLeft:
-        "Y"
-    case .faceButtonRight:
-        "A"
-    case .startButton:
-        "Start"
-    case .selectButton:
-        "Select"
-    case .shoulderLeft:
-        "L"
-    case .shoulderRight:
-        "R"
-    case .triggerLeft:
-        "ZL"
-    case .triggerRight:
-        "ZR"
-    case .dpadUp:
-        "Up"
-    case .dpadDown:
-        "Down"
-    case .dpadLeft:
-        "Left"
-    case .dpadRight:
-        "Right"
-    case .leftJoystickUp:
-        "Left Joystick Y+"
-    case .leftJoystickDown:
-        "Left Joystick Y-"
-    case .leftJoystickLeft:
-        "Left Joystick X-"
-    case .leftJoystickRight:
-        "Left Joystick X+"
-    case .rightJoystickUp:
-        "Right Joystick Y+"
-    case .rightJoystickDown:
-        "Right Joystick Y-"
-    case .rightJoystickLeft:
-        "Right Joystick X-"
-    case .rightJoystickRight:
-        "Right Joystick X+"
-    case .touchPosX:
-        "Touch X+"
-    case .touchNegX:
-        "Touch X-"
-    case .touchPosY:
-        "Touch Y+"
-    case .touchNegY:
-        "Touch Y-"
-    case .lid:
-        "Lid"
-    case .mic:
-        "Mic"
-    }
-    }
+}
+
+@objc(ECGameCoreDelegate)
+public protocol GameCoreDelegate {
+    func coreRenderAudio(samples: UnsafeRawPointer, byteSize: UInt64) -> UInt64
+    func coreDidSave(at path: URL) -> Void
 }
 
 /// You should not do any allocations or setup in the init block. None of the functions will be called until after `setup` is called.
@@ -199,5 +138,5 @@ public protocol GameCore {
     /// Notifies that a player has disconnected
     func playerDisconnected(player: UInt8) -> Void
     /// Sets the inputs for a player
-    func playerSetInputs(player: UInt8, value: UInt32)
+    func playerSetInputs(player: UInt8, value: GameInput.RawValue)
 }

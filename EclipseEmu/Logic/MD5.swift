@@ -3,29 +3,6 @@ import Foundation
 fileprivate let BLOCK_SIZE: UInt8 = 64
 fileprivate let BLOCK_SIZE_MASK: UInt8 = 0b00111111 // 63, all bits before 64 are on.
 
-fileprivate struct DataByteSequence: AsyncSequence {
-    var data: Data
-    typealias Element = UInt8
-
-    struct AsyncIterator: AsyncIteratorProtocol {
-        var data: Data
-        var i = 0
-        
-        mutating func next() async -> UInt8? {
-            defer { i += 1 }
-            if i < data.count {
-                return data[i]
-            } else {
-                return nil
-            }
-        }
-    }
-
-    func makeAsyncIterator() -> AsyncIterator {
-        AsyncIterator(data: data)
-    }
-}
-
 struct MD5Hasher: ~Copyable {
     private var input: ContiguousArray<UInt32>
     private var inputBytes: UnsafeMutableBufferPointer<UInt8>

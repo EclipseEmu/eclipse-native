@@ -1,10 +1,3 @@
-//
-//  MessageBlock.swift
-//  EclipseEmu
-//
-//  Created by Tucker Morley on 2024.04.20.
-//
-
 import SwiftUI
 
 struct MessageBlock<Content: View>: View {

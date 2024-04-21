@@ -4,13 +4,12 @@ import QuartzCore
 import EclipseKit
 import simd
 
-protocol GameCoreCoordinatorTouchControlsDelegate {
-    var valueChangedHandler: ((UInt32) -> Void)? { get set }
+enum GameVideoRenderer {
+    case frameBuffer(GameFrameBufferRenderer)
 }
 
 // FIXME: this needs better running state.
 //  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
-
 actor GameCoreCoordinator: GameCoreDelegate {
     enum Failure: Error {
         case failedToGetMetalDevice
@@ -24,23 +23,22 @@ actor GameCoreCoordinator: GameCoreDelegate {
     var height: CGFloat = 0.0
     
     private let core: GameCore
+    let inputs: GameInputCoordinator
     /// SAFTEY: since we never write, this should not be an issue
     nonisolated(unsafe) private(set) var isRunning: Bool = false
-    /// SAFTEY: this is only nonisolated so the touch controller can attach itself, otherwise no mutations occur.
-    nonisolated(unsafe) private(set) var inputs: GameInputCoordinator
     /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer can be written to syncronously by the core.
     nonisolated(unsafe) private let audio: GameAudio
     /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.
     nonisolated(unsafe) let renderingSurface: CAMetalLayer
 
     // NOTE: in the future this should be handled properly
-    private var renderer: GameRenderer
+    private var renderer: GameVideoRenderer
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private(set) var rate: Double = 1.0
     private var frameTimerTask: Task<Void, Never>?
     
-    init(core: GameCore, system: GameSystem) throws {
+    init(core: GameCore, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
         self.core = core
 
         core.setup(system: system)
@@ -54,12 +52,13 @@ actor GameCoreCoordinator: GameCoreDelegate {
         
         let width = core.getVideoWidth()
         let height = core.getVideoHeight()
+        let size = CGSize(width: width, height: height)
         self.width = CGFloat(width)
         self.height = CGFloat(height)
         
         self.renderingSurface = .init()
         self.renderingSurface.contentsScale = 2.0
-        self.renderingSurface.drawableSize = .init(width: width, height: height)
+        self.renderingSurface.drawableSize = size
         self.renderingSurface.device = device
         self.renderingSurface.framebufferOnly = true
         self.renderingSurface.isOpaque = true
@@ -71,14 +70,21 @@ actor GameCoreCoordinator: GameCoreDelegate {
         switch core.getVideoRenderingType() {
         case .frameBuffer:
             let pixelFormat = core.getVideoPixelFormat()
-            self.renderer = try GameRenderer2D(with: device, pixelFormat: pixelFormat, core: self.core, desiredFrameRate: desiredFrameRate)
-            try self.renderer.update()
+            let renderer = try GameFrameBufferRenderer(
+                with: device,
+                width: width,
+                height: height,
+                pixelFormat: pixelFormat,
+                frameDuration: frameDuration,
+                core: core
+            )
+            self.renderer = .frameBuffer(renderer)
             break
         }
         
         self.audio = try GameAudio(format: core.getAudioFormat())
         
-        self.inputs = .init(maxPlayers: core.getMaxPlayers())
+        self.inputs = .init(maxPlayers: core.getMaxPlayers(), reorderPlayers: reorderControls)
         self.core.delegate = self
     }
     
@@ -132,10 +138,6 @@ actor GameCoreCoordinator: GameCoreDelegate {
         self.isRunning = false
     }
     
-    func renderFrame() {
-        self.renderer.render(in: self.renderingSurface)
-    }
-    
     // MARK: Core Delegate methods
     
     nonisolated func coreRenderAudio(samples: UnsafeRawPointer, byteSize: UInt64) -> UInt64 {
@@ -154,8 +156,14 @@ actor GameCoreCoordinator: GameCoreDelegate {
         #if canImport(AppKit)
         self.renderingSurface.displaySyncEnabled = !enabled
         #endif
-        self.renderer.useAdaptiveSync = !enabled
-        self.frameDuration = (1.0 / desiredFrameRate) / rate
+        
+        let newFrameDuration = (1.0 / desiredFrameRate) / rate
+        switch self.renderer {
+        case .frameBuffer(let renderer):
+            renderer.useAdaptiveSync = !enabled
+            renderer.frameDuration = newFrameDuration
+        }
+        self.frameDuration = newFrameDuration
     }
     
     func startFrameTimer() {
@@ -186,7 +194,10 @@ actor GameCoreCoordinator: GameCoreDelegate {
                     
                     self.core.executeFrame(processVideo: doRender)
                     if doRender {
-                        self.renderFrame()
+                        switch self.renderer {
+                        case .frameBuffer(let renderer):
+                            renderer.render(in: self.renderingSurface)
+                        }
                     }
                 }
 

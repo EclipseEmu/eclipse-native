@@ -53,6 +53,7 @@ actor GameAudio {
         Task {
             await self.stop()
             await self.removeListeners()
+            ring_buffer_deinit(self.ringBuffer)
         }
     }
     

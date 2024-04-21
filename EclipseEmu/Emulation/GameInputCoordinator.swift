@@ -6,17 +6,44 @@ protocol GameInputCoordinatorDelegate {
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void
 }
 
-protocol GameInputCoordinatorTouchDelegate {
-    var state: UInt32 { get set }
-}
+final class GameInputCoordinator {
+    typealias ReorderControllersCallback = (inout [GameInputCoordinator.Player], UInt8) async -> Void
+    
+    struct Player: Identifiable {
+        var id = UUID()
+        var state: GameInput.RawValue = 0
+        var kind: ControllerKind
+        
+        enum ControllerKind: Equatable {
+            #if os(iOS)
+            case touch
+            #endif
+            case keyboard(Box<KeyboardBindings>, GCKeyboard)
+            case gamepad(Box<[GamepadBinding]>, GCController)
+            
+            static func ==(lhs: GameInputCoordinator.Player.ControllerKind, rhs: GameInputCoordinator.Player.ControllerKind) -> Bool {
+                switch (lhs, rhs) {
+                #if os(iOS)
+                case (.touch, .touch):
+                    return true
+                #endif
+                case (.gamepad(_, let lhsDevice), .gamepad(_, let rhsDevice)):
+                    return lhsDevice.id == rhsDevice.id
+                case (.keyboard(_, let lhsDevice), .keyboard(_, let rhsDevice)):
+                    return lhsDevice == rhsDevice
+                default:
+                    return false
+                }
+            }
+        }
+    }
 
-class GameInputCoordinator {
     // these two properties are used in comparisons where the bindings don't actually matter
     static let throwawayKeyboardBindings = Box<KeyboardBindings>([:])
     static let throwawayGamepadBindings = Box<[GamepadBinding]>([])
     
     weak var coreCoordinator: GameCoreCoordinator?
-    var delegate: GameInputCoordinatorDelegate?
+    var reorderPlayers: ReorderControllersCallback
     
     var maxPlayers: UInt8 = 0
     var players = [Player]()
@@ -25,8 +52,8 @@ class GameInputCoordinator {
     private var controllerDisconnectObserver: Any?
     private var keyboardConnectObserver: Any?
     private var keyboardDisconnectObserver: Any?
-    private var touchState: UInt32 = 0
-    var touchControls: GameInputCoordinatorTouchDelegate? {
+    #if os(iOS)
+    weak var touchControls: TouchControlsController? {
         didSet {
             if oldValue == nil && touchControls != nil {
                 Task {
@@ -40,34 +67,11 @@ class GameInputCoordinator {
             }
         }
     }
+    #endif
 
-    struct Player: Identifiable {
-        var id = UUID()
-        var state: UInt32 = 0
-        var kind: ControllerKind
-        
-        enum ControllerKind: Equatable {
-            case touch
-            case keyboard(Box<KeyboardBindings>, GCKeyboard)
-            case gamepad(Box<[GamepadBinding]>, GCController)
-            
-            static func ==(lhs: GameInputCoordinator.Player.ControllerKind, rhs: GameInputCoordinator.Player.ControllerKind) -> Bool {
-                switch (lhs, rhs) {
-                case (.touch, .touch):
-                    return true
-                case (.gamepad(_, let lhsDevice), .gamepad(_, let rhsDevice)):
-                    return lhsDevice.id == rhsDevice.id
-                case (.keyboard(_, let lhsDevice), .keyboard(_, let rhsDevice)):
-                    return lhsDevice == rhsDevice
-                default:
-                    return false
-                }
-            }
-        }
-    }
-    
-    init(maxPlayers: UInt8) {
+    init(maxPlayers: UInt8, reorderPlayers: @escaping ReorderControllersCallback) {
         self.maxPlayers = maxPlayers
+        self.reorderPlayers = reorderPlayers
     }
     
     deinit {
@@ -197,13 +201,13 @@ class GameInputCoordinator {
     }
 
     func playerConnected(kind: Player.ControllerKind) async {
-        guard let delegate, let coreCoordinator else { return }
+        guard let coreCoordinator else { return }
         
         let newPlayer = Player(kind: kind)
         
         self.players.append(newPlayer)
         if self.players.count > 1 {
-            await delegate.reorderControllers(players: &self.players, maxPlayers: self.maxPlayers)
+            await self.reorderPlayers(&self.players, self.maxPlayers)
         }
         let index = self.players.firstIndex(where: { $0.id == newPlayer.id }) ?? -1
 
@@ -215,11 +219,11 @@ class GameInputCoordinator {
     }
     
     func playerDisconnected(id: UUID) async {
-        guard let delegate, let coreCoordinator else { return }
+        guard let coreCoordinator else { return }
         
         guard let index = self.players.firstIndex(where: { $0.id == id }) else { return }
-        await delegate.reorderControllers(players: &self.players, maxPlayers: self.maxPlayers)
-        
+        await self.reorderPlayers(&self.players, self.maxPlayers)
+
         if players.count < maxPlayers {
             await coreCoordinator.playerDisconnected(player: UInt8(index))
         }
@@ -231,14 +235,16 @@ class GameInputCoordinator {
     func poll() {
         for var player in self.players {
             switch player.kind {
+            #if os(iOS)
             case .touch:
                 player.state = self.touchControls?.state ?? 0
+            #endif
             case .keyboard(let bindings, let device):
                 guard let inputs = device.keyboardInput else { continue }
                 player.state = 0
                 for (keyCode, input) in bindings.value {
                     // FIXME: is inputs.button(forKeyCode:) practical for polling? or should the GCControllerButtonInput be cached?
-                    player.state |= input.rawValue * UInt32(inputs.button(forKeyCode: keyCode)?.isPressed ?? false)
+                    player.state |= input.rawValue * GameInput.RawValue(inputs.button(forKeyCode: keyCode)?.isPressed ?? false)
                 }
             case .gamepad(let bindings, let device):
                 guard let inputs = device.extendedGamepad else { continue }
@@ -246,11 +252,11 @@ class GameInputCoordinator {
                 for binding in bindings.value {
                     switch binding.kind {
                     case .button:
-                        player.state |= UInt32(inputs.buttons[binding.id]?.isPressed ?? false) * binding.input.rawValue
+                        player.state |= binding.input.rawValue * GameInput.RawValue(inputs.buttons[binding.id]?.isPressed ?? false)
                     case .axis:
                         let expected = Float32(binding.direction.rawValue) - binding.deadZone
                         let value = inputs.axes[binding.id]?.value ?? 0
-                        player.state |= binding.input.rawValue * UInt32((binding.direction == .negative && value <= expected) || (binding.direction == .positive && value >= expected))
+                        player.state |= binding.input.rawValue * GameInput.RawValue((binding.direction == .negative && value <= expected) || (binding.direction == .positive && value >= expected))
                     }
                 }
             }
@@ -261,8 +267,10 @@ class GameInputCoordinator {
 extension GameInputCoordinator.Player {
     var displayName: String {
         switch self.kind {
+        #if os(iOS)
         case .touch:
             return "Touch"
+        #endif
         case .keyboard(_, let device):
             return device.vendorName ?? "Keyboard"
         case .gamepad(_, let device):
@@ -272,8 +280,10 @@ extension GameInputCoordinator.Player {
     
     var sfSymbol: String {
         switch self.kind {
+        #if os(iOS)
         case .touch:
             return "hand.draw"
+        #endif
         case .keyboard(_, _):
             return "keyboard"
         case .gamepad(_, let device):

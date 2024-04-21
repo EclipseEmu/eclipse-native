@@ -4,50 +4,122 @@ import QuartzCore
 import simd
 import EclipseKit
 
-final class GameRenderer2D: GameRenderer {
+fileprivate struct FrameBuffer: ~Copyable {
+    let device: MTLDevice
+    public let pixelFormat: MTLPixelFormat
+    let bytesPerPixel: Int
+    let width: Int
+    let height: Int
+
+    let bytesPerRow: Int
+    let sourceBuffer: MTLBuffer
+    
+    let buffer: UnsafeMutableRawPointer
+    let bufferSize: Int
+    let isBufferOwned: Bool
+    
+    enum Failure: Error {
+    }
+    
+    init(device: MTLDevice, pixelFormat: MTLPixelFormat, height: Int, width: Int, ptr: UnsafeRawPointer?) throws {
+        let bytesPerRow = pixelFormat.bytesPerPixel * width
+        let bufferSize = bytesPerRow * height
+        
+        self.device = device
+        self.pixelFormat = pixelFormat
+        self.bytesPerPixel = pixelFormat.bytesPerPixel
+        self.bytesPerRow = bytesPerRow
+        self.width = width
+        self.height = height
+
+        guard let sourceBuffer = device.makeBuffer(length: bufferSize, options: .storageModeShared) else {
+            throw GameFrameBufferRenderer.Failure.failedToMakeSourceBuffer
+        }
+        self.sourceBuffer = sourceBuffer
+        
+        self.bufferSize = bufferSize
+        self.isBufferOwned = ptr == nil
+        if let ptr {
+            self.buffer = UnsafeMutableRawPointer(mutating: ptr)
+        } else {
+            self.buffer = UnsafeMutableRawPointer.allocate(byteCount: bufferSize, alignment: 1)
+        }
+    }
+    
+    deinit {
+        if self.isBufferOwned {
+            self.buffer.deallocate()
+        }
+    }
+    
+    func prepare(with commandBuffer: MTLCommandBuffer, texture: MTLTexture) {
+        if texture.storageMode != .private {
+            texture.replace(region: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0, withBytes: buffer, bytesPerRow: bytesPerRow)
+            return
+        }
+        
+        self.sourceBuffer.contents().copyMemory(from: buffer, byteCount: self.bufferSize)
+        
+        guard let encoder = commandBuffer.makeBlitCommandEncoder() else { return }
+        let len = sourceBuffer.length
+        encoder.copy(
+            from: sourceBuffer,
+            sourceOffset: 0,
+            sourceBytesPerRow: bytesPerRow,
+            sourceBytesPerImage: len,
+            sourceSize: MTLSize(width: width, height: height, depth: 1),
+            to: texture,
+            destinationSlice: 0,
+            destinationLevel: 0,
+            destinationOrigin: .init()
+        )
+        encoder.endEncoding()
+    }
+}
+
+final class GameFrameBufferRenderer {
     enum Failure: Error {
         case failedToGetMetalDevice
         case failedToCreateFullscreenQuad
         case failedToCreatePipelineState
         case failedToCreateTheCommandQueue
         case failedToCreateSamplerState
+        case failedToMakeSourceBuffer
     }
     
     struct Vertex {
-        let position: vector_float2
-        let textureCoordinates: vector_float2
+        let position: simd_float2
+        let textureCoordinates: simd_float2
     }
     
-    let core: GameCore
     private(set) var renderTexture: MTLTexture?
     var useAdaptiveSync: Bool = true
-    var desiredFrameRate: Double
+    var frameDuration: Double
     
     private let pixelFormat: MTLPixelFormat
     private let device: MTLDevice
-    private var frameBuffer: FrameBuffer?
+    private let frameBuffer: FrameBuffer
     private var commandQueue: MTLCommandQueue
     private var quadBuffer: MTLBuffer
     private var pipelineState: MTLRenderPipelineState
     private var samplerState: MTLSamplerState
-
-    init(with device: MTLDevice, pixelFormat: MTLPixelFormat, core: GameCore, desiredFrameRate: Double) throws {
+    
+    /// NOTE: The core is not stored, it is only used to initialize the frame buffer.
+    init(with device: MTLDevice, width: Int, height: Int, pixelFormat: MTLPixelFormat, frameDuration: Double, core: GameCore) throws {
         self.device = device
         guard let queue = device.makeCommandQueue() else {
             throw Failure.failedToCreateTheCommandQueue
         }
         self.commandQueue = queue
-        
-        self.core = core
         self.pixelFormat = pixelFormat
         
         let vertexArrayObject: [Vertex] = [
-            .init(position: vector_float2(1, -1), textureCoordinates: vector_float2(1, 1)),
-            .init(position: vector_float2(-1,  -1), textureCoordinates: vector_float2(0, 1)),
-            .init(position: vector_float2(-1, 1), textureCoordinates: vector_float2(0, 0)),
-            .init(position: vector_float2(1, -1), textureCoordinates: vector_float2(1, 1)),
-            .init(position: vector_float2(-1, 1), textureCoordinates: vector_float2(0, 0)),
-            .init(position: vector_float2(1, 1), textureCoordinates: vector_float2(1, 0))
+            .init(position: simd_float2(1, -1), textureCoordinates: simd_float2(1, 1)),
+            .init(position: simd_float2(-1, -1), textureCoordinates: simd_float2(0, 1)),
+            .init(position: simd_float2(-1, 1), textureCoordinates: simd_float2(0, 0)),
+            .init(position: simd_float2(1, -1), textureCoordinates: simd_float2(1, 1)),
+            .init(position: simd_float2(-1, 1), textureCoordinates: simd_float2(0, 0)),
+            .init(position: simd_float2(1, 1), textureCoordinates: simd_float2(1, 0))
         ]
         
         guard let buffer = self.device.makeBuffer(
@@ -89,22 +161,18 @@ final class GameRenderer2D: GameRenderer {
         }
         
         self.samplerState = samplerState
-        self.desiredFrameRate = desiredFrameRate
-    }
-    
-    func update() throws {
-        let width = core.getVideoWidth()
-        let height = core.getVideoHeight()
+        self.frameDuration = frameDuration
         
-        if frameBuffer == nil {
-            if core.canSetVideoBufferPointer() {
-                let buffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: nil)
-                let _ = core.getVideoBuffer(setPointer: buffer.buffer)
-                self.frameBuffer = buffer
-            } else {
-                let buf = UnsafeMutableRawPointer(mutating: core.getVideoBuffer(setPointer: nil))
-                frameBuffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: buf)
-            }
+        // setup the frame buffer and setup the texture
+        
+        // NOTE: the size is initialized with the int values already, so this doesn't cause any issue
+        if core.canSetVideoBufferPointer() {
+            let buffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: nil)
+            let _ = core.getVideoBuffer(setPointer: buffer.buffer)
+            self.frameBuffer = buffer
+        } else {
+            let buf = UnsafeMutableRawPointer(mutating: core.getVideoBuffer(setPointer: nil))
+            frameBuffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: buf)
         }
         
         let td = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: pixelFormat, width: width, height: height, mipmapped: false)
@@ -117,7 +185,7 @@ final class GameRenderer2D: GameRenderer {
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
         
         guard let texture = renderTexture else { return }
-        self.frameBuffer?.prepare(with: commandBuffer, texture: texture)
+        self.frameBuffer.prepare(with: commandBuffer, texture: texture)
         
         guard let drawable = renderingSurface.nextDrawable() else { return }
         
@@ -142,7 +210,7 @@ final class GameRenderer2D: GameRenderer {
 
         if useAdaptiveSync {
             #if !targetEnvironment(simulator)
-            commandBuffer.present(drawable, afterMinimumDuration: 1 / self.desiredFrameRate)
+            commandBuffer.present(drawable, afterMinimumDuration: self.frameDuration)
             #else
             commandBuffer.present(drawable)
             #endif

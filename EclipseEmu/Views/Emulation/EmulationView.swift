@@ -4,7 +4,7 @@ import Combine
 import EclipseKit
 
 class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
-    var coreCoordinator: GameCoreCoordinator
+    var coreCoordinator: GameCoreCoordinator!
     var game: Game
     
     @Published var width: CGFloat = 0.0
@@ -18,9 +18,8 @@ class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
     
     init(core: GameCore, game: Game) {
         self.game = game
-        self.coreCoordinator = try! GameCoreCoordinator(core: core, system: game.system)
+        self.coreCoordinator = try! GameCoreCoordinator(core: core, system: game.system, reorderControls: self.reorderControllers)
     }
-    
     
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
         await self.coreCoordinator.pause()

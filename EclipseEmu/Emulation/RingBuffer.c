@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct RingBuffer *ring_buffer_init(uint64_t capacity) {
+RingBuffer *ring_buffer_init(uint64_t capacity) {
     struct RingBuffer *ring = malloc(sizeof(struct RingBuffer));
     if (ring == NULL) {
         return NULL;
@@ -23,30 +23,35 @@ struct RingBuffer *ring_buffer_init(uint64_t capacity) {
     return ring;
 }
 
-inline uint64_t ring_buffer_available_read_preloaded(struct RingBuffer *self, uint64_t tail, uint64_t head) {
+inline void ring_buffer_deinit(RingBuffer *self) {
+    free(self->inner);
+    free(self);
+}
+
+inline uint64_t ring_buffer_available_read_preloaded(RingBuffer *self, uint64_t tail, uint64_t head) {
     // NOTE: this is equivalent to
     // `return tail >= head ? tail - head : tail + self->capacity - head;`
     return tail + ((tail >= head) * self->capacity) - head;
 }
 
-inline uint64_t ring_buffer_available_write_preloaded(struct RingBuffer *self, uint64_t tail, uint64_t head) {
+inline uint64_t ring_buffer_available_write_preloaded(RingBuffer *self, uint64_t tail, uint64_t head) {
     return tail >= head ? self->capacity - tail + head : head - tail;
 }
 
-inline uint64_t ring_buffer_available_read(struct RingBuffer *self) {
+inline uint64_t ring_buffer_available_read(RingBuffer *self) {
     uint64_t head = atomic_load_explicit(&(self->head), memory_order_relaxed);
     uint64_t tail = atomic_load_explicit(&(self->tail), memory_order_relaxed);
     return ring_buffer_available_read_preloaded(self, tail, head);
 }
 
-inline uint64_t ring_buffer_available_write(struct RingBuffer *self) {
+inline uint64_t ring_buffer_available_write(RingBuffer *self) {
     uint64_t head = atomic_load_explicit(&(self->head), memory_order_relaxed);
     uint64_t tail = atomic_load_explicit(&(self->tail), memory_order_relaxed);
     return ring_buffer_available_write_preloaded(self, tail, head);
 }
 
 /// this is under the assumption that length will never be more than capacity
-uint64_t ring_buffer_write(struct RingBuffer *self, const void *src, uint64_t length) {
+uint64_t ring_buffer_write(RingBuffer *self, const void *src, uint64_t length) {
     uint64_t head = atomic_load_explicit(&(self->head), memory_order_relaxed);
     uint64_t tail = atomic_load_explicit(&(self->tail), memory_order_acquire);
     
@@ -69,7 +74,7 @@ uint64_t ring_buffer_write(struct RingBuffer *self, const void *src, uint64_t le
     return length;
 }
 
-uint64_t ring_buffer_read(struct RingBuffer *self, void *dst, uint64_t length) {
+uint64_t ring_buffer_read(RingBuffer *self, void *dst, uint64_t length) {
     uint64_t head = atomic_load_explicit(&(self->head), memory_order_acquire);
     uint64_t tail = atomic_load_explicit(&(self->tail), memory_order_relaxed);
     
@@ -92,7 +97,7 @@ uint64_t ring_buffer_read(struct RingBuffer *self, void *dst, uint64_t length) {
     return length;
 }
 
-void ring_buffer_clear(struct RingBuffer *self) {
+void ring_buffer_clear(RingBuffer *self) {
     atomic_store_explicit((&self->head), 0, memory_order_relaxed);
     atomic_store_explicit((&self->tail), 0, memory_order_relaxed);
     memset(self->inner, 0, self->capacity);

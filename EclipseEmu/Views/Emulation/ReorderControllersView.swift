@@ -1,10 +1,3 @@
-//
-//  ReorderControllersView.swift
-//  EclipseEmu
-//
-//  Created by Tucker Morley on 2024.04.20.
-//
-
 import SwiftUI
 
 struct PlayerOrderChangeRequest: Identifiable {
@@ -62,7 +55,6 @@ struct ReorderControllersView: View {
     VStack {}.sheet(isPresented: .constant(true)) {
         ReorderControllersView(request:
             PlayerOrderChangeRequest(maxPlayers: 4, players: [
-                .init(kind: .touch),
                 .init(kind: .keyboard(.init(.init()), .init())),
                 .init(kind: .keyboard(.init(.init()), .init())),
                 .init(kind: .keyboard(.init(.init()), .init())),
