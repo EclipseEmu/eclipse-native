@@ -6,24 +6,63 @@ protocol GameInputCoordinatorDelegate {
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void
 }
 
-struct GameInputCoordinator: ~Copyable {
+protocol GameInputCoordinatorTouchDelegate {
+    var state: UInt32 { get set }
+}
+
+class GameInputCoordinator {
+    // these two properties are used in comparisons where the bindings don't actually matter
+    static let throwawayKeyboardBindings = Box<KeyboardBindings>([:])
+    static let throwawayGamepadBindings = Box<[GamepadBinding]>([])
+    
     weak var coreCoordinator: GameCoreCoordinator?
     var delegate: GameInputCoordinatorDelegate?
     
     var maxPlayers: UInt8 = 0
     var players = [Player]()
     
+    private var controllerConnectObserver: Any?
+    private var controllerDisconnectObserver: Any?
+    private var keyboardConnectObserver: Any?
+    private var keyboardDisconnectObserver: Any?
     private var touchState: UInt32 = 0
+    var touchControls: GameInputCoordinatorTouchDelegate? {
+        didSet {
+            if oldValue == nil && touchControls != nil {
+                Task {
+                    await self.playerConnected(kind: .touch)
+                }
+            } else if oldValue != nil && touchControls == nil {
+                guard let player = self.getPlayer(kind: .touch) else { return }
+                Task {
+                    await self.playerDisconnected(id: player.id)
+                }
+            }
+        }
+    }
 
     struct Player: Identifiable {
         var id = UUID()
         var state: UInt32 = 0
         var kind: ControllerKind
         
-        enum ControllerKind {
-            case touch(Box<TouchLayout>)
+        enum ControllerKind: Equatable {
+            case touch
             case keyboard(Box<KeyboardBindings>, GCKeyboard)
             case gamepad(Box<[GamepadBinding]>, GCController)
+            
+            static func ==(lhs: GameInputCoordinator.Player.ControllerKind, rhs: GameInputCoordinator.Player.ControllerKind) -> Bool {
+                switch (lhs, rhs) {
+                case (.touch, .touch):
+                    return true
+                case (.gamepad(_, let lhsDevice), .gamepad(_, let rhsDevice)):
+                    return lhsDevice.id == rhsDevice.id
+                case (.keyboard(_, let lhsDevice), .keyboard(_, let rhsDevice)):
+                    return lhsDevice == rhsDevice
+                default:
+                    return false
+                }
+            }
         }
     }
     
@@ -31,15 +70,143 @@ struct GameInputCoordinator: ~Copyable {
         self.maxPlayers = maxPlayers
     }
     
-    mutating func playerConnected(kind: Player.ControllerKind) async {
+    deinit {
+        self.stop()
+    }
+    
+    // MARK: Bindings loading
+    
+    private func loadGamepadBindings(for controller: GCController) async -> [GamepadBinding] {
+        // FIXME: do proper binding loading
+        return Self.throwawayGamepadBindings.value
+    }
+    
+    private func loadKeyboardBindings(for controller: GCKeyboard) async -> KeyboardBindings {
+        // FIXME: do proper binding loading
+        return Self.throwawayKeyboardBindings.value
+    }
+
+    // MARK: Connection management
+    
+    private func hasPlayer(kind: Player.ControllerKind) -> Bool {
+        return self.players.contains(where: { $0.kind == kind })
+    }
+    
+    private func getPlayer(kind: Player.ControllerKind) -> Player? {
+        return self.players.first(where: { $0.kind == kind })
+    }
+
+    func start() async {
+        if self.keyboardConnectObserver == nil {
+            self.keyboardConnectObserver = NotificationCenter.default.addObserver(forName: .GCKeyboardDidConnect, object: nil, queue: nil, using: { notification in
+                guard 
+                    let keyboard = notification.object as? GCKeyboard,
+                    keyboard.keyboardInput != nil
+                else { return }
+                
+                Task {
+                    let bindings = await self.loadKeyboardBindings(for: keyboard)
+                    await self.playerConnected(kind: .keyboard(Box(bindings), keyboard))
+                }
+            })
+        }
+        
+        if self.controllerConnectObserver == nil {
+            self.controllerConnectObserver = NotificationCenter.default.addObserver(forName: .GCControllerDidConnect, object: nil, queue: nil, using: { notification in
+                guard 
+                    let controller = notification.object as? GCController,
+                    controller.extendedGamepad != nil
+                else { return }
+                
+                Task {
+                    let bindings = await self.loadGamepadBindings(for: controller)
+                    await self.playerConnected(kind: .gamepad(Box(bindings), controller))
+                }
+            })
+        }
+        
+        if self.keyboardDisconnectObserver == nil {
+            self.keyboardDisconnectObserver = NotificationCenter.default.addObserver(forName: .GCKeyboardDidDisconnect, object: nil, queue: nil, using: { notification in
+                guard
+                    let keyboard = notification.object as? GCKeyboard,
+                    let player = self.getPlayer(kind: .keyboard(Self.throwawayKeyboardBindings, keyboard))
+                else { return }
+                
+                Task {
+                    await self.playerDisconnected(id: player.id)
+                }
+            })
+        }
+
+        if self.controllerDisconnectObserver == nil {
+            self.controllerDisconnectObserver = NotificationCenter.default.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: nil, using: { notification in
+                guard 
+                    let controller = notification.object as? GCController,
+                    let player = self.getPlayer(kind: .gamepad(Self.throwawayGamepadBindings, controller))
+                else { return }
+                
+                Task {
+                    await self.playerDisconnected(id: player.id)
+                }
+            })
+        }
+        
+        // Get currently connected controllers
+        let countBefore = self.players.count
+        for device in GCController.controllers() {
+            guard device.extendedGamepad != nil else { continue }
+            let bindings = await self.loadGamepadBindings(for: device)
+            let kind = Player.ControllerKind.gamepad(Box(bindings), device)
+            if !self.hasPlayer(kind: kind) {
+                self.players.append(.init(kind: kind))
+            }
+        }
+        
+        // Get the currently connected keyboard
+        if let device = GCKeyboard.coalesced {
+            let bindings = await self.loadKeyboardBindings(for: device)
+            let kind = Player.ControllerKind.keyboard(Box(bindings), device)
+            if !self.hasPlayer(kind: kind) {
+                self.players.append(.init(kind: kind))
+            }
+        }
+        
+        // Notify the core, if necessary
+        let countAfter = self.players.count
+        let newlyAddedCount = min(countAfter - countBefore, Int(maxPlayers) - countAfter)
+        if let coreCoordinator, newlyAddedCount > 0 {
+            for index in 0..<newlyAddedCount {
+                let _ = await coreCoordinator.playerConnected(player: UInt8(index))
+            }
+        }
+    }
+    
+    func stop() {
+        if let controllerConnectObserver {
+            NotificationCenter.default.removeObserver(controllerConnectObserver)
+        }
+        if let controllerDisconnectObserver {
+            NotificationCenter.default.removeObserver(controllerDisconnectObserver)
+        }
+        if let keyboardConnectObserver {
+            NotificationCenter.default.removeObserver(keyboardConnectObserver)
+        }
+        if let keyboardDisconnectObserver {
+            NotificationCenter.default.removeObserver(keyboardDisconnectObserver)
+        }
+    }
+
+    func playerConnected(kind: Player.ControllerKind) async {
         guard let delegate, let coreCoordinator else { return }
         
         let newPlayer = Player(kind: kind)
         
         self.players.append(newPlayer)
-        await delegate.reorderControllers(players: &self.players, maxPlayers: self.maxPlayers)
+        if self.players.count > 1 {
+            await delegate.reorderControllers(players: &self.players, maxPlayers: self.maxPlayers)
+        }
         let index = self.players.firstIndex(where: { $0.id == newPlayer.id }) ?? -1
-        
+
         // only report a new player if necessary
         if players.count < maxPlayers && index > -1 && index < maxPlayers {
             // FIXME: if the core rejects the new player, what should happen?
@@ -47,7 +214,7 @@ struct GameInputCoordinator: ~Copyable {
         }
     }
     
-    mutating func playerDisconnected(id: UUID) async {
+    func playerDisconnected(id: UUID) async {
         guard let delegate, let coreCoordinator else { return }
         
         guard let index = self.players.firstIndex(where: { $0.id == id }) else { return }
@@ -58,17 +225,14 @@ struct GameInputCoordinator: ~Copyable {
         }
     }
     
-    // NOTE: Actually polling for touch controls is not practical, so we just store the touch state for the next poll
-    mutating func touchControlsChanged(newState: UInt32) -> Void {
-        self.touchState = newState
-    }
+    // MARK: Input handling
     
     /// Loads the current state for each player their respective state field.
-    mutating func poll() {
+    func poll() {
         for var player in self.players {
             switch player.kind {
             case .touch:
-                player.state = self.touchState
+                player.state = self.touchControls?.state ?? 0
             case .keyboard(let bindings, let device):
                 guard let inputs = device.keyboardInput else { continue }
                 player.state = 0
@@ -97,12 +261,30 @@ struct GameInputCoordinator: ~Copyable {
 extension GameInputCoordinator.Player {
     var displayName: String {
         switch self.kind {
-        case .touch(_):
+        case .touch:
             return "Touch"
         case .keyboard(_, let device):
             return device.vendorName ?? "Keyboard"
         case .gamepad(_, let device):
             return device.vendorName ?? "Controller"
+        }
+    }
+    
+    var sfSymbol: String {
+        switch self.kind {
+        case .touch:
+            return "hand.draw"
+        case .keyboard(_, _):
+            return "keyboard"
+        case .gamepad(_, let device):
+            switch device.productCategory {
+            case GCProductCategoryXboxOne:
+                return "xbox.logo"
+            case GCProductCategoryDualShock4, GCProductCategoryDualSense:
+                return "playstation.logo"
+            default:
+                return "gamecontroller"
+            }
         }
     }
 }

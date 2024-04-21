@@ -43,12 +43,12 @@ struct GameViewHeader: View {
         }
         .background(Material.regular)
         .background(ignoresSafeAreaEdges: .all)
-#if os(macOS)
-        .overlay(Rectangle().frame(width: nil, height: 1, alignment: .bottom).foregroundColor(colorScheme == .light ? .init(white: 0.5, opacity: 0.25) : .init(white: 0.0, opacity: 0.5)), alignment: .bottom)
-#else
         .overlay(
             Rectangle()
                 .frame(width: nil, height: 1, alignment: .bottom)
+            #if os(macOS)
+                .foregroundStyle(Color(nsColor: .separatorColor))
+            #else
                 .opacity(0.25)
                 .modify {
                     if #available(iOS 17.0, *) {
@@ -56,10 +56,10 @@ struct GameViewHeader: View {
                     } else {
                         $0
                     }
-                },
-            alignment: .bottom
+                }
+            #endif
+            , alignment: .bottom
         )
-#endif
     }
     
     func play() {
@@ -70,10 +70,8 @@ struct GameViewHeader: View {
 }
 
 struct GameView: View {
+    @Environment(\.dismiss) var dismiss: DismissAction
     var game: Game
-    
-    @Environment(\.dismiss)
-    var dismiss: DismissAction
     
     var body: some View {
         NavigationStack {
@@ -106,22 +104,19 @@ struct GameView: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarLeading) {
-                    CloseButton(dismissAction: dismiss)
+                ToolbarItem(placement: DismissButton.placement) {
+                    DismissButton()
                 }
-                #else
-                ToolbarItem(placement: .primaryAction) {
-                    CloseButton(dismissAction: dismiss)
-                }
-                #endif
             }
         }
     }
 }
 
-#Preview {
-    Text("").sheet(item: .constant(Game())) {
-        GameView(game: $0)
-    }.environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+#Preview { let context = PersistenceController.preview.container.viewContext
+    
+    return VStack {}
+        .sheet(item: .constant(Game(context: context))) {
+            GameView(game: $0)
+        }
+        .environment(\.managedObjectContext, context)
 }

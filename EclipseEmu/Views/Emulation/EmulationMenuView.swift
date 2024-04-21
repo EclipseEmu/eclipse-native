@@ -16,9 +16,6 @@ struct EmulationMenuView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    CloseButton(dismissAction: dismiss)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         model.isQuitDialogShown = true
@@ -26,6 +23,9 @@ struct EmulationMenuView: View {
                         Label("Quit", systemImage: "xmark")
                             .labelStyle(.titleOnly)
                     }
+                }
+                ToolbarItem(placement: DismissButton.placement) {
+                    DismissButton()
                 }
             }
         }
@@ -133,6 +133,7 @@ struct EmulationMenuViewBar: View {
             .padding(.vertical, 8.0)
             .background(Material.bar)
             .clipShape(RoundedRectangle(cornerRadius: 12.0))
+            .opacity(Double(self.model.isMenuVisible))
         }.padding()
     }
 }

@@ -125,19 +125,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarLeading) {
-                    CloseButton(dismissAction: dismiss)
+                ToolbarItem(placement: DismissButton.placement) {
+                    DismissButton()
                 }
-                #else
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Done")
-                    }
-                }
-                #endif
             }
         }
     }

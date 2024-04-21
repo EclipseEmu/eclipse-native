@@ -9,10 +9,8 @@ protocol TouchControlsControllerDelegate {
 fileprivate let borderWidth = 2.0
 fileprivate let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
-class TouchControlsController: UIViewController, GameCoreCoordinatorTouchControlsDelegate {
-    private var state: UInt32 = 0
-    
-    var valueChangedHandler: ((UInt32) -> Void)?
+class TouchControlsController: UIViewController, GameInputCoordinatorTouchDelegate {
+    var state: UInt32 = 0
     var delegate: TouchControlsControllerDelegate?
     
     private var feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
@@ -238,8 +236,6 @@ class TouchControlsController: UIViewController, GameCoreCoordinatorTouchControl
                 self.state |= element.bindings.inputA
             }
         }
-        
-        self.valueChangedHandler?(self.state)
     }
     
     private func handleEndedTouches(touches: Set<UITouch>) {
@@ -254,8 +250,6 @@ class TouchControlsController: UIViewController, GameCoreCoordinatorTouchControl
                 self.state &= ~element.bindings.inputA
             }
         }
-        
-        self.valueChangedHandler?(self.state)
     }
 }
 
@@ -285,7 +279,7 @@ struct TouchControlsView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> TouchControlsController {
         let vc = TouchControlsController()
         vc.delegate = context.coordinator
-        coreCoordinator?.touchControlsDelegate = vc
+        coreCoordinator?.inputs.touchControls = vc
         return vc
     }
     

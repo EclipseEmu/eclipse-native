@@ -74,14 +74,8 @@ struct LibraryView: View {
                     .fixedSize()
                 }.padding([.horizontal, .top])
                 
-                if games.count != 0 {
-                    LazyVGrid(columns: [.init(.adaptive(minimum: 140.0, maximum: 240.0))]) {
-                        ForEach(games) { item in
-                            GameGridItem(game: item, selectedGame: $selectedGame)
-                        }
-                    }.padding([.horizontal, .bottom])
-                } else {
-                    VStack {
+                if games.count == 0 {
+                    MessageBlock {
                         Text("No Games")
                             .fontWeight(.medium)
                             .padding([.top, .horizontal], 8.0)
@@ -90,26 +84,12 @@ struct LibraryView: View {
                             .foregroundStyle(.secondary)
                             .padding([.bottom, .horizontal], 8.0)
                     }
-                    .padding()
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .modify {
-                        #if canImport(UIKit)
-                        if #available(iOS 17.0, macOS 14.0, *) {
-                            $0.background(.background.secondary)
-                        } else {
-                            $0.background(Color(uiColor: .secondarySystemBackground))
+                } else {
+                    LazyVGrid(columns: [.init(.adaptive(minimum: 140.0, maximum: 240.0))]) {
+                        ForEach(games) { item in
+                            GameGridItem(game: item, selectedGame: $selectedGame)
                         }
-                        #else
-                        if #available(macOS 14.0, *) {
-                            $0.background(Color(nsColor: .tertiarySystemFill))
-                        } else {
-                            $0.background(Color(nsColor: .gridColor))
-                        }
-                        #endif
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                    }.padding([.horizontal, .bottom])
                 }
             }
             .navigationTitle("Library")

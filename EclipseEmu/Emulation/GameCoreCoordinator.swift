@@ -8,6 +8,9 @@ protocol GameCoreCoordinatorTouchControlsDelegate {
     var valueChangedHandler: ((UInt32) -> Void)? { get set }
 }
 
+// FIXME: this needs better running state.
+//  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
+
 actor GameCoreCoordinator: GameCoreDelegate {
     enum Failure: Error {
         case failedToGetMetalDevice
@@ -20,22 +23,18 @@ actor GameCoreCoordinator: GameCoreDelegate {
     var width: CGFloat = 0.0
     var height: CGFloat = 0.0
     
-    // SAFTEY: since we never write, this should not be an issue
-    nonisolated(unsafe) private(set) var isRunning: Bool = false
-    
     private let core: GameCore
-    var inputs: GameInputCoordinator
-//    private var inputs: [UInt32] = [0]
-    
-    // SAFTEY: this is only set once
-    nonisolated(unsafe) var touchControlsDelegate: GameCoreCoordinatorTouchControlsDelegate?
-    
-    // SAFTEY: this is an actor itself, there should be no real issue
-    private nonisolated(unsafe) let audio: GameAudio
-    
-    private var renderer: GameRenderer
-    private(set) nonisolated(unsafe) var renderingSurface: CAMetalLayer
+    /// SAFTEY: since we never write, this should not be an issue
+    nonisolated(unsafe) private(set) var isRunning: Bool = false
+    /// SAFTEY: this is only nonisolated so the touch controller can attach itself, otherwise no mutations occur.
+    nonisolated(unsafe) private(set) var inputs: GameInputCoordinator
+    /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer can be written to syncronously by the core.
+    nonisolated(unsafe) private let audio: GameAudio
+    /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.
+    nonisolated(unsafe) let renderingSurface: CAMetalLayer
 
+    // NOTE: in the future this should be handled properly
+    private var renderer: GameRenderer
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private(set) var rate: Double = 1.0
@@ -90,6 +89,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     func start(gameUrl: URL) async {
         guard self.core.start(url: gameUrl) else { return }
+        await self.inputs.start()
         await self.audio.start()
         await self.play()
     }
@@ -97,8 +97,9 @@ actor GameCoreCoordinator: GameCoreDelegate {
     func stop() async {
         await self.pause()
         self.core.stop()
-//        self.stopListeningForInputs()
+        self.inputs.stop()
         await self.audio.stop()
+        self.core.takedown()
     }
     
     func restart() async {
@@ -108,9 +109,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
             self.frameTimerTask = nil
         }
         await self.audio.clear()
-//        self.stopListeningForInputs()
         self.core.restart()
-//        self.startListeningForInputs()
         self.startFrameTimer()
         await self.audio.resume()
         self.isRunning = true
@@ -118,7 +117,6 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     func play() async {
         guard !self.isRunning else { return }
-//        self.startListeningForInputs()
         self.core.play()
         self.startFrameTimer()
         await self.audio.resume()
@@ -128,7 +126,6 @@ actor GameCoreCoordinator: GameCoreDelegate {
     func pause() async {
         guard self.isRunning else { return }
         self.core.pause()
-//        self.stopListeningForInputs()
         await self.audio.pause()
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
@@ -212,104 +209,4 @@ actor GameCoreCoordinator: GameCoreDelegate {
     func playerDisconnected(player: UInt8) {
         return self.core.playerDisconnected(player: player)
     }
-
-//    func startListeningForInputs() {
-//        // listen for new connections
-//        
-//        NotificationCenter.default.addObserver(forName: NSNotification.Name.GCControllerDidConnect, object: nil, queue: nil) { note in
-//            guard let controller = note.object as? GCController, let gamepad = controller.extendedGamepad else { return }
-//            print(gamepad)
-////            gamepad.valueChangedHandler = self.handleGamepadInput
-//        }
-//        
-//        NotificationCenter.default.addObserver(forName: NSNotification.Name.GCControllerDidDisconnect, object: nil, queue: nil) { note in
-//            guard let controller = note.object as? GCController, let gamepad = controller.extendedGamepad else { return }
-//            gamepad.valueChangedHandler = nil
-//        }
-//        
-//        NotificationCenter.default.addObserver(forName: NSNotification.Name.GCKeyboardDidConnect, object: nil, queue: nil) { note in
-//            guard let keyboard = note.object as? GCKeyboard, let keyboardInput = keyboard.keyboardInput else { return }
-//            print(keyboardInput)
-////            keyboardInput.keyChangedHandler = self.handleKeyboardInput
-//        }
-//        
-//        NotificationCenter.default.addObserver(forName: NSNotification.Name.GCKeyboardDidDisconnect, object: nil, queue: nil) { note in
-//            guard let keyboard = note.object as? GCKeyboard, let keyboardInput = keyboard.keyboardInput else { return }
-//            keyboardInput.keyChangedHandler = nil
-//        }
-//        
-//        // bind already connected controllers
-//
-//        if let keyboard = GCKeyboard.coalesced, let input = keyboard.keyboardInput {
-//            input.keyChangedHandler = self.handleKeyboardInput
-//        }
-//        
-//        for gamepad in GCController.controllers() {
-//            if let gamepad = gamepad.extendedGamepad {
-//                gamepad.valueChangedHandler = self.handleGamepadInput
-//            }
-//        }
-//        
-//        touchControlsDelegate?.valueChangedHandler = self.handleTouchInput
-//    }
-//
-//    func stopListeningForInputs() {
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCControllerDidConnect, object: nil)
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCControllerDidDisconnect, object: nil)
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCKeyboardDidDisconnect, object: nil)
-//
-//        if let keyboard = GCKeyboard.coalesced {
-//            keyboard.keyboardInput?.keyChangedHandler = nil
-//        }
-//        
-//        for gamepad in GCController.controllers() {
-//            if let gamepad = gamepad.extendedGamepad {
-//                gamepad.valueChangedHandler = nil
-//            }
-//        }
-//        
-//        touchControlsDelegate?.valueChangedHandler = nil
-//    }
-//    
-//    private func handleGamepadInput(gamepad: GCExtendedGamepad, _: GCControllerElement) {
-//        var state: UInt32 = 0
-//        
-//        state |= GameInput.dpadUp.rawValue * UInt32(gamepad.dpad.up.isPressed)
-//        state |= GameInput.dpadDown.rawValue * UInt32(gamepad.dpad.down.isPressed)
-//        state |= GameInput.dpadLeft.rawValue * UInt32(gamepad.dpad.left.isPressed)
-//        state |= GameInput.dpadRight.rawValue * UInt32(gamepad.dpad.right.isPressed)
-//        
-//        state |= GameInput.faceButtonRight.rawValue * UInt32(gamepad.buttonA.isPressed)
-//        state |= GameInput.faceButtonDown.rawValue * UInt32(gamepad.buttonB.isPressed)
-//
-//        state |= GameInput.startButton.rawValue * UInt32(gamepad.buttonMenu.isPressed)
-//        state |= GameInput.selectButton.rawValue * UInt32(gamepad.buttonOptions?.isPressed ?? false)
-//        
-//        self.core.playerSetInputs(player: 0, value: state)
-//    }
-//    
-//    private func handleKeyboardInput(keyboard: GCKeyboardInput?, key: GCDeviceButtonInput?, keyCode: GCKeyCode, pressed: Bool) {
-//        let input = switch keyCode {
-//        case .keyZ:             GameInput.faceButtonRight
-//        case .keyX:             GameInput.faceButtonDown
-//        case .returnOrEnter:    GameInput.startButton
-//        case .rightShift:       GameInput.selectButton
-//        case .upArrow:          GameInput.dpadUp
-//        case .downArrow:        GameInput.dpadDown
-//        case .leftArrow:        GameInput.dpadLeft
-//        case .rightArrow:       GameInput.dpadRight
-//        default:                GameInput.none
-//        }
-//        
-//        inputs[0] = pressed
-//            ? inputs[0] | input.rawValue
-//            : inputs[0] & ~input.rawValue
-//        
-//        self.core.playerSetInputs(player: 0, value: inputs[0])
-//    }
-//    
-//    private func handleTouchInput(input: UInt32) {
-//        self.core.playerSetInputs(player: 0, value: input)
-//    }
 }

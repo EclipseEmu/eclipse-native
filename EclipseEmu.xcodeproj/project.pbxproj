@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
 		92115C322BD366ED0020D62F /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C312BD366ED0020D62F /* Box.swift */; };
+		92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C332BD3F2550020D62F /* ReorderControllersView.swift */; };
+		92115C362BD435840020D62F /* MessageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C352BD435840020D62F /* MessageBlock.swift */; };
 		9227F5452BCB49EE00A29074 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9227F5442BCB49EE00A29074 /* EclipseKit */; };
 		922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78932BC23CB100695252 /* EmulationMenuView.swift */; };
 		922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78952BC23D5900695252 /* TouchControlsView.swift */; };
@@ -57,7 +59,7 @@
 		92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7272BC103BC00659C37 /* SettingsView.swift */; };
 		92D5D72B2BC1723700659C37 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72A2BC1723700659C37 /* GameView.swift */; };
 		92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72C2BC1724E00659C37 /* EmulationView.swift */; };
-		92D5D7312BC17C2800659C37 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* CloseButton.swift */; };
+		92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* DismissButton.swift */; };
 		92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */; };
 /* End PBXBuildFile section */
 
@@ -81,6 +83,8 @@
 /* Begin PBXFileReference section */
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
 		92115C312BD366ED0020D62F /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
+		92115C332BD3F2550020D62F /* ReorderControllersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReorderControllersView.swift; sourceTree = "<group>"; };
+		92115C352BD435840020D62F /* MessageBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBlock.swift; sourceTree = "<group>"; };
 		9227F5432BCB49E200A29074 /* EclipseKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = EclipseKit; sourceTree = "<group>"; };
 		922D78932BC23CB100695252 /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
 		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
@@ -137,7 +141,7 @@
 		92D5D7272BC103BC00659C37 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		92D5D72A2BC1723700659C37 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		92D5D72C2BC1724E00659C37 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
-		92D5D7302BC17C2800659C37 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
+		92D5D7302BC17C2800659C37 /* DismissButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissButton.swift; sourceTree = "<group>"; };
 		92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEmulationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -181,6 +185,7 @@
 				922D78932BC23CB100695252 /* EmulationMenuView.swift */,
 				922D78952BC23D5900695252 /* TouchControlsView.swift */,
 				925B14EA2BC9E90F00AD7257 /* GameScreen.swift */,
+				92115C332BD3F2550020D62F /* ReorderControllersView.swift */,
 			);
 			path = Emulation;
 			sourceTree = "<group>";
@@ -377,8 +382,9 @@
 				92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */,
 				92D5D7252BC1007900659C37 /* GameGridItem.swift */,
 				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
-				92D5D7302BC17C2800659C37 /* CloseButton.swift */,
+				92D5D7302BC17C2800659C37 /* DismissButton.swift */,
 				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
+				92115C352BD435840020D62F /* MessageBlock.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -542,6 +548,7 @@
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
 				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
+				92115C362BD435840020D62F /* MessageBlock.swift in Sources */,
 				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
 				922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */,
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
@@ -566,7 +573,7 @@
 				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */,
 				92CAA2452BD2B67D000D4FE0 /* RingBuffer.c in Sources */,
 				925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */,
-				92D5D7312BC17C2800659C37 /* CloseButton.swift in Sources */,
+				92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */,
 				92115C322BD366ED0020D62F /* Box.swift in Sources */,
 				923E37FD2BC9AE0D00ECC973 /* GameRenderer2D.swift in Sources */,
 				928237072BCB77B5001E27B3 /* View+modify.swift in Sources */,
@@ -575,6 +582,7 @@
 				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
 				92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */,
 				9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */,
+				92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
