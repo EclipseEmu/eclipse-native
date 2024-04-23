@@ -1,0 +1,15 @@
+{
+  "originHash" : "2b3595120b911c29b883bd56c16dcfdeff6156881fc455f0b5ed9925e918afe2",
+  "pins" : [
+    {
+      "identity" : "eclipsekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/eclipseemu/eclipsekit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "64aa776bad13769a01ede62a8f10f3723fdee237"
+      }
+    }
+  ],
+  "version" : 3
+}

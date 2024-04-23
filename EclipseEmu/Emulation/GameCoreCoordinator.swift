@@ -41,15 +41,16 @@ actor GameCoreCoordinator {
     private let callbackContext: UnsafeMutablePointer<CallbackContext>
     
     struct CallbackContext {
-        weak var audio: GameAudio?
+        var audio: GameAudio!
     }
     
     init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
         self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
         self.callbackContext.initialize(to: CallbackContext())
         
-        let coreCallbacks = EKCoreCallbacks(
-            ctx: self.callbackContext,
+        let coreCallbacksPtr = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
+        coreCallbacksPtr.initialize(to: GameCoreCallbacks(
+            callbackContext: self.callbackContext,
             didSave: { savePathPtr in
                 let savePath = String(cString: savePathPtr!)
                 // send a notification here
@@ -57,10 +58,11 @@ actor GameCoreCoordinator {
             },
             writeAudio: { ctx, ptr, count in
                 let audio = ctx!.assumingMemoryBound(to: CallbackContext.self).pointee.audio
-                return audio?.write(samples: ptr.unsafelyUnwrapped, count: count) ?? 0
+                return audio!.write(samples: ptr.unsafelyUnwrapped, count: count)
             }
-        )
-        guard let core = coreInfo.setup(system, coreCallbacks) else {
+        ))
+
+        guard let core = coreInfo.setup(system, coreCallbacksPtr) else {
             throw Failure.failedToGetCoreInstance
         }
         

@@ -13,8 +13,14 @@ let package = Package(
             targets: ["DummyCore"]
         ),
     ],
-    dependencies: [.package(path: "../../EclipseKit")],
+    dependencies: [
+        .package(url: "https://github.com/eclipseemu/eclipsekit.git", branch: "main"),
+    ],
     targets: [
-        .target(name: "DummyCore", dependencies: ["EclipseKit"], linkerSettings: [.unsafeFlags(["-fprofile-instr-generate"])]),
+        .target(
+            name: "DummyCore",
+            dependencies: [.product(name: "EclipseKit", package: "eclipsekit")],
+            linkerSettings: [.unsafeFlags(["-fprofile-instr-generate"])]
+        ),
     ]
 )

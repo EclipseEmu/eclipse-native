@@ -12,7 +12,7 @@ namespace dummycore {
     const uint32_t videoBufferSize = videoWidth * videoHeight * 4;
 
     struct DummyCoreCtx {
-        EKCoreCallbacks callbacks;
+        const EKCoreCallbacks *callbacks;
         uint8_t *videoBuffer;
         int16_t *audioBuffer;
         uint8_t playersCount;
@@ -31,7 +31,6 @@ namespace dummycore {
                 .commonFormat = EKCoreCommonAudioFormatPcmInt16,
                 .sampleRate = 44100,
                 .channelCount = 2,
-                .isInterleaved = true,
             };
         }
 
@@ -76,7 +75,7 @@ namespace dummycore {
             for (int i = 0; i < audioBufferSize; ++i) {
                 ctx->audioBuffer[i] = (int16_t)(rand() & 0xffff);
             }
-            ctx->callbacks.writeAudio(ctx->callbacks.ctx, ctx->audioBuffer, audioBufferSize);
+            ctx->callbacks->writeAudio(ctx->callbacks->callbackContext, ctx->audioBuffer, audioBufferSize);
             
             if (!willRender) return;
             
@@ -129,7 +128,7 @@ namespace dummycore {
     
     const EKCoreSetting settings[] = {};
 
-    EKCore *initializeCore(EKSystem system, EKCoreCallbacks callbacks) {
+    EKCore *initializeCore(EKSystem system, const EKCoreCallbacks *callbacks) {
         DummyCoreCtx* coreContext = static_cast<DummyCoreCtx *>(malloc(sizeof(DummyCoreCtx)));
         if (coreContext == nullptr) {
             return nullptr;

@@ -50,7 +50,6 @@
 		92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB7912BC190C30093B2E3 /* AppIconView.swift */; };
 		92C11CCD2BD7064A00BB11A2 /* DummyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92C11CCC2BD7064A00BB11A2 /* DummyCore */; };
 		92C11CCE2BD7067100BB11A2 /* DummyCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 92C11CCC2BD7064A00BB11A2 /* DummyCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		92C11CD42BD768F900BB11A2 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92C11CD32BD768F900BB11A2 /* EclipseKit */; };
 		92CAA2452BD2B67D000D4FE0 /* RingBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 92CAA2442BD2B67D000D4FE0 /* RingBuffer.c */; };
 		92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */; };
 		92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D3712BC0DF1700F1116C /* MD5.swift */; };
@@ -144,7 +143,6 @@
 		92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayGameAction.swift; sourceTree = "<group>"; };
 		92BFB7912BC190C30093B2E3 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		92C11CC72BD6EF5200BB11A2 /* DummyCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DummyCore; sourceTree = "<group>"; };
-		92C11CD12BD7686C00BB11A2 /* EclipseKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = EclipseKit; sourceTree = "<group>"; };
 		92CAA2422BD2B67D000D4FE0 /* EclipseEmu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EclipseEmu-Bridging-Header.h"; sourceTree = "<group>"; };
 		92CAA2432BD2B67D000D4FE0 /* RingBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RingBuffer.h; sourceTree = "<group>"; };
 		92CAA2442BD2B67D000D4FE0 /* RingBuffer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RingBuffer.c; sourceTree = "<group>"; };
@@ -166,7 +164,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				92C11CCD2BD7064A00BB11A2 /* DummyCore in Frameworks */,
-				92C11CD42BD768F900BB11A2 /* EclipseKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +207,6 @@
 			isa = PBXGroup;
 			children = (
 				928237052BCB540C001E27B3 /* README.md */,
-				92C11CD12BD7686C00BB11A2 /* EclipseKit */,
 				929AD0192BCB46C6001BC106 /* Cores */,
 				922F00A32BC0C26600B419D7 /* EclipseEmu */,
 				922F00BA2BC0C26700B419D7 /* EclipseEmuTests */,
@@ -434,7 +430,6 @@
 			name = EclipseEmu;
 			packageProductDependencies = (
 				92C11CCC2BD7064A00BB11A2 /* DummyCore */,
-				92C11CD32BD768F900BB11A2 /* EclipseKit */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
@@ -511,7 +506,7 @@
 			mainGroup = 922F00982BC0C26600B419D7;
 			packageReferences = (
 				92C11CCB2BD7064A00BB11A2 /* XCLocalSwiftPackageReference "Cores/DummyCore" */,
-				92C11CD22BD768F900BB11A2 /* XCLocalSwiftPackageReference "EclipseKit" */,
+				92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -985,20 +980,23 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Cores/DummyCore;
 		};
-		92C11CD22BD768F900BB11A2 /* XCLocalSwiftPackageReference "EclipseKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = EclipseKit;
-		};
 /* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		92C11CCC2BD7064A00BB11A2 /* DummyCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DummyCore;
-		};
-		92C11CD32BD768F900BB11A2 /* EclipseKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EclipseKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

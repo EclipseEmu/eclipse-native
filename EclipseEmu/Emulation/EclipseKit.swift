@@ -51,7 +51,7 @@ extension GameCoreCommonAudioFormat {
 
 extension GameCoreAudioFormat {
     var avAudioFormat: AVAudioFormat? {
-        AVAudioFormat(commonFormat: self.commonFormat.avCommonFormat, sampleRate: self.sampleRate, channels: self.channelCount, interleaved: self.isInterleaved)
+        AVAudioFormat(commonFormat: self.commonFormat.avCommonFormat, sampleRate: self.sampleRate, channels: self.channelCount, interleaved: true)
     }
 }
 
