@@ -34,6 +34,7 @@ extension GameInput {
         case .touchNegY:            "Touch Y-"
         case .lid:                  "Lid"
         case .mic:                  "Mic"
+        @unknown default:           "Unknown"
         }
     }
 }

@@ -1,6 +1,5 @@
 import Foundation
 import AVFoundation
-import EclipseKit
 
 // FIXME: handle changes in audio output
 

@@ -1,6 +1,5 @@
 import Foundation
 import GameController
-import EclipseKit
 
 protocol GameInputCoordinatorDelegate {
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void
@@ -11,7 +10,7 @@ final class GameInputCoordinator {
     
     struct Player: Identifiable {
         var id = UUID()
-        var state: GameInput.RawValue = 0
+        var state: UInt32 = 0
         var kind: ControllerKind
         
         enum ControllerKind: Equatable {
@@ -244,7 +243,7 @@ final class GameInputCoordinator {
                 player.state = 0
                 for (keyCode, input) in bindings.value {
                     // FIXME: is inputs.button(forKeyCode:) practical for polling? or should the GCControllerButtonInput be cached?
-                    player.state |= input.rawValue * GameInput.RawValue(inputs.button(forKeyCode: keyCode)?.isPressed ?? false)
+                    player.state |= input.rawValue * UInt32(inputs.button(forKeyCode: keyCode)?.isPressed ?? false)
                 }
             case .gamepad(let bindings, let device):
                 guard let inputs = device.extendedGamepad else { continue }
@@ -252,11 +251,11 @@ final class GameInputCoordinator {
                 for binding in bindings.value {
                     switch binding.kind {
                     case .button:
-                        player.state |= binding.input.rawValue * GameInput.RawValue(inputs.buttons[binding.id]?.isPressed ?? false)
+                        player.state |= binding.input.rawValue * UInt32(inputs.buttons[binding.id]?.isPressed ?? false)
                     case .axis:
                         let expected = Float32(binding.direction.rawValue) - binding.deadZone
                         let value = inputs.axes[binding.id]?.value ?? 0
-                        player.state |= binding.input.rawValue * GameInput.RawValue((binding.direction == .negative && value <= expected) || (binding.direction == .positive && value >= expected))
+                        player.state |= binding.input.rawValue * UInt32((binding.direction == .negative && value <= expected) || (binding.direction == .positive && value >= expected))
                     }
                 }
             }

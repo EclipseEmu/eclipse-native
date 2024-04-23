@@ -16,9 +16,9 @@ class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
     @Published var isRestartDialogShown = false
     @Published var volume: Float = 0.0
     
-    init(core: GameCore, game: Game) {
+    init(core: GameCoreInfo, game: Game) {
         self.game = game
-        self.coreCoordinator = try! GameCoreCoordinator(core: core, system: game.system, reorderControls: self.reorderControllers)
+        self.coreCoordinator = try! GameCoreCoordinator(coreInfo: core, system: game.system, reorderControls: self.reorderControllers)
     }
     
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
@@ -40,8 +40,8 @@ struct EmulationView: View {
     @Environment(\.playGame) var playGame
     @StateObject var model: EmulationViewModel
     
-    init(game: Game, core: GameCore) {
-        self._model = StateObject(wrappedValue: EmulationViewModel(core: core, game: game))
+    init(game: Game, coreInfo: GameCoreInfo) {
+        self._model = StateObject(wrappedValue: EmulationViewModel(core: coreInfo, game: game))
     }
     
     var body: some View {
@@ -97,7 +97,7 @@ struct EmulationView: View {
             guard let romPath = self.model.game.romPath else {
                 return
             }
-            await self.model.coreCoordinator.start(gameUrl: romPath)
+            await self.model.coreCoordinator.start(gamePath: romPath, savePath: nil)
             self.model.width = await self.model.coreCoordinator.width
             self.model.height = await self.model.coreCoordinator.height
         }

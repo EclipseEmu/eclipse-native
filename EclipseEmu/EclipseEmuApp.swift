@@ -1,4 +1,5 @@
 import SwiftUI
+import DummyCore
 
 @main
 struct EclipseEmuApp: App {
@@ -6,8 +7,7 @@ struct EclipseEmuApp: App {
     let persistenceController = PersistenceController.preview
     @StateObject var playGameAction = PlayGameAction()
     static let cores: GameCoreRegistry = {
-        let dummyCore = DummyCore()
-        
+        let dummyCore = DummyCore.coreInfo
         let registry = GameCoreRegistry(cores: [dummyCore])
         registry.registerDefaults(id: dummyCore.id, for: .gb)
         registry.registerDefaults(id: dummyCore.id, for: .gbc)
@@ -21,7 +21,7 @@ struct EclipseEmuApp: App {
     var body: some Scene {
         WindowGroup {
             if let context = playGameAction.context {
-                EmulationView(game: context.game, core: context.core)
+                EmulationView(game: context.game, coreInfo: context.core)
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)
             } else {

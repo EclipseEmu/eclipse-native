@@ -18,7 +18,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="romPath" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="savePath" optional="YES" attributeType="URI" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="system" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="system" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Cheat" inverseName="game" inverseEntity="Cheat"/>
         <relationship name="collections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Collection" inverseName="games" inverseEntity="Collection"/>
         <relationship name="saveStates" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SaveStates" inverseName="game" inverseEntity="SaveStates"/>

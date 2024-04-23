@@ -105,7 +105,7 @@ final class GameFrameBufferRenderer {
     private var samplerState: MTLSamplerState
     
     /// NOTE: The core is not stored, it is only used to initialize the frame buffer.
-    init(with device: MTLDevice, width: Int, height: Int, pixelFormat: MTLPixelFormat, frameDuration: Double, core: GameCore) throws {
+    init(with device: MTLDevice, width: Int, height: Int, pixelFormat: MTLPixelFormat, frameDuration: Double, core: UnsafeMutablePointer<GameCore>) throws {
         self.device = device
         guard let queue = device.makeCommandQueue() else {
             throw Failure.failedToCreateTheCommandQueue
@@ -166,12 +166,13 @@ final class GameFrameBufferRenderer {
         // setup the frame buffer and setup the texture
         
         // NOTE: the size is initialized with the int values already, so this doesn't cause any issue
-        if core.canSetVideoBufferPointer() {
+        
+        if core.pointee.canSetVideoPointer(core.pointee.data) {
             let buffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: nil)
-            let _ = core.getVideoBuffer(setPointer: buffer.buffer)
+            let _ = core.pointee.getVideoPointer(core.pointee.data, buffer.buffer)
             self.frameBuffer = buffer
         } else {
-            let buf = UnsafeMutableRawPointer(mutating: core.getVideoBuffer(setPointer: nil))
+            let buf = UnsafeMutableRawPointer(mutating: core.pointee.getVideoPointer(core.pointee.data, nil))
             frameBuffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: buf)
         }
         

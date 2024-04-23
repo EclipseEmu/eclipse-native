@@ -1,8 +1,8 @@
 import Foundation
 import GameController
 import QuartzCore
-import EclipseKit
 import simd
+import EclipseKit
 
 enum GameVideoRenderer {
     case frameBuffer(GameFrameBufferRenderer)
@@ -10,21 +10,22 @@ enum GameVideoRenderer {
 
 // FIXME: this needs better running state.
 //  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
-actor GameCoreCoordinator: GameCoreDelegate {
+actor GameCoreCoordinator {
     enum Failure: Error {
+        case failedToGetCoreInstance
         case failedToGetMetalDevice
-        case failedToCreateFullscreenQuad
-        case failedToCreatePipelineState
-        case failedToCreateTheCommandQueue
-        case failedToCreateSamplerState
+        
+        case invalidPixelFormat
+        case invalidAudioFormat
+        case invalidRendererFormat
     }
     
     var width: CGFloat = 0.0
     var height: CGFloat = 0.0
     
-    private let core: GameCore
+    private let core: UnsafeMutablePointer<GameCore>
     let inputs: GameInputCoordinator
-    /// SAFTEY: since we never write, this should not be an issue
+    /// FIXME: this should be isolated and there should be some sort of notification to indicate changes in state
     nonisolated(unsafe) private(set) var isRunning: Bool = false
     /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer can be written to syncronously by the core.
     nonisolated(unsafe) private let audio: GameAudio
@@ -35,26 +36,51 @@ actor GameCoreCoordinator: GameCoreDelegate {
     private var renderer: GameVideoRenderer
     private let desiredFrameRate: Double
     private var frameDuration: Double
-    private(set) var rate: Double = 1.0
     private var frameTimerTask: Task<Void, Never>?
+    private(set) var rate: Double = 1.0
+    private let callbackContext: UnsafeMutablePointer<CallbackContext>
     
-    init(core: GameCore, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
-        self.core = core
-
-        core.setup(system: system)
+    struct CallbackContext {
+        weak var audio: GameAudio?
+    }
+    
+    init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
+        self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
+        self.callbackContext.initialize(to: CallbackContext())
         
-        self.desiredFrameRate = core.getDesiredFrameRate()
+        let coreCallbacks = EKCoreCallbacks(
+            ctx: self.callbackContext,
+            didSave: { savePathPtr in
+                let savePath = String(cString: savePathPtr!)
+                // send a notification here
+                print(savePath)
+            },
+            writeAudio: { ctx, ptr, count in
+                let audio = ctx!.assumingMemoryBound(to: CallbackContext.self).pointee.audio
+                return audio?.write(samples: ptr.unsafelyUnwrapped, count: count) ?? 0
+            }
+        )
+        guard let core = coreInfo.setup(system, coreCallbacks) else {
+            throw Failure.failedToGetCoreInstance
+        }
+        
+        self.core = core
+        
+        self.desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
         self.frameDuration = 1.0 / desiredFrameRate
         
         guard let device = MTLCreateSystemDefaultDevice() else {
             throw Failure.failedToGetMetalDevice
         }
         
-        let width = core.getVideoWidth()
-        let height = core.getVideoHeight()
-        let size = CGSize(width: width, height: height)
+        let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
+        
+        let width =  videoFormat.width
+        let height = videoFormat.height
+        
         self.width = CGFloat(width)
         self.height = CGFloat(height)
+        let size = CGSize(width: self.width, height: self.height)
         
         self.renderingSurface = .init()
         self.renderingSurface.contentsScale = 2.0
@@ -67,34 +93,47 @@ actor GameCoreCoordinator: GameCoreDelegate {
         self.renderingSurface.displaySyncEnabled = true
         #endif
         
-        switch core.getVideoRenderingType() {
+        switch videoFormat.renderingType {
         case .frameBuffer:
-            let pixelFormat = core.getVideoPixelFormat()
+            guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
             let renderer = try GameFrameBufferRenderer(
                 with: device,
-                width: width,
-                height: height,
+                width: Int(width),
+                height: Int(height),
                 pixelFormat: pixelFormat,
                 frameDuration: frameDuration,
                 core: core
             )
             self.renderer = .frameBuffer(renderer)
             break
+        @unknown default:
+            throw Failure.invalidRendererFormat
         }
         
-        self.audio = try GameAudio(format: core.getAudioFormat())
+        guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
+            throw Failure.invalidAudioFormat
+        }
+                
         
-        self.inputs = .init(maxPlayers: core.getMaxPlayers(), reorderPlayers: reorderControls)
-        self.core.delegate = self
+        self.audio = try GameAudio(format: audioFormat)
+        self.callbackContext.pointee.audio = self.audio
+
+        self.inputs = .init(maxPlayers: core.pointee.getMaxPlayers(core.pointee.data), reorderPlayers: reorderControls)
     }
     
     deinit {
-        core.stop()
-        core.takedown()
+        core.pointee.stop(core.pointee.data)
+        core.pointee.deallocate(core.pointee.data)
+        core.deallocate()
+        callbackContext.deallocate()
     }
     
-    func start(gameUrl: URL) async {
-        guard self.core.start(url: gameUrl) else { return }
+    func start(gamePath: URL, savePath: URL?) async {
+        guard self.core.pointee.start(
+            self.core.pointee.data,
+            gamePath.absoluteString.cString(using: .ascii),
+            savePath?.absoluteString.cString(using: .ascii)
+        ) else { return }
         await self.inputs.start()
         await self.audio.start()
         await self.play()
@@ -102,10 +141,9 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     func stop() async {
         await self.pause()
-        self.core.stop()
+        self.core.pointee.stop(core.pointee.data)
         self.inputs.stop()
         await self.audio.stop()
-        self.core.takedown()
     }
     
     func restart() async {
@@ -115,7 +153,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
             self.frameTimerTask = nil
         }
         await self.audio.clear()
-        self.core.restart()
+        self.core.pointee.restart(core.pointee.data)
         self.startFrameTimer()
         await self.audio.resume()
         self.isRunning = true
@@ -123,7 +161,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     func play() async {
         guard !self.isRunning else { return }
-        self.core.play()
+        self.core.pointee.play(core.pointee.data)
         self.startFrameTimer()
         await self.audio.resume()
         self.isRunning = true
@@ -131,7 +169,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     func pause() async {
         guard self.isRunning else { return }
-        self.core.pause()
+        self.core.pointee.pause(core.pointee.data)
         await self.audio.pause()
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
@@ -140,11 +178,11 @@ actor GameCoreCoordinator: GameCoreDelegate {
     
     // MARK: Core Delegate methods
     
-    nonisolated func coreRenderAudio(samples: UnsafeRawPointer, byteSize: UInt64) -> UInt64 {
+    nonisolated func coreRenderAudio(_ samples: UnsafeRawPointer, _ byteSize: UInt64) -> UInt64 {
         return self.audio.write(samples: samples, count: byteSize)
     }
     
-    nonisolated func coreDidSave(at path: URL) {
+    nonisolated func coreDidSave(_ path: UnsafePointer<CChar>) {
         print(path)
     }
 
@@ -181,10 +219,9 @@ actor GameCoreCoordinator: GameCoreDelegate {
                 let expectedTime = start - initialTime
                 time = max(time, expectedTime - maxCatchupRate)
 
-                // FIXME: is this a good position in the loop?
                 self.inputs.poll()
                 for (i, player) in self.inputs.players.enumerated() {
-                    self.core.playerSetInputs(player: UInt8(i), value: player.state)
+                    self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
                 }
                 
                 while time <= expectedTime {
@@ -192,7 +229,7 @@ actor GameCoreCoordinator: GameCoreDelegate {
                     let doRender = time >= expectedTime && expectedTime >= nextRenderTime
                     nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
                     
-                    self.core.executeFrame(processVideo: doRender)
+                    self.core.pointee.executeFrame(self.core.pointee.data, doRender)
                     if doRender {
                         switch self.renderer {
                         case .frameBuffer(let renderer):
@@ -214,10 +251,10 @@ actor GameCoreCoordinator: GameCoreDelegate {
     // MARK: Input handling
 
     func playerConnected(player: UInt8) -> Bool {
-        return self.core.playerConnected(player: player)
+        return self.core.pointee.playerConnected(self.core.pointee.data, player)
     }
     
     func playerDisconnected(player: UInt8) {
-        return self.core.playerDisconnected(player: player)
+        return self.core.pointee.playerDisconnected(self.core.pointee.data, player)
     }
 }

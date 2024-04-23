@@ -1,5 +1,4 @@
 import SwiftUI
-import EclipseKit
 
 #if canImport(UIKit)
 fileprivate let borderWidth = 2.0

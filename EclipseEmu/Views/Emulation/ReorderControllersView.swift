@@ -1,4 +1,5 @@
 import SwiftUI
+import EclipseKit
 
 struct PlayerOrderChangeRequest: Identifiable {
     var id = UUID()

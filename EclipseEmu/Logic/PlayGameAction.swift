@@ -5,7 +5,7 @@ final class PlayGameAction: ObservableObject {
     @Published var context: EmulationContext?
     
     struct EmulationContext {
-        var core: GameCore
+        var core: GameCoreInfo
         var game: Game
     }
     

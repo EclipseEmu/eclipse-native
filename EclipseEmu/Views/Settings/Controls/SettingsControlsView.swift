@@ -42,12 +42,10 @@ struct SettingsControlsView: View {
         .refreshable {
             self.reloadControllers()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name.GCControllerDidConnect)) { _ in
-            print("Hello")
+        .onReceive(NotificationCenter.default.publisher(for: .GCControllerDidConnect)) { _ in
             self.reloadControllers()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name.GCControllerDidConnect)) { _ in
-            print("Goodbye")
+        .onReceive(NotificationCenter.default.publisher(for: .GCControllerDidConnect)) { _ in
             self.reloadControllers()
         }
         .navigationTitle("Controls")
