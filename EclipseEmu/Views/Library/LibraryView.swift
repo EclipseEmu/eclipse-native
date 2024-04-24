@@ -145,14 +145,13 @@ struct LibraryView: View {
     func fileImported(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            Task {
+            Task.detached {
                 do {
                     guard url.startAccessingSecurityScopedResource() else {
                         print("access denied")
                         return
                     }
                     defer { url.stopAccessingSecurityScopedResource() }
-
 
                     var resource: URLResourceValues?
                     do {
@@ -168,9 +167,10 @@ struct LibraryView: View {
                         GameSystem.unknown
                     }
                     
-                    
                     guard system != .unknown else {
-                        self.isUnknownSystemDialogShown = true
+                        await MainActor.run {
+                            self.isUnknownSystemDialogShown = true
+                        }
                         return
                     }
 

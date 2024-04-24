@@ -18,6 +18,7 @@ class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
     
     init(core: GameCoreInfo, game: Game) {
         self.game = game
+        // FIXME: this is expensive here...
         self.coreCoordinator = try! GameCoreCoordinator(coreInfo: core, system: game.system, reorderControls: self.reorderControllers)
     }
     
@@ -40,8 +41,8 @@ struct EmulationView: View {
     @Environment(\.playGame) var playGame
     @StateObject var model: EmulationViewModel
     
-    init(game: Game, coreInfo: GameCoreInfo) {
-        self._model = StateObject(wrappedValue: EmulationViewModel(core: coreInfo, game: game))
+    init(model: EmulationViewModel) {
+        self._model = StateObject(wrappedValue: model)
     }
     
     var body: some View {

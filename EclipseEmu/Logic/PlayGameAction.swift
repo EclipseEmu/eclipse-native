@@ -2,12 +2,7 @@ import SwiftUI
 import EclipseKit
 
 final class PlayGameAction: ObservableObject {
-    @Published var context: EmulationContext?
-    
-    struct EmulationContext {
-        var core: GameCoreInfo
-        var game: Game
-    }
+    @Published var model: EmulationViewModel?
     
     enum Failure: Error {
         case missingCore
@@ -15,17 +10,18 @@ final class PlayGameAction: ObservableObject {
     
     @MainActor
     public func callAsFunction(game: Game) async throws {
-        try await MainActor.run {
-            guard let core = EclipseEmuApp.cores.get(for: game) else {
-                throw Failure.missingCore
-            }
-            self.context = EmulationContext(core: core, game: game)
+        guard let core = EclipseEmuApp.cores.get(for: game) else {
+            throw Failure.missingCore
+        }
+        let model = EmulationViewModel(core: core, game: game)
+        await MainActor.run {
+            self.model = model
         }
     }
     
     public func closeGame() async {
         await MainActor.run {
-            self.context = nil
+            self.model = nil
         }
     }
 }

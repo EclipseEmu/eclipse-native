@@ -58,7 +58,7 @@ struct GameKeepPlayingItem: View {
     }
     
     func play() {
-        Task {
+        Task.detached {
             try await playGame(game: game)
         }
     }

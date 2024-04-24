@@ -20,8 +20,8 @@ struct EclipseEmuApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if let context = playGameAction.context {
-                EmulationView(game: context.game, coreInfo: context.core)
+            if let model = playGameAction.model {
+                EmulationView(model: model)
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)
             } else {

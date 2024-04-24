@@ -188,7 +188,6 @@ namespace dummycore {
     }
 }
 
-
 EKCoreInfo coreInfo = {
     .id = "dev.magnetar.dummycore",
     .name = "Dummy Core",
@@ -203,4 +202,3 @@ EKCoreInfo coreInfo = {
     .cheatFormats = nullptr,
     .setup = dummycore::initializeCore,
 };
-
