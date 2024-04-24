@@ -5,9 +5,8 @@ struct SectionHeader: View {
     
     var body: some View {
         Text(title)
-            .font(.title3)
+            .font(.title3.weight(.semibold))
             .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            .fontWeight(.semibold)
     }
 }
 

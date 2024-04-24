@@ -6,7 +6,7 @@ struct EmulationMenuView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        NavigationStack {
+        CompatNavigationStack {
             ScrollView {
                 Button("Fast Foward") {
                     Task {

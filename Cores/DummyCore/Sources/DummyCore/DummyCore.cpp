@@ -199,6 +199,8 @@ EKCoreInfo coreInfo = {
         .itemsCount = sizeof(dummycore::settings) / sizeof(EKCoreSetting),
         .items = dummycore::settings,
     },
+    .cheatFormatsCount = 0,
+    .cheatFormats = nullptr,
     .setup = dummycore::initializeCore,
 };
 

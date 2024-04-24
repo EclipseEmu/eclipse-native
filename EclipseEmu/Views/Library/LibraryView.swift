@@ -40,7 +40,7 @@ struct LibraryView: View {
     private var games: FetchedResults<Game>
     
     var body: some View {
-        NavigationStack {
+        CompatNavigationStack {
             ScrollView {
                 if recentlyPlayed.count != 0 {
                     VStack(alignment: .leading, spacing: 0.0) {

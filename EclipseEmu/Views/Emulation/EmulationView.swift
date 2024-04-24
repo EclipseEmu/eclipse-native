@@ -69,7 +69,13 @@ struct EmulationView: View {
         #if !os(macOS)
         .sheet(isPresented: $model.isMenuVisible) {
             EmulationMenuView(model: model)
-                .presentationDetents([.medium])
+                .modify {
+                    if #available(iOS 16.0, *) {
+                        $0.presentationDetents([.medium])
+                    } else {
+                        $0
+                    }
+                }
         }
         #else
         .onHover { state in

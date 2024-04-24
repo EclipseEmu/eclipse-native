@@ -31,8 +31,7 @@ struct GameViewHeader: View {
                         .font(.headline)
                 }
                 .buttonStyle(.borderedProminent)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+                .font(.subheadline.weight(.semibold))
                 .controlSize(.large)
                 .tint(.black)
                 .foregroundStyle(.white)
@@ -74,7 +73,7 @@ struct GameView: View {
     var game: Game
     
     var body: some View {
-        NavigationStack {
+        CompatNavigationStack {
             GeometryReader { geometry in
                 ScrollView {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top)

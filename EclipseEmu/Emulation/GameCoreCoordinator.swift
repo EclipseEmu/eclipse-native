@@ -8,6 +8,22 @@ enum GameVideoRenderer {
     case frameBuffer(GameFrameBufferRenderer)
 }
 
+fileprivate enum MonotomicClock {
+    private static let nanosecondsFactor: Double = {
+        var timebase = mach_timebase_info()
+        mach_timebase_info(&timebase)
+        return (Double(timebase.numer) / Double(timebase.denom))
+    }()
+    
+    private static let secondsFactor: Double = {
+        return Self.nanosecondsFactor / 1e9;
+    }()
+    
+    private static var now: UInt64 {
+        mach_absolute_time()
+    }
+}
+
 // FIXME: this needs better running state.
 //  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
 actor GameCoreCoordinator {
@@ -208,45 +224,66 @@ actor GameCoreCoordinator {
     
     func startFrameTimer() {
         self.frameTimerTask?.cancel()
-        self.frameTimerTask = Task(priority: .userInitiated) {
-            let initialTime: ContinuousClock.Instant = .now
-            var time: ContinuousClock.Duration = .zero
-            let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
-            var nextRenderTime: ContinuousClock.Duration = .zero
-
-            while !Task.isCancelled {
-                let start: ContinuousClock.Instant = .now
-                let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
-                let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
-                let expectedTime = start - initialTime
-                time = max(time, expectedTime - maxCatchupRate)
-
-                self.inputs.poll()
-                for (i, player) in self.inputs.players.enumerated() {
-                    self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
-                }
+        if #available(iOS 16.0, macOS 12.0, *) {
+            self.frameTimerTask = Task(priority: .userInitiated) {
+                let initialTime: ContinuousClock.Instant = .now
+                var time: ContinuousClock.Duration = .zero
+                let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
+                var nextRenderTime: ContinuousClock.Duration = .zero
                 
-                while time <= expectedTime {
-                    time += frameDuration
-                    let doRender = time >= expectedTime && expectedTime >= nextRenderTime
-                    nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
+                while !Task.isCancelled {
+                    let start: ContinuousClock.Instant = .now
+                    let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+                    let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
+                    let expectedTime = start - initialTime
+                    time = max(time, expectedTime - maxCatchupRate)
                     
-                    self.core.pointee.executeFrame(self.core.pointee.data, doRender)
-                    if doRender {
-                        switch self.renderer {
-                        case .frameBuffer(let renderer):
-                            renderer.render(in: self.renderingSurface)
+                    self.inputs.poll()
+                    for (i, player) in self.inputs.players.enumerated() {
+                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
+                    }
+                    
+                    while time <= expectedTime {
+                        time += frameDuration
+                        let doRender = time >= expectedTime && expectedTime >= nextRenderTime
+                        nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
+                        
+                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
+                        if doRender {
+                            switch self.renderer {
+                            case .frameBuffer(let renderer):
+                                renderer.render(in: self.renderingSurface)
+                            }
                         }
                     }
-                }
-
-                let framesTime: ContinuousClock.Duration = .now - start
-                if framesTime < frameDuration {
-                    try? await Task.sleep(until: start + frameDuration)
-                } else {
-                    await Task.yield()
+                    
+                    let framesTime: ContinuousClock.Duration = .now - start
+                    if framesTime < frameDuration {
+                        try? await Task.sleep(until: start + frameDuration)
+                    } else {
+                        await Task.yield()
+                    }
                 }
             }
+        } else {
+            #warning("FIXME: Frame timer is unimplemented for iOS 15, as ContinuousClock is iOS 16+ only")
+            // NOTES:
+            // This could be recreated with the following symbols:
+            //  - mach_absolute_time
+            //  - mach_timebase_into
+            //  - mach_wait_until
+            //
+            // The same logic as above applies, the worrying difference is Task.sleep(until:) vs mach_wait_until:
+            //  - I'm not sure if Task.sleep is specialized to effectively yield until the sleep finishes.
+            //  - I'm fairly certain mach_wait_until blocks the current thread until the given time has passed.
+            //  > Both of these are my gut feelings, if they're equivalent in nature then this is a non-issue.
+            //
+            // Luckily the implementation is open source to find out for real:
+            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/ContinuousClock.swift
+            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/Clock.cpp
+            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/Clock.swift
+            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/TaskSleepDuration.swift
+            preconditionFailure("unimplemented")
         }
     }
 

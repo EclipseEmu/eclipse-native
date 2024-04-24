@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */; };
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
 		92115C322BD366ED0020D62F /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C312BD366ED0020D62F /* Box.swift */; };
 		92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C332BD3F2550020D62F /* ReorderControllersView.swift */; };
 		92115C362BD435840020D62F /* MessageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C352BD435840020D62F /* MessageBlock.swift */; };
 		92115C382BD4C7580020D62F /* GameInput+string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C372BD4C7580020D62F /* GameInput+string.swift */; };
-		92115C3A2BD580F00020D62F /* EclipseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C392BD580F00020D62F /* EclipseKit.swift */; };
+		92115C3A2BD580F00020D62F /* EclipseKit+Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C392BD580F00020D62F /* EclipseKit+Swift.swift */; };
 		922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78932BC23CB100695252 /* EmulationMenuView.swift */; };
 		922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78952BC23D5900695252 /* TouchControlsView.swift */; };
 		922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */; };
@@ -95,12 +96,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatNavigationStack.swift; sourceTree = "<group>"; };
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
 		92115C312BD366ED0020D62F /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 		92115C332BD3F2550020D62F /* ReorderControllersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReorderControllersView.swift; sourceTree = "<group>"; };
 		92115C352BD435840020D62F /* MessageBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBlock.swift; sourceTree = "<group>"; };
 		92115C372BD4C7580020D62F /* GameInput+string.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameInput+string.swift"; sourceTree = "<group>"; };
-		92115C392BD580F00020D62F /* EclipseKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseKit.swift; sourceTree = "<group>"; };
+		92115C392BD580F00020D62F /* EclipseKit+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EclipseKit+Swift.swift"; sourceTree = "<group>"; };
 		922D78932BC23CB100695252 /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
 		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
 		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -295,6 +297,7 @@
 		925B14EC2BCA487400AD7257 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				92115C392BD580F00020D62F /* EclipseKit+Swift.swift */,
 				9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */,
 				925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */,
 				92875E9A2BCADDB900EABD63 /* Bundle+version.swift */,
@@ -366,7 +369,6 @@
 		92CC9CF82BC3930B00D668DB /* Emulation */ = {
 			isa = PBXGroup;
 			children = (
-				92115C392BD580F00020D62F /* EclipseKit.swift */,
 				92CAA2432BD2B67D000D4FE0 /* RingBuffer.h */,
 				92CAA2442BD2B67D000D4FE0 /* RingBuffer.c */,
 				923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */,
@@ -397,6 +399,7 @@
 				92D5D7302BC17C2800659C37 /* DismissButton.swift */,
 				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
 				92115C352BD435840020D62F /* MessageBlock.swift */,
+				920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -557,7 +560,7 @@
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
 				9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
-				92115C3A2BD580F00020D62F /* EclipseKit.swift in Sources */,
+				92115C3A2BD580F00020D62F /* EclipseKit+Swift.swift in Sources */,
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
@@ -582,6 +585,7 @@
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
+				920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */,
 				9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */,
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
 				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */,
@@ -777,7 +781,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
@@ -823,7 +827,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;

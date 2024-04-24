@@ -1,4 +1,5 @@
 import SwiftUI
+import EclipseKit
 
 #if canImport(UIKit)
 fileprivate let borderWidth = 2.0
@@ -12,7 +13,11 @@ class TouchControlsController: UIViewController {
     private var touchControlsSubview = UIView()
     private var menuButton: UIButton = {
         var buttonConfig = UIButton.Configuration.plain()
-        buttonConfig.indicator = .none
+        
+        if #available(iOS 16.0, *) {
+            buttonConfig.indicator = .none
+        }
+        
         buttonConfig.image = UIImage(systemName: "line.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(scale: .default))
         buttonConfig.imagePlacement = .trailing
         buttonConfig.baseForegroundColor = .label

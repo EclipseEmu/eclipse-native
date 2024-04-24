@@ -15,10 +15,9 @@ struct GameKeepPlayingItem: View {
                 
                 VStack(alignment: .leading) {
                     Text("Resume · 5h ago")
-                        .font(.caption)
+                        .font(.caption.weight(.medium))
                         .textCase(.uppercase)
                         .foregroundStyle(.secondary)
-                        .fontWeight(.medium)
                     
                     Text(game.name ?? "Unknown Game")
                         .font(.headline)
@@ -43,8 +42,7 @@ struct GameKeepPlayingItem: View {
                     }
                     .tint(.white)
                     .foregroundStyle(.black)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(.subheadline.weight(.semibold))
                 }
                 .frame(minWidth: 0, maxWidth: .infinity)
                 .multilineTextAlignment(.leading)

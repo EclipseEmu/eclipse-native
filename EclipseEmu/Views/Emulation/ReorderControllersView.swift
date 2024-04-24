@@ -19,7 +19,7 @@ struct ReorderControllersView: View {
     @State var request: PlayerOrderChangeRequest
 
     var body: some View {
-        NavigationStack {
+        CompatNavigationStack {
             List {
                 ForEach(Array(request.players.enumerated()), id: \.element.id) { (i, player) in
                     HStack(alignment: .center) {
@@ -45,7 +45,13 @@ struct ReorderControllersView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .modify {
+            if #available(iOS 16.0, *) {
+                $0.presentationDetents([.medium])
+            } else {
+                $0
+            }
+        }
         .onDisappear {
             request.finish(request.players)
         }
