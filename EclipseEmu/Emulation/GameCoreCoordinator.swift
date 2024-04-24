@@ -8,22 +8,6 @@ enum GameVideoRenderer {
     case frameBuffer(GameFrameBufferRenderer)
 }
 
-fileprivate enum MonotomicClock {
-    private static let nanosecondsFactor: Double = {
-        var timebase = mach_timebase_info()
-        mach_timebase_info(&timebase)
-        return (Double(timebase.numer) / Double(timebase.denom))
-    }()
-    
-    private static let secondsFactor: Double = {
-        return Self.nanosecondsFactor / 1e9;
-    }()
-    
-    private static var now: UInt64 {
-        mach_absolute_time()
-    }
-}
-
 // FIXME: this needs better running state.
 //  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
 actor GameCoreCoordinator {
@@ -60,6 +44,21 @@ actor GameCoreCoordinator {
         var audio: GameAudio!
     }
     
+    private static let writeAudio: EKCoreAudioWriteCallback = { ctx, ptr, count in
+        // SAFETY:
+        //  audio is set at the end of the init block.
+        //  ctx should always be passed back in and will only be nil when the actor deinits.
+        //  if the core doesn't remove all references to it then it needs to, branching here would be awful for perf.
+        //  it is like 99% likely that ctx will not be nil, so even an unlikely branch would be excessive.
+        let audio = ctx!.assumingMemoryBound(to: CallbackContext.self).pointee.audio!
+        return audio.write(samples: ptr.unsafelyUnwrapped, count: count)
+    }
+    
+    private static let didSave: EKCoreSaveCallback = { savePathPtr in
+        guard let savePathPtr else { return }
+        let savePath = String(cString: savePathPtr)
+    }
+    
     init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
         self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
         self.callbackContext.initialize(to: CallbackContext())
@@ -67,15 +66,8 @@ actor GameCoreCoordinator {
         let coreCallbacksPtr = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
         coreCallbacksPtr.initialize(to: GameCoreCallbacks(
             callbackContext: self.callbackContext,
-            didSave: { savePathPtr in
-                let savePath = String(cString: savePathPtr!)
-                // send a notification here
-                print(savePath)
-            },
-            writeAudio: { ctx, ptr, count in
-                let audio = ctx!.assumingMemoryBound(to: CallbackContext.self).pointee.audio
-                return audio!.write(samples: ptr.unsafelyUnwrapped, count: count)
-            }
+            didSave: Self.didSave,
+            writeAudio: Self.writeAudio
         ))
 
         guard let core = coreInfo.setup(system, coreCallbacksPtr) else {
@@ -194,16 +186,6 @@ actor GameCoreCoordinator {
         self.isRunning = false
     }
     
-    // MARK: Core Delegate methods
-    
-    nonisolated func coreRenderAudio(_ samples: UnsafeRawPointer, _ byteSize: UInt64) -> UInt64 {
-        return self.audio.write(samples: samples, count: byteSize)
-    }
-    
-    nonisolated func coreDidSave(_ path: UnsafePointer<CChar>) {
-        print(path)
-    }
-
     // MARK: Frame Timing
 
     func setFastForward(enabled: Bool) {
@@ -230,13 +212,57 @@ actor GameCoreCoordinator {
                 var time: ContinuousClock.Duration = .zero
                 let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
                 var nextRenderTime: ContinuousClock.Duration = .zero
-                
+
                 while !Task.isCancelled {
                     let start: ContinuousClock.Instant = .now
                     let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
                     let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
                     let expectedTime = start - initialTime
                     time = max(time, expectedTime - maxCatchupRate)
+
+                    self.inputs.poll()
+                    for (i, player) in self.inputs.players.enumerated() {
+                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
+                    }
+
+                    while time <= expectedTime {
+                        time += frameDuration
+                        let doRender = time >= expectedTime && expectedTime >= nextRenderTime
+                        nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
+
+                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
+                        if doRender {
+                            switch self.renderer {
+                            case .frameBuffer(let renderer):
+                                renderer.render(in: self.renderingSurface)
+                            }
+                        }
+                    }
+
+                    let framesTime: ContinuousClock.Duration = .now - start
+                    if framesTime < frameDuration {
+                        try? await Task.sleep(until: start + frameDuration)
+                    } else {
+                        await Task.yield()
+                    }
+                }
+            }
+        } else {
+            // NOTE: 
+            //  This version may be slightly less accurate because of the way MonotomicClock.sleep is implemented, hence having both.
+            //  I don't think there's any way to make this more accurate with public APIs, without blocking a thread (which defeats the purpose of a Task)
+            self.frameTimerTask = Task(priority: .userInitiated) {
+                let initialTime: MonotomicClock.Instant = MonotomicClock.now
+                var time: MonotomicClock.Duration = 0
+                let renderInterval: MonotomicClock.Duration = MonotomicClock.seconds(1.0 / 60.0)
+                var nextRenderTime: MonotomicClock.Duration = 0
+                
+                while !Task.isCancelled {
+                    let start: MonotomicClock.Instant = MonotomicClock.now
+                    let frameDuration: MonotomicClock.Duration = MonotomicClock.seconds(self.frameDuration)
+                    let maxCatchupRate: MonotomicClock.Duration = MonotomicClock.seconds(5 * self.frameDuration)
+                    let expectedTime = start - initialTime
+                    time = max(time, UInt64(expectedTime > maxCatchupRate) * (expectedTime &- maxCatchupRate))
                     
                     self.inputs.poll()
                     for (i, player) in self.inputs.players.enumerated() {
@@ -257,33 +283,14 @@ actor GameCoreCoordinator {
                         }
                     }
                     
-                    let framesTime: ContinuousClock.Duration = .now - start
+                    let framesTime: MonotomicClock.Duration = MonotomicClock.now - start
                     if framesTime < frameDuration {
-                        try? await Task.sleep(until: start + frameDuration)
+                        try? await MonotomicClock.sleep(until: start + frameDuration)
                     } else {
                         await Task.yield()
                     }
                 }
             }
-        } else {
-            #warning("FIXME: Frame timer is unimplemented for iOS 15, as ContinuousClock is iOS 16+ only")
-            // NOTES:
-            // This could be recreated with the following symbols:
-            //  - mach_absolute_time
-            //  - mach_timebase_into
-            //  - mach_wait_until
-            //
-            // The same logic as above applies, the worrying difference is Task.sleep(until:) vs mach_wait_until:
-            //  - I'm not sure if Task.sleep is specialized to effectively yield until the sleep finishes.
-            //  - I'm fairly certain mach_wait_until blocks the current thread until the given time has passed.
-            //  > Both of these are my gut feelings, if they're equivalent in nature then this is a non-issue.
-            //
-            // Luckily the implementation is open source to find out for real:
-            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/ContinuousClock.swift
-            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/Clock.cpp
-            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/Clock.swift
-            //  - https://github.com/apple/swift/blob/main/stdlib/public/Concurrency/TaskSleepDuration.swift
-            preconditionFailure("unimplemented")
         }
     }
 

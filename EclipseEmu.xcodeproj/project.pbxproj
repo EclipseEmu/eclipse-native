@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */; };
+		920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */; };
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
 		92115C322BD366ED0020D62F /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C312BD366ED0020D62F /* Box.swift */; };
 		92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C332BD3F2550020D62F /* ReorderControllersView.swift */; };
@@ -97,6 +98,7 @@
 
 /* Begin PBXFileReference section */
 		920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatNavigationStack.swift; sourceTree = "<group>"; };
+		920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonotomicClock.swift; sourceTree = "<group>"; };
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
 		92115C312BD366ED0020D62F /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 		92115C332BD3F2550020D62F /* ReorderControllersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReorderControllersView.swift; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 			children = (
 				92CAA2432BD2B67D000D4FE0 /* RingBuffer.h */,
 				92CAA2442BD2B67D000D4FE0 /* RingBuffer.c */,
+				920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */,
 				923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */,
 				92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */,
 				923E37FC2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift */,
@@ -577,6 +580,7 @@
 				925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */,
 				9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */,
+				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
 				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,
 				922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */,
