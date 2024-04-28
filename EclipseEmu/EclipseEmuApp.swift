@@ -30,10 +30,6 @@ struct EclipseEmuApp: App {
                 LibraryView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)
-                    .onAppear {
-                        print(MemoryLayout<GamepadBinding>.size)
-                        print(MemoryLayout<GamepadBinding.Kind>.size)
-                    }
             }
         }
     }
