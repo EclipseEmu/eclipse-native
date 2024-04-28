@@ -5,10 +5,11 @@ import EclipseKit
 fileprivate let borderWidth = 2.0
 fileprivate let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
-class TouchControlsController: UIViewController {
-    var state: GameInput.RawValue = 0
+final class TouchControlsController: UIViewController {
     weak var delegate: TouchControlsView.Coordinator?
-    
+    var valueChangedHandler: ((_ newState: UInt32) -> Void)?
+
+    private var state: GameInput.RawValue = 0
     private var feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var touchControlsSubview = UIView()
     private var menuButton: UIButton = {
@@ -50,6 +51,18 @@ class TouchControlsController: UIViewController {
             label: "B",
             style: .circle,
             layout: .init(xOrigin: .trailing, yOrigin: .trailing, x: 91.0, y: 90.0, width: 75.0, height: 75.0, hidden: false),
+            bindings: .init(kind: .button, inputA: GameInput.faceButtonDown.rawValue, inputB: .none, inputC: .none, inputD: .none)
+        ),
+        TouchLayout.Element(
+            label: "L",
+            style: .capsule,
+            layout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16.0, y: 264.0, width: 100.0, height: 42.0, hidden: false),
+            bindings: .init(kind: .button, inputA: GameInput.faceButtonRight.rawValue, inputB: .none, inputC: .none, inputD: .none)
+        ),
+        TouchLayout.Element(
+            label: "R",
+            style: .capsule,
+            layout: .init(xOrigin: .trailing, yOrigin: .trailing, x: 16.0, y: 264.0, width: 100.0, height: 42.0, hidden: false),
             bindings: .init(kind: .button, inputA: GameInput.faceButtonDown.rawValue, inputB: .none, inputC: .none, inputD: .none)
         ),
         TouchLayout.Element(
@@ -156,11 +169,11 @@ class TouchControlsController: UIViewController {
     }
     
     @objc
-    func openMenu() {
+    private func openMenu() {
         self.delegate?.menuButtonPressed()
     }
     
-    func layoutElements() {
+    private func layoutElements() {
         guard self.touchControlsSubview.subviews.count >= self.touchEls.count else { return }
         let regionSize = self.touchControlsSubview.frame.size
         
@@ -232,8 +245,8 @@ class TouchControlsController: UIViewController {
                     continue
                 }
                 
-//                self.feedbackGenerator.impactOccurred()
                 self.state |= element.bindings.inputA
+                self.valueChangedHandler?(self.state)
             }
         }
     }
@@ -248,6 +261,7 @@ class TouchControlsController: UIViewController {
                 }
                 
                 self.state &= ~element.bindings.inputA
+                self.valueChangedHandler?(self.state)
             }
         }
     }
@@ -279,7 +293,10 @@ struct TouchControlsView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> TouchControlsController {
         let vc = TouchControlsController()
         vc.delegate = context.coordinator
-        coreCoordinator?.inputs.touchControls = vc
+        if let coreCoordinator {
+            vc.valueChangedHandler = coreCoordinator.inputs.handleTouchInput
+            coreCoordinator.inputs.touchControls = vc
+        }
         return vc
     }
     

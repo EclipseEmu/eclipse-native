@@ -63,6 +63,8 @@
 		92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72C2BC1724E00659C37 /* EmulationView.swift */; };
 		92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* DismissButton.swift */; };
 		92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */; };
+		92FAE0D72BDE1C41000EBC08 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */; };
+		92FAE0D82BDE1C50000EBC08 /* mGBAEclipseCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +91,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				92FAE0D82BDE1C50000EBC08 /* mGBAEclipseCore in Embed Frameworks */,
 				92C11CCE2BD7067100BB11A2 /* DummyCore in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -167,6 +170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92FAE0D72BDE1C41000EBC08 /* mGBAEclipseCore in Frameworks */,
 				92C11CCD2BD7064A00BB11A2 /* DummyCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -436,6 +440,7 @@
 			name = EclipseEmu;
 			packageProductDependencies = (
 				92C11CCC2BD7064A00BB11A2 /* DummyCore */,
+				92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
@@ -513,6 +518,7 @@
 			packageReferences = (
 				92C11CCB2BD7064A00BB11A2 /* XCLocalSwiftPackageReference "Cores/DummyCore" */,
 				92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */,
+				92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -999,12 +1005,25 @@
 				kind = branch;
 			};
 		};
+		92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		92C11CCC2BD7064A00BB11A2 /* DummyCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DummyCore;
+		};
+		92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */;
+			productName = mGBAEclipseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 

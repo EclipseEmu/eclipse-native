@@ -185,25 +185,24 @@ struct LibraryView: View {
                     let md5Digest = try await MD5Hasher().hash(data: bytes)
                     let md5 = MD5Hasher.stringFromDigest(digest: md5Digest)
                     
-                    await MainActor.run {
-                        withAnimation {
-                            let newGame = Game(context: self.viewContext)
-                            newGame.name = name
-                            newGame.system = system
-                            newGame.md5 = md5
-                            newGame.romPath = url
-                            newGame.savePath = nil
-                            newGame.coverArtPath = nil
-                            newGame.dateAdded = Date.now
-                            newGame.datePlayed = nil
+                    let context = await self.viewContext
+                    withAnimation {
+                        let newGame = Game(context: context)
+                        newGame.name = name
+                        newGame.system = system
+                        newGame.md5 = md5
+                        newGame.romPath = url
+                        newGame.savePath = nil
+                        newGame.coverArtPath = nil
+                        newGame.dateAdded = Date.now
+                        newGame.datePlayed = nil
 
-                            do {
-                                try viewContext.save()
-                            } catch {
-                                // FIXME: Handle
-                                let nsError = error as NSError
-                                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-                            }
+                        do {
+                            try context.save()
+                        } catch {
+                            // FIXME: Handle
+                            let nsError = error as NSError
+                            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
                         }
                     }
                 } catch {

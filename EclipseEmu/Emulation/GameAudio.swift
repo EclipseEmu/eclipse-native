@@ -3,7 +3,7 @@ import AVFoundation
 
 // FIXME: handle changes in audio output
 
-actor GameAudio {
+class GameAudio {
     enum Failure: Error {
         case failedToGetAudioFormat
         case unknownSampleFormat
@@ -49,11 +49,9 @@ actor GameAudio {
     }
     
     deinit {
-        Task {
-            await self.stop()
-            await self.removeListeners()
-            ring_buffer_deinit(self.ringBuffer)
-        }
+        self.stop()
+        self.removeListeners()
+        ring_buffer_deinit(self.ringBuffer)
     }
     
     func start() {
@@ -121,17 +119,15 @@ actor GameAudio {
     }
     
     func addListeners() {
-        self.hardwareObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: self.audio, queue: .main) { [weak self] _ in
-            guard let self else { return }
-            Task {
-                await self.handleHardwareChange()
-            }
+        self.hardwareObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: self.audio, queue: .main) { _ in
+            self.handleHardwareChange()
         }
     }
     
     func removeListeners() {
         guard let observer = self.hardwareObserver else { return }
         NotificationCenter.default.removeObserver(observer)
+        self.hardwareObserver = nil
     }
     
     func handleHardwareChange() {

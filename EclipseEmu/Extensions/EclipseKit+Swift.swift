@@ -27,6 +27,7 @@ extension GameCoreVideoPixelFormat {
     var metal: MTLPixelFormat? {
         return switch self {
         case .bgra8Unorm: .bgra8Unorm
+        case .rgba8Unorm: .rgba8Unorm
         default: nil
         }
     }

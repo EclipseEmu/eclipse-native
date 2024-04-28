@@ -22,6 +22,12 @@ class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
         self.coreCoordinator = try! GameCoreCoordinator(coreInfo: core, system: game.system, reorderControls: self.reorderControllers)
     }
     
+    @MainActor
+    func setScreenSize(width: CGFloat, height: CGFloat) {
+        self.width = width
+        self.height = height
+    }
+    
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
         await self.coreCoordinator.pause()
         
@@ -38,6 +44,7 @@ class EmulationViewModel: ObservableObject, GameInputCoordinatorDelegate  {
 struct EmulationView: View {
     @FocusState var focused: Bool
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.playGame) var playGame
     @StateObject var model: EmulationViewModel
     
@@ -50,6 +57,9 @@ struct EmulationView: View {
             EmulationGameScreen(emulation: model.coreCoordinator)
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .aspectRatio(model.width / model.height, contentMode: .fit)
+                #if canImport(UIKit)
+                .padding(.bottom, verticalSizeClass == .compact ? 0 : 153.0)
+                #endif
             
             #if canImport(UIKit)
             TouchControlsView($model.isMenuVisible, coreCoordinator: model.coreCoordinator).opacity(0.6)
@@ -101,20 +111,14 @@ struct EmulationView: View {
             focused = true
         }
         .firstTask {
-            guard let romPath = self.model.game.romPath else {
+            guard let romPath = self.model.game.romPath, romPath.startAccessingSecurityScopedResource() else {
                 return
             }
-            await self.model.coreCoordinator.start(gamePath: romPath, savePath: nil)
-            self.model.width = await self.model.coreCoordinator.width
-            self.model.height = await self.model.coreCoordinator.height
-        }
-        .task {
-            await self.model.coreCoordinator.play()
-        }
-        .onDisappear {
-            Task {
-                await self.model.coreCoordinator.pause()
-            }
+            await self.model.coreCoordinator.start(gamePath: romPath, savePath: nil);
+            
+            let width = await self.model.coreCoordinator.width
+            let height = await self.model.coreCoordinator.height
+            self.model.setScreenSize(width: width, height: height)
         }
         .sheet(item: $model.playerOrderChangeRequest) { request in
             ReorderControllersView(request: request)
@@ -124,6 +128,9 @@ struct EmulationView: View {
                 Task {
                     await self.model.coreCoordinator.stop()
                     await playGame.closeGame()
+                    if let romPath = self.model.game.romPath {
+                        romPath.stopAccessingSecurityScopedResource()
+                    }
                 }
             }
         } message: {

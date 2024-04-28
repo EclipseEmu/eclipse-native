@@ -1,5 +1,6 @@
 import SwiftUI
 import DummyCore
+import mGBAEclipseCore
 
 @main
 struct EclipseEmuApp: App {
@@ -8,10 +9,11 @@ struct EclipseEmuApp: App {
     @StateObject var playGameAction = PlayGameAction()
     static let cores: GameCoreRegistry = {
         let dummyCore = DummyCore.coreInfo
-        let registry = GameCoreRegistry(cores: [dummyCore])
+        let mGBACore = mGBAEclipseCore.coreInfo
+        let registry = GameCoreRegistry(cores: [dummyCore, mGBACore])
         registry.registerDefaults(id: dummyCore.id, for: .gb)
         registry.registerDefaults(id: dummyCore.id, for: .gbc)
-        registry.registerDefaults(id: dummyCore.id, for: .gba)
+        registry.registerDefaults(id: mGBACore.id, for: .gba)
         registry.registerDefaults(id: dummyCore.id, for: .nes)
         registry.registerDefaults(id: dummyCore.id, for: .snes)
         
@@ -28,6 +30,10 @@ struct EclipseEmuApp: App {
                 LibraryView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.playGame, playGameAction)
+                    .onAppear {
+                        print(MemoryLayout<GamepadBinding>.size)
+                        print(MemoryLayout<GamepadBinding.Kind>.size)
+                    }
             }
         }
     }

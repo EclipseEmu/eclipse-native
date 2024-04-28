@@ -1,20 +1,17 @@
 import Foundation
 import EclipseKit
+import GameController
 
 struct GamepadBinding {
+    var control: String
     var kind: Kind
-    var id: String
-    var direction: Direction
-    var deadZone: Float32
-    var input: GameInput
     
-    enum Kind: UInt8 {
-        case button
-        case axis
-    }
-    
-    enum Direction: UInt8 {
-        case negative = 0
-        case positive = 1
+    enum Kind {
+        case button(GameInput)
+        case directionPad(up: GameInput, down: GameInput, left: GameInput, right: GameInput)
+        case joystick(up: GameInput, down: GameInput, left: GameInput, right: GameInput)
+        case gyro(x: GameInput, y: GameInput, z: GameInput)
+        case touchPad(x: GameInput, y: GameInput)
     }
 }
+

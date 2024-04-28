@@ -62,11 +62,11 @@ struct ReorderControllersView: View {
     VStack {}.sheet(isPresented: .constant(true)) {
         ReorderControllersView(request:
             PlayerOrderChangeRequest(maxPlayers: 4, players: [
-                .init(kind: .keyboard(.init(.init()), .init())),
-                .init(kind: .keyboard(.init(.init()), .init())),
-                .init(kind: .keyboard(.init(.init()), .init())),
-                .init(kind: .keyboard(.init(.init()), .init())),
-                .init(kind: .gamepad(.init(.init()), .init()))
+                .init(kind: .builtin),
+                .init(kind: .controller),
+                .init(kind: .controller),
+                .init(kind: .controller),
+                .init(kind: .controller),
             ]) {
                 print($0)
             }

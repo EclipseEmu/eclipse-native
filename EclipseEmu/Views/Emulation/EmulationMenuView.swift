@@ -8,22 +8,50 @@ struct EmulationMenuView: View {
     var body: some View {
         CompatNavigationStack {
             ScrollView {
-                Button("Fast Foward") {
+                Button {
                     Task {
                         await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
                     }
+                } label: {
+                    Label("Fast Forward", systemImage: "forward.fill")
                 }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle)
+                
+                Button {
+                    Task {
+                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
+                    }
+                } label: {
+                    Label("Save State", systemImage: "tray.and.arrow.down")
+                }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle)
+                
+                Button {
+                    Task {
+                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
+                    }
+                } label: {
+                    Label("Load State", systemImage: "tray.and.arrow.up")
+                }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle)
+                
+                Button(role: .destructive) {
+                    model.isQuitDialogShown = true
+                } label: {
+                    Label("Quit", systemImage: "power")
+                }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.roundedRectangle)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        model.isQuitDialogShown = true
-                    } label: {
-                        Label("Quit", systemImage: "xmark")
-                            .labelStyle(.titleOnly)
-                    }
-                }
                 ToolbarItem(placement: DismissButton.placement) {
                     DismissButton()
                 }

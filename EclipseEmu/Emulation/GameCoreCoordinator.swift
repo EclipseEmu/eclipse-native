@@ -1,11 +1,15 @@
 import Foundation
 import GameController
-import QuartzCore
+import MetalKit
 import simd
 import EclipseKit
 
 enum GameVideoRenderer {
     case frameBuffer(GameFrameBufferRenderer)
+}
+
+extension NSNotification.Name {
+    static let EKGameCoreDidSave = "EKGameCoreDidSaveNotification"
 }
 
 // FIXME: this needs better running state.
@@ -57,6 +61,7 @@ actor GameCoreCoordinator {
     private static let didSave: EKCoreSaveCallback = { savePathPtr in
         guard let savePathPtr else { return }
         let savePath = String(cString: savePathPtr)
+        print(savePath)
     }
     
     init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
@@ -93,7 +98,6 @@ actor GameCoreCoordinator {
         let size = CGSize(width: self.width, height: self.height)
         
         self.renderingSurface = .init()
-        self.renderingSurface.contentsScale = 2.0
         self.renderingSurface.drawableSize = size
         self.renderingSurface.device = device
         self.renderingSurface.framebufferOnly = true
@@ -106,6 +110,7 @@ actor GameCoreCoordinator {
         switch videoFormat.renderingType {
         case .frameBuffer:
             guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
+            self.renderingSurface.pixelFormat = pixelFormat
             let renderer = try GameFrameBufferRenderer(
                 with: device,
                 width: Int(width),
@@ -139,13 +144,22 @@ actor GameCoreCoordinator {
     }
     
     func start(gamePath: URL, savePath: URL?) async {
-        guard self.core.pointee.start(
-            self.core.pointee.data,
-            gamePath.absoluteString.cString(using: .ascii),
-            savePath?.absoluteString.cString(using: .ascii)
-        ) else { return }
+        if #available(iOS 16.0, *) {
+            guard self.core.pointee.start(
+                self.core.pointee.data,
+                gamePath.path(percentEncoded: false).cString(using: .ascii),
+                savePath?.path(percentEncoded: false).cString(using: .ascii)
+            ) else { return }
+        } else {
+            guard self.core.pointee.start(
+                self.core.pointee.data,
+                gamePath.path.cString(using: .ascii),
+                savePath?.path.cString(using: .ascii)
+            ) else { return }
+            // Fallback on earlier versions
+        }
         await self.inputs.start()
-        await self.audio.start()
+//        self.audio.start()
         await self.play()
     }
     
@@ -153,19 +167,19 @@ actor GameCoreCoordinator {
         await self.pause()
         self.core.pointee.stop(core.pointee.data)
         self.inputs.stop()
-        await self.audio.stop()
+//        self.audio.stop()
     }
     
     func restart() async {
         if self.isRunning {
-            await self.audio.pause()
+            self.audio.pause()
             self.frameTimerTask?.cancel()
             self.frameTimerTask = nil
         }
-        await self.audio.clear()
+        self.audio.clear()
         self.core.pointee.restart(core.pointee.data)
         self.startFrameTimer()
-        await self.audio.resume()
+//        self.audio.resume()
         self.isRunning = true
     }
     
@@ -173,17 +187,18 @@ actor GameCoreCoordinator {
         guard !self.isRunning else { return }
         self.core.pointee.play(core.pointee.data)
         self.startFrameTimer()
-        await self.audio.resume()
+//        self.audio.resume()
         self.isRunning = true
     }
     
     func pause() async {
         guard self.isRunning else { return }
-        self.core.pointee.pause(core.pointee.data)
-        await self.audio.pause()
-        self.frameTimerTask?.cancel()
-        self.frameTimerTask = nil
         self.isRunning = false
+        
+        self.frameTimerTask?.cancel()
+        self.core.pointee.pause(core.pointee.data)
+        self.frameTimerTask = nil
+//        self.audio.pause()
     }
     
     // MARK: Frame Timing
@@ -220,11 +235,8 @@ actor GameCoreCoordinator {
                     let expectedTime = start - initialTime
                     time = max(time, expectedTime - maxCatchupRate)
 
-                    self.inputs.poll()
-                    for (i, player) in self.inputs.players.enumerated() {
-                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
-                    }
-
+                    self.core.pointee.playerSetInputs(self.core.pointee.data, 0, inputs.players[0].state);
+                    
                     while time <= expectedTime {
                         time += frameDuration
                         let doRender = time >= expectedTime && expectedTime >= nextRenderTime
@@ -264,9 +276,8 @@ actor GameCoreCoordinator {
                     let expectedTime = start - initialTime
                     time = max(time, UInt64(expectedTime > maxCatchupRate) * (expectedTime &- maxCatchupRate))
                     
-                    self.inputs.poll()
                     for (i, player) in self.inputs.players.enumerated() {
-                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state)
+                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(i), player.state);
                     }
                     
                     while time <= expectedTime {
