@@ -1,5 +1,6 @@
 import SwiftUI
 import EclipseKit
+import MetalKit
 
 final class EmulationViewModel: ObservableObject {
     enum State {
@@ -164,10 +165,11 @@ struct EmulationView: View {
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
-            case .loaded(_):
+            case .loaded(let core):
                 #if os(iOS)
-                TouchControlsView(model: model)
-                    .opacity(0.8)
+                TouchControlsView { newValue in
+                    core.inputs.handleTouchInput(newState: newValue)
+                }.opacity(0.8)
                 #endif
                 EmulationMenuView(
                     model: model,

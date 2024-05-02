@@ -198,15 +198,23 @@ final class GameFrameBufferRenderer {
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         encoder.endEncoding()
 
-        if useAdaptiveSync {
-            #if !targetEnvironment(simulator)
-            commandBuffer.present(drawable, afterMinimumDuration: self.frameDuration)
-            #else
-            commandBuffer.present(drawable)
-            #endif
-        } else {
-            commandBuffer.present(drawable)
+        // FIXME: This should be fine, we aren't rendering frequently enough for where jitters could occur, but that's untested.
+        commandBuffer.addScheduledHandler { [self] _ in
+            if useAdaptiveSync {
+                #if !targetEnvironment(simulator)
+                drawable.present(afterMinimumDuration: self.frameDuration)
+                #else
+                drawable.present()
+                #endif
+            } else {
+                drawable.present()
+            }
+            
+            Task { @MainActor in
+                renderingSurface.setNeedsDisplay(renderingSurface.bounds)
+            }
         }
+        
         commandBuffer.commit()
     }
 }

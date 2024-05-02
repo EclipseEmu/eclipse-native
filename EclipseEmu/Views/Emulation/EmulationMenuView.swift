@@ -20,8 +20,11 @@ struct EmulationMenuView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     #if os(macOS)
     @State var isVisible = false
+    @State var hideTask: Task<Void, Never>?
+    @State var hideTaskInstant: ContinuousClock.Instant = .now
     #endif
-
+    
+    
     var content: some View {
         Group {
             Button {
@@ -59,8 +62,10 @@ struct EmulationMenuView: View {
             } maximumValueLabel: {
                 Label("Raise Volume", systemImage: "speaker.wave.3.fill")
             }
+            #if os(macOS)
             .labelStyle(.iconOnly)
             .controlSize(.small)
+            #endif
         
             Button(role: .destructive) {
                 model.isQuitConfirmationShown = true
@@ -128,7 +133,7 @@ struct EmulationMenuView: View {
                 .frame(maxWidth: 400.0)
                 .padding(.horizontal)
                 .padding(.vertical, 8.0)
-                .background(Material.regular)
+                .background(Material.ultraThick)
                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 .padding()
                 .opacity(self.isVisible ? 1.0 : 0.0)
@@ -139,6 +144,22 @@ struct EmulationMenuView: View {
                     switch hoverPhase {
                     case .active(_):
                         self.isVisible = true
+                        self.hideTaskInstant = .now + .seconds(5)
+                        if self.hideTask == nil {
+                            self.hideTask = Task.detached(priority: .low) {
+                                while await self.hideTaskInstant > .now && !Task.isCancelled {
+                                    try? await Task.sleep(until: self.hideTaskInstant)
+                                }
+                                await MainActor.run {
+                                    withAnimation {
+                                        self.isVisible = false
+                                        self.hideTask = nil
+                                        
+                                        NSCursor.setHiddenUntilMouseMoves(true)
+                                    }
+                                }
+                            }
+                        }
                     case .ended:
                         self.isVisible = false
                     }

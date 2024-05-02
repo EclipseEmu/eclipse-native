@@ -224,26 +224,34 @@ final class TouchControlsController: UIViewController {
 
 struct TouchControlsView: UIViewControllerRepresentable {
     typealias UIViewControllerType = TouchControlsController
-    var model: EmulationViewModel
+    var callback: (UInt32) -> Void
     
-    init(model: EmulationViewModel) {
-        self.model = model
+    init(_ callback: @escaping (UInt32) -> Void) {
+        self.callback = callback
     }
     
     func makeUIViewController(context: Context) -> TouchControlsController {
         let vc = TouchControlsController()
-        if case .loaded(let core) = model.state {
-            vc.valueChangedHandler = core.inputs.handleTouchInput
-        }
+        vc.valueChangedHandler = self.callback
         return vc
     }
     
-    func updateUIViewController(_ uiViewController: TouchControlsController, context: Context) {
-        if case .loaded(let core) = model.state {
-            uiViewController.valueChangedHandler = core.inputs.handleTouchInput
-        } else {
-            uiViewController.valueChangedHandler = nil
+    func updateUIViewController(_ uiViewController: TouchControlsController, context: Context) {}
+}
+
+
+#Preview {
+    struct DemoView: View {
+        @State var foo: UInt32 = 0
+        
+        var body: some View {
+            ZStack {
+                Text("\(foo)")
+                TouchControlsView { newValue in foo = newValue }
+            }
         }
     }
+    
+    return DemoView()
 }
 #endif
