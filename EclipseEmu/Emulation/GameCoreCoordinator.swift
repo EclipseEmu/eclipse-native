@@ -3,18 +3,25 @@ import GameController
 import MetalKit
 import simd
 import EclipseKit
+import Combine
 
-enum GameVideoRenderer {
+extension NSNotification.Name {
+    static let EKGameCoreDidSave = NSNotification.Name.init("EKGameCoreDidSaveNotification")
+}
+
+fileprivate enum GameVideoRenderer {
     case frameBuffer(GameFrameBufferRenderer)
 }
 
-extension NSNotification.Name {
-    static let EKGameCoreDidSave = "EKGameCoreDidSaveNotification"
-}
-
-// FIXME: this needs better running state.
-//  i.e. if someone hides the app with the game paused, then comes back, it shouldn't resume the game until the user does.
-actor GameCoreCoordinator {
+final actor GameCoreCoordinator {
+    enum State: UInt8, RawRepresentable {
+        case running = 0
+        case stopped = 1
+        case backgrounded = 2
+        case pendingUserInput = 3
+        case paused = 4
+    }
+    
     enum Failure: Error {
         case failedToGetCoreInstance
         case failedToGetMetalDevice
@@ -24,20 +31,19 @@ actor GameCoreCoordinator {
         case invalidRendererFormat
     }
     
-    var width: CGFloat = 0.0
-    var height: CGFloat = 0.0
+    let width: CGFloat
+    let height: CGFloat
     
     private let core: UnsafeMutablePointer<GameCore>
     let inputs: GameInputCoordinator
     /// FIXME: this should be isolated and there should be some sort of notification to indicate changes in state
-    nonisolated(unsafe) private(set) var isRunning: Bool = false
+    nonisolated(unsafe) private(set) var state: State = .stopped
     /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer can be written to syncronously by the core.
-    nonisolated(unsafe) private let audio: GameAudio
+    nonisolated(unsafe) let audio: GameAudio
     /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.
     nonisolated(unsafe) let renderingSurface: CAMetalLayer
 
-    // NOTE: in the future this should be handled properly
-    private var renderer: GameVideoRenderer
+    private let renderer: GameVideoRenderer
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private var frameTimerTask: Task<Void, Never>?
@@ -60,11 +66,15 @@ actor GameCoreCoordinator {
     
     private static let didSave: EKCoreSaveCallback = { savePathPtr in
         guard let savePathPtr else { return }
-        let savePath = String(cString: savePathPtr)
-        print(savePath)
+        NotificationCenter.default.post(name: .EKGameCoreDidSave, object: String(cString: savePathPtr))
     }
     
-    init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback) throws {
+    init(
+        coreInfo: GameCoreInfo,
+        system: GameSystem,
+        surface: CAMetalLayer,
+        reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback
+    ) throws {
         self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
         self.callbackContext.initialize(to: CallbackContext())
         
@@ -97,9 +107,11 @@ actor GameCoreCoordinator {
         self.height = CGFloat(height)
         let size = CGSize(width: self.width, height: self.height)
         
-        self.renderingSurface = .init()
+        self.renderingSurface = surface
         self.renderingSurface.drawableSize = size
         self.renderingSurface.device = device
+        self.renderingSurface.contentsScale = 1.0
+        self.renderingSurface.needsDisplayOnBoundsChange = true
         self.renderingSurface.framebufferOnly = true
         self.renderingSurface.isOpaque = true
         self.renderingSurface.presentsWithTransaction = true
@@ -128,7 +140,6 @@ actor GameCoreCoordinator {
         guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
             throw Failure.invalidAudioFormat
         }
-                
         
         self.audio = try GameAudio(format: audioFormat)
         self.callbackContext.pointee.audio = self.audio
@@ -156,7 +167,6 @@ actor GameCoreCoordinator {
                 gamePath.path.cString(using: .ascii),
                 savePath?.path.cString(using: .ascii)
             ) else { return }
-            // Fallback on earlier versions
         }
         await self.inputs.start()
 //        self.audio.start()
@@ -164,14 +174,14 @@ actor GameCoreCoordinator {
     }
     
     func stop() async {
-        await self.pause()
+        await self.pause(reason: .stopped)
         self.core.pointee.stop(core.pointee.data)
         self.inputs.stop()
 //        self.audio.stop()
     }
     
     func restart() async {
-        if self.isRunning {
+        if self.state == .running {
             self.audio.pause()
             self.frameTimerTask?.cancel()
             self.frameTimerTask = nil
@@ -180,20 +190,20 @@ actor GameCoreCoordinator {
         self.core.pointee.restart(core.pointee.data)
         self.startFrameTimer()
 //        self.audio.resume()
-        self.isRunning = true
+        self.state = .running
     }
     
     func play() async {
-        guard !self.isRunning else { return }
+        guard self.state != .running else { return }
+        self.state = .running
         self.core.pointee.play(core.pointee.data)
         self.startFrameTimer()
 //        self.audio.resume()
-        self.isRunning = true
     }
     
-    func pause() async {
-        guard self.isRunning else { return }
-        self.isRunning = false
+    func pause(reason: State) async {
+        guard self.state == .running else { return }
+        self.state = reason
         
         self.frameTimerTask?.cancel()
         self.core.pointee.pause(core.pointee.data)
@@ -262,7 +272,7 @@ actor GameCoreCoordinator {
         } else {
             // NOTE: 
             //  This version may be slightly less accurate because of the way MonotomicClock.sleep is implemented, hence having both.
-            //  I don't think there's any way to make this more accurate with public APIs, without blocking a thread (which defeats the purpose of a Task)
+            //  I don't think there's any way to make this more accurate, with public APIs, without blocking a thread (which defeats the purpose of a Task)
             self.frameTimerTask = Task(priority: .userInitiated) {
                 let initialTime: MonotomicClock.Instant = MonotomicClock.now
                 var time: MonotomicClock.Duration = 0

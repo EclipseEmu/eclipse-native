@@ -6,38 +6,11 @@ fileprivate let borderWidth = 2.0
 fileprivate let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
 final class TouchControlsController: UIViewController {
-    weak var delegate: TouchControlsView.Coordinator?
     var valueChangedHandler: ((_ newState: UInt32) -> Void)?
 
     private var state: GameInput.RawValue = 0
     private var feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     private var touchControlsSubview = UIView()
-    private var menuButton: UIButton = {
-        var buttonConfig = UIButton.Configuration.plain()
-        
-        if #available(iOS 16.0, *) {
-            buttonConfig.indicator = .none
-        }
-        
-        buttonConfig.image = UIImage(systemName: "line.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(scale: .default))
-        buttonConfig.imagePlacement = .trailing
-        buttonConfig.baseForegroundColor = .label
-        buttonConfig.baseForegroundColor = .white
-        
-        var backgroundConfig = UIBackgroundConfiguration.clear()
-        let background = UIView()
-        background.backgroundColor = .black
-        backgroundConfig.customView = background
-        buttonConfig.background = backgroundConfig
-        
-        let button = UIButton(configuration: buttonConfig)
-        button.clipsToBounds = true
-        
-        button.layer.borderWidth = borderWidth
-        button.layer.borderColor = borderColor
-
-        return button
-    }()
     
     var menuButtonLayout: TouchLayout.ElementDisplay = .init(xOrigin: .leading, yOrigin: .trailing, x: 16.0, y: 0.0, width: 42.0, height: 42.0, hidden: false)
     var touchEls: [TouchLayout.Element] = [
@@ -163,14 +136,6 @@ final class TouchControlsController: UIViewController {
             }
             self.touchControlsSubview.addSubview(view)
         }
-        
-        self.touchControlsSubview.addSubview(menuButton)
-        menuButton.addTarget(self, action: #selector(self.openMenu), for: .touchUpInside)
-    }
-    
-    @objc
-    private func openMenu() {
-        self.delegate?.menuButtonPressed()
     }
     
     private func layoutElements() {
@@ -195,16 +160,6 @@ final class TouchControlsController: UIViewController {
                 break
             }
         }
-        
-        let menuButtonX = menuButtonLayout.xOrigin == .leading
-            ? menuButtonLayout.x
-            : regionSize.width - (menuButtonLayout.x + menuButtonLayout.width)
-        let menuButtonY = menuButtonLayout.yOrigin == .leading
-            ? menuButtonLayout.y
-            : regionSize.height - (menuButtonLayout.y + menuButtonLayout.height)
-        
-        self.menuButton.frame = .init(x: menuButtonX, y: menuButtonY, width: menuButtonLayout.width, height: menuButtonLayout.height)
-        self.menuButton.layer.cornerRadius = menuButtonLayout.height / 2
     }
     
     override func viewDidLayoutSubviews() {
@@ -269,41 +224,26 @@ final class TouchControlsController: UIViewController {
 
 struct TouchControlsView: UIViewControllerRepresentable {
     typealias UIViewControllerType = TouchControlsController
+    var model: EmulationViewModel
     
-    @Binding var isMenuOpen: Bool
-    weak var coreCoordinator: GameCoreCoordinator?
-    
-    init(_ isMenuOpen: Binding<Bool>, coreCoordinator: GameCoreCoordinator) {
-        self._isMenuOpen = isMenuOpen
-        self.coreCoordinator = coreCoordinator
-    }
-    
-    class Coordinator: NSObject {
-        var parent: TouchControlsView
-        
-        init(_ parent: TouchControlsView) {
-            self.parent = parent
-        }
-        
-        func menuButtonPressed() {
-            self.parent.isMenuOpen = true
-        }
+    init(model: EmulationViewModel) {
+        self.model = model
     }
     
     func makeUIViewController(context: Context) -> TouchControlsController {
         let vc = TouchControlsController()
-        vc.delegate = context.coordinator
-        if let coreCoordinator {
-            vc.valueChangedHandler = coreCoordinator.inputs.handleTouchInput
-            coreCoordinator.inputs.touchControls = vc
+        if case .loaded(let core) = model.state {
+            vc.valueChangedHandler = core.inputs.handleTouchInput
         }
         return vc
     }
     
-    func updateUIViewController(_ uiViewController: TouchControlsController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    func updateUIViewController(_ uiViewController: TouchControlsController, context: Context) {
+        if case .loaded(let core) = model.state {
+            uiViewController.valueChangedHandler = core.inputs.handleTouchInput
+        } else {
+            uiViewController.valueChangedHandler = nil
+        }
     }
 }
 #endif

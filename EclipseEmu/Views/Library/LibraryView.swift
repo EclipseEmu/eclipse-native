@@ -48,7 +48,7 @@ struct LibraryView: View {
                             .padding([.horizontal, .top])
                         
                         ScrollView(.horizontal) {
-                            LazyHStack(spacing: 16.0) {
+                            LazyHStack(alignment: .top, spacing: 16.0) {
                                 ForEach(recentlyPlayed) { item in
                                     GameKeepPlayingItem(game: item, selectedGame: $selectedGame)
                                 }
@@ -85,11 +85,12 @@ struct LibraryView: View {
                             .padding([.bottom, .horizontal], 8.0)
                     }
                 } else {
-                    LazyVGrid(columns: [.init(.adaptive(minimum: 140.0, maximum: 240.0))]) {
+                    LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
                         ForEach(games) { item in
                             GameGridItem(game: item, selectedGame: $selectedGame)
                         }
-                    }.padding([.horizontal, .bottom])
+                    }
+                    .padding([.horizontal, .bottom])
                 }
             }
             .navigationTitle("Library")
@@ -145,7 +146,7 @@ struct LibraryView: View {
     func fileImported(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            Task.detached {
+            Task.detached(priority: .userInitiated) {
                 do {
                     guard url.startAccessingSecurityScopedResource() else {
                         print("access denied")

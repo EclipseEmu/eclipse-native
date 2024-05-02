@@ -73,8 +73,9 @@ final class GameInputCoordinator {
     }
     
     func start() async {
-        NotificationCenter.default.addObserver(forName: .GCControllerDidConnect, object: nil, queue: nil) { note in
-            guard 
+        NotificationCenter.default.addObserver(forName: .GCControllerDidConnect, object: nil, queue: nil) { [weak self] note in
+            guard
+                let self,
                 let controller = note.object as? GCController,
                 let gamepad = controller.extendedGamepad
             else { return }
@@ -88,12 +89,21 @@ final class GameInputCoordinator {
         }
         
         NotificationCenter.default.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: nil) { note in
-            guard let controller = note.object as? GCController, let gamepad = controller.extendedGamepad else { return }
+            guard 
+                let controller = note.object as? GCController,
+                let gamepad = controller.extendedGamepad 
+            else { return }
+            
             gamepad.valueChangedHandler = nil
         }
         
-        NotificationCenter.default.addObserver(forName: .GCKeyboardDidConnect, object: nil, queue: nil) { note in
-            guard let keyboard = note.object as? GCKeyboard, let keyboardInput = keyboard.keyboardInput else { return }
+        NotificationCenter.default.addObserver(forName: .GCKeyboardDidConnect, object: nil, queue: nil) { [weak self] note in
+            guard 
+                let self,
+                let keyboard = note.object as? GCKeyboard,
+                let keyboardInput = keyboard.keyboardInput
+            else { return }
+            
             Task {
                 if self.keyboardBindings == nil {
                     self.keyboardBindings = await self.loadKeyboardBindings()
@@ -103,7 +113,11 @@ final class GameInputCoordinator {
         }
         
         NotificationCenter.default.addObserver(forName: .GCKeyboardDidDisconnect, object: nil, queue: nil) { note in
-            guard let keyboard = note.object as? GCKeyboard, let keyboardInput = keyboard.keyboardInput else { return }
+            guard 
+                let keyboard = note.object as? GCKeyboard,
+                let keyboardInput = keyboard.keyboardInput 
+            else { return }
+            
             keyboardInput.keyChangedHandler = nil
         }
         

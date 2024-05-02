@@ -1,5 +1,6 @@
 import SwiftUI
 import EclipseKit
+import CoreData
 
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
@@ -8,13 +9,20 @@ final class PlayGameAction: ObservableObject {
         case missingCore
     }
     
-    public func callAsFunction(game: Game) async throws {
+    public func callAsFunction(game: Game, viewContext: NSManagedObjectContext) async throws {
         guard let core = await EclipseEmuApp.cores.get(for: game) else {
             throw Failure.missingCore
         }
-        let model = EmulationViewModel(core: core, game: game)
+        let model = EmulationViewModel(coreInfo: core, game: game)
         await MainActor.run {
             self.model = model
+        }
+        
+        do {
+            game.datePlayed = Date()
+            try viewContext.save()
+        } catch {
+            print(error)
         }
     }
     

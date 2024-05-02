@@ -5,7 +5,8 @@ struct GameViewHeader: View {
     var safeAreaTop: CGFloat
     @Environment(\.playGame) var playGame
     @Environment(\.colorScheme) var colorScheme
-    
+    @Environment(\.managedObjectContext) var viewContext
+
     var body: some View {
         ZStack {
             VStack(alignment: .center) {
@@ -63,7 +64,7 @@ struct GameViewHeader: View {
     
     func play() {
         Task.detached {
-            try await playGame(game: game)
+            try await playGame(game: game, viewContext: viewContext)
         }
     }
 }

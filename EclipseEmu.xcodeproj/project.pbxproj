@@ -15,7 +15,9 @@
 		92115C362BD435840020D62F /* MessageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C352BD435840020D62F /* MessageBlock.swift */; };
 		92115C382BD4C7580020D62F /* GameInput+string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C372BD4C7580020D62F /* GameInput+string.swift */; };
 		92115C3A2BD580F00020D62F /* EclipseKit+Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C392BD580F00020D62F /* EclipseKit+Swift.swift */; };
-		922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78932BC23CB100695252 /* EmulationMenuView.swift */; };
+		922358112BE15AF20014BFFA /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358102BE15AF20014BFFA /* EmulationView.swift */; };
+		922358142BE15ECE0014BFFA /* GameScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358132BE15ECE0014BFFA /* GameScreenView.swift */; };
+		922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358152BE2B8B50014BFFA /* EmulationMenuView.swift */; };
 		922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78952BC23D5900695252 /* TouchControlsView.swift */; };
 		922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */; };
 		922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A62BC0C26600B419D7 /* Persistence.swift */; };
@@ -31,7 +33,6 @@
 		922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */; };
 		923E37FD2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E37FC2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift */; };
 		923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */; };
-		925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EA2BC9E90F00AD7257 /* GameScreen.swift */; };
 		925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */; };
 		925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */; };
 		9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */; };
@@ -60,7 +61,6 @@
 		92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7252BC1007900659C37 /* GameGridItem.swift */; };
 		92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7272BC103BC00659C37 /* SettingsView.swift */; };
 		92D5D72B2BC1723700659C37 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72A2BC1723700659C37 /* GameView.swift */; };
-		92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72C2BC1724E00659C37 /* EmulationView.swift */; };
 		92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* DismissButton.swift */; };
 		92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */; };
 		92FAE0D72BDE1C41000EBC08 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */; };
@@ -108,7 +108,9 @@
 		92115C352BD435840020D62F /* MessageBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBlock.swift; sourceTree = "<group>"; };
 		92115C372BD4C7580020D62F /* GameInput+string.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameInput+string.swift"; sourceTree = "<group>"; };
 		92115C392BD580F00020D62F /* EclipseKit+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EclipseKit+Swift.swift"; sourceTree = "<group>"; };
-		922D78932BC23CB100695252 /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
+		922358102BE15AF20014BFFA /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
+		922358132BE15ECE0014BFFA /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
+		922358152BE2B8B50014BFFA /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
 		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
 		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuApp.swift; sourceTree = "<group>"; };
@@ -128,7 +130,6 @@
 		922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		923E37FC2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFrameBufferRenderer.swift; sourceTree = "<group>"; };
 		923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreCoordinator.swift; sourceTree = "<group>"; };
-		925B14EA2BC9E90F00AD7257 /* GameScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreen.swift; sourceTree = "<group>"; };
 		925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Numeric.swift"; sourceTree = "<group>"; };
 		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+bytesPerPixel.swift"; sourceTree = "<group>"; };
 		9281CCA92BCC1F6B00E4FE48 /* GameAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAudio.swift; sourceTree = "<group>"; };
@@ -160,7 +161,6 @@
 		92D5D7252BC1007900659C37 /* GameGridItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameGridItem.swift; sourceTree = "<group>"; };
 		92D5D7272BC103BC00659C37 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		92D5D72A2BC1723700659C37 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
-		92D5D72C2BC1724E00659C37 /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		92D5D7302BC17C2800659C37 /* DismissButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissButton.swift; sourceTree = "<group>"; };
 		92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEmulationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -192,23 +192,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		922358122BE15AFA0014BFFA /* Emulation */ = {
+			isa = PBXGroup;
+			children = (
+				922358102BE15AF20014BFFA /* EmulationView.swift */,
+				922358152BE2B8B50014BFFA /* EmulationMenuView.swift */,
+				922358132BE15ECE0014BFFA /* GameScreenView.swift */,
+				922D78952BC23D5900695252 /* TouchControlsView.swift */,
+				92115C332BD3F2550020D62F /* ReorderControllersView.swift */,
+			);
+			path = Emulation;
+			sourceTree = "<group>";
+		};
 		9227F53E2BCB490700A29074 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		922D78922BC23CA500695252 /* Emulation */ = {
-			isa = PBXGroup;
-			children = (
-				92D5D72C2BC1724E00659C37 /* EmulationView.swift */,
-				922D78932BC23CB100695252 /* EmulationMenuView.swift */,
-				922D78952BC23D5900695252 /* TouchControlsView.swift */,
-				925B14EA2BC9E90F00AD7257 /* GameScreen.swift */,
-				92115C332BD3F2550020D62F /* ReorderControllersView.swift */,
-			);
-			path = Emulation;
 			sourceTree = "<group>";
 		};
 		922F00982BC0C26600B419D7 = {
@@ -389,7 +389,7 @@
 		92D5D71F2BC0FF9800659C37 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				922D78922BC23CA500695252 /* Emulation */,
+				922358122BE15AFA0014BFFA /* Emulation */,
 				9294E5D62BC1A72900B174E1 /* Library */,
 				9294E5D52BC1A71E00B174E1 /* Settings */,
 				92D5D7202BC0FFA000659C37 /* Supporting */,
@@ -565,7 +565,6 @@
 				922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */,
 				922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */,
 				92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */,
-				92D5D72D2BC1724E00659C37 /* EmulationView.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
 				9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
@@ -573,6 +572,7 @@
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
+				922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */,
 				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
 				92115C362BD435840020D62F /* MessageBlock.swift in Sources */,
 				92115C382BD4C7580020D62F /* GameInput+string.swift in Sources */,
@@ -581,9 +581,7 @@
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */,
-				922D78942BC23CB100695252 /* EmulationMenuView.swift in Sources */,
 				9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */,
-				925B14EB2BC9E90F00AD7257 /* GameScreen.swift in Sources */,
 				9281CCAA2BCC1F6B00E4FE48 /* GameAudio.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
@@ -592,6 +590,7 @@
 				922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */,
 				922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */,
 				9294E5DC2BC1A9AB00B174E1 /* SettingsBackupsView.swift in Sources */,
+				922358112BE15AF20014BFFA /* EmulationView.swift in Sources */,
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
@@ -600,6 +599,7 @@
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
 				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */,
 				92CAA2452BD2B67D000D4FE0 /* RingBuffer.c in Sources */,
+				922358142BE15ECE0014BFFA /* GameScreenView.swift in Sources */,
 				925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */,
 				92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */,
 				92115C322BD366ED0020D62F /* Box.swift in Sources */,
@@ -780,7 +780,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EclipseEmu/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -826,7 +826,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EclipseEmu/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

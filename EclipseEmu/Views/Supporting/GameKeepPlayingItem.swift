@@ -1,9 +1,16 @@
 import SwiftUI
 
 struct GameKeepPlayingItem: View {
+    static let playedDateFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter
+    }()
+    
     var game: Game
     @Binding var selectedGame: Game?
     @Environment(\.playGame) private var playGame
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         Button {
@@ -14,13 +21,14 @@ struct GameKeepPlayingItem: View {
                     .aspectRatio(1.0, contentMode: .fit)
                 
                 VStack(alignment: .leading) {
-                    Text("Resume · 5h ago")
+                    Text("Resume · \(game.datePlayed ?? Date(), formatter: Self.playedDateFormatter)")
                         .font(.caption.weight(.medium))
                         .textCase(.uppercase)
                         .foregroundStyle(.secondary)
                     
                     Text(game.name ?? "Unknown Game")
                         .font(.headline)
+                        .lineLimit(1)
                         .foregroundStyle(.primary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     
@@ -59,7 +67,7 @@ struct GameKeepPlayingItem: View {
     
     func play() {
         Task.detached {
-            try await playGame(game: game)
+            try await playGame(game: game, viewContext: viewContext)
         }
     }
 }

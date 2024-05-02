@@ -2,7 +2,7 @@ import Foundation
 import EclipseKit
 
 struct TouchLayout {
-    var menuButton: CGRect
+    var menuButton: ElementDisplay
     var controls: [Element]
     var variants: [Variant]
     
@@ -11,7 +11,7 @@ struct TouchLayout {
         var minHeight: UInt64?
         var orientation: Orientation?
         
-        var menuButton: CGRect?
+        var menuButton: ElementDisplay?
         var overrides: [Override]
         
         enum Orientation: UInt8 {

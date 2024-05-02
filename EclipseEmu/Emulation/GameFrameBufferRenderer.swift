@@ -5,29 +5,20 @@ import simd
 import EclipseKit
 
 fileprivate struct FrameBuffer: ~Copyable {
-    let device: MTLDevice
-    public let pixelFormat: MTLPixelFormat
-    let bytesPerPixel: Int
-    let width: Int
-    let height: Int
-
-    let bytesPerRow: Int
-    let sourceBuffer: MTLBuffer
-    
     let buffer: UnsafeMutableRawPointer
-    let bufferSize: Int
-    let isBufferOwned: Bool
+    private let bufferSize: Int
+    private let isBufferOwned: Bool
     
-    enum Failure: Error {
-    }
+    private let width: Int
+    private let height: Int
+
+    private let bytesPerRow: Int
+    private let sourceBuffer: MTLBuffer
     
     init(device: MTLDevice, pixelFormat: MTLPixelFormat, height: Int, width: Int, ptr: UnsafeRawPointer?) throws {
         let bytesPerRow = pixelFormat.bytesPerPixel * width
         let bufferSize = bytesPerRow * height
         
-        self.device = device
-        self.pixelFormat = pixelFormat
-        self.bytesPerPixel = pixelFormat.bytesPerPixel
         self.bytesPerRow = bytesPerRow
         self.width = width
         self.height = height
@@ -96,7 +87,6 @@ final class GameFrameBufferRenderer {
     var useAdaptiveSync: Bool = true
     var frameDuration: Double
     
-    private let pixelFormat: MTLPixelFormat
     private let device: MTLDevice
     private let frameBuffer: FrameBuffer
     private var commandQueue: MTLCommandQueue
@@ -111,7 +101,6 @@ final class GameFrameBufferRenderer {
             throw Failure.failedToCreateTheCommandQueue
         }
         self.commandQueue = queue
-        self.pixelFormat = pixelFormat
         
         let vertexArrayObject: [Vertex] = [
             .init(position: simd_float2(1, -1), textureCoordinates: simd_float2(1, 1)),

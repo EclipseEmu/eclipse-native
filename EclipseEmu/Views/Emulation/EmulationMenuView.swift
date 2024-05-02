@@ -1,168 +1,168 @@
 import SwiftUI
 
-#if canImport(UIKit)
+#if os(macOS)
+struct EmulationMenuButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: 32.0, height: 32.0)
+            .buttonStyle(.borderless)
+            .controlSize(.large)
+            .labelStyle(.iconOnly)
+    }
+}
+#endif
+
 struct EmulationMenuView: View {
-    @ObservedObject var model: EmulationViewModel
-    @Environment(\.dismiss) var dismiss
+    @StateObject var model: EmulationViewModel
+    var menuButtonLayout: TouchLayout.ElementDisplay
+    
+    @Environment(\.playGame) var playGame
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    #if os(macOS)
+    @State var isVisible = false
+    #endif
+
+    var content: some View {
+        Group {
+            Button {
+                Task {
+                    await model.togglePlayPause()
+                }
+            } label: {
+                Label("Play/Pause", systemImage: "playpause.fill")
+            }
+            #if os(macOS)
+            .buttonStyle(EmulationMenuButtonStyle())
+            #endif
+            
+            #if os(macOS)
+            Button {
+                model.isFastForwarding.toggle()
+            } label: {
+                Label("Fast Forward", systemImage: "forward.fill")
+            }
+            .buttonStyle(EmulationMenuButtonStyle())
+            #else
+            Toggle(isOn: $model.isFastForwarding) {
+                Label("Fast Forward", systemImage: "forward.fill")
+            }
+            #endif
+
+            #if os(macOS)
+            Spacer()
+            #else
+            Divider()
+            #endif
+            
+            Slider(value: $model.volume, in: 0...1) {} minimumValueLabel: {
+                Label("Lower Volume", systemImage: "speaker.fill")
+            } maximumValueLabel: {
+                Label("Raise Volume", systemImage: "speaker.wave.3.fill")
+            }
+            .labelStyle(.iconOnly)
+            .controlSize(.small)
+        
+            Button(role: .destructive) {
+                model.isQuitConfirmationShown = true
+            } label: {
+                Label("Quit", systemImage: "power")
+            }
+            #if os(macOS)
+            .labelStyle(.iconOnly)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .modify {
+                if #available(macOS 14.0, *) {
+                    $0.buttonBorderShape(.circle)
+                } else {
+                    $0
+                }
+            }
+            #endif
+        }
+    }
     
     var body: some View {
-        CompatNavigationStack {
-            ScrollView {
-                Button {
-                    Task {
-                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
-                    }
-                } label: {
-                    Label("Fast Forward", systemImage: "forward.fill")
-                }
-                .frame(minWidth: 0, maxWidth: .infinity)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.roundedRectangle)
-                
-                Button {
-                    Task {
-                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
-                    }
-                } label: {
-                    Label("Save State", systemImage: "tray.and.arrow.down")
-                }
-                .frame(minWidth: 0, maxWidth: .infinity)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.roundedRectangle)
-                
-                Button {
-                    Task {
-                        await model.coreCoordinator.setFastForward(enabled: model.coreCoordinator.rate != 2.0)
-                    }
-                } label: {
-                    Label("Load State", systemImage: "tray.and.arrow.up")
-                }
-                .frame(minWidth: 0, maxWidth: .infinity)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.roundedRectangle)
-                
-                Button(role: .destructive) {
-                    model.isQuitDialogShown = true
-                } label: {
-                    Label("Quit", systemImage: "power")
-                }
-                .frame(minWidth: 0, maxWidth: .infinity)
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.roundedRectangle)
+        GeometryReader { proxy in
+            let halfWidth = menuButtonLayout.width / 2
+            let halfHeight = menuButtonLayout.height / 2
+            let menuButtonX = menuButtonLayout.xOrigin == .leading
+                ? menuButtonLayout.x + halfWidth
+                : proxy.size.width - menuButtonLayout.x - halfWidth
+            let menuButtonY = menuButtonLayout.yOrigin == .leading
+                ? menuButtonLayout.y + halfHeight
+                : proxy.size.height - menuButtonLayout.y - halfHeight
+            
+            #if !os(macOS)
+            Menu {
+                content
+            } label: {
+                Label("Menu", systemImage: "line.horizontal.3")
+                    .frame(
+                        width: menuButtonLayout.width,
+                        height: menuButtonLayout.height
+                    )
+                    .labelStyle(.iconOnly)
+                    .background(
+                        Circle()
+                            .strokeBorder(.white, lineWidth: 2)
+                            .background(Circle().fill(Color.black))
+                    )
+                    .foregroundStyle(.white)
+                    .opacity(0.8)
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: DismissButton.placement) {
-                    DismissButton()
+            .modify {
+                if #available(iOS 16.0, *) {
+                    $0.menuOrder(.fixed)
+                } else {
+                    $0
                 }
             }
+            .position(.init(x: menuButtonX, y: menuButtonY))
+            #else
+            VStack {
+                Spacer()
+                HStack {
+                    content
+                }
+                .frame(maxWidth: 400.0)
+                .padding(.horizontal)
+                .padding(.vertical, 8.0)
+                .background(Material.regular)
+                .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                .padding()
+                .opacity(self.isVisible ? 1.0 : 0.0)
+            }
+            .frame(minWidth: 0, maxWidth: .infinity)
+            .onContinuousHover(coordinateSpace: .global) { hoverPhase in
+                withAnimation {
+                    switch hoverPhase {
+                    case .active(_):
+                        self.isVisible = true
+                    case .ended:
+                        self.isVisible = false
+                    }
+                }
+            }
+            #endif
         }
     }
 }
-#endif
 
-// Rather than displaying the emulation menu options in a sheet, having them in a bar on Mac makes more sense.
-#if os(macOS)
-struct EmulationMenuViewBar: View {
-    @ObservedObject var model: EmulationViewModel
-    
-    var body: some View {
-        VStack {
-            Spacer()
-            
-            HStack(spacing: 8.0) {
-                Button {
-                    Task(priority: .userInitiated) {
-                        if model.coreCoordinator.isRunning {
-                            await model.coreCoordinator.pause()
-                        } else {
-                            await model.coreCoordinator.play()
-                        }
-                    }
-                } label: {
-                    if model.coreCoordinator.isRunning {
-                        Label("Pause", systemImage: "pause.fill")
-                    } else {
-                        Label("Play", systemImage: "play.fill")
-                    }
-                }
-                .frame(width: 32.0, height: 32.0)
-                .buttonStyle(.borderless)
-                .controlSize(.large)
-                .labelStyle(.iconOnly)
-                .modify {
-                    if #available(iOS 17.0, macOS 14.0, *) {
-                        $0.transition(.symbolEffect)
-                    } else {
-                        $0
-                    }
-                }
-
-                Button {
-                    model.isRestartDialogShown = true
-                } label: {
-                    Label("Restart", systemImage: "arrow.clockwise")
-                }
-                .frame(width: 32.0, height: 32.0)
-                .buttonStyle(.borderless)
-                .controlSize(.large)
-                .labelStyle(.iconOnly)
-
-                Button {
-                    print("Save State")
-                } label: {
-                    Label("Save State", systemImage: "tray.and.arrow.down")
-                }
-                .frame(width: 32.0, height: 32.0)
-                .buttonStyle(.borderless)
-                .controlSize(.large)
-                .labelStyle(.iconOnly)
-                Button {
-                    print("Load State")
-                } label: {
-                    Label("Load State", systemImage: "tray.and.arrow.up")
-                }
-                .frame(width: 32.0, height: 32.0)
-                .buttonStyle(.borderless)
-                .controlSize(.large)
-                .labelStyle(.iconOnly)
-
-                Spacer(minLength: 16.0)
-
-                Slider(value: $model.volume, in: 0...1) {} minimumValueLabel: {
-                    Label("Lower Volume", systemImage: "speaker")
-                } maximumValueLabel: {
-                    Label("Raise Volume", systemImage: "speaker.wave.3")
-                }.labelStyle(.iconOnly)
-                    .controlSize(.small)
-
-                Spacer(minLength: 16.0)
-                
-                Button {
-                    self.model.isQuitDialogShown = true
-                } label: {
-                    Label("Quit Game", systemImage: "power")
-                }
-                .labelStyle(.iconOnly)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .modify {
-                    if #available(macOS 14.0, *) {
-                        $0.buttonBorderShape(.circle)
-                    } else {
-                        $0
-                    }
-                }
-                .tint(.red)
-            }
-            .fontWeight(.semibold)
-            .frame(minWidth: 0, maxWidth: 400.0)
-            .padding(.horizontal)
-            .padding(.vertical, 8.0)
-            .background(Material.bar)
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-            .opacity(Double(self.model.isMenuVisible))
-        }.padding()
+#Preview {
+    ZStack {
+        EmulationMenuView(
+            model: .init(coreInfo: .init(), game: .init(context: PersistenceController.preview.container.viewContext)),
+            menuButtonLayout: .init(
+                xOrigin: .leading,
+                yOrigin: .trailing,
+                x: 16,
+                y: 0,
+                width: 50,
+                height: 50,
+                hidden: false
+            )
+        )
     }
+    .background(Color.red)
 }
-#endif

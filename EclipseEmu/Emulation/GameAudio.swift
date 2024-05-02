@@ -3,7 +3,7 @@ import AVFoundation
 
 // FIXME: handle changes in audio output
 
-class GameAudio {
+final class GameAudio {
     enum Failure: Error {
         case failedToGetAudioFormat
         case unknownSampleFormat
