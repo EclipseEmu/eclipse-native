@@ -112,7 +112,7 @@
 		922358132BE15ECE0014BFFA /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
 		922358152BE2B8B50014BFFA /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
 		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
-		922F00A12BC0C26600B419D7 /* Eclipse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eclipse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuApp.swift; sourceTree = "<group>"; };
 		922F00A62BC0C26600B419D7 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		922F00A92BC0C26600B419D7 /* EclipseEmu.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = EclipseEmu.xcdatamodel; sourceTree = "<group>"; };
@@ -227,7 +227,7 @@
 		922F00A22BC0C26600B419D7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				922F00A12BC0C26600B419D7 /* Eclipse.app */,
+				922F00A12BC0C26600B419D7 /* EclipseEmu.app */,
 				922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */,
 				922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */,
 			);
@@ -443,7 +443,7 @@
 				92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
-			productReference = 922F00A12BC0C26600B419D7 /* Eclipse.app */;
+			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
 			productType = "com.apple.product-type.application";
 		};
 		922F00B62BC0C26700B419D7 /* EclipseEmuTests */ = {
@@ -797,7 +797,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
-				PRODUCT_NAME = Eclipse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -843,7 +843,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
-				PRODUCT_NAME = Eclipse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;

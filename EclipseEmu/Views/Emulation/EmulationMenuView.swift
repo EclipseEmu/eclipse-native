@@ -15,6 +15,7 @@ struct EmulationMenuButtonStyle: ButtonStyle {
 struct EmulationMenuView: View {
     @StateObject var model: EmulationViewModel
     var menuButtonLayout: TouchLayout.ElementDisplay
+    var buttonOpacity: Double
     
     @Environment(\.playGame) var playGame
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
@@ -114,7 +115,7 @@ struct EmulationMenuView: View {
                             .background(Circle().fill(Color.black))
                     )
                     .foregroundStyle(.white)
-                    .opacity(0.8)
+                    .opacity(buttonOpacity)
             }
             .modify {
                 if #available(iOS 16.0, *) {
@@ -182,7 +183,8 @@ struct EmulationMenuView: View {
                 width: 50,
                 height: 50,
                 hidden: false
-            )
+            ),
+            buttonOpacity: 0.6
         )
     }
     .background(Color.red)

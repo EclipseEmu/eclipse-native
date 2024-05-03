@@ -169,11 +169,12 @@ struct EmulationView: View {
                 #if os(iOS)
                 TouchControlsView { newValue in
                     core.inputs.handleTouchInput(newState: newValue)
-                }.opacity(0.8)
+                }.opacity(0.6)
                 #endif
                 EmulationMenuView(
                     model: model,
-                    menuButtonLayout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16, y: 0, width: 42, height: 42, hidden: false)
+                    menuButtonLayout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16, y: 0, width: 42, height: 42, hidden: false),
+                    buttonOpacity: 0.6
                 )
             }
         }

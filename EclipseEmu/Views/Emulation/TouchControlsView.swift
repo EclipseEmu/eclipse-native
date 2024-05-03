@@ -5,15 +5,28 @@ import EclipseKit
 fileprivate let borderWidth = 2.0
 fileprivate let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
+extension CGRect {
+    @inlinable
+    func centralDistance(to other: CGPoint) -> CGPoint {
+        CGPoint(
+            x: max(-1, min((other.x - self.midX) / (self.width / 2), 1)),
+            y: max(-1, min((other.y - self.midY) / (self.height / 2), 1))
+        )
+    }
+}
+
 final class TouchControlsController: UIViewController {
-    var valueChangedHandler: ((_ newState: UInt32) -> Void)?
+    private static let deadZone = 0.5
+    
+    private let valueChangedHandler: ((_ newState: UInt32) -> Void)
 
     private var state: GameInput.RawValue = 0
-    private var feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
-    private var touchControlsSubview = UIView()
+    private var lockedTouches = [UITouch : (Int, TouchLayout.Element)]()
     
-    var menuButtonLayout: TouchLayout.ElementDisplay = .init(xOrigin: .leading, yOrigin: .trailing, x: 16.0, y: 0.0, width: 42.0, height: 42.0, hidden: false)
-    var touchEls: [TouchLayout.Element] = [
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+    private let touchControlsSubview = UIView()
+    
+    private var touchEls: [TouchLayout.Element] = [
         TouchLayout.Element(
             label: "A",
             style: .circle,
@@ -27,16 +40,22 @@ final class TouchControlsController: UIViewController {
             bindings: .init(kind: .button, inputA: GameInput.faceButtonDown.rawValue, inputB: .none, inputC: .none, inputD: .none)
         ),
         TouchLayout.Element(
+            label: "A + B",
+            style: .capsule,
+            layout: .init(xOrigin: .trailing, yOrigin: .trailing, x: 16.0, y: 90.0, width: 75.0, height: 60.0, hidden: true),
+            bindings: .init(kind: .multiButton, inputA: GameInput.faceButtonDown.rawValue | GameInput.faceButtonRight.rawValue, inputB: .none, inputC: .none, inputD: .none)
+        ),
+        TouchLayout.Element(
             label: "L",
             style: .capsule,
             layout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16.0, y: 264.0, width: 100.0, height: 42.0, hidden: false),
-            bindings: .init(kind: .button, inputA: GameInput.faceButtonRight.rawValue, inputB: .none, inputC: .none, inputD: .none)
+            bindings: .init(kind: .button, inputA: GameInput.shoulderLeft.rawValue, inputB: .none, inputC: .none, inputD: .none)
         ),
         TouchLayout.Element(
             label: "R",
             style: .capsule,
             layout: .init(xOrigin: .trailing, yOrigin: .trailing, x: 16.0, y: 264.0, width: 100.0, height: 42.0, hidden: false),
-            bindings: .init(kind: .button, inputA: GameInput.faceButtonDown.rawValue, inputB: .none, inputC: .none, inputD: .none)
+            bindings: .init(kind: .button, inputA: GameInput.shoulderRight.rawValue, inputB: .none, inputC: .none, inputD: .none)
         ),
         TouchLayout.Element(
             label: "Start",
@@ -57,6 +76,15 @@ final class TouchControlsController: UIViewController {
             bindings: .init(kind: .dpad, inputA: GameInput.dpadUp.rawValue, inputB: .dpadDown, inputC: .dpadLeft, inputD: .dpadRight)
         )
     ]
+    
+    init(valueChangedHandler: @escaping (_: UInt32) -> Void) {
+        self.valueChangedHandler = valueChangedHandler
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,6 +125,7 @@ final class TouchControlsController: UIViewController {
                 
                 view.layer.borderWidth = borderWidth
                 view.layer.borderColor = borderColor
+                view.isHidden = element.layout.hidden
                 break
             case .dpad:
                 let path = UIBezierPath()
@@ -170,13 +199,13 @@ final class TouchControlsController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         guard let allTouches = event?.allTouches else { return }
-        self.handleTouches(touches: allTouches)
+        self.handleTouches(touches: allTouches, isStart: true)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
         guard let allTouches = event?.allTouches else { return }
-        self.handleTouches(touches: allTouches)
+        self.handleTouches(touches: allTouches, isStart: false)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -189,36 +218,85 @@ final class TouchControlsController: UIViewController {
         self.handleEndedTouches(touches: touches)
     }
     
-    private func handleTouches(touches: Set<UITouch>) {
+    // FIXME: present some visual indication of input
+
+    private func handleTouches(touches: Set<UITouch>, isStart: Bool) {
+        let oldState = self.state
         self.state = 0
         
         for touch in touches {
             let touchPoint = touch.location(in: self.touchControlsSubview)
+            
+            if let (i, element) = self.lockedTouches[touch] {
+                let view = self.touchControlsSubview.subviews[i]
+                self.touchDown(bindings: element.bindings, view: view, distance: view.frame.centralDistance(to: touchPoint))
+                continue
+            }
+            
             for (i, element) in self.touchEls.enumerated() {
                 let view = self.touchControlsSubview.subviews[i]
+                
                 if !view.frame.contains(touchPoint) {
+                    continue
+                }
+                
+                if element.bindings.kind == .joystick || element.bindings.kind == .dpad {
+                    guard isStart else { continue }
+                    
+                    self.lockedTouches[touch] = (i, element)
+                    self.touchDown(bindings: element.bindings, view: view, distance: view.frame.centralDistance(to: touchPoint))
                     continue
                 }
                 
                 self.state |= element.bindings.inputA
-                self.valueChangedHandler?(self.state)
             }
         }
+        
+        if self.state & ~oldState > 0 {
+            feedbackGenerator.impactOccurred()
+        }
+        
+        self.valueChangedHandler(self.state)
     }
     
     private func handleEndedTouches(touches: Set<UITouch>) {
         for touch in touches {
+            if let (i, element) = self.lockedTouches[touch] {
+                self.lockedTouches.removeValue(forKey: touch)
+//                let view = self.touchControlsSubview.subviews[i]
+                self.state &= ~(
+                    element.bindings.inputA |
+                    element.bindings.inputB.rawValue |
+                    element.bindings.inputC.rawValue |
+                    element.bindings.inputD.rawValue)
+                self.valueChangedHandler(self.state)
+                continue
+            }
+            
             let touchPoint = touch.location(in: self.touchControlsSubview)
+            
             for (i, element) in self.touchEls.enumerated() {
                 let view = self.touchControlsSubview.subviews[i]
                 if !view.frame.contains(touchPoint) {
                     continue
                 }
-                
-                self.state &= ~element.bindings.inputA
-                self.valueChangedHandler?(self.state)
+                self.state &= ~(
+                    element.bindings.inputA |
+                    element.bindings.inputB.rawValue |
+                    element.bindings.inputC.rawValue |
+                    element.bindings.inputD.rawValue)
             }
         }
+        self.valueChangedHandler(self.state)
+    }
+    
+    private func touchDown(bindings: TouchLayout.Bindings, view: UIView, distance: CGPoint) {
+        // print(distance)
+        self.state |=
+            (UInt32(distance.y <= -Self.deadZone) * bindings.inputA) |
+            (UInt32(distance.y >= Self.deadZone) * bindings.inputB.rawValue) |
+            (UInt32(distance.x <= -Self.deadZone) * bindings.inputC.rawValue) |
+            (UInt32(distance.x >= Self.deadZone) * bindings.inputD.rawValue)
     }
 }
 
@@ -231,9 +309,7 @@ struct TouchControlsView: UIViewControllerRepresentable {
     }
     
     func makeUIViewController(context: Context) -> TouchControlsController {
-        let vc = TouchControlsController()
-        vc.valueChangedHandler = self.callback
-        return vc
+        return TouchControlsController(valueChangedHandler: self.callback)
     }
     
     func updateUIViewController(_ uiViewController: TouchControlsController, context: Context) {}
@@ -242,12 +318,12 @@ struct TouchControlsView: UIViewControllerRepresentable {
 
 #Preview {
     struct DemoView: View {
-        @State var foo: UInt32 = 0
+        @State var value: UInt32 = 0
         
         var body: some View {
             ZStack {
-                Text("\(foo)")
-                TouchControlsView { newValue in foo = newValue }
+                Text("\(value)")
+                TouchControlsView { value = $0 }
             }
         }
     }
