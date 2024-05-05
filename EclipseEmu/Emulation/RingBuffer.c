@@ -63,14 +63,14 @@ uint64_t ring_buffer_write(RingBuffer *self, const void *src, uint64_t length) {
     uint64_t next_tail = tail + length;
     bool needs_wrap = next_tail >= self->capacity;
     next_tail -= needs_wrap * self->capacity;
-    
+    atomic_store_explicit(&(self->tail), next_tail, memory_order_release);
+
     uint64_t len1 = needs_wrap ? self->capacity - tail : length;
     uint64_t len2 = needs_wrap * next_tail;
     
     memcpy(self->inner + tail, src, len1);
     memcpy(self->inner, src + len1, len2);
     
-    atomic_store_explicit(&(self->tail), next_tail, memory_order_release);
     return length;
 }
 
@@ -86,14 +86,14 @@ uint64_t ring_buffer_read(RingBuffer *self, void *dst, uint64_t length) {
     uint64_t next_head = head + length;
     bool needs_wrap = next_head >= self->capacity;
     next_head -= needs_wrap * self->capacity;
-    
+    atomic_store_explicit(&(self->head), next_head, memory_order_release);
+
     uint64_t len1 = needs_wrap ? self->capacity - head : length;
     uint64_t len2 = needs_wrap * next_head;
     
     memcpy(dst, self->inner + head, len1);
     memcpy(dst + head, self->inner, len2);
     
-    atomic_store_explicit(&(self->head), next_head, memory_order_release);
     return length;
 }
 

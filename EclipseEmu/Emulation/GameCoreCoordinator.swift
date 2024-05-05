@@ -4,6 +4,7 @@ import MetalKit
 import simd
 import EclipseKit
 import Combine
+import AVFoundation
 
 extension NSNotification.Name {
     static let EKGameCoreDidSave = NSNotification.Name.init("EKGameCoreDidSaveNotification")
@@ -47,7 +48,7 @@ final actor GameCoreCoordinator {
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private var frameTimerTask: Task<Void, Never>?
-    private(set) var rate: Double = 1.0
+    private(set) var rate: Float = 1.0
     private let callbackContext: UnsafeMutablePointer<CallbackContext>
     
     struct CallbackContext {
@@ -100,7 +101,7 @@ final actor GameCoreCoordinator {
         
         let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
         
-        let width =  videoFormat.width
+        let width = videoFormat.width
         let height = videoFormat.height
         
         self.width = CGFloat(width)
@@ -148,6 +149,8 @@ final actor GameCoreCoordinator {
     }
     
     deinit {
+        self.frameTimerTask?.cancel()
+        self.frameTimerTask = nil
         core.pointee.stop(core.pointee.data)
         core.pointee.deallocate(core.pointee.data)
         core.deallocate()
@@ -169,7 +172,7 @@ final actor GameCoreCoordinator {
             ) else { return }
         }
         await self.inputs.start()
-//        self.audio.start()
+        await self.audio.start()
         await self.play()
     }
     
@@ -177,19 +180,19 @@ final actor GameCoreCoordinator {
         await self.pause(reason: .stopped)
         self.core.pointee.stop(core.pointee.data)
         self.inputs.stop()
-//        self.audio.stop()
+        await self.audio.stop()
     }
     
     func restart() async {
         if self.state == .running {
-            self.audio.pause()
+            await self.audio.pause()
             self.frameTimerTask?.cancel()
             self.frameTimerTask = nil
         }
         self.audio.clear()
         self.core.pointee.restart(core.pointee.data)
         self.startFrameTimer()
-//        self.audio.resume()
+        await self.audio.resume()
         self.state = .running
     }
     
@@ -198,7 +201,7 @@ final actor GameCoreCoordinator {
         self.state = .running
         self.core.pointee.play(core.pointee.data)
         self.startFrameTimer()
-//        self.audio.resume()
+        await self.audio.resume()
     }
     
     func pause(reason: State) async {
@@ -208,19 +211,20 @@ final actor GameCoreCoordinator {
         self.frameTimerTask?.cancel()
         self.core.pointee.pause(core.pointee.data)
         self.frameTimerTask = nil
-//        self.audio.pause()
+        await self.audio.pause()
     }
     
     // MARK: Frame Timing
 
     func setFastForward(enabled: Bool) {
-        let rate: Double = enabled ? 2 : 1
+        let rate: Float = enabled ? 2 : 1
         self.rate = rate
         #if canImport(AppKit)
         self.renderingSurface.displaySyncEnabled = !enabled
         #endif
         
-        let newFrameDuration = (1.0 / desiredFrameRate) / rate
+        self.audio.setRate(rate: rate)
+        let newFrameDuration = (1.0 / desiredFrameRate) / Double(rate)
         switch self.renderer {
         case .frameBuffer(let renderer):
             renderer.useAdaptiveSync = !enabled

@@ -209,10 +209,6 @@ final class GameFrameBufferRenderer {
             } else {
                 drawable.present()
             }
-            
-            Task { @MainActor in
-                renderingSurface.setNeedsDisplay(renderingSurface.bounds)
-            }
         }
         
         commandBuffer.commit()

@@ -1,6 +1,7 @@
 import SwiftUI
 import EclipseKit
 import MetalKit
+import AVFoundation
 
 final class EmulationViewModel: ObservableObject {
     enum State {
@@ -65,6 +66,7 @@ final class EmulationViewModel: ObservableObject {
             let aspectRatio = core.width / core.height
             await MainActor.run {
                 self.aspectRatio = aspectRatio
+                self.volume = 0.5
                 self.state = .loaded(core)
             }
             
@@ -176,6 +178,9 @@ struct EmulationView: View {
                     menuButtonLayout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16, y: 0, width: 42, height: 42, hidden: false),
                     buttonOpacity: 0.6
                 )
+                .onAppear {
+                    self.focusState = true
+                }
             }
         }
         .confirmationDialog("Quit Game", isPresented: $model.isQuitConfirmationShown) {
