@@ -46,6 +46,8 @@ struct EmulationMenuView: View {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
             .buttonStyle(EmulationMenuButtonStyle())
+            
+            .foregroundStyle(model.isFastForwarding ? .primary : .secondary)
             #else
             Toggle(isOn: $model.isFastForwarding) {
                 Label("Fast Forward", systemImage: "forward.fill")
@@ -66,6 +68,7 @@ struct EmulationMenuView: View {
             #if os(macOS)
             .labelStyle(.iconOnly)
             .controlSize(.small)
+            .frame(maxWidth: 140)
             #endif
         
             Button(role: .destructive) {
@@ -165,6 +168,9 @@ struct EmulationMenuView: View {
                         self.isVisible = false
                     }
                 }
+            }
+            .onDisappear {
+                self.hideTask?.cancel()
             }
             #endif
         }

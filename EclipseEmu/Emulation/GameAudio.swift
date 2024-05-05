@@ -2,11 +2,9 @@ import Foundation
 import AVFoundation
 
 // FIXME: Handle hardware/sample rate changes.
-// FIXME: Figure out how to deal with initial audio crackle.
-// FIXME: Figure out how to deal with audio being ~0.5 seconds delayed.
 // FIXME: Figure out why this randomly crashes.
 // FIXME: Figure out why AVAudioEngine deadlocks sometimes.
-// FIXME: Figure out why this randomly will blast audio sometimes but not others.
+// FIXME: Figure out why this randomly will blast audio sometimes but not others. (Fixed?)
 
 final class GameAudio {
     enum Failure: Error {
@@ -18,20 +16,19 @@ final class GameAudio {
     // Unfortunately, AVAudioEngine blocks which causes major issues when used within Swift Concurrency (i.e. deadlocks),
     // so we have to use a DispatchQueue here.
     private let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.audio")
-    private let ringBuffer: OpaquePointer
+    private var ringBuffer: RingBuffer
     
     private let inputFormat: AVAudioFormat
     private var outputFormat: AVAudioFormat
-    private var sampleRateRatio: Int
-    
+    private var sampleRateRatio: Int = 1
+
     private let engine: AVAudioEngine
     private let playback: AVAudioUnitTimePitch
     private var sourceNode: AVAudioSourceNode?
     
     private(set) var running = false
-    private var lastAvailableRead: UInt64 = 0
+    private var lastAvailableRead: Int = -1
     
-    @usableFromInline
     var volume: Float {
         get {
             return self.engine.mainMixerNode.outputVolume
@@ -48,14 +45,8 @@ final class GameAudio {
         
         let bytesPerSample = format.commonFormat.bytesPerSample
         guard bytesPerSample != -1 else { throw Failure.unknownSampleFormat }
-        
-        let ringBufferSize = Int(format.sampleRate * Double(format.channelCount * 2))
         self.inputFormat = format
-        
-        guard let ringBuffer = ring_buffer_init(UInt64(ringBufferSize)) else {
-            throw Failure.failedToInitializeRingBuffer
-        }
-        self.ringBuffer = ringBuffer
+        self.ringBuffer = RingBuffer(capacity: Int(format.sampleRate * Double(format.channelCount * 2)))
         
         self.engine = AVAudioEngine()
         playback = AVAudioUnitTimePitch()
@@ -65,7 +56,7 @@ final class GameAudio {
         sampleRateRatio = Int((inputFormat.sampleRate / outputFormat.sampleRate).rounded(.up))
         
         #if os(macOS)
-        self.setOutputDeviceFor(self.engine)
+        print("set audio device to default", self.useDefaultOutputDevice())
         #endif
     }
     
@@ -74,7 +65,6 @@ final class GameAudio {
             engine.detach(sourceNode)
         }
         engine.detach(playback)
-        ring_buffer_deinit(ringBuffer)
     }
     
     #if os(iOS)
@@ -147,12 +137,12 @@ final class GameAudio {
     
     @inlinable
     func clear() {
-        ring_buffer_clear(self.ringBuffer)
+        self.ringBuffer.clear()
     }
     
     @inlinable
-    func write(samples: UnsafeRawPointer, count: UInt64) -> UInt64 {
-        return ring_buffer_write(self.ringBuffer, samples, UInt64(count))
+    func write(samples: UnsafeRawPointer, count: Int) -> Int {
+        return ringBuffer.write(src: samples, length: count)
     }
 
     // MARK: Source Node Handling
@@ -171,7 +161,7 @@ final class GameAudio {
         frameCount: AVAudioFrameCount,
         audioBufferList: UnsafeMutablePointer<AudioBufferList>
     ) -> OSStatus {
-        defer { self.lastAvailableRead = ring_buffer_available_read(self.ringBuffer) }
+        defer { self.lastAvailableRead = ringBuffer.availableRead() }
         
         let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
         guard let buffer = buffers[0].mData else {
@@ -179,16 +169,15 @@ final class GameAudio {
         }
         
         let requested = Int(frameCount * self.inputFormat.streamDescription.pointee.mBytesPerFrame)
-        let availableRead = ring_buffer_available_read(self.ringBuffer)
+        let availableRead = ringBuffer.availableRead()
         guard
             availableRead >= requested * self.sampleRateRatio,
-            availableRead >= requested,
             availableRead >= self.lastAvailableRead
         else {
             return kAudioFileStreamError_DataUnavailable
         }
         
-        let amountRead = ring_buffer_read(self.ringBuffer, buffer, UInt64(requested));
+        let amountRead = self.ringBuffer.read(dst: buffer, length: requested);
         guard amountRead > 0 else {
             return kAudioFileStreamError_DataUnavailable
         }
@@ -200,11 +189,14 @@ final class GameAudio {
     // MARK: Output & Change Handling
     
     #if os(macOS)
-    func setOutputDeviceFor(_ engine: AVAudioEngine) -> Bool {
+    /// There was a bug, it may still be a thing, where with AirPods the audio engine would prepare both input and output.
+    /// This bug essentially degraded audio to the phone call quality, which is awful.
+    func useDefaultOutputDevice() -> Bool {
         var addr = AudioObjectPropertyAddress(
             mSelector: kAudioHardwarePropertyDefaultOutputDevice,
             mScope: kAudioObjectPropertyScopeGlobal,
-            mElement: kAudioObjectPropertyElementMain)
+            mElement: kAudioObjectPropertyElementMain
+        )
 
         var deviceID: AudioObjectID = 0
         var size = UInt32(MemoryLayout.size(ofValue: deviceID))
@@ -214,22 +206,23 @@ final class GameAudio {
             0,
             nil,
             &size,
-            &deviceID)
+            &deviceID
+        )
 
-        if (noErr == err && kAudioDeviceUnknown != deviceID) {
-            do {
-                try engine.outputNode.auAudioUnit.setDeviceID(deviceID)
-                self.outputFormat = engine.outputNode.outputFormat(forBus: 0)
-                self.sampleRateRatio = Int((inputFormat.sampleRate / outputFormat.sampleRate).rounded(.up))
-            } catch {
-                print(error)
-                return false
-            }
-            return true
-        } else {
+        guard err == noErr && deviceID != kAudioDeviceUnknown else {
             print("ERROR: couldn't get default output device, ID = \(deviceID), err = \(err)")
             return false
         }
+        
+        do {
+            try engine.outputNode.auAudioUnit.setDeviceID(deviceID)
+            self.outputFormat = engine.outputNode.outputFormat(forBus: 0)
+            self.sampleRateRatio = Int((inputFormat.sampleRate / outputFormat.sampleRate).rounded(.up))
+        } catch {
+            print(error)
+            return false
+        }
+        return true
     }
     #endif
 }

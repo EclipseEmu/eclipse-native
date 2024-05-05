@@ -149,7 +149,10 @@ struct EmulationView: View {
                         $0
                     }
                 }
-            
+                .onReceive(NotificationCenter.default.publisher(for: .EKGameCoreDidSave), perform: { _ in
+                    print("game saved")
+                })
+           
             switch model.state {
             case .loading:
                 VStack {

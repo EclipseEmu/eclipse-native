@@ -52,17 +52,15 @@ final actor GameCoreCoordinator {
     private let callbackContext: UnsafeMutablePointer<CallbackContext>
     
     struct CallbackContext {
-        var audio: GameAudio!
+        weak var audio: GameAudio?
     }
     
     private static let writeAudio: EKCoreAudioWriteCallback = { ctx, ptr, count in
-        // SAFETY:
-        //  audio is set at the end of the init block.
-        //  ctx should always be passed back in and will only be nil when the actor deinits.
-        //  if the core doesn't remove all references to it then it needs to, branching here would be awful for perf.
-        //  it is like 99% likely that ctx will not be nil, so even an unlikely branch would be excessive.
-        let audio = ctx!.assumingMemoryBound(to: CallbackContext.self).pointee.audio!
-        return audio.write(samples: ptr.unsafelyUnwrapped, count: count)
+        // SAFETY: ctx should always be passed back in and will only be nil when the actor deinits.
+        let context = ctx!.assumingMemoryBound(to: CallbackContext.self)
+        let audio = context.pointee.audio
+        guard _fastPath(audio != nil) else { return 0 }
+        return UInt64(audio!.write(samples: ptr.unsafelyUnwrapped, count: Int(count)))
     }
     
     private static let didSave: EKCoreSaveCallback = { savePathPtr in
@@ -151,6 +149,7 @@ final actor GameCoreCoordinator {
     deinit {
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
+        
         core.pointee.stop(core.pointee.data)
         core.pointee.deallocate(core.pointee.data)
         core.deallocate()
@@ -217,7 +216,7 @@ final actor GameCoreCoordinator {
     // MARK: Frame Timing
 
     func setFastForward(enabled: Bool) {
-        let rate: Float = enabled ? 2 : 1
+        let rate: Float = enabled ? 2.0 : 1.0
         self.rate = rate
         #if canImport(AppKit)
         self.renderingSurface.displaySyncEnabled = !enabled
