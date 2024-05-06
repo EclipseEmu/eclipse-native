@@ -16,10 +16,10 @@ fileprivate enum GameVideoRenderer {
 
 final actor GameCoreCoordinator {
     enum State: UInt8, RawRepresentable {
-        case running = 0
-        case stopped = 1
-        case backgrounded = 2
-        case pendingUserInput = 3
+        case stopped = 0
+        case running = 1
+        case pendingUserInput = 2
+        case backgrounded = 3
         case paused = 4
     }
     
@@ -172,7 +172,7 @@ final actor GameCoreCoordinator {
         }
         await self.inputs.start()
         await self.audio.start()
-        await self.play()
+        await self.play(reason: .stopped)
     }
     
     func stop() async {
@@ -195,8 +195,8 @@ final actor GameCoreCoordinator {
         self.state = .running
     }
     
-    func play() async {
-        guard self.state != .running else { return }
+    func play(reason: State) async {
+        guard self.state.rawValue <= reason.rawValue else { return }
         self.state = .running
         self.core.pointee.play(core.pointee.data)
         self.startFrameTimer()
@@ -204,12 +204,13 @@ final actor GameCoreCoordinator {
     }
     
     func pause(reason: State) async {
-        guard self.state == .running else { return }
+        guard self.state.rawValue < reason.rawValue || reason == .stopped else { return }
         self.state = reason
         
         self.frameTimerTask?.cancel()
-        self.core.pointee.pause(core.pointee.data)
         self.frameTimerTask = nil
+        
+        self.core.pointee.pause(core.pointee.data)
         await self.audio.pause()
     }
     

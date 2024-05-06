@@ -89,7 +89,7 @@ final class EmulationViewModel: ObservableObject {
     
     func sceneMadeActive() async {
         guard case .loaded(let core) = self.state else { return }
-        await core.play()
+        await core.play(reason: .backgrounded)
     }
     
     func sceneHidden() async {
@@ -100,7 +100,7 @@ final class EmulationViewModel: ObservableObject {
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void {
         guard case .loaded(let core) = self.state else { return }
         await core.pause(reason: .pendingUserInput)
-        await core.play()
+        await core.play(reason: .pendingUserInput)
     }
     
     func togglePlayPause() async {
@@ -108,7 +108,7 @@ final class EmulationViewModel: ObservableObject {
         if core.state == .running {
             await core.pause(reason: .paused)
         } else {
-            await core.play()
+            await core.play(reason: .paused)
         }
     }
 }

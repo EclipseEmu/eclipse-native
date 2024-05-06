@@ -132,7 +132,9 @@ final class GameAudio {
     }
     
     func setRate(rate: Float) {
-        self.playback.rate = rate
+        self.queue.async {
+            self.playback.rate = rate
+        }
     }
     
     @inlinable
