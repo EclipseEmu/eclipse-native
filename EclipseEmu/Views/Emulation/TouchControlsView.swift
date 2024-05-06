@@ -291,7 +291,6 @@ final class TouchControlsController: UIViewController {
     }
     
     private func touchDown(bindings: TouchLayout.Bindings, view: UIView, distance: CGPoint) {
-        // print(distance)
         self.state |=
             (UInt32(distance.y <= -Self.deadZone) * bindings.inputA) |
             (UInt32(distance.y >= Self.deadZone) * bindings.inputB.rawValue) |
