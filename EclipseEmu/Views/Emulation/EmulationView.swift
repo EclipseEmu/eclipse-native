@@ -6,6 +6,7 @@ import AVFoundation
 final class EmulationViewModel: ObservableObject {
     enum State {
         case loading
+        case quitting
         case error(Error)
         case loaded(GameCoreCoordinator)
     }
@@ -83,6 +84,9 @@ final class EmulationViewModel: ObservableObject {
     func quit(playAction: PlayGameAction) async {
         if case .loaded(let core) = self.state {
             await core.stop()
+        }
+        await MainActor.run {
+            self.state = .quitting
         }
         await playAction.closeGame()
     }
@@ -163,6 +167,8 @@ struct EmulationView: View {
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
+            case .quitting:
+                EmptyView()
             case .error(let error):
                 VStack {
                     Text("Something went wrong")

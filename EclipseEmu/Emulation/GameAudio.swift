@@ -2,9 +2,6 @@ import Foundation
 import AVFoundation
 
 // FIXME: Handle hardware/sample rate changes.
-// FIXME: Figure out why this randomly crashes.
-// FIXME: Figure out why AVAudioEngine deadlocks sometimes.
-// FIXME: Figure out why this randomly will blast audio sometimes but not others. (Fixed?)
 
 final class GameAudio {
     enum Failure: Error {
