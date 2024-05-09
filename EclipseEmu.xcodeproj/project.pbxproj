@@ -44,7 +44,7 @@
 		9279730E2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */; };
 		927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */; };
 		927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973112BEBE6FD008F2FE4 /* String+Extension.swift */; };
-		927973142BEC4886008F2FE4 /* EditCheatVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973132BEC4886008F2FE4 /* EditCheatVIew.swift */; };
+		927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973132BEC4886008F2FE4 /* EditCheatView.swift */; };
 		927973172BEC58DA008F2FE4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 927973162BEC58DA008F2FE4 /* mGBAEclipseCore */; };
 		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
 		9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */; };
@@ -141,7 +141,7 @@
 		9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterSet+Extension.swift"; sourceTree = "<group>"; };
 		9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatCodeField.swift; sourceTree = "<group>"; };
 		927973112BEBE6FD008F2FE4 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
-		927973132BEC4886008F2FE4 /* EditCheatVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheatVIew.swift; sourceTree = "<group>"; };
+		927973132BEC4886008F2FE4 /* EditCheatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheatView.swift; sourceTree = "<group>"; };
 		9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewView.swift; sourceTree = "<group>"; };
 		9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioCommonFormat+Extension.swift"; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -342,7 +342,7 @@
 				92D5D72A2BC1723700659C37 /* GameView.swift */,
 				9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */,
 				9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */,
-				927973132BEC4886008F2FE4 /* EditCheatVIew.swift */,
+				927973132BEC4886008F2FE4 /* EditCheatView.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -591,7 +591,7 @@
 				92115C382BD4C7580020D62F /* GameInput+Extension.swift in Sources */,
 				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
 				922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */,
-				927973142BEC4886008F2FE4 /* EditCheatVIew.swift in Sources */,
+				927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */,
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */,

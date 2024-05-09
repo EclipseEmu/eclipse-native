@@ -1,10 +1,24 @@
 import SwiftUI
 import EclipseKit
-import mGBAEclipseCore
 
 struct CheatCodeField {
     @Binding var value: String
-    var format: GameCoreCheatFormat
+    @Binding var formatter: GameCoreCheatFormat.Formatter
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(value: $value, formatter: $formatter)
+    }
+    
+    class Coordinator: NSObject {
+        var value: Binding<String>
+        var formatter: Binding<GameCoreCheatFormat.Formatter>
+
+        init(value: Binding<String>, formatter: Binding<GameCoreCheatFormat.Formatter>) {
+            self.value = value
+            self.formatter = formatter
+            super.init()
+        }
+    }
 }
 
 #if canImport(UIKit)
@@ -13,6 +27,7 @@ extension CheatCodeField: UIViewRepresentable {
         let textView = UITextView()
         textView.isScrollEnabled = false
         textView.autocorrectionType = .no
+        textView.autocapitalizationType = .none
         textView.font = .monospacedSystemFont(ofSize: UIFont.labelFontSize, weight: .regular)
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.backgroundColor = .clear
@@ -22,56 +37,40 @@ extension CheatCodeField: UIViewRepresentable {
         return textView
     }
     
-    func updateUIView(_ uiView: UITextView, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        if uiView.text != self.value {
+            uiView.text = self.value
+        } else {
+            uiView.text = self.formatter.formatInput(value: uiView.text)
+        }
     }
-    
-    class Coordinator: NSObject, UITextViewDelegate {
-        var parent: CheatCodeField
-        var formatter: GameCoreCheatFormat.Formatter
+}
+
+extension CheatCodeField.Coordinator: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText string: String) -> Bool {
+        guard
+            let text = textView.text,
+            let swiftRange = Range(range, in: text)
+        else { return false }
         
-        init(_ parent: CheatCodeField) {
-            self.parent = parent
-            self.formatter = self.parent.format.makeFormatter()
-            
-            super.init()
+        let newString = text.replacingCharacters(in: swiftRange, with: string)
+        let result = self.formatter.wrappedValue.formatInput(
+            value: newString,
+            range: swiftRange,
+            wasBackspace: string.isEmpty,
+            insertion: string
+        )
+        
+        textView.text = result.formattedText
+
+        if let newPosition = textView.position(from: textView.beginningOfDocument, offset: result.cursorOffset) {
+            let newSelectedRange = textView.textRange(from: newPosition, to: newPosition)
+            textView.selectedTextRange = newSelectedRange
         }
         
-        func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText string: String) -> Bool {
-            guard 
-                let text = textView.text,
-                let swiftRange = Range(range, in: text)
-            else { return false }
-            
-            let wasBackspace = if 
-                let char = string.cString(using: .utf8),
-                strcmp(char, "\\b") == -92
-            {
-                true
-            } else {
-                false
-            }
-            
-            let newString = (text as NSString).replacingCharacters(in: range, with: string)
-            let result = self.formatter.formatInput(
-                value: newString,
-                range: swiftRange,
-                wasBackspace: wasBackspace,
-                insertionCount: string.countValidCharacters(in: self.formatter.characterSet)
-            )
-            
-            textView.text = result.formattedText
-            self.parent.value = result.formattedText
+        self.value.wrappedValue = result.formattedText
 
-            if let newPosition = textView.position(from: textView.beginningOfDocument, offset: result.cursorOffset) {
-                let newSelectedRange = textView.textRange(from: newPosition, to: newPosition)
-                textView.selectedTextRange = newSelectedRange
-            }
-
-            return false
-        }
+        return false
     }
 }
 #else
@@ -87,67 +86,78 @@ extension CheatCodeField: NSViewRepresentable {
         return textView
     }
     
-    func updateNSView(_ nsView: NSTextView, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    func updateNSView(_ nsView: NSTextView, context: Context) {
+        if nsView.string != self.value {
+            nsView.string = self.value
+        } else {
+            nsView.string = self.formatter.formatInput(value: nsView.string)
+        }
     }
-    
-    class Coordinator: NSObject, NSTextViewDelegate {
-        var parent: CheatCodeField
-        var formatter: GameCoreCheatFormat.Formatter
-        
-        init(_ parent: CheatCodeField) {
-            self.parent = parent
-            self.formatter = self.parent.format.makeFormatter()
-            super.init()
-        }
-        
-        func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString string: String?) -> Bool {
-            guard let string else { print(range); return false }
-            
-            let text = textView.string
-            guard let swiftRange = Range(range, in: text) else { return false }
-            
-            let wasBackspace = if
-                let char = string.cString(using: .utf8),
-                strcmp(char, "\\b") == -92
-            {
-                true
-            } else {
-                false
-            }
-            
-            let newString = text.replacingCharacters(in: swiftRange, with: string)
-            let result = self.formatter.formatInput(
-                value: newString,
-                range: swiftRange,
-                wasBackspace: wasBackspace,
-                insertionCount: string.countValidCharacters(in: self.formatter.characterSet)
-            )
-            
-            textView.string = result.formattedText
-            self.parent.value = result.formattedText
-            
-            let newSelectedRange = NSRange(location: result.cursorOffset, length: 0)
-            textView.setSelectedRange(newSelectedRange)
+}
 
-            return false
-        }
+extension CheatCodeField.Coordinator: NSTextViewDelegate {
+  func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString string: String?) -> Bool {
+        guard let string else { return false }
+        
+        let text = textView.string
+        guard let swiftRange = Range(range, in: text) else { return false }
+        
+        let newString = text.replacingCharacters(in: swiftRange, with: string)
+        let result = self.formatter.wrappedValue.formatInput(
+            value: newString,
+            range: swiftRange,
+            wasBackspace: string.isEmpty,
+            insertion: string
+        )
+        
+        textView.string = result.formattedText
+        self.value.wrappedValue = result.formattedText
+        
+        let newSelectedRange = NSRange(location: result.cursorOffset, length: 0)
+        textView.setSelectedRange(newSelectedRange)
+
+        return false
     }
 }
 #endif
 
 #Preview {
-    var code = ""
-    return Form {
-        Section {
-            CheatCodeField(
-                value: .init(get: { code }, set: { code = $0 }),
-                format: mGBAEclipseCore.coreInfo.cheatFormats.pointee
-            )
-        } header: {
-            Text("Code")
+    struct Preview: View {
+        var formats: UnsafeBufferPointer<GameCoreCheatFormat>
+        @State var code: String = ""
+        @State var format: GameCoreCheatFormat {
+            didSet {
+            }
+        }
+        @State var formatter: GameCoreCheatFormat.Formatter
+        
+        init() {
+            let core = EclipseEmuApp.cores.allCores[0]
+            self.formats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
+            let format = formats[0]
+            self.format = format
+            self.formatter = format.makeFormatter()
+        }
+        
+        var body: some View {
+            Form {
+                Section {
+                    Picker("Format", selection: $format) {
+                        ForEach(formats, id: \.id) { format in
+                            Text(String(cString: format.displayName)).tag(format)
+                        }
+                    }
+                    .onChange(of: format, perform: { value in
+                        self.formatter = value.makeFormatter()
+                    })
+                    
+                    CheatCodeField(value: $code, formatter: $formatter)
+                } header: {
+                    Text("Code")
+                }
+            }
         }
     }
+    
+    return Preview()
 }

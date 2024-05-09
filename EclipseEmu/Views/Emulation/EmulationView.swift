@@ -114,7 +114,7 @@ final class EmulationViewModel: ObservableObject {
     
     func togglePlayPause() async {
         guard case .loaded(let core) = self.state else { return }
-        if core.state == .running {
+        if await core.state == .running {
             await core.pause(reason: .paused)
         } else {
             await core.play(reason: .paused)

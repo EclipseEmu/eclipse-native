@@ -198,7 +198,6 @@ final class GameFrameBufferRenderer {
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         encoder.endEncoding()
 
-        // FIXME: This should be fine, we aren't rendering frequently enough for where jitters could occur, but that's untested.
         commandBuffer.addScheduledHandler { [self] _ in
             if useAdaptiveSync {
                 #if !targetEnvironment(simulator)

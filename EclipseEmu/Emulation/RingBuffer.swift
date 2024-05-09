@@ -21,7 +21,6 @@ struct RingBuffer: ~Copyable {
     
     @inlinable
     func availableRead(head: Int, tail: Int) -> Int {
-        // NOTE: this is equivalent to `return tail >= head ? tail - head : tail + self.capacity - head;`
         return tail >= head ? tail &- head : tail &+ self.capacity &- head;
     }
     

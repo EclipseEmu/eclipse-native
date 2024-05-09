@@ -37,8 +37,8 @@ final actor GameCoreCoordinator {
     
     private let core: UnsafeMutablePointer<GameCore>
     let inputs: GameInputCoordinator
-    /// FIXME: this should be isolated and there should be some sort of notification to indicate changes in state
-    nonisolated(unsafe) private(set) var state: State = .stopped
+    /// FIXME: there should be some sort of notification to indicate changes in state
+    private(set) var state: State = .stopped
     /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer can be written to syncronously by the core.
     nonisolated(unsafe) let audio: GameAudio
     /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.

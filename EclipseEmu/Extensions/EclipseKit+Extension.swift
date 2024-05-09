@@ -64,7 +64,7 @@ extension GameCoreCheatCharacterSet {
     }
 }
 
-extension GameCoreCheatFormat: Hashable {
+extension GameCoreCheatFormat: Equatable, Hashable {
     public static func == (lhs: GameCoreCheatFormat, rhs: GameCoreCheatFormat) -> Bool {
         return lhs.id == rhs.id
     }
@@ -75,7 +75,7 @@ extension GameCoreCheatFormat: Hashable {
 }
 
 extension GameCoreCheatFormat {
-    struct Formatter {
+    class Formatter {
         struct FormattedText {
             let formattedText: String
             let cursorOffset: Int
@@ -93,79 +93,44 @@ extension GameCoreCheatFormat {
             self.characterSetAndNewline = characterSet.union(.onlyNewlineFeed)
         }
         
-        func format(_ value: String) -> String {
-            var formatIndex = formatString.startIndex
-            let formatLastIndex = formatString.index(before: formatString.endIndex)
-            var output: String = ""
-            
-            var i = value.startIndex
-            while i < value.endIndex {
-                if formatString[formatIndex] == "x" {
-                    let ch = value[i]
-                    i = value.index(after: i)
-                    if !ch.unicodeScalars.allSatisfy(characterSet.contains(_:)) {
-                        continue
-                    }
-                    output.append(ch.uppercased())
-                } else {
-                    output.append(formatString[formatIndex])
-                }
-                
-                formatIndex = formatString.index(after: formatIndex)
-                
-                if formatIndex == formatLastIndex {
-                    formatIndex = formatString.startIndex
-                    output.append("\n" as Character)
-                }
-            }
-
-            return output
+        @inlinable
+        func formatInput(value: String) -> String {
+            return self.formatInput(value: value, range: value.startIndex..<value.startIndex, wasBackspace: false, insertion: "").formattedText
         }
         
-        func formatInput(value: String, range: Range<String.Index>, wasBackspace: Bool, insertionCount: Int) -> FormattedText {
-            var formatIndex = formatString.startIndex
-            let formatLastIndex = formatString.index(before: formatString.endIndex)
-            var output: String = ""
-            
-            let cursorIndex = range.lowerBound
+        func formatInput(value: String, range: Range<String.Index>, wasBackspace: Bool, insertion: String) -> FormattedText {
             let direction = Int(!wasBackspace)
-            var offset = insertionCount
+            let cursorIndex = range.lowerBound
             
-            var lastCharWasAddedAutomatically = false
-            var i = value.startIndex
-            while i < value.endIndex {
-                if cursorIndex == i && lastCharWasAddedAutomatically && wasBackspace {
-                    offset -= 1
+            var output: String = ""
+            var offset = insertion.countValidCharacters(in: self.characterSet)
+            var valueIndex = value.startIndex
+            var formatIndex = formatString.startIndex
+            
+            // FIXME: this does not handle backspaces properly
+            
+            while valueIndex < value.endIndex {
+                let shouldBumpOffset = Int(cursorIndex == valueIndex) & direction
+                
+                if formatIndex == formatString.endIndex {
+                    formatIndex = formatString.startIndex
+                    output.append("\n" as Character)
+                    offset += shouldBumpOffset
                 }
                 
-                if formatString[formatIndex] == "x" {
-                    let ch = value[i]
-                    i = value.index(after: i)
-                    lastCharWasAddedAutomatically = false
-                    if !ch.unicodeScalars.allSatisfy(characterSet.contains(_:)) {
+                if formatString[formatIndex] != "x" {
+                    output.append(formatString[formatIndex])
+                    offset += shouldBumpOffset
+                } else {
+                    let ch = value[valueIndex]
+                    valueIndex = value.index(after: valueIndex)
+                    if !characterSet.contains(character: ch) {
                         continue
                     }
                     output.append(ch.uppercased())
-                } else {
-                    output.append(formatString[formatIndex])
-                    
-                    if cursorIndex == i {
-                        offset += direction
-                        print(offset)
-                    }
-                    lastCharWasAddedAutomatically = true
                 }
                 
                 formatIndex = formatString.index(after: formatIndex)
-                
-                if formatIndex == formatLastIndex {
-                    formatIndex = formatString.startIndex
-                    output.append("\n" as Character)
-                    
-                    if cursorIndex == i {
-                        offset += direction
-                    }
-                }
             }
             
             let newPosition = cursorIndex.utf16Offset(in: output) + offset
@@ -177,7 +142,14 @@ extension GameCoreCheatFormat {
                 output.index(cursorIndex, offsetBy: offset)
             }
             
-            return .init(formattedText: output, cursorOffset: newIndex.utf16Offset(in: output))
+            return FormattedText(
+                formattedText: output,
+                cursorOffset: newIndex.utf16Offset(in: output)
+            )
+        }
+        
+        func validate(value: String) -> Bool {
+            return false
         }
     }
     
