@@ -13,7 +13,20 @@ final class PlayGameAction: ObservableObject {
         guard let core = await EclipseEmuApp.cores.get(for: game) else {
             throw Failure.missingCore
         }
-        let model = EmulationViewModel(coreInfo: core, game: game)
+        
+        let cheats = await viewContext.perform {
+            let cheatsRequest = Cheat.fetchRequest()
+            cheatsRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
+            cheatsRequest.predicate = NSPredicate(format: "game = %@", game)
+            do {
+                return try viewContext.fetch(cheatsRequest)
+            } catch {
+                print(error)
+                return []
+            }
+        }
+        
+        let model = EmulationViewModel(coreInfo: core, game: game, cheats: cheats)
         await MainActor.run {
             self.model = model
         }

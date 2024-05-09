@@ -261,7 +261,7 @@ final class TouchControlsController: UIViewController {
     
     private func handleEndedTouches(touches: Set<UITouch>) {
         for touch in touches {
-            if let (i, element) = self.lockedTouches[touch] {
+            if let (_, element) = self.lockedTouches[touch] {
                 self.lockedTouches.removeValue(forKey: touch)
 //                let view = self.touchControlsSubview.subviews[i]
                 self.state &= ~(

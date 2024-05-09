@@ -49,10 +49,12 @@ final class EmulationViewModel: ObservableObject {
     
     var coreInfo: GameCoreInfo
     var game: Game
+    var cheats: [Cheat]
     
-    init(coreInfo: GameCoreInfo, game: Game) {
+    init(coreInfo: GameCoreInfo, game: Game, cheats: [Cheat]) {
         self.coreInfo = coreInfo
         self.game = game
+        self.cheats = cheats
     }
 
     func renderingSurfaceCreated(surface: CAMetalLayer) async {
@@ -74,6 +76,9 @@ final class EmulationViewModel: ObservableObject {
             guard let romPath = game.romPath else { throw Failure.romMissing}
             guard romPath.startAccessingSecurityScopedResource() else { throw Failure.romBadAccess }
             await core.start(gamePath: romPath, savePath: game.savePath)
+            for cheat in cheats {
+                print("set cheat", await core.setCheat(cheat: cheat))
+            }
         } catch {
             await MainActor.run {
                 self.state = .error(error)

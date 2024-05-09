@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,8 +13,8 @@
 		92115C322BD366ED0020D62F /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C312BD366ED0020D62F /* Box.swift */; };
 		92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C332BD3F2550020D62F /* ReorderControllersView.swift */; };
 		92115C362BD435840020D62F /* MessageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C352BD435840020D62F /* MessageBlock.swift */; };
-		92115C382BD4C7580020D62F /* GameInput+string.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C372BD4C7580020D62F /* GameInput+string.swift */; };
-		92115C3A2BD580F00020D62F /* EclipseKit+Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C392BD580F00020D62F /* EclipseKit+Swift.swift */; };
+		92115C382BD4C7580020D62F /* GameInput+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C372BD4C7580020D62F /* GameInput+Extension.swift */; };
+		92115C3A2BD580F00020D62F /* EclipseKit+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C392BD580F00020D62F /* EclipseKit+Extension.swift */; };
 		922358112BE15AF20014BFFA /* EmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358102BE15AF20014BFFA /* EmulationView.swift */; };
 		922358142BE15ECE0014BFFA /* GameScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358132BE15ECE0014BFFA /* GameScreenView.swift */; };
 		922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358152BE2B8B50014BFFA /* EmulationMenuView.swift */; };
@@ -35,14 +35,21 @@
 		923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */; };
 		924B21892BE7F37900ED02F4 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 924B21882BE7F37900ED02F4 /* RingBuffer.swift */; };
 		924B218C2BE8156700ED02F4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218B2BE8156700ED02F4 /* Atomics */; };
+		924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; };
+		924B21902BE97A9000ED02F4 /* mGBAEclipseCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9252332D2BE679AE00D46154 /* GameAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9252332C2BE679AE00D46154 /* GameAudio.swift */; };
-		925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */; };
-		925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */; };
+		925B14EE2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14ED2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift */; };
+		925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925B14EF2BCACA0900AD7257 /* MTLPixelFormat+Extension.swift */; };
+		9279730C2BE9B3F7008F2FE4 /* CheatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */; };
+		9279730E2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */; };
+		927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */; };
+		927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973112BEBE6FD008F2FE4 /* String+Extension.swift */; };
+		927973142BEC4886008F2FE4 /* EditCheatVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973132BEC4886008F2FE4 /* EditCheatVIew.swift */; };
+		927973172BEC58DA008F2FE4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 927973162BEC58DA008F2FE4 /* mGBAEclipseCore */; };
 		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
-		9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */; };
-		9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */; };
-		928237072BCB77B5001E27B3 /* View+modify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+modify.swift */; };
-		92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+version.swift */; };
+		9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */; };
+		928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+Extension.swift */; };
+		92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */; };
 		92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */; };
 		9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */; };
 		9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */; };
@@ -53,8 +60,6 @@
 		9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E82BC1D82000B174E1 /* Bindings.swift */; };
 		92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */; };
 		92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB7912BC190C30093B2E3 /* AppIconView.swift */; };
-		92C11CCD2BD7064A00BB11A2 /* DummyCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92C11CCC2BD7064A00BB11A2 /* DummyCore */; };
-		92C11CCE2BD7067100BB11A2 /* DummyCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 92C11CCC2BD7064A00BB11A2 /* DummyCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */; };
 		92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D3712BC0DF1700F1116C /* MD5.swift */; };
 		92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */; };
@@ -64,8 +69,6 @@
 		92D5D72B2BC1723700659C37 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D72A2BC1723700659C37 /* GameView.swift */; };
 		92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D5D7302BC17C2800659C37 /* DismissButton.swift */; };
 		92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DFA3D42BC1E5FA0024D3EA /* SettingsEmulationView.swift */; };
-		92FAE0D72BDE1C41000EBC08 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */; };
-		92FAE0D82BDE1C50000EBC08 /* mGBAEclipseCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,8 +95,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				92FAE0D82BDE1C50000EBC08 /* mGBAEclipseCore in Embed Frameworks */,
-				92C11CCE2BD7067100BB11A2 /* DummyCore in Embed Frameworks */,
+				924B21902BE97A9000ED02F4 /* mGBAEclipseCore in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,8 +109,8 @@
 		92115C312BD366ED0020D62F /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 		92115C332BD3F2550020D62F /* ReorderControllersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReorderControllersView.swift; sourceTree = "<group>"; };
 		92115C352BD435840020D62F /* MessageBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBlock.swift; sourceTree = "<group>"; };
-		92115C372BD4C7580020D62F /* GameInput+string.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameInput+string.swift"; sourceTree = "<group>"; };
-		92115C392BD580F00020D62F /* EclipseKit+Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EclipseKit+Swift.swift"; sourceTree = "<group>"; };
+		92115C372BD4C7580020D62F /* GameInput+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameInput+Extension.swift"; sourceTree = "<group>"; };
+		92115C392BD580F00020D62F /* EclipseKit+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EclipseKit+Extension.swift"; sourceTree = "<group>"; };
 		922358102BE15AF20014BFFA /* EmulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationView.swift; sourceTree = "<group>"; };
 		922358132BE15ECE0014BFFA /* GameScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScreenView.swift; sourceTree = "<group>"; };
 		922358152BE2B8B50014BFFA /* EmulationMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulationMenuView.swift; sourceTree = "<group>"; };
@@ -133,14 +135,18 @@
 		923E38002BC9BF0D00ECC973 /* GameCoreCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreCoordinator.swift; sourceTree = "<group>"; };
 		924B21882BE7F37900ED02F4 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		9252332C2BE679AE00D46154 /* GameAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAudio.swift; sourceTree = "<group>"; };
-		925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bool+Numeric.swift"; sourceTree = "<group>"; };
-		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+bytesPerPixel.swift"; sourceTree = "<group>"; };
+		925B14ED2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExpressibleByIntegerLiteral+Extension.swift"; sourceTree = "<group>"; };
+		925B14EF2BCACA0900AD7257 /* MTLPixelFormat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLPixelFormat+Extension.swift"; sourceTree = "<group>"; };
+		9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatsView.swift; sourceTree = "<group>"; };
+		9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CharacterSet+Extension.swift"; sourceTree = "<group>"; };
+		9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatCodeField.swift; sourceTree = "<group>"; };
+		927973112BEBE6FD008F2FE4 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		927973132BEC4886008F2FE4 /* EditCheatVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheatVIew.swift; sourceTree = "<group>"; };
 		9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewView.swift; sourceTree = "<group>"; };
-		9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioCommonFormat+bytesPerSample.swift"; sourceTree = "<group>"; };
-		9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+onFirstAppear.swift"; sourceTree = "<group>"; };
+		9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioCommonFormat+Extension.swift"; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		928237062BCB77B5001E27B3 /* View+modify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+modify.swift"; sourceTree = "<group>"; };
-		92875E9A2BCADDB900EABD63 /* Bundle+version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+version.swift"; sourceTree = "<group>"; };
+		928237062BCB77B5001E27B3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
+		92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreRegistry.swift; sourceTree = "<group>"; };
 		9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGeneralView.swift; sourceTree = "<group>"; };
 		9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsControlsView.swift; sourceTree = "<group>"; };
@@ -171,8 +177,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				924B218C2BE8156700ED02F4 /* Atomics in Frameworks */,
-				92FAE0D72BDE1C41000EBC08 /* mGBAEclipseCore in Frameworks */,
-				92C11CCD2BD7064A00BB11A2 /* DummyCore in Frameworks */,
+				924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */,
+				927973172BEC58DA008F2FE4 /* mGBAEclipseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,14 +310,15 @@
 		925B14EC2BCA487400AD7257 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				92115C392BD580F00020D62F /* EclipseKit+Swift.swift */,
-				9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift */,
-				925B14ED2BCA487F00AD7257 /* Bool+Numeric.swift */,
-				92875E9A2BCADDB900EABD63 /* Bundle+version.swift */,
-				925B14EF2BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift */,
-				928237062BCB77B5001E27B3 /* View+modify.swift */,
-				9281CCB12BCE2E0D00E4FE48 /* View+onFirstAppear.swift */,
-				92115C372BD4C7580020D62F /* GameInput+string.swift */,
+				9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */,
+				92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */,
+				9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */,
+				92115C392BD580F00020D62F /* EclipseKit+Extension.swift */,
+				925B14ED2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift */,
+				92115C372BD4C7580020D62F /* GameInput+Extension.swift */,
+				925B14EF2BCACA0900AD7257 /* MTLPixelFormat+Extension.swift */,
+				927973112BEBE6FD008F2FE4 /* String+Extension.swift */,
+				928237062BCB77B5001E27B3 /* View+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -334,6 +341,8 @@
 				922F00AB2BC0C26600B419D7 /* LibraryView.swift */,
 				92D5D72A2BC1723700659C37 /* GameView.swift */,
 				9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */,
+				9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */,
+				927973132BEC4886008F2FE4 /* EditCheatVIew.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -407,6 +416,7 @@
 				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
 				92115C352BD435840020D62F /* MessageBlock.swift */,
 				920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */,
+				9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -439,9 +449,9 @@
 			);
 			name = EclipseEmu;
 			packageProductDependencies = (
-				92C11CCC2BD7064A00BB11A2 /* DummyCore */,
-				92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */,
 				924B218B2BE8156700ED02F4 /* Atomics */,
+				924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */,
+				927973162BEC58DA008F2FE4 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
@@ -517,10 +527,9 @@
 			);
 			mainGroup = 922F00982BC0C26600B419D7;
 			packageReferences = (
-				92C11CCB2BD7064A00BB11A2 /* XCLocalSwiftPackageReference "Cores/DummyCore" */,
 				92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */,
-				92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */,
 				924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -567,11 +576,11 @@
 				922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */,
 				924B21892BE7F37900ED02F4 /* RingBuffer.swift in Sources */,
 				922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */,
-				92875E9B2BCADDB900EABD63 /* Bundle+version.swift in Sources */,
+				92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
-				9281CCB22BCE2E0D00E4FE48 /* View+onFirstAppear.swift in Sources */,
+				9279730C2BE9B3F7008F2FE4 /* CheatsView.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
-				92115C3A2BD580F00020D62F /* EclipseKit+Swift.swift in Sources */,
+				92115C3A2BD580F00020D62F /* EclipseKit+Extension.swift in Sources */,
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
@@ -579,14 +588,16 @@
 				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
 				92115C362BD435840020D62F /* MessageBlock.swift in Sources */,
 				9252332D2BE679AE00D46154 /* GameAudio.swift in Sources */,
-				92115C382BD4C7580020D62F /* GameInput+string.swift in Sources */,
+				92115C382BD4C7580020D62F /* GameInput+Extension.swift in Sources */,
 				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
 				922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */,
+				927973142BEC4886008F2FE4 /* EditCheatVIew.swift in Sources */,
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */,
 				9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */,
-				925B14F02BCACA0900AD7257 /* MTLPixelFormat+bytesPerPixel.swift in Sources */,
+				927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */,
+				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
 				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,
@@ -594,19 +605,21 @@
 				922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */,
 				9294E5DC2BC1A9AB00B174E1 /* SettingsBackupsView.swift in Sources */,
 				922358112BE15AF20014BFFA /* EmulationView.swift in Sources */,
+				927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */,
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
 				920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */,
 				9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */,
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
-				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+bytesPerSample.swift in Sources */,
+				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift in Sources */,
 				922358142BE15ECE0014BFFA /* GameScreenView.swift in Sources */,
-				925B14EE2BCA487F00AD7257 /* Bool+Numeric.swift in Sources */,
+				925B14EE2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift in Sources */,
 				92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */,
 				92115C322BD366ED0020D62F /* Box.swift in Sources */,
 				923E37FD2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift in Sources */,
-				928237072BCB77B5001E27B3 /* View+modify.swift in Sources */,
+				9279730E2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift in Sources */,
+				928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */,
 				922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */,
 				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
 				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
@@ -993,13 +1006,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		92C11CCB2BD7064A00BB11A2 /* XCLocalSwiftPackageReference "Cores/DummyCore" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Cores/DummyCore;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1009,17 +1015,17 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
+		927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
+			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
 			requirement = {
 				branch = main;
 				kind = branch;
 			};
 		};
-		92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
+		92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
+			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -1033,13 +1039,13 @@
 			package = 924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
 			productName = Atomics;
 		};
-		92C11CCC2BD7064A00BB11A2 /* DummyCore */ = {
+		924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = DummyCore;
+			productName = mGBAEclipseCore;
 		};
-		92FAE0D62BDE1C41000EBC08 /* mGBAEclipseCore */ = {
+		927973162BEC58DA008F2FE4 /* mGBAEclipseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 92FAE0D52BDE1C41000EBC08 /* XCRemoteSwiftPackageReference "core-mgba" */;
+			package = 927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */;
 			productName = mGBAEclipseCore;
 		};
 /* End XCSwiftPackageProductDependency section */

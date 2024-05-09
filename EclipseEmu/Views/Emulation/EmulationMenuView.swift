@@ -180,7 +180,7 @@ struct EmulationMenuView: View {
 #Preview {
     ZStack {
         EmulationMenuView(
-            model: .init(coreInfo: .init(), game: .init(context: PersistenceController.preview.container.viewContext)),
+            model: .init(coreInfo: .init(), game: .init(context: PersistenceController.preview.container.viewContext), cheats: []),
             menuButtonLayout: .init(
                 xOrigin: .leading,
                 yOrigin: .trailing,

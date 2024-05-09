@@ -1,5 +1,5 @@
 {
-  "originHash" : "f68a0fb3f87e6d4bacc994bdde052caa4a7727951e7eb374f757cafb55f5971b",
+  "originHash" : "c786884dd4ea3acac0881001bd3a403b5dde2882a80819001d6a0b3bd83a5250",
   "pins" : [
     {
       "identity" : "core-mgba",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/eclipseemu/core-mgba.git",
       "state" : {
         "branch" : "main",
-        "revision" : "963e869d46de48e3e851f717624256217f78a3d6"
+        "revision" : "b132fca4c9bf107e7bc984436f901abde4dbd50c"
       }
     },
     {
@@ -16,7 +16,7 @@
       "location" : "https://github.com/eclipseemu/eclipsekit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "fd377743072beb18fc49af9f3e8dcbe9117e93ef"
+        "revision" : "9b3edaf2f228a9075fd347bd9fe12283c3121f40"
       }
     },
     {

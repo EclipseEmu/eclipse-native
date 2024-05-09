@@ -150,6 +150,7 @@ final actor GameCoreCoordinator {
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
         
+        let _ = core.pointee.clearCheats(core.pointee.data)
         core.pointee.stop(core.pointee.data)
         core.pointee.deallocate(core.pointee.data)
         core.deallocate()
@@ -212,6 +213,17 @@ final actor GameCoreCoordinator {
         
         self.core.pointee.pause(core.pointee.data)
         await self.audio.pause()
+    }
+    
+    // MARK: Cheats
+    
+    func setCheat(cheat: Cheat) -> Bool {
+        guard let type = cheat.type, let code = cheat.code else { return false }
+        return self.core.pointee.setCheat(self.core.pointee.data, type, code, cheat.enabled)
+    }
+    
+    func clearCheats() {
+        self.core.pointee.clearCheats(self.core.pointee.data)
     }
     
     // MARK: Frame Timing

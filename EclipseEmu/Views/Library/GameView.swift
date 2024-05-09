@@ -69,6 +69,32 @@ struct GameViewHeader: View {
     }
 }
 
+struct SaveStateView: View {
+    enum Kind {
+        case auto
+        case manual
+        
+        var string: String {
+            switch self {
+            case .auto: "Auto"
+            case .manual: "Manual"
+            }
+        }
+    }
+    
+    let kind: Kind
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 8.0)
+                .aspectRatio(1.5, contentMode: .fit)
+            Text("\(kind.string) · 5h ago")
+                .foregroundStyle(.secondary)
+        }
+        .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
+    }
+}
+
 struct GameView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     var game: Game
@@ -78,31 +104,40 @@ struct GameView: View {
             GeometryReader { geometry in
                 ScrollView {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top)
-                    
                     SectionHeader(title: "Save States").padding([.horizontal, .top])
                     ScrollView(.horizontal) {
                         LazyHStack {
-                            VStack(alignment: .leading) {
-                                RoundedRectangle(cornerRadius: 8.0)
-                                    .aspectRatio(1.5, contentMode: .fit)
-                                Text("Auto · 5h ago").foregroundStyle(.secondary)
-                            }.frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
+                            SaveStateView(kind: .auto)
                             Divider()
                             ForEach(0..<10) { _ in
-                                VStack(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: 8.0)
-                                        .aspectRatio(1.5, contentMode: .fit)
-                                    Text("Manual · 8h ago").foregroundStyle(.secondary)
-                                }.frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
+                                SaveStateView(kind: .manual)
                             }
                         }.padding(.horizontal)
                     }.padding(.bottom)
+                    
+                    LazyVStack(alignment: .leading) {
+                        NavigationLink(destination: CheatsView(game: game)) {
+                            Label("Cheats", systemImage: "doc.badge.gearshape")
+                        }
+                        .modify {
+                            if #available(iOS 17.0, macOS 14.0, *) {
+                                $0.background(.background.secondary)
+                            } else {
+#if canImport(UIKit)
+                                $0.background(Color(uiColor: .secondarySystemGroupedBackground))
+#elseif canImport(AppKit)
+                                $0.background(Color(nsColor: .underPageBackgroundColor))
+#endif
+                            }
+                        }
+                        .padding(.all)
+                    }
                 }
                 .ignoresSafeArea(edges: .top)
             }
-            #if os(iOS)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
+#endif
             .toolbar {
                 ToolbarItem(placement: DismissButton.placement) {
                     DismissButton()
@@ -112,11 +147,10 @@ struct GameView: View {
     }
 }
 
-#Preview { let context = PersistenceController.preview.container.viewContext
+#Preview {
+    let context = PersistenceController.preview.container.viewContext
+    let game = Game(context: context)
+    game.system = .gba
     
-    return VStack {}
-        .sheet(item: .constant(Game(context: context))) {
-            GameView(game: $0)
-        }
-        .environment(\.managedObjectContext, context)
+    return GameView(game: game).environment(\.managedObjectContext, context)
 }

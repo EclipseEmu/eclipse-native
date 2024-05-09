@@ -1,5 +1,5 @@
 import SwiftUI
-import DummyCore
+//import DummyCore
 import mGBAEclipseCore
 
 @main
@@ -8,14 +8,14 @@ struct EclipseEmuApp: App {
     let persistenceController = PersistenceController.preview
     @StateObject var playGameAction = PlayGameAction()
     static let cores: GameCoreRegistry = {
-        let dummyCore = DummyCore.coreInfo
+//        let dummyCore = DummyCore.coreInfo
         let mGBACore = mGBAEclipseCore.coreInfo
-        let registry = GameCoreRegistry(cores: [dummyCore, mGBACore])
-        registry.registerDefaults(id: dummyCore.id, for: .gb)
-        registry.registerDefaults(id: dummyCore.id, for: .gbc)
+        let registry = GameCoreRegistry(cores: [mGBACore])
+//        registry.registerDefaults(id: dummyCore.id, for: .gb)
+//        registry.registerDefaults(id: dummyCore.id, for: .gbc)
         registry.registerDefaults(id: mGBACore.id, for: .gba)
-        registry.registerDefaults(id: dummyCore.id, for: .nes)
-        registry.registerDefaults(id: dummyCore.id, for: .snes)
+//        registry.registerDefaults(id: dummyCore.id, for: .nes)
+//        registry.registerDefaults(id: dummyCore.id, for: .snes)
         
         return registry
     }()
@@ -24,13 +24,11 @@ struct EclipseEmuApp: App {
         WindowGroup {
             if let model = playGameAction.model {
                 EmulationView(model: model)
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environment(\.playGame, playGameAction)
             } else {
                 LibraryView()
-                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                    .environment(\.playGame, playGameAction)
             }
         }
+        .environment(\.managedObjectContext, persistenceController.container.viewContext)
+        .environment(\.playGame, playGameAction)
     }
 }

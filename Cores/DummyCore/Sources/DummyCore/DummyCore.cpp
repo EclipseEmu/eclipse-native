@@ -121,9 +121,11 @@ namespace dummycore {
 
         void playerSetInputs(void *data, uint8_t player, uint32_t inputs) {}
 
-        bool setCheats(void *data, EKCheat *cheats, size_t count) {
+        bool setCheat(void *data, const char *format, const char *code, bool enabled) {
             return false;
         }
+    
+        void clearCheats(void *data) {}
     }
     
     const EKCoreSetting settings[] = {};
@@ -182,7 +184,8 @@ namespace dummycore {
         core->playerConnected = methods::playerConnected;
         core->playerDisconnected = methods::playerDisconnected;
         core->playerSetInputs = methods::playerSetInputs;
-        core->setCheats = methods::setCheats;
+        core->setCheat = methods::setCheat;
+        core->clearCheats = methods::clearCheats;
 
         return core;
     }
