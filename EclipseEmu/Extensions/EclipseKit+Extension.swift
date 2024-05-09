@@ -99,7 +99,8 @@ extension GameCoreCheatFormat {
         }
         
         func formatInput(value: String, range: Range<String.Index>, wasBackspace: Bool, insertion: String) -> FormattedText {
-            let direction = Int(!wasBackspace)
+            let isBackspace = Int(wasBackspace)
+            let isNotBackspace = isBackspace ^ 1
             let cursorIndex = range.lowerBound
             
             var output: String = ""
@@ -107,10 +108,11 @@ extension GameCoreCheatFormat {
             var valueIndex = value.startIndex
             var formatIndex = formatString.startIndex
             
-            // FIXME: this does not handle backspaces properly
-            
+            var wasLastCharAutomaticallyInserted = 0
             while valueIndex < value.endIndex {
-                let shouldBumpOffset = Int(cursorIndex == valueIndex) & direction
+                let isCursorHere = Int(cursorIndex == valueIndex)
+                let shouldBumpOffset = isCursorHere & isNotBackspace
+                offset -= (isNotBackspace ^ 1) & wasLastCharAutomaticallyInserted & isCursorHere
                 
                 if formatIndex == formatString.endIndex {
                     formatIndex = formatString.startIndex
@@ -121,17 +123,20 @@ extension GameCoreCheatFormat {
                 if formatString[formatIndex] != "x" {
                     output.append(formatString[formatIndex])
                     offset += shouldBumpOffset
+                    wasLastCharAutomaticallyInserted = 1
                 } else {
                     let ch = value[valueIndex]
                     valueIndex = value.index(after: valueIndex)
-                    if !characterSet.contains(character: ch) {
-                        continue
-                    }
+                    guard characterSet.contains(character: ch) else { continue }
                     output.append(ch.uppercased())
+                    wasLastCharAutomaticallyInserted = 0
                 }
                 
                 formatIndex = formatString.index(after: formatIndex)
             }
+            
+            let isCursorHere = Int(cursorIndex == valueIndex)
+            offset -= isCursorHere & isBackspace & wasLastCharAutomaticallyInserted
             
             let newPosition = cursorIndex.utf16Offset(in: output) + offset
             let newIndex = if newPosition > output.utf16.count {
