@@ -9,10 +9,10 @@ struct EditCheatView: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var viewContext
-    @State var label: String = ""
+    @State var label: String
     @State var format: GameCoreCheatFormat 
     @State var formatter: GameCoreCheatFormat.Formatter
-    @State var code: String = ""
+    @State var code: String
     @State var enabled: Bool = true
     @State var isValid: Bool = false
 
@@ -29,11 +29,14 @@ struct EditCheatView: View {
             self.label = cheat.label ?? ""
             self.code = cheat.code ?? ""
             self.enabled = cheat.enabled
-            self.isValid = false
+            self.isValid = true
+            print("hello?", cheat)
         } else {
             let format = cheatFormats[0]
             self.format = cheatFormats[0]
             self.formatter = format.makeFormatter()
+            self.label = ""
+            self.code = ""
         }
     }
 
@@ -41,8 +44,7 @@ struct EditCheatView: View {
         CompatNavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $label)
-                    
+                    TextField("Name & Info", text: $label)
                     
                     Picker("Format", selection: $format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
@@ -100,6 +102,10 @@ struct EditCheatView: View {
                         cheatToEdit.code = self.format.normalizeCode(string: self.code)
                         cheatToEdit.enabled = self.enabled
                         cheatToEdit.game = self.game
+                        
+                        if cheat != nil {
+                            cheatToEdit.priority = 10
+                        }
                         
                         do {
                             try viewContext.save()

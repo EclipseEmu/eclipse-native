@@ -3,6 +3,54 @@ import SwiftUI
 import EclipseKit
 import Combine
 
+struct CheatItemView: View {
+    @Environment(\.managedObjectContext) var viewContext
+    @Environment(\.editMode) var editMode
+    @State var cheat: Cheat
+    @Binding var editingCheat: Cheat?
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(cheat.label ?? "Unnamed Cheat")
+                    .lineLimit(1)
+                Text(cheat.code ?? "")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer()
+            if editMode?.wrappedValue == .active {
+                Button {
+                    self.editingCheat = cheat
+                } label: {
+                    Label("Edit", systemImage: "pencil.circle")
+                        .labelStyle(.iconOnly)
+                }
+            } else {
+                Toggle("Enabled", isOn: $cheat.enabled)
+                    .labelsHidden()
+            }
+        }
+        .onChange(of: cheat.enabled, perform: { newValue in
+            try? viewContext.save()
+        })
+        .contextMenu(ContextMenu(menuItems: {
+            Button {
+                self.editingCheat = cheat
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+            Button(role: .destructive) {
+                viewContext.delete(cheat)
+                try? viewContext.save()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }))
+    }
+}
+
 struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
     
@@ -42,13 +90,7 @@ struct CheatsView: View {
             } else {
                 List {
                     ForEach(self.cheats) { cheat in
-                        Button {
-                            self.editingCheat = cheat
-                        } label: {
-                            Text(cheat.label ?? cheat.code ?? "")
-                                .lineLimit(1)
-                        }
-                        .buttonStyle(.plain)
+                        CheatItemView(cheat: cheat, editingCheat: $editingCheat)
                     }
                     .onDelete(perform: self.deleteCheats)
                     .onMove(perform: self.moveCheat)
