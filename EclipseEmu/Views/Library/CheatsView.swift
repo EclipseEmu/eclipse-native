@@ -26,18 +26,34 @@ struct CheatsView: View {
     }
     
     var body: some View {
-        List {
-            ForEach(self.cheats) { cheat in
-                Button {
-                    self.editingCheat = cheat
-                } label: {
-                    Text(cheat.label ?? cheat.code ?? "")
-                        .lineLimit(1)
+        Group {
+            if self.cheats.count == 0 {
+                ScrollView {
+                    MessageBlock {
+                        Text("No Cheats")
+                            .fontWeight(.medium)
+                            .padding([.top, .horizontal], 8.0)
+                        Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .padding([.bottom, .horizontal], 8.0)
+                    }
                 }
-                .buttonStyle(.plain)
+            } else {
+                List {
+                    ForEach(self.cheats) { cheat in
+                        Button {
+                            self.editingCheat = cheat
+                        } label: {
+                            Text(cheat.label ?? cheat.code ?? "")
+                                .lineLimit(1)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .onDelete(perform: self.deleteCheats)
+                    .onMove(perform: self.moveCheat)
+                }
             }
-            .onDelete(perform: self.deleteCheats)
-            .onMove(perform: self.moveCheat)
         }.toolbar {
             #if !os(macOS)
             ToolbarItem {
