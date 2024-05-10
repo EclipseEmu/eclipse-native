@@ -3,7 +3,7 @@ import EclipseKit
 
 struct CheatCodeField {
     @Binding var value: String
-    @Binding var formatter: GameCoreCheatFormat.Formatter
+    @Binding var formatter: CheatFormatter
     
     func makeCoordinator() -> Coordinator {
         Coordinator(value: $value, formatter: $formatter)
@@ -11,9 +11,9 @@ struct CheatCodeField {
     
     class Coordinator: NSObject {
         var value: Binding<String>
-        var formatter: Binding<GameCoreCheatFormat.Formatter>
+        var formatter: Binding<CheatFormatter>
 
-        init(value: Binding<String>, formatter: Binding<GameCoreCheatFormat.Formatter>) {
+        init(value: Binding<String>, formatter: Binding<CheatFormatter>) {
             self.value = value
             self.formatter = formatter
             super.init()
@@ -31,7 +31,7 @@ extension CheatCodeField: UIViewRepresentable {
         textView.font = .monospacedSystemFont(ofSize: UIFont.labelFontSize, weight: .regular)
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.backgroundColor = .clear
-        textView.text = self.value
+        textView.text = self.formatter.formatInput(value: self.value)
         textView.delegate = context.coordinator
         
         return textView
@@ -40,8 +40,6 @@ extension CheatCodeField: UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         if uiView.text != self.value {
             uiView.text = self.value
-        } else {
-            uiView.text = self.formatter.formatInput(value: uiView.text)
         }
     }
 }
@@ -77,7 +75,7 @@ extension CheatCodeField.Coordinator: UITextViewDelegate {
 extension CheatCodeField: NSViewRepresentable {
     func makeNSView(context: Context) -> NSTextView {
         let textView = NSTextView()
-        textView.string = self.value
+        textView.string = self.formatter.formatInput(value: self.value)
         textView.delegate = context.coordinator
         textView.font = .monospacedSystemFont(ofSize: NSFont.labelFontSize, weight: .regular)
         textView.translatesAutoresizingMaskIntoConstraints = false
@@ -89,8 +87,6 @@ extension CheatCodeField: NSViewRepresentable {
     func updateNSView(_ nsView: NSTextView, context: Context) {
         if nsView.string != self.value {
             nsView.string = self.value
-        } else {
-            nsView.string = self.formatter.formatInput(value: nsView.string)
         }
     }
 }

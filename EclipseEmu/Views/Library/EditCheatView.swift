@@ -11,10 +11,10 @@ struct EditCheatView: View {
     @Environment(\.managedObjectContext) var viewContext
     @State var label: String
     @State var format: GameCoreCheatFormat 
-    @State var formatter: GameCoreCheatFormat.Formatter
+    @State var formatter: CheatFormatter
     @State var code: String
     @State var enabled: Bool = true
-    @State var isValid: Bool = false
+    @State var isCodeValid: Bool = false
 
     init(cheat: Cheat?, game: Game, cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>) {
         self.cheat = cheat
@@ -29,8 +29,7 @@ struct EditCheatView: View {
             self.label = cheat.label ?? ""
             self.code = cheat.code ?? ""
             self.enabled = cheat.enabled
-            self.isValid = true
-            print("hello?", cheat)
+            self.isCodeValid = true
         } else {
             let format = cheatFormats[0]
             self.format = cheatFormats[0]
@@ -44,24 +43,21 @@ struct EditCheatView: View {
         CompatNavigationStack {
             Form {
                 Section {
-                    TextField("Name & Info", text: $label)
-                    
+                    TextField("Name", text: $label)
+                    Toggle("Enabled", isOn: $enabled)
+                } header: {
+                    #if !os(macOS)
+                    Text("Name & State")
+                    #endif
+                }
+                
+                Section {
                     Picker("Format", selection: $format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
                             Text(String(cString: format.displayName)).tag(format)
                         }
                     }
-                    .onChange(of: format, perform: { value in
-                        self.formatter = value.makeFormatter()
-                    })
-                    Toggle("Enabled", isOn: $enabled)
-                } header: {
-                    #if !os(macOS)
-                    Text("Name")
-                    #endif
-                }
-                
-                Section {
+                    
                     #if os(macOS)
                     LabeledContent("Code") {
                         CheatCodeField(value: $code, formatter: $formatter)
@@ -77,48 +73,55 @@ struct EditCheatView: View {
                     Text("The code will automatically be formatted as \"\(String(cString: self.format.format).uppercased())\"")
                 }
             }
-            #if os(macOS)
-            .padding()
-            #endif
+            .onChange(of: self.format, perform: self.formatChanged)
+            .onChange(of: self.code, perform: self.codeChanged)
             .navigationTitle(isCreatingCheat ? "Add Cheat" : "Edit Cheat")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #else
+            .padding()
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     DismissButton()
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        // FIXME: Validate
-                        let cheatToEdit = if let cheat {
-                            cheat
-                        } else {
-                            Cheat(context: viewContext)
-                        }
-                        
-                        cheatToEdit.type = String(cString: self.format.id)
-                        cheatToEdit.label = self.label
-                        cheatToEdit.code = self.format.normalizeCode(string: self.code)
-                        cheatToEdit.enabled = self.enabled
-                        cheatToEdit.game = self.game
-                        
-                        if cheat != nil {
-                            cheatToEdit.priority = 10
-                        }
-                        
-                        do {
-                            try viewContext.save()
-                        } catch {
-                            print(error)
-                        }
-                        dismiss()
-                    } label: {
+                    Button(action: self.save) {
                         Text(isCreatingCheat ? "Add" : "Save")
                     }
+                    .disabled(label.isEmpty || !isCodeValid)
                 }
             }
         }
+    }
+    
+    func formatChanged(value: GameCoreCheatFormat) {
+        self.formatter = value.makeFormatter()
+        self.code = self.formatter.formatInput(value: self.code)
+        self.isCodeValid = self.formatter.validate(value: self.code)
+    }
+    
+    func codeChanged(value: String) {
+        self.isCodeValid = self.formatter.validate(value: value)
+    }
+    
+    func save() {
+        guard self.isCodeValid && !self.label.isEmpty else { return }
+        
+        let cheat = self.cheat ?? Cheat(context: viewContext)
+        cheat.type = String(cString: self.format.id)
+        cheat.label = self.label
+        cheat.code = self.format.normalizeCode(string: self.code)
+        cheat.enabled = self.enabled
+        cheat.game = self.game
+        
+        do {
+            try viewContext.save()
+        } catch {
+            print(error)
+        }
+        
+        dismiss()
     }
 }
 

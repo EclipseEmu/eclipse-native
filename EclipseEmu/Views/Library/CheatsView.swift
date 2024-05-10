@@ -5,7 +5,9 @@ import Combine
 
 struct CheatItemView: View {
     @Environment(\.managedObjectContext) var viewContext
+    #if !os(macOS)
     @Environment(\.editMode) var editMode
+    #endif
     @State var cheat: Cheat
     @Binding var editingCheat: Cheat?
     
@@ -20,6 +22,7 @@ struct CheatItemView: View {
                     .lineLimit(1)
             }
             Spacer()
+            #if !os(macOS)
             if editMode?.wrappedValue == .active {
                 Button {
                     self.editingCheat = cheat
@@ -31,6 +34,10 @@ struct CheatItemView: View {
                 Toggle("Enabled", isOn: $cheat.enabled)
                     .labelsHidden()
             }
+            #else
+            Toggle("Enabled", isOn: $cheat.enabled)
+                .labelsHidden()
+            #endif
         }
         .onChange(of: cheat.enabled, perform: { newValue in
             try? viewContext.save()
