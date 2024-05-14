@@ -58,7 +58,6 @@
 		9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E22BC1D0BE00B174E1 /* Touch.swift */; };
 		9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */; };
 		9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E82BC1D82000B174E1 /* Bindings.swift */; };
-		9298FEE82BEEC62E00F9881E /* ImageStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9298FEE72BEEC62E00F9881E /* ImageStorage.swift */; };
 		9298FEEF2BEEF47400F9881E /* BoxartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9298FEEE2BEEF47400F9881E /* BoxartView.swift */; };
 		92A5F6122BEF023800DCC338 /* FileStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6112BEF023800DCC338 /* FileStream.swift */; };
 		92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6132BEF123800DCC338 /* Data+Extension.swift */; };
@@ -171,7 +170,6 @@
 		9294E5E22BC1D0BE00B174E1 /* Touch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Touch.swift; sourceTree = "<group>"; };
 		9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gamepad.swift; sourceTree = "<group>"; };
 		9294E5E82BC1D82000B174E1 /* Bindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindings.swift; sourceTree = "<group>"; };
-		9298FEE72BEEC62E00F9881E /* ImageStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStorage.swift; sourceTree = "<group>"; };
 		9298FEEE2BEEF47400F9881E /* BoxartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxartView.swift; sourceTree = "<group>"; };
 		92A5F6112BEF023800DCC338 /* FileStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStream.swift; sourceTree = "<group>"; };
 		92A5F6132BEF123800DCC338 /* Data+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extension.swift"; sourceTree = "<group>"; };
@@ -406,21 +404,12 @@
 		92A5F6172BEFF55E00DCC338 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
-				92A5F61A2BF00AC200DCC338 /* External */,
 				922F00D62BC0C2EE00B419D7 /* Model */,
 				92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */,
 				92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */,
 				92A5F61B2BF0198A00DCC338 /* GameManager.swift */,
 			);
 			path = Storage;
-			sourceTree = "<group>";
-		};
-		92A5F61A2BF00AC200DCC338 /* External */ = {
-			isa = PBXGroup;
-			children = (
-				9298FEE72BEEC62E00F9881E /* ImageStorage.swift */,
-			);
-			path = External;
 			sourceTree = "<group>";
 		};
 		92BBAADA2BC4680700B09755 /* Shaders */ = {
@@ -672,7 +661,6 @@
 				922358112BE15AF20014BFFA /* EmulationView.swift in Sources */,
 				927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */,
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
-				9298FEE82BEEC62E00F9881E /* ImageStorage.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
 				92A5F6162BEFEFF300DCC338 /* PersistenceCoordinator.swift in Sources */,
