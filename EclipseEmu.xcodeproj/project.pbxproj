@@ -46,7 +46,6 @@
 		927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973132BEC4886008F2FE4 /* EditCheatView.swift */; };
 		927973192BEEB6FA008F2FE4 /* LazySplitIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */; };
 		9279731B2BEEBA9E008F2FE4 /* CheatFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */; };
-		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
 		9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */; };
 		928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+Extension.swift */; };
 		92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */; };
@@ -156,7 +155,6 @@
 		927973132BEC4886008F2FE4 /* EditCheatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheatView.swift; sourceTree = "<group>"; };
 		927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazySplitIterator.swift; sourceTree = "<group>"; };
 		9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatFormatter.swift; sourceTree = "<group>"; };
-		9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewView.swift; sourceTree = "<group>"; };
 		9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioCommonFormat+Extension.swift"; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		928237062BCB77B5001E27B3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
@@ -366,7 +364,6 @@
 			children = (
 				922F00AB2BC0C26600B419D7 /* LibraryView.swift */,
 				92D5D72A2BC1723700659C37 /* GameView.swift */,
-				9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */,
 				9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */,
 				927973132BEC4886008F2FE4 /* EditCheatView.swift */,
 				92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */,
@@ -646,7 +643,6 @@
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */,
-				9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */,
 				927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,

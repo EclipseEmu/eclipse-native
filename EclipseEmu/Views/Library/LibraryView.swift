@@ -112,17 +112,10 @@ struct LibraryView: View {
                     }
                 }
                 ToolbarItem {
-                    Menu {
-                        Button {
-                            self.isRomPickerOpen = true
-                        } label: {
-                            Label("Files", systemImage: "folder")
-                        }
-                        NavigationLink(destination: HomebrewView()) {
-                            Label("Homebrew", systemImage: "mug")
-                        }
+                    Button {
+                        self.isRomPickerOpen = true
                     } label: {
-                        Label("Add Item", systemImage: "plus")
+                        Label("Add Game", systemImage: "plus")
                     }
                 }
             }
