@@ -26,8 +26,6 @@ struct MD5Hasher: ~Copyable {
         var c = buffer[2];
         var d = buffer[3];
         
-        // NOTE: this suffers from CPU pipelining slowdown, but that's kinda inherit to the MD5 algorithm
-
         // round 1 (f)
         a &+= (((b & c) | (~b & d)) &+ input[0] &- 680876936)
         a = (((a << 7) | (a >> 25)) &+ b)
@@ -218,19 +216,17 @@ struct MD5Hasher: ~Copyable {
         return finish()
     }
 
-    consuming func hash(data: Data) async throws -> ContiguousArray<UInt8> {
+    consuming func hash(data: Data) -> ContiguousArray<UInt8> {
         for byte in data {
             readByte(byte: byte)
         }
         return finish()
     }
     
-    static func stringFromDigest(digest: ContiguousArray<UInt8>) -> String {
-        var string = ""
-        for byte in digest {
-            let str = String(byte, radix: 16)
-            string += String(repeating: "0", count: 2 - str.count) + str
+    consuming func hash(file url: URL) async throws -> ContiguousArray<UInt8> {
+        for try await byte in url.resourceBytes {
+            self.readByte(byte: byte)
         }
-        return string
+        return self.finish()
     }
 }

@@ -19,64 +19,71 @@ struct EmulationMenuView: View {
     
     @Environment(\.playGame) var playGame
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    #if os(macOS)
+#if os(macOS)
     @State var isVisible = false
     @State var hideTask: Task<Void, Never>?
     @State var hideTaskInstant: ContinuousClock.Instant = .now
-    #endif
-    
+#endif
     
     var content: some View {
         Group {
-            Button {
-                Task {
-                    await model.togglePlayPause()
-                }
-            } label: {
+            Button(action: self.togglePlayPause) {
                 Label("Play/Pause", systemImage: "playpause.fill")
             }
-            #if os(macOS)
+#if os(macOS)
             .buttonStyle(EmulationMenuButtonStyle())
-            #endif
+#endif
             
-            #if os(macOS)
-            Button {
-                model.isFastForwarding.toggle()
-            } label: {
+#if os(macOS)
+            Button(action: self.toggleFastForward) {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
             .buttonStyle(EmulationMenuButtonStyle())
             
             .foregroundStyle(model.isFastForwarding ? .primary : .secondary)
-            #else
+#else
             Toggle(isOn: $model.isFastForwarding) {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
-            #endif
+#endif
+            
+            Button(action: {
+                model.saveState(isAuto: false)
+            }) {
+                Label("Save State", systemImage: "square.and.arrow.up.on.square")
+            }
+#if os(macOS)
+            .buttonStyle(EmulationMenuButtonStyle())
+#endif
 
-            #if os(macOS)
+            Button(action: self.showSaveStates) {
+                Label("Load State", systemImage: "square.and.arrow.down.on.square")
+            }
+#if os(macOS)
+            .buttonStyle(EmulationMenuButtonStyle())
+#endif
+
+#if os(macOS)
             Spacer()
-            #else
+#else
             Divider()
-            #endif
+#endif
             
             Slider(value: $model.volume, in: 0...1) {} minimumValueLabel: {
                 Label("Lower Volume", systemImage: "speaker.fill")
             } maximumValueLabel: {
                 Label("Raise Volume", systemImage: "speaker.wave.3.fill")
             }
-            #if os(macOS)
+#if os(macOS)
             .labelStyle(.iconOnly)
             .controlSize(.small)
             .frame(maxWidth: 140)
-            #endif
-        
-            Button(role: .destructive) {
-                model.isQuitConfirmationShown = true
-            } label: {
+#endif
+            
+            Button(role: .destructive, action: self.showQuitDialog) {
                 Label("Quit", systemImage: "power")
             }
-            #if os(macOS)
+#if os(macOS)
             .labelStyle(.iconOnly)
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -87,7 +94,7 @@ struct EmulationMenuView: View {
                     $0
                 }
             }
-            #endif
+#endif
         }
     }
     
@@ -96,13 +103,13 @@ struct EmulationMenuView: View {
             let halfWidth = menuButtonLayout.width / 2
             let halfHeight = menuButtonLayout.height / 2
             let menuButtonX = menuButtonLayout.xOrigin == .leading
-                ? menuButtonLayout.x + halfWidth
-                : proxy.size.width - menuButtonLayout.x - halfWidth
+            ? menuButtonLayout.x + halfWidth
+            : proxy.size.width - menuButtonLayout.x - halfWidth
             let menuButtonY = menuButtonLayout.yOrigin == .leading
-                ? menuButtonLayout.y + halfHeight
-                : proxy.size.height - menuButtonLayout.y - halfHeight
+            ? menuButtonLayout.y + halfHeight
+            : proxy.size.height - menuButtonLayout.y - halfHeight
             
-            #if !os(macOS)
+#if !os(macOS)
             Menu {
                 content
             } label: {
@@ -128,7 +135,7 @@ struct EmulationMenuView: View {
                 }
             }
             .position(.init(x: menuButtonX, y: menuButtonY))
-            #else
+#else
             VStack {
                 Spacer()
                 HStack {
@@ -172,15 +179,43 @@ struct EmulationMenuView: View {
             .onDisappear {
                 self.hideTask?.cancel()
             }
-            #endif
+#endif
         }
+    }
+    
+    func toggleFastForward() {
+        model.isFastForwarding.toggle()
+    }
+    
+    func togglePlayPause() {
+        Task {
+            await model.togglePlayPause()
+        }
+    }
+    
+    func showQuitDialog() {
+        model.isQuitConfirmationShown = true
+    }
+    
+    func showSaveStates() {
+        model.isSaveStateViewShown = true
     }
 }
 
+#if DEBUG
 #Preview {
     ZStack {
         EmulationMenuView(
-            model: .init(coreInfo: .init(), game: .init(context: PersistenceController.preview.container.viewContext), cheats: []),
+            model: .init(
+                coreInfo: .init(),
+                game: .init(context: PersistenceCoordinator.preview.container.viewContext), 
+                persistence: .preview,
+                emulationData: .init(
+                    romPath: URL(string: "/")!,
+                    savePath: URL(string: "/")!,
+                    cheats: .init()
+                )
+            ),
             menuButtonLayout: .init(
                 xOrigin: .leading,
                 yOrigin: .trailing,
@@ -195,3 +230,4 @@ struct EmulationMenuView: View {
     }
     .background(Color.red)
 }
+#endif

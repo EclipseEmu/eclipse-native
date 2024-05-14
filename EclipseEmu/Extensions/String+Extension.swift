@@ -6,8 +6,8 @@ extension String {
         let outsideSet: Int
     }
     
-    static func normalize(_ string: String, with characterSet: CharacterSet) -> String {
-        return string.trimmed().filter {
+    func normalize(with characterSet: CharacterSet) -> String {
+        return self.trimmed().filter {
             characterSet.contains(character: $0)
         }
     }
@@ -66,5 +66,10 @@ extension String {
         
         // return the slice
         return self[newStartIndex...newEndIndex]
+    }
+    
+    @inlinable
+    func leftPad(count: Int, with char: Character) -> String {
+        String(repeating: char, count: count - self.count) + self
     }
 }

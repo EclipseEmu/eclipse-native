@@ -154,8 +154,6 @@ final class GameFrameBufferRenderer {
         
         // setup the frame buffer and setup the texture
         
-        // NOTE: the size is initialized with the int values already, so this doesn't cause any issue
-        
         if core.pointee.canSetVideoPointer(core.pointee.data) {
             let buffer = try FrameBuffer(device: device, pixelFormat: pixelFormat, height: height, width: width, ptr: nil)
             let _ = core.pointee.getVideoPointer(core.pointee.data, buffer.buffer)

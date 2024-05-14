@@ -78,7 +78,7 @@ extension GameCoreCheatFormat {
     /// Normalize the code for storage or loading into the core
     func normalizeCode(string: String) -> String {
         let characterSet = self.characterSet.swiftCharacterSet.union(.onlyNewlineFeed)
-        return String.normalize(string, with: characterSet)
+        return string.normalize(with: characterSet)
     }
     
     func makeFormatter() -> CheatFormatter {

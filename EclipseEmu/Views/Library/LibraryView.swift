@@ -21,6 +21,7 @@ struct LibraryView: View {
     }()
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.persistenceCoordinator) private var persistence
     @Environment(\.playGame) private var playGame
     @State var searchQuery: String = ""
     @State var selectedGame: Game? = nil
@@ -176,36 +177,17 @@ struct LibraryView: View {
                     }
 
                     let fileName = url.lastPathComponent
-                    let name = if let fileExtensionIndex = fileName.firstIndex(of: ".") {
-                        String(fileName.prefix(upTo: fileExtensionIndex))
-                    } else {
-                        fileName
-                    }
-
-                    let bytes = try Data(contentsOf: url)
-                    let md5Digest = try await MD5Hasher().hash(data: bytes)
-                    let md5 = MD5Hasher.stringFromDigest(digest: md5Digest)
                     
-                    let context = await self.viewContext
-                    withAnimation {
-                        let newGame = Game(context: context)
-                        newGame.name = name
-                        newGame.system = system
-                        newGame.md5 = md5
-                        newGame.romPath = url
-                        newGame.savePath = nil
-                        newGame.coverArtPath = nil
-                        newGame.dateAdded = Date.now
-                        newGame.datePlayed = nil
-
-                        do {
-                            try context.save()
-                        } catch {
-                            // FIXME: Handle
-                            let nsError = error as NSError
-                            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-                        }
+                    var name = fileName
+                    var romExtension: String?
+                    
+                    let fileExtensionIndex = fileName.firstIndex(of: ".")
+                    if let fileExtensionIndex {
+                        name = String(fileName.prefix(upTo: fileExtensionIndex))
+                        romExtension = String(fileName[fileExtensionIndex...])
                     }
+
+                    try await persistence.games.insert(name: name, system: system, romPath: url, romExtension: romExtension)
                 } catch {
                     print(error)
                 }
@@ -218,6 +200,9 @@ struct LibraryView: View {
     }
 }
 
+#if DEBUG
 #Preview {
-    LibraryView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    LibraryView()
+        .environment(\.managedObjectContext, PersistenceCoordinator.preview.container.viewContext)
 }
+#endif

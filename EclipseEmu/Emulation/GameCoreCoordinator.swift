@@ -36,6 +36,8 @@ final actor GameCoreCoordinator {
     let height: CGFloat
     
     private let core: UnsafeMutablePointer<GameCore>
+    private let game: Game
+    
     let inputs: GameInputCoordinator
     /// FIXME: there should be some sort of notification to indicate changes in state
     private(set) var state: State = .stopped
@@ -50,100 +52,118 @@ final actor GameCoreCoordinator {
     private var frameTimerTask: Task<Void, Never>?
     private(set) var rate: Float = 1.0
     private let callbackContext: UnsafeMutablePointer<CallbackContext>
-    
+    private let callbacks: UnsafeMutablePointer<GameCoreCallbacks>
+
     struct CallbackContext {
-        weak var audio: GameAudio?
+        weak var parent: GameCoreCoordinator?
     }
     
     private static let writeAudio: EKCoreAudioWriteCallback = { ctx, ptr, count in
         // SAFETY: ctx should always be passed back in and will only be nil when the actor deinits.
         let context = ctx!.assumingMemoryBound(to: CallbackContext.self)
-        let audio = context.pointee.audio
-        guard _fastPath(audio != nil) else { return 0 }
-        return UInt64(audio!.write(samples: ptr.unsafelyUnwrapped, count: Int(count)))
+        
+        let coreCoordinator = context.pointee.parent
+        guard _fastPath(coreCoordinator != nil) else { return 0 }
+        return UInt64(coreCoordinator!.audio.write(samples: ptr.unsafelyUnwrapped, count: Int(count)))
     }
     
-    private static let didSave: EKCoreSaveCallback = { savePathPtr in
-        guard let savePathPtr else { return }
-        NotificationCenter.default.post(name: .EKGameCoreDidSave, object: String(cString: savePathPtr))
+    private static let didSave: EKCoreSaveCallback = { ctx in
+        // SAFETY: ctx should always be passed back in and will only be nil when the actor deinits.
+        let context = ctx!.assumingMemoryBound(to: CallbackContext.self)
+        
+        let coreCoordinator = context.pointee.parent
+        guard _fastPath(coreCoordinator != nil) else { return }
+        
+        Task { @MainActor in
+            NotificationCenter.default.post(name: .EKGameCoreDidSave, object: nil)
+        }
     }
     
     init(
+        game: Game,
         coreInfo: GameCoreInfo,
         system: GameSystem,
         surface: CAMetalLayer,
         reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback
     ) throws {
-        self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
-        self.callbackContext.initialize(to: CallbackContext())
-        
-        let coreCallbacksPtr = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
-        coreCallbacksPtr.initialize(to: GameCoreCallbacks(
-            callbackContext: self.callbackContext,
-            didSave: Self.didSave,
-            writeAudio: Self.writeAudio
-        ))
-
-        guard let core = coreInfo.setup(system, coreCallbacksPtr) else {
-            throw Failure.failedToGetCoreInstance
+        do {
+            self.game = game
+            
+            self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
+            self.callbackContext.initialize(to: CallbackContext())
+            
+            self.callbacks = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
+            self.callbacks.initialize(to: GameCoreCallbacks(
+                callbackContext: self.callbackContext,
+                didSave: Self.didSave,
+                writeAudio: Self.writeAudio
+            ))
+            
+            guard let core = coreInfo.setup(system, callbacks) else {
+                throw Failure.failedToGetCoreInstance
+            }
+            
+            self.core = core
+            
+            self.desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
+            self.frameDuration = 1.0 / desiredFrameRate
+            
+            guard let device = MTLCreateSystemDefaultDevice() else {
+                throw Failure.failedToGetMetalDevice
+            }
+            
+            let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
+            
+            let width = videoFormat.width
+            let height = videoFormat.height
+            
+            self.width = CGFloat(width)
+            self.height = CGFloat(height)
+            let size = CGSize(width: self.width, height: self.height)
+            
+            self.renderingSurface = surface
+            self.renderingSurface.drawableSize = size
+            self.renderingSurface.device = device
+            self.renderingSurface.contentsScale = 1.0
+            self.renderingSurface.needsDisplayOnBoundsChange = true
+            self.renderingSurface.framebufferOnly = true
+            self.renderingSurface.isOpaque = true
+            self.renderingSurface.presentsWithTransaction = true
+#if canImport(AppKit)
+            self.renderingSurface.displaySyncEnabled = true
+#endif
+            
+            switch videoFormat.renderingType {
+            case .frameBuffer:
+                guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
+                self.renderingSurface.pixelFormat = pixelFormat
+                let renderer = try GameFrameBufferRenderer(
+                    with: device,
+                    width: Int(width),
+                    height: Int(height),
+                    pixelFormat: pixelFormat,
+                    frameDuration: frameDuration,
+                    core: core
+                )
+                self.renderer = .frameBuffer(renderer)
+                break
+            @unknown default:
+                throw Failure.invalidRendererFormat
+            }
+            
+            guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
+                throw Failure.invalidAudioFormat
+            }
+            
+            self.audio = try GameAudio(format: audioFormat)
+            self.inputs = .init(maxPlayers: core.pointee.getMaxPlayers(core.pointee.data), reorderPlayers: reorderControls)
+            
+            self.callbackContext.pointee.parent = self
+        } catch {
+            self.callbackContext.deallocate()
+            self.callbacks.deallocate()
+            throw error
         }
-        
-        self.core = core
-        
-        self.desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
-        self.frameDuration = 1.0 / desiredFrameRate
-        
-        guard let device = MTLCreateSystemDefaultDevice() else {
-            throw Failure.failedToGetMetalDevice
-        }
-        
-        let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
-        
-        let width = videoFormat.width
-        let height = videoFormat.height
-        
-        self.width = CGFloat(width)
-        self.height = CGFloat(height)
-        let size = CGSize(width: self.width, height: self.height)
-        
-        self.renderingSurface = surface
-        self.renderingSurface.drawableSize = size
-        self.renderingSurface.device = device
-        self.renderingSurface.contentsScale = 1.0
-        self.renderingSurface.needsDisplayOnBoundsChange = true
-        self.renderingSurface.framebufferOnly = true
-        self.renderingSurface.isOpaque = true
-        self.renderingSurface.presentsWithTransaction = true
-        #if canImport(AppKit)
-        self.renderingSurface.displaySyncEnabled = true
-        #endif
-        
-        switch videoFormat.renderingType {
-        case .frameBuffer:
-            guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
-            self.renderingSurface.pixelFormat = pixelFormat
-            let renderer = try GameFrameBufferRenderer(
-                with: device,
-                width: Int(width),
-                height: Int(height),
-                pixelFormat: pixelFormat,
-                frameDuration: frameDuration,
-                core: core
-            )
-            self.renderer = .frameBuffer(renderer)
-            break
-        @unknown default:
-            throw Failure.invalidRendererFormat
-        }
-        
-        guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
-            throw Failure.invalidAudioFormat
-        }
-        
-        self.audio = try GameAudio(format: audioFormat)
-        self.callbackContext.pointee.audio = self.audio
-
-        self.inputs = .init(maxPlayers: core.pointee.getMaxPlayers(core.pointee.data), reorderPlayers: reorderControls)
     }
     
     deinit {
@@ -155,20 +175,21 @@ final actor GameCoreCoordinator {
         core.pointee.deallocate(core.pointee.data)
         core.deallocate()
         callbackContext.deallocate()
+        callbacks.deallocate()
     }
     
-    func start(gamePath: URL, savePath: URL?) async {
+    func start(gamePath: URL, savePath: URL) async {
         if #available(iOS 16.0, *) {
             guard self.core.pointee.start(
                 self.core.pointee.data,
                 gamePath.path(percentEncoded: false).cString(using: .ascii),
-                savePath?.path(percentEncoded: false).cString(using: .ascii)
+                savePath.path(percentEncoded: false).cString(using: .ascii)
             ) else { return }
         } else {
             guard self.core.pointee.start(
                 self.core.pointee.data,
                 gamePath.path.cString(using: .ascii),
-                savePath?.path.cString(using: .ascii)
+                savePath.path.cString(using: .ascii)
             ) else { return }
         }
         await self.inputs.start()
@@ -215,6 +236,20 @@ final actor GameCoreCoordinator {
         await self.audio.pause()
     }
     
+    // MARK: Saving
+    
+    func save(to url: URL) -> Bool {
+        self.core.pointee.save(self.core.pointee.data, url.path)
+    }
+    
+    func saveState(to url: URL) -> Bool {
+        return self.core.pointee.saveState(self.core.pointee.data, url.path)
+    }
+    
+    func loadState(for url: URL) -> Bool {
+        return self.core.pointee.loadState(self.core.pointee.data, url.path)
+    }
+
     // MARK: Cheats
     
     func setCheat(cheat: Cheat) -> Bool {

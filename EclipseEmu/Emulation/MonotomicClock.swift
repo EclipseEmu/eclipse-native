@@ -5,7 +5,6 @@ import Foundation
 //  As such, all credit really goes to the Swift people.
 
 @available(iOS, introduced: 15.0, deprecated: 16.0, renamed: "ContinuousClock", message: "This is a general implementation of ContinuousClock for older OSs, use the newer version instead.")
-@frozen
 enum MonotomicClock {
     typealias Instant = UInt64
     typealias Duration = UInt64

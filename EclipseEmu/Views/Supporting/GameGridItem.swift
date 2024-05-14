@@ -3,15 +3,15 @@ import SwiftUI
 struct GameGridItem: View {
     var game: Game
     @Binding var selectedGame: Game?
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.persistenceCoordinator) private var persistence
 
     var body: some View {
         Button {
             selectedGame = game
         } label: {
             VStack(alignment: .leading, spacing: 8.0) {
-                RoundedRectangle(cornerRadius: 8.0)
-                    .aspectRatio(1.0, contentMode: .fit)
+                BoxartView()
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
                 VStack(alignment: .leading) {
                     Text(game.name ?? "Unknown Game")
                         .lineLimit(2)
@@ -30,20 +30,23 @@ struct GameGridItem: View {
     }
     
     private func deleteGame() {
-        withAnimation {
-            viewContext.delete(game)
+        Task {
             do {
-                try viewContext.save()
+                try await self.persistence.games.delete(game: game)
+                persistence.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                print(error)
             }
         }
     }
 }
 
+#if DEBUG
 #Preview {
-    GameGridItem(game: Game(), selectedGame: .constant(nil))
+    let viewContext = PersistenceCoordinator.preview.container.viewContext
+    
+    return GameGridItem(game: Game(context: viewContext), selectedGame: .constant(nil))
+        .padding()
+        .environment(\.managedObjectContext, viewContext)
 }
+#endif

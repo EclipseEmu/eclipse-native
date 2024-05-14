@@ -125,8 +125,9 @@ struct EditCheatView: View {
     }
 }
 
+#if DEBUG
 #Preview {
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceCoordinator.preview.container.viewContext
     let game = Game(context: context)
     game.system = .gba
     
@@ -136,3 +137,4 @@ struct EditCheatView: View {
     return EditCheatView(cheat: nil, game: game, cheatFormats: formats)
         .environment(\.managedObjectContext, context)
 }
+#endif

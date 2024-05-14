@@ -9,33 +9,20 @@ final class PlayGameAction: ObservableObject {
         case missingCore
     }
     
-    public func callAsFunction(game: Game, viewContext: NSManagedObjectContext) async throws {
+    public func callAsFunction(game: Game, persistence: PersistenceCoordinator) async throws {
         guard let core = await EclipseEmuApp.cores.get(for: game) else {
             throw Failure.missingCore
         }
         
-        let cheats = await viewContext.perform {
-            let cheatsRequest = Cheat.fetchRequest()
-            cheatsRequest.sortDescriptors = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
-            cheatsRequest.predicate = NSPredicate(format: "game = %@", game)
-            do {
-                return try viewContext.fetch(cheatsRequest)
-            } catch {
-                print(error)
-                return []
-            }
+        let data = try persistence.games.emulationData(for: game)
+        let model = EmulationViewModel(coreInfo: core, game: game, persistence: persistence, emulationData: data)
+        
+        Task {
+            persistence.games.updateDatePlayed(for: game)
         }
         
-        let model = EmulationViewModel(coreInfo: core, game: game, cheats: cheats)
         await MainActor.run {
             self.model = model
-        }
-        
-        do {
-            game.datePlayed = Date()
-            try viewContext.save()
-        } catch {
-            print(error)
         }
     }
     

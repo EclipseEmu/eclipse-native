@@ -10,15 +10,14 @@ struct GameKeepPlayingItem: View {
     var game: Game
     @Binding var selectedGame: Game?
     @Environment(\.playGame) private var playGame
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.persistenceCoordinator) private var persistence
     
     var body: some View {
         Button {
             selectedGame = game
         } label: {
             VStack(alignment: .leading, spacing: 0.0) {
-                Rectangle()
-                    .aspectRatio(1.0, contentMode: .fit)
+                BoxartView()
                 
                 VStack(alignment: .leading) {
                     Text("Resume · \(game.datePlayed ?? Date(), formatter: Self.playedDateFormatter)")
@@ -67,11 +66,19 @@ struct GameKeepPlayingItem: View {
     
     func play() {
         Task.detached {
-            try await playGame(game: game, viewContext: viewContext)
+            try await playGame(game: game, persistence: persistence)
         }
     }
 }
 
+#if DEBUG
 #Preview {
-    GameKeepPlayingItem(game: Game(), selectedGame: .constant(nil))
+    let viewContext = PersistenceCoordinator.preview.container.viewContext
+    
+    return GameKeepPlayingItem(
+        game: Game(context: viewContext),
+        selectedGame: .constant(nil)
+    )
+    .environment(\.managedObjectContext, viewContext)
 }
+#endif

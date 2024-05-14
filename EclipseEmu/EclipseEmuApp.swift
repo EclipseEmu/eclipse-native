@@ -5,7 +5,7 @@ import mGBAEclipseCore
 @main
 struct EclipseEmuApp: App {
     // FIXME: once the models are finalized, make this use shared
-    let persistenceController = PersistenceController.preview
+    let persistenceCoordinator = PersistenceCoordinator.preview
     @StateObject var playGameAction = PlayGameAction()
     static let cores: GameCoreRegistry = {
 //        let dummyCore = DummyCore.coreInfo
@@ -22,13 +22,14 @@ struct EclipseEmuApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if let model = playGameAction.model {
+            if let model = self.playGameAction.model {
                 EmulationView(model: model)
             } else {
                 LibraryView()
             }
         }
-        .environment(\.managedObjectContext, persistenceController.container.viewContext)
-        .environment(\.playGame, playGameAction)
+        .environment(\.managedObjectContext, self.persistenceCoordinator.container.viewContext)
+        .environment(\.persistenceCoordinator, self.persistenceCoordinator)
+        .environment(\.playGame, self.playGameAction)
     }
 }

@@ -5,7 +5,7 @@ struct GameViewHeader: View {
     var safeAreaTop: CGFloat
     @Environment(\.playGame) var playGame
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.managedObjectContext) var viewContext
+    @Environment(\.persistenceCoordinator) var persistence
 
     var body: some View {
         ZStack {
@@ -64,34 +64,8 @@ struct GameViewHeader: View {
     
     func play() {
         Task.detached {
-            try await playGame(game: game, viewContext: viewContext)
+            try await playGame(game: game, persistence: persistence)
         }
-    }
-}
-
-struct SaveStateView: View {
-    enum Kind {
-        case auto
-        case manual
-        
-        var string: String {
-            switch self {
-            case .auto: "Auto"
-            case .manual: "Manual"
-            }
-        }
-    }
-    
-    let kind: Kind
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 8.0)
-                .aspectRatio(1.5, contentMode: .fit)
-            Text("\(kind.string) · 5h ago")
-                .foregroundStyle(.secondary)
-        }
-        .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
     }
 }
 
@@ -104,20 +78,12 @@ struct GameView: View {
             GeometryReader { geometry in
                 ScrollView {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top)
-                    SectionHeader(title: "Save States").padding([.horizontal, .top])
-                    ScrollView(.horizontal) {
-                        LazyHStack {
-                            SaveStateView(kind: .auto)
-                            Divider()
-                            ForEach(0..<10) { _ in
-                                SaveStateView(kind: .manual)
-                            }
-                        }.padding(.horizontal)
-                    }.padding(.bottom)
+//                    SectionHeader(title: "Save States").padding([.horizontal, .top])
                     
                     LazyVStack(alignment: .leading) {
                         NavigationLink(destination: CheatsView(game: game)) {
                             Label("Cheats", systemImage: "doc.badge.gearshape")
+                                .padding()
                         }
                         .modify {
                             if #available(iOS 17.0, macOS 14.0, *) {
@@ -147,10 +113,12 @@ struct GameView: View {
     }
 }
 
+#if DEBUG
 #Preview {
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceCoordinator.preview.container.viewContext
     let game = Game(context: context)
     game.system = .gba
     
     return GameView(game: game).environment(\.managedObjectContext, context)
 }
+#endif

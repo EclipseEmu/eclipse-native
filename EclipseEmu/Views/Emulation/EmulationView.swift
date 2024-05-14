@@ -29,6 +29,7 @@ final class EmulationViewModel: ObservableObject {
     @Published var aspectRatio: CGFloat = 1.0
     
     @Published var isQuitConfirmationShown = false
+    @Published var isSaveStateViewShown = false
     
     @Published var volume: Float = 0.0 {
         didSet {
@@ -49,17 +50,20 @@ final class EmulationViewModel: ObservableObject {
     
     var coreInfo: GameCoreInfo
     var game: Game
-    var cheats: [Cheat]
+    var persistence: PersistenceCoordinator
+    var emulationData: GameManager.EmulationData
     
-    init(coreInfo: GameCoreInfo, game: Game, cheats: [Cheat]) {
+    init(coreInfo: GameCoreInfo, game: Game, persistence: PersistenceCoordinator, emulationData: GameManager.EmulationData) {
         self.coreInfo = coreInfo
         self.game = game
-        self.cheats = cheats
+        self.persistence = persistence
+        self.emulationData = emulationData
     }
 
     func renderingSurfaceCreated(surface: CAMetalLayer) async {
         do {
             let core = try GameCoreCoordinator(
+                game: self.game,
                 coreInfo: self.coreInfo,
                 system: game.system,
                 surface: surface,
@@ -73,10 +77,8 @@ final class EmulationViewModel: ObservableObject {
                 self.state = .loaded(core)
             }
             
-            guard let romPath = game.romPath else { throw Failure.romMissing}
-            guard romPath.startAccessingSecurityScopedResource() else { throw Failure.romBadAccess }
-            await core.start(gamePath: romPath, savePath: game.savePath)
-            for cheat in cheats {
+            await core.start(gamePath: emulationData.romPath, savePath: emulationData.savePath)
+            for cheat in emulationData.cheats {
                 print("set cheat", await core.setCheat(cheat: cheat))
             }
         } catch {
@@ -118,6 +120,35 @@ final class EmulationViewModel: ObservableObject {
             await core.pause(reason: .paused)
         } else {
             await core.play(reason: .paused)
+        }
+    }
+    
+    func saveState(isAuto: Bool) {
+        guard case .loaded(let core) = self.state else { return }
+        
+        Task {
+            let saveState = SaveState(context: self.persistence.context)
+            saveState.id = UUID()
+            saveState.date = .now
+            saveState.isAuto = isAuto
+            saveState.game = self.game
+            
+            let path = self.persistence.external.getSaveStatePath(for: saveState)
+            self.persistence.save()
+            
+            let _ = await core.saveState(to: path)
+            // FIXME: show a message here
+        }
+    }
+    
+    func loadState(saveState: SaveState) {
+        guard case .loaded(let core) = self.state else { return }
+        
+        let path = self.persistence.external.getSaveStatePath(for: saveState)
+        Task {
+            let _ = await core.loadState(for: path)
+            
+            // FIXME: show a message here
         }
     }
 }
@@ -194,6 +225,20 @@ struct EmulationView: View {
                 )
                 .onAppear {
                     self.focusState = true
+                }
+            }
+        }
+        .sheet(isPresented: $model.isSaveStateViewShown) {
+            CompatNavigationStack {
+                SaveStatesListView(game: model.game, action: self.model.loadState(saveState:), haveDismissButton: true)
+                    .navigationTitle("Load State")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+            .modify {
+                if #available(iOS 16.0, *) {
+                    $0.presentationDetents([.medium, .large])
+                } else {
+                    $0
                 }
             }
         }

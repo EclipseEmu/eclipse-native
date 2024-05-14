@@ -14,4 +14,3 @@ struct GamepadBinding {
         case touchPad(x: GameInput, y: GameInput)
     }
 }
-

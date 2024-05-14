@@ -20,7 +20,6 @@
 		922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922358152BE2B8B50014BFFA /* EmulationMenuView.swift */; };
 		922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922D78952BC23D5900695252 /* TouchControlsView.swift */; };
 		922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */; };
-		922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A62BC0C26600B419D7 /* Persistence.swift */; };
 		922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 922F00A82BC0C26600B419D7 /* EclipseEmu.xcdatamodeld */; };
 		922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00AB2BC0C26600B419D7 /* LibraryView.swift */; };
 		922F00AE2BC0C26700B419D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922F00AD2BC0C26700B419D7 /* Assets.xcassets */; };
@@ -45,7 +44,6 @@
 		927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */; };
 		927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973112BEBE6FD008F2FE4 /* String+Extension.swift */; };
 		927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973132BEC4886008F2FE4 /* EditCheatView.swift */; };
-		927973172BEC58DA008F2FE4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 927973162BEC58DA008F2FE4 /* mGBAEclipseCore */; };
 		927973192BEEB6FA008F2FE4 /* LazySplitIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */; };
 		9279731B2BEEBA9E008F2FE4 /* CheatFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */; };
 		9281CCAC2BCC481B00E4FE48 /* HomebrewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */; };
@@ -60,6 +58,20 @@
 		9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E22BC1D0BE00B174E1 /* Touch.swift */; };
 		9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */; };
 		9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E82BC1D82000B174E1 /* Bindings.swift */; };
+		9298FEE82BEEC62E00F9881E /* ImageStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9298FEE72BEEC62E00F9881E /* ImageStorage.swift */; };
+		9298FEEF2BEEF47400F9881E /* BoxartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9298FEEE2BEEF47400F9881E /* BoxartView.swift */; };
+		92A5F6122BEF023800DCC338 /* FileStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6112BEF023800DCC338 /* FileStream.swift */; };
+		92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6132BEF123800DCC338 /* Data+Extension.swift */; };
+		92A5F6162BEFEFF300DCC338 /* PersistenceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */; };
+		92A5F61C2BF0198A00DCC338 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F61B2BF0198A00DCC338 /* GameManager.swift */; };
+		92A5F61E2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F61D2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift */; };
+		92A5F6242BF1249D00DCC338 /* ExternalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */; };
+		92A5F6272BF1DDCF00DCC338 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */; };
+		92A5F62A2BF2600300DCC338 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6292BF2600300DCC338 /* EclipseKit */; };
+		92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */; };
+		92A5F62F2BF2BA7D00DCC338 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F62E2BF2BA7D00DCC338 /* EclipseKit */; };
+		92A5F6322BF2BA8F00DCC338 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */; };
+		92A5F6342BF2BD0A00DCC338 /* SaveStateItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */; };
 		92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */; };
 		92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BFB7912BC190C30093B2E3 /* AppIconView.swift */; };
 		92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 92CC9CFE2BC3983A00D668DB /* FrameBuffer.metal */; };
@@ -119,7 +131,6 @@
 		922D78952BC23D5900695252 /* TouchControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchControlsView.swift; sourceTree = "<group>"; };
 		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuApp.swift; sourceTree = "<group>"; };
-		922F00A62BC0C26600B419D7 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		922F00A92BC0C26600B419D7 /* EclipseEmu.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = EclipseEmu.xcdatamodel; sourceTree = "<group>"; };
 		922F00AB2BC0C26600B419D7 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		922F00AD2BC0C26700B419D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -160,6 +171,16 @@
 		9294E5E22BC1D0BE00B174E1 /* Touch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Touch.swift; sourceTree = "<group>"; };
 		9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gamepad.swift; sourceTree = "<group>"; };
 		9294E5E82BC1D82000B174E1 /* Bindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindings.swift; sourceTree = "<group>"; };
+		9298FEE72BEEC62E00F9881E /* ImageStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStorage.swift; sourceTree = "<group>"; };
+		9298FEEE2BEEF47400F9881E /* BoxartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxartView.swift; sourceTree = "<group>"; };
+		92A5F6112BEF023800DCC338 /* FileStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStream.swift; sourceTree = "<group>"; };
+		92A5F6132BEF123800DCC338 /* Data+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extension.swift"; sourceTree = "<group>"; };
+		92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceCoordinator.swift; sourceTree = "<group>"; };
+		92A5F61B2BF0198A00DCC338 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		92A5F61D2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BidirectionalCollection+Extension.swift"; sourceTree = "<group>"; };
+		92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalStorage.swift; sourceTree = "<group>"; };
+		92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStatesListView.swift; sourceTree = "<group>"; };
+		92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStateItem.swift; sourceTree = "<group>"; };
 		92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayGameAction.swift; sourceTree = "<group>"; };
 		92BFB7912BC190C30093B2E3 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		92C11CC72BD6EF5200BB11A2 /* DummyCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DummyCore; sourceTree = "<group>"; };
@@ -182,7 +203,10 @@
 			files = (
 				924B218C2BE8156700ED02F4 /* Atomics in Frameworks */,
 				924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */,
-				927973172BEC58DA008F2FE4 /* mGBAEclipseCore in Frameworks */,
+				92A5F6322BF2BA8F00DCC338 /* mGBAEclipseCore in Frameworks */,
+				92A5F6272BF1DDCF00DCC338 /* mGBAEclipseCore in Frameworks */,
+				92A5F62A2BF2600300DCC338 /* EclipseKit in Frameworks */,
+				92A5F62F2BF2BA7D00DCC338 /* EclipseKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,13 +273,12 @@
 			isa = PBXGroup;
 			children = (
 				925B14EC2BCA487400AD7257 /* Extensions */,
-				92BBAADA2BC4680700B09755 /* Shaders */,
 				92CC9CF82BC3930B00D668DB /* Emulation */,
 				92D5D7292BC1722600659C37 /* Helpers */,
+				92BBAADA2BC4680700B09755 /* Shaders */,
+				92A5F6172BEFF55E00DCC338 /* Storage */,
 				92D5D71F2BC0FF9800659C37 /* Views */,
-				922F00D62BC0C2EE00B419D7 /* Model */,
 				922F00A42BC0C26600B419D7 /* EclipseEmuApp.swift */,
-				922F00A62BC0C26600B419D7 /* Persistence.swift */,
 				9294E5DD2BC1AF7800B174E1 /* Info.plist */,
 				922F00AD2BC0C26700B419D7 /* Assets.xcassets */,
 				922F00AF2BC0C26700B419D7 /* EclipseEmu.entitlements */,
@@ -297,8 +320,6 @@
 				9294E5E12BC1D0AF00B174E1 /* Controls */,
 				922F00DB2BC0C75B00B419D7 /* Game */,
 				922F00D42BC0C2EB00B419D7 /* System.swift */,
-				92115C312BD366ED0020D62F /* Box.swift */,
-				92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -316,8 +337,10 @@
 			isa = PBXGroup;
 			children = (
 				9281CCAF2BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift */,
+				92A5F61D2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift */,
 				92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */,
 				9279730D2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift */,
+				92A5F6132BEF123800DCC338 /* Data+Extension.swift */,
 				92115C392BD580F00020D62F /* EclipseKit+Extension.swift */,
 				925B14ED2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift */,
 				92115C372BD4C7580020D62F /* GameInput+Extension.swift */,
@@ -348,6 +371,7 @@
 				9281CCAB2BCC481B00E4FE48 /* HomebrewView.swift */,
 				9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */,
 				927973132BEC4886008F2FE4 /* EditCheatView.swift */,
+				92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -377,6 +401,26 @@
 				92C11CC72BD6EF5200BB11A2 /* DummyCore */,
 			);
 			path = Cores;
+			sourceTree = "<group>";
+		};
+		92A5F6172BEFF55E00DCC338 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				92A5F61A2BF00AC200DCC338 /* External */,
+				922F00D62BC0C2EE00B419D7 /* Model */,
+				92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */,
+				92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */,
+				92A5F61B2BF0198A00DCC338 /* GameManager.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		92A5F61A2BF00AC200DCC338 /* External */ = {
+			isa = PBXGroup;
+			children = (
+				9298FEE72BEEC62E00F9881E /* ImageStorage.swift */,
+			);
+			path = External;
 			sourceTree = "<group>";
 		};
 		92BBAADA2BC4680700B09755 /* Shaders */ = {
@@ -414,14 +458,16 @@
 		92D5D7202BC0FFA000659C37 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
+				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
+				9298FEEE2BEEF47400F9881E /* BoxartView.swift */,
+				9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */,
+				920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */,
 				92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */,
 				92D5D7252BC1007900659C37 /* GameGridItem.swift */,
-				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
 				92D5D7302BC17C2800659C37 /* DismissButton.swift */,
-				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
 				92115C352BD435840020D62F /* MessageBlock.swift */,
-				920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */,
-				9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */,
+				92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */,
+				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -429,10 +475,13 @@
 		92D5D7292BC1722600659C37 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				92D5D3712BC0DF1700F1116C /* MD5.swift */,
-				92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */,
-				927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */,
+				92115C312BD366ED0020D62F /* Box.swift */,
 				9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */,
+				92A5F6112BEF023800DCC338 /* FileStream.swift */,
+				92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */,
+				92D5D3712BC0DF1700F1116C /* MD5.swift */,
+				927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */,
+				92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -457,7 +506,10 @@
 			packageProductDependencies = (
 				924B218B2BE8156700ED02F4 /* Atomics */,
 				924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */,
-				927973162BEC58DA008F2FE4 /* mGBAEclipseCore */,
+				92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */,
+				92A5F6292BF2600300DCC338 /* EclipseKit */,
+				92A5F62E2BF2BA7D00DCC338 /* EclipseKit */,
+				92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
@@ -533,9 +585,9 @@
 			);
 			mainGroup = 922F00982BC0C26600B419D7;
 			packageReferences = (
-				92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */,
 				924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
-				927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */,
+				92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */,
+				92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -585,19 +637,21 @@
 				92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
 				9279730C2BE9B3F7008F2FE4 /* CheatsView.swift in Sources */,
+				92A5F6242BF1249D00DCC338 /* ExternalStorage.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
 				92115C3A2BD580F00020D62F /* EclipseKit+Extension.swift in Sources */,
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
 				922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */,
+				92A5F6342BF2BD0A00DCC338 /* SaveStateItem.swift in Sources */,
+				92A5F6122BEF023800DCC338 /* FileStream.swift in Sources */,
 				927973192BEEB6FA008F2FE4 /* LazySplitIterator.swift in Sources */,
 				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
 				92115C362BD435840020D62F /* MessageBlock.swift in Sources */,
 				9252332D2BE679AE00D46154 /* GameAudio.swift in Sources */,
 				92115C382BD4C7580020D62F /* GameInput+Extension.swift in Sources */,
 				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
-				922F00A72BC0C26600B419D7 /* Persistence.swift in Sources */,
 				927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */,
 				9279731B2BEEBA9E008F2FE4 /* CheatFormatter.swift in Sources */,
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
@@ -607,7 +661,10 @@
 				927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
+				92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
+				92A5F61C2BF0198A00DCC338 /* GameManager.swift in Sources */,
+				92A5F61E2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift in Sources */,
 				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,
 				922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */,
 				922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */,
@@ -615,8 +672,10 @@
 				922358112BE15AF20014BFFA /* EmulationView.swift in Sources */,
 				927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */,
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
+				9298FEE82BEEC62E00F9881E /* ImageStorage.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
+				92A5F6162BEFEFF300DCC338 /* PersistenceCoordinator.swift in Sources */,
 				920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */,
 				9294E5DF2BC1BFB700B174E1 /* SettingsGamepadView.swift in Sources */,
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
@@ -625,10 +684,12 @@
 				925B14EE2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift in Sources */,
 				92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */,
 				92115C322BD366ED0020D62F /* Box.swift in Sources */,
+				9298FEEF2BEEF47400F9881E /* BoxartView.swift in Sources */,
 				923E37FD2BC9AE0D00ECC973 /* GameFrameBufferRenderer.swift in Sources */,
 				9279730E2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift in Sources */,
 				928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */,
 				922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */,
+				92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */,
 				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
 				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
 				92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */,
@@ -1023,17 +1084,17 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
+		92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
+			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
 			requirement = {
 				branch = main;
 				kind = branch;
 			};
 		};
-		92C11CD52BD81CEF00BB11A2 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
+		92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
+			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -1051,9 +1112,22 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = mGBAEclipseCore;
 		};
-		927973162BEC58DA008F2FE4 /* mGBAEclipseCore */ = {
+		92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 927973152BEC58DA008F2FE4 /* XCRemoteSwiftPackageReference "core-mgba" */;
+			productName = mGBAEclipseCore;
+		};
+		92A5F6292BF2600300DCC338 /* EclipseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EclipseKit;
+		};
+		92A5F62E2BF2BA7D00DCC338 /* EclipseKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */;
+			productName = EclipseKit;
+		};
+		92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */;
 			productName = mGBAEclipseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
