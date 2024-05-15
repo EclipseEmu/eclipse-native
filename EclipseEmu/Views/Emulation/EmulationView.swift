@@ -78,8 +78,9 @@ final class EmulationViewModel: ObservableObject {
             }
             
             await core.start(gamePath: emulationData.romPath, savePath: emulationData.savePath)
-            for cheat in emulationData.cheats {
-                print("set cheat", await core.setCheat(cheat: cheat))
+            if let failedCheats = await core.setCheats(cheats: emulationData.cheats) {
+                // FIXME: figure out what to do with these
+                print("failed to set the following cheats:", failedCheats)
             }
         } catch {
             await MainActor.run {
@@ -127,25 +128,21 @@ final class EmulationViewModel: ObservableObject {
         guard case .loaded(let core) = self.state else { return }
         
         Task {
-            let saveState = SaveState(context: self.persistence.context)
-            saveState.id = UUID()
-            saveState.date = .now
-            saveState.isAuto = isAuto
-            saveState.game = self.game
             
-            let path = self.persistence.external.getSaveStatePath(for: saveState)
-            self.persistence.save()
-            
-            let _ = await core.saveState(to: path)
             // FIXME: show a message here
+            do {
+                try await SaveStateManager.create(isAuto: isAuto, for: game, with: core, in: persistence)
+            } catch {
+                print("creating save state failed:", error)
+            }
         }
     }
     
     func loadState(saveState: SaveState) {
         guard case .loaded(let core) = self.state else { return }
         
-        let path = self.persistence.external.getSaveStatePath(for: saveState)
         Task {
+            let path = saveState.path(in: persistence)
             let _ = await core.loadState(for: path)
             
             // FIXME: show a message here
@@ -232,7 +229,9 @@ struct EmulationView: View {
             CompatNavigationStack {
                 SaveStatesListView(game: model.game, action: self.model.loadState(saveState:), haveDismissButton: true)
                     .navigationTitle("Load State")
+                #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
+                #endif
             }
             .modify {
                 if #available(iOS 16.0, *) {

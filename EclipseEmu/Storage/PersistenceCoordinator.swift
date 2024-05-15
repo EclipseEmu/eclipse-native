@@ -2,19 +2,40 @@ import Foundation
 import CoreData
 import SwiftUI
 
+fileprivate func createDirectoryIfNeeded(path: String, base: URL, with fileManager: FileManager) -> URL {
+    let directory = base.appendingPathComponent(path, isDirectory: true)
+    if !fileManager.fileExists(atPath: directory.path) {
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+    }
+    return directory
+}
+
 final class PersistenceCoordinator {
+    enum Failure: LocalizedError {
+        case missingRomPath
+        case missingSavePath
+        case failedToCreateFile
+    }
+    
     static let shared = PersistenceCoordinator()
 //    #if DEBUG
     static let preview = PersistenceCoordinator(inMemory: true)
 //    #endif
-    let external = ExternalStorage()
 
-    let inMemory: Bool
-    lazy var games: GameManager = {
-        return GameManager(self)
-    }()
+    private let inMemory: Bool
     
-    lazy var container: NSPersistentContainer = {
+    let fileManager: FileManager
+    let romDirectory: URL
+    let saveDirectory: URL
+    let saveStateDirectory: URL
+    let imageDirectory: URL
+    
+    // Core Data properties
+    
+    @usableFromInline
+    var context: NSManagedObjectContext { self.container.viewContext }
+    
+    lazy private(set) var container: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "EclipseEmu")
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
@@ -48,11 +69,18 @@ final class PersistenceCoordinator {
         })
         return container
     }()
-    var context: NSManagedObjectContext { container.viewContext }
     
-    init(inMemory: Bool = false) {
+    init(fileManager: FileManager = .default, inMemory: Bool = false) {
         self.inMemory = inMemory
+        let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        self.fileManager = fileManager
+        self.romDirectory = createDirectoryIfNeeded(path: "roms", base: documentDirectory, with: fileManager)
+        self.saveDirectory = createDirectoryIfNeeded(path: "saves", base: documentDirectory, with: fileManager)
+        self.saveStateDirectory = createDirectoryIfNeeded(path: "save_states", base: documentDirectory, with: fileManager)
+        self.imageDirectory = createDirectoryIfNeeded(path: "images", base: documentDirectory, with: fileManager)
     }
+
+    // MARK: Core Data helpers
     
     func save() {
         do {
@@ -78,7 +106,33 @@ final class PersistenceCoordinator {
         let batchRequest = NSBatchDeleteRequest(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
         try batchRequest.fetchRequest.execute()
     }
+    
+    // MARK: File Helpers
+    
+    @inlinable
+    func getPath(name: String, fileExtension: String?, base: URL) -> URL {
+        var filePath = name
+        if let fileExtension {
+            filePath += "." + fileExtension
+        }
+        return base.appendingPathComponent(filePath)
+    }
+    
+    @inlinable
+    func writeFile(path: URL, contents: Data) throws {
+        guard fileManager.createFile(atPath: path.path, contents: contents, attributes: nil) else {
+            throw Failure.failedToCreateFile
+        }
+    }
+    
+    @inlinable
+    func deleteFile(path: URL) throws {
+        guard self.fileManager.fileExists(atPath: path.path) else { return }
+        try fileManager.removeItem(at: path)
+    }
 }
+
+// MARK: Make PersistenceCoordinator to be available from SwiftUI's envrionment
 
 private struct PersistenceCoordinatorKey: EnvironmentKey {
     #if DEBUG

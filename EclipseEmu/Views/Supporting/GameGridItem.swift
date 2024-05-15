@@ -32,7 +32,7 @@ struct GameGridItem: View {
     private func deleteGame() {
         Task {
             do {
-                try await self.persistence.games.delete(game: game)
+                try await GameManager.delete(game: game, in: persistence)
                 persistence.save()
             } catch {
                 print(error)

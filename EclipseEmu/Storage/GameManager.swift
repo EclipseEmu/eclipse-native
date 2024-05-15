@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 import EclipseKit
 
-struct GameManager {
+enum GameManager {
     enum Failure: Error {
         case failedToAccessSecurityScopedResource
         case failedToGetRomPath
@@ -14,13 +14,7 @@ struct GameManager {
         let cheats: Set<Cheat>
     }
     
-    let persistence: PersistenceCoordinator
-    
-    init(_ persistence: PersistenceCoordinator) {
-        self.persistence = persistence
-    }
-    
-    func insert(name: String, system: GameSystem, romPath: URL, romExtension: String?) async throws {
+    static func insert(name: String, system: GameSystem, romPath: URL, romExtension: String?, in persistence: PersistenceCoordinator) async throws {
         guard romPath.startAccessingSecurityScopedResource() else { throw Failure.failedToAccessSecurityScopedResource }
         defer { romPath.stopAccessingSecurityScopedResource() }
         
@@ -36,56 +30,25 @@ struct GameManager {
         game.datePlayed = nil
         game.md5 = md5
 
-        try persistence.external.writeRom(for: game, data: romData)
+        try persistence.writeFile(path: game.romPath(in: persistence), contents: romData)
 
         persistence.save()
     }
     
-    func updateDatePlayed(for game: Game) {
+    static func updateDatePlayed(for game: Game, in persistence: PersistenceCoordinator) {
         game.datePlayed = .now
         persistence.save()
     }
     
-    func delete(game: Game) async throws {
-        // determine if the rom should be deleted
-        let canDeleteRom = try await persistence.context.perform {
-            let request = Game.fetchRequest()
-            request.fetchLimit = 2
-            request.predicate = NSPredicate(format: "md5 == %@", game.md5)
-            request.includesPropertyValues = false
-            request.includesSubentities = false
-            let count = try self.persistence.context.count(for: request)
-            return count < 2
-        }
-        
-
-        if canDeleteRom {
-            try persistence.external.deleteRom(for: game)
-        }
-        
-        try persistence.external.deleteSave(for: game)
-        
-        let saveStatePaths = try await persistence.context.perform {
-            let request = SaveState.fetchRequest()
-            request.predicate = NSPredicate(format: "game = %@", game)
-            let saveStates = try request.execute()
-            let paths = saveStates.map { persistence.external.getSaveStatePath(for: $0) }
-            saveStates.forEach(persistence.context.delete(_:))
-            return paths
-        }
-        
-        for saveStatePath in saveStatePaths {
-            try? persistence.external.deleteFile(path: saveStatePath)
-        }
-        
+    static func delete(game: Game, in persistence: PersistenceCoordinator) async throws {
         persistence.context.delete(game)
+        persistence.save()
     }
     
-    /// Returns data needed by the emulator
-    func emulationData(for game: Game) throws -> Self.EmulationData {
-        let externalStorage = persistence.external
-        let romPath = externalStorage.getRomPath(for: game)
-        let savePath = externalStorage.getSavePath(for: game)
+    /// - Returns: Data needed by the emulator, including paths and cheats.
+    static func emulationData(for game: Game, in persistence: PersistenceCoordinator) throws -> Self.EmulationData {
+        let romPath = game.romPath(in: persistence)
+        let savePath = game.savePath(in: persistence)
         let cheats: Set<Cheat> = (game.cheats as? Set<Cheat>) ?? Set()
         return .init(romPath: romPath, savePath: savePath, cheats: cheats)
     }

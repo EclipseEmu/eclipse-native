@@ -18,13 +18,13 @@ struct SaveStateItem: View {
             VStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 8.0)
                     .aspectRatio(1.5, contentMode: .fit)
-                Text("\(saveState.isAuto ? "Auto" : "Manual") · \(saveState.date ?? .now, format: .dateTime)")
+                Text("\(saveState.isAuto ? "Auto" : "Manual") · \(saveState.date, format: .dateTime)")
                     .foregroundStyle(.secondary)
             }
         }
         .buttonStyle(.plain)
         .contextMenu {
-            Button(action: self.deleteSaveState) {
+            Button(role: .destructive, action: self.deleteSaveState) {
                 Label("Delete", systemImage: "trash")
             }
         }
@@ -32,9 +32,7 @@ struct SaveStateItem: View {
     
     func deleteSaveState() {
         do {
-            try persistence.external.deleteSaveState(for: self.saveState)
-            persistence.context.delete(self.saveState)
-            persistence.save()
+            try SaveStateManager.delete(saveState, in: persistence)
         } catch {
             print(error)
         }

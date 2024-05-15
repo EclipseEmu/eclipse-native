@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		920A7AD72BF3E4250055BC24 /* SaveStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AD62BF3E4250055BC24 /* SaveStateManager.swift */; };
+		920A7AD92BF408EC0055BC24 /* CheatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AD82BF408EC0055BC24 /* CheatManager.swift */; };
+		920A7ADB2BF426000055BC24 /* SaveState+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7ADA2BF426000055BC24 /* SaveState+CoreDataClass.swift */; };
+		920A7ADD2BF426240055BC24 /* SaveState+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7ADC2BF426240055BC24 /* SaveState+CoreDataProperties.swift */; };
+		920A7AE02BF446950055BC24 /* CheatItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7ADF2BF446950055BC24 /* CheatItemView.swift */; };
+		920A7AE22BF459F10055BC24 /* ImageAsset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */; };
+		920A7AE42BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */; };
 		920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */; };
 		920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */; };
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
@@ -58,12 +65,10 @@
 		9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */; };
 		9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5E82BC1D82000B174E1 /* Bindings.swift */; };
 		9298FEEF2BEEF47400F9881E /* BoxartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9298FEEE2BEEF47400F9881E /* BoxartView.swift */; };
-		92A5F6122BEF023800DCC338 /* FileStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6112BEF023800DCC338 /* FileStream.swift */; };
 		92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6132BEF123800DCC338 /* Data+Extension.swift */; };
 		92A5F6162BEFEFF300DCC338 /* PersistenceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */; };
 		92A5F61C2BF0198A00DCC338 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F61B2BF0198A00DCC338 /* GameManager.swift */; };
 		92A5F61E2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F61D2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift */; };
-		92A5F6242BF1249D00DCC338 /* ExternalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */; };
 		92A5F6272BF1DDCF00DCC338 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */; };
 		92A5F62A2BF2600300DCC338 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6292BF2600300DCC338 /* EclipseKit */; };
 		92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */; };
@@ -115,6 +120,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		920A7AD62BF3E4250055BC24 /* SaveStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStateManager.swift; sourceTree = "<group>"; };
+		920A7AD82BF408EC0055BC24 /* CheatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatManager.swift; sourceTree = "<group>"; };
+		920A7ADA2BF426000055BC24 /* SaveState+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaveState+CoreDataClass.swift"; sourceTree = "<group>"; };
+		920A7ADC2BF426240055BC24 /* SaveState+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SaveState+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		920A7ADF2BF446950055BC24 /* CheatItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatItemView.swift; sourceTree = "<group>"; };
+		920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageAsset+CoreDataClass.swift"; sourceTree = "<group>"; };
+		920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageAsset+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatNavigationStack.swift; sourceTree = "<group>"; };
 		920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonotomicClock.swift; sourceTree = "<group>"; };
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
@@ -169,12 +181,10 @@
 		9294E5E62BC1D6EF00B174E1 /* Gamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gamepad.swift; sourceTree = "<group>"; };
 		9294E5E82BC1D82000B174E1 /* Bindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindings.swift; sourceTree = "<group>"; };
 		9298FEEE2BEEF47400F9881E /* BoxartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxartView.swift; sourceTree = "<group>"; };
-		92A5F6112BEF023800DCC338 /* FileStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStream.swift; sourceTree = "<group>"; };
 		92A5F6132BEF123800DCC338 /* Data+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extension.swift"; sourceTree = "<group>"; };
 		92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceCoordinator.swift; sourceTree = "<group>"; };
 		92A5F61B2BF0198A00DCC338 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		92A5F61D2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BidirectionalCollection+Extension.swift"; sourceTree = "<group>"; };
-		92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalStorage.swift; sourceTree = "<group>"; };
 		92A5F62B2BF27BCE00DCC338 /* SaveStatesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStatesListView.swift; sourceTree = "<group>"; };
 		92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveStateItem.swift; sourceTree = "<group>"; };
 		92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayGameAction.swift; sourceTree = "<group>"; };
@@ -314,19 +324,23 @@
 			isa = PBXGroup;
 			children = (
 				9294E5E12BC1D0AF00B174E1 /* Controls */,
-				922F00DB2BC0C75B00B419D7 /* Game */,
+				922F00DB2BC0C75B00B419D7 /* CoreData */,
 				922F00D42BC0C2EB00B419D7 /* System.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
 		};
-		922F00DB2BC0C75B00B419D7 /* Game */ = {
+		922F00DB2BC0C75B00B419D7 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
 				922F00D72BC0C75000B419D7 /* Game+CoreDataClass.swift */,
 				922F00D82BC0C75000B419D7 /* Game+CoreDataProperties.swift */,
+				920A7ADA2BF426000055BC24 /* SaveState+CoreDataClass.swift */,
+				920A7ADC2BF426240055BC24 /* SaveState+CoreDataProperties.swift */,
+				920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */,
+				920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */,
 			);
-			path = Game;
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 		925B14EC2BCA487400AD7257 /* Extensions */ = {
@@ -403,8 +417,9 @@
 			children = (
 				922F00D62BC0C2EE00B419D7 /* Model */,
 				92A5F6152BEFEFF300DCC338 /* PersistenceCoordinator.swift */,
-				92A5F6232BF1249D00DCC338 /* ExternalStorage.swift */,
 				92A5F61B2BF0198A00DCC338 /* GameManager.swift */,
+				920A7AD82BF408EC0055BC24 /* CheatManager.swift */,
+				920A7AD62BF3E4250055BC24 /* SaveStateManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -447,6 +462,7 @@
 				92BFB7912BC190C30093B2E3 /* AppIconView.swift */,
 				9298FEEE2BEEF47400F9881E /* BoxartView.swift */,
 				9279730F2BEAB373008F2FE4 /* CheatCodeField.swift */,
+				920A7ADF2BF446950055BC24 /* CheatItemView.swift */,
 				920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */,
 				92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */,
 				92D5D7252BC1007900659C37 /* GameGridItem.swift */,
@@ -463,7 +479,6 @@
 			children = (
 				92115C312BD366ED0020D62F /* Box.swift */,
 				9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */,
-				92A5F6112BEF023800DCC338 /* FileStream.swift */,
 				92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */,
 				92D5D3712BC0DF1700F1116C /* MD5.swift */,
 				927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */,
@@ -619,19 +634,20 @@
 			files = (
 				922F00DA2BC0C75000B419D7 /* Game+CoreDataProperties.swift in Sources */,
 				924B21892BE7F37900ED02F4 /* RingBuffer.swift in Sources */,
+				920A7AD72BF3E4250055BC24 /* SaveStateManager.swift in Sources */,
 				922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */,
 				92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
 				9279730C2BE9B3F7008F2FE4 /* CheatsView.swift in Sources */,
-				92A5F6242BF1249D00DCC338 /* ExternalStorage.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
+				920A7ADD2BF426240055BC24 /* SaveState+CoreDataProperties.swift in Sources */,
 				92115C3A2BD580F00020D62F /* EclipseKit+Extension.swift in Sources */,
+				920A7ADB2BF426000055BC24 /* SaveState+CoreDataClass.swift in Sources */,
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
 				922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */,
 				92A5F6342BF2BD0A00DCC338 /* SaveStateItem.swift in Sources */,
-				92A5F6122BEF023800DCC338 /* FileStream.swift in Sources */,
 				927973192BEEB6FA008F2FE4 /* LazySplitIterator.swift in Sources */,
 				923E38012BC9BF0D00ECC973 /* GameCoreCoordinator.swift in Sources */,
 				92115C362BD435840020D62F /* MessageBlock.swift in Sources */,
@@ -640,11 +656,13 @@
 				922F00A52BC0C26600B419D7 /* EclipseEmuApp.swift in Sources */,
 				927973142BEC4886008F2FE4 /* EditCheatView.swift in Sources */,
 				9279731B2BEEBA9E008F2FE4 /* CheatFormatter.swift in Sources */,
+				920A7AD92BF408EC0055BC24 /* CheatManager.swift in Sources */,
 				92DFA3D52BC1E5FA0024D3EA /* SettingsEmulationView.swift in Sources */,
 				92D5D7262BC1007900659C37 /* GameGridItem.swift in Sources */,
 				92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */,
 				927973122BEBE6FD008F2FE4 /* String+Extension.swift in Sources */,
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
+				920A7AE22BF459F10055BC24 /* ImageAsset+CoreDataClass.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
 				92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
@@ -673,8 +691,10 @@
 				9279730E2BE9ECA0008F2FE4 /* CharacterSet+Extension.swift in Sources */,
 				928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */,
 				922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */,
+				920A7AE02BF446950055BC24 /* CheatItemView.swift in Sources */,
 				92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */,
 				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
+				920A7AE42BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift in Sources */,
 				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
 				92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */,
 				9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */,

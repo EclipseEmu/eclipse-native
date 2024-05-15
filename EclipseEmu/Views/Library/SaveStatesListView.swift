@@ -16,9 +16,8 @@ struct SaveStatesListView: View {
         self.action = action
         self.haveDismissButton = haveDismissButton
         
-        let request = SaveState.fetchRequest()
+        let request = SaveStateManager.listRequest(for: game, limit: nil)
         request.sortDescriptors = Self.sortDescriptors
-        request.predicate = NSPredicate(format: "game == %@", self.game)
         self._saveStates = FetchRequest(fetchRequest: request)
     }
     

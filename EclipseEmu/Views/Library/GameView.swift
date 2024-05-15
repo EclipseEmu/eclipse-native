@@ -64,7 +64,11 @@ struct GameViewHeader: View {
     
     func play() {
         Task.detached {
-            try await playGame(game: game, persistence: persistence)
+            do {
+                try await playGame(game: game, persistence: persistence)
+            } catch {
+                print("failed to launch game: \(error.localizedDescription)")
+            }
         }
     }
 }

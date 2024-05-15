@@ -252,15 +252,23 @@ final actor GameCoreCoordinator {
 
     // MARK: Cheats
     
-    func setCheat(cheat: Cheat) -> Bool {
-        guard let type = cheat.type, let code = cheat.code else { return false }
-        return self.core.pointee.setCheat(self.core.pointee.data, type, code, cheat.enabled)
-    }
-    
-    func clearCheats() {
+    /// - Parameter cheats: A list of cheats to add
+    /// - Returns: A set of the cheats that failed to set.
+    func setCheats(cheats: Set<Cheat>) -> Set<Cheat>? {
         self.core.pointee.clearCheats(self.core.pointee.data)
+        var response: Set<Cheat>?
+        for cheat in cheats {
+            guard let type = cheat.type, let code = cheat.code else { continue }
+            // FIXME: what to do when this fails
+            let wasSuccessful = self.core.pointee.setCheat(self.core.pointee.data, type, code, cheat.enabled)
+            if !wasSuccessful {
+                response = response ?? Set()
+                response!.insert(cheat)
+            }
+        }
+        return response
     }
-    
+   
     // MARK: Frame Timing
 
     func setFastForward(enabled: Bool) {

@@ -180,7 +180,13 @@ struct LibraryView: View {
                         romExtension = String(fileName[fileExtensionIndex...])
                     }
 
-                    try await persistence.games.insert(name: name, system: system, romPath: url, romExtension: romExtension)
+                    try await GameManager.insert(
+                        name: name,
+                        system: system,
+                        romPath: url,
+                        romExtension: romExtension,
+                        in: persistence
+                    )
                 } catch {
                     print(error)
                 }

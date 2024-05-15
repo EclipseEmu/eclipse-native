@@ -2,8 +2,7 @@ import Foundation
 
 extension Data {
     init(asyncContentsOf url: URL) async throws {
-        let stream = try FileStream(url: url, mode: .readOnly)
-        self = try await Data(stream.readAll())
-        stream.close()
+        let (data, _) = try await URLSession.shared.data(from: url)
+        self = data
     }
 }

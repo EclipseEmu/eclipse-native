@@ -14,12 +14,10 @@ final class PlayGameAction: ObservableObject {
             throw Failure.missingCore
         }
         
-        let data = try persistence.games.emulationData(for: game)
+        let data = try GameManager.emulationData(for: game, in: persistence)
         let model = EmulationViewModel(coreInfo: core, game: game, persistence: persistence, emulationData: data)
         
-        Task {
-            persistence.games.updateDatePlayed(for: game)
-        }
+        GameManager.updateDatePlayed(for: game, in: persistence)
         
         await MainActor.run {
             self.model = model

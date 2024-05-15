@@ -8,7 +8,7 @@ struct EditCheatView: View {
     var isCreatingCheat: Bool
     
     @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var viewContext
+    @Environment(\.persistenceCoordinator) var persistence
     @State var label: String
     @State var format: GameCoreCheatFormat 
     @State var formatter: CheatFormatter
@@ -108,20 +108,32 @@ struct EditCheatView: View {
     func save() {
         guard self.isCodeValid && !self.label.isEmpty else { return }
         
-        let cheat = self.cheat ?? Cheat(context: viewContext)
-        cheat.type = String(cString: self.format.id)
-        cheat.label = self.label
-        cheat.code = self.format.normalizeCode(string: self.code)
-        cheat.enabled = self.enabled
-        cheat.game = self.game
-        
-        do {
-            try viewContext.save()
-        } catch {
-            print(error)
+        let format = String(cString: self.format.id)
+        let normalizedCode = self.format.normalizeCode(string: self.code)
+
+        if let cheat {
+            cheat.type = String(cString: self.format.id)
+            cheat.label = self.label
+            cheat.code = self.format.normalizeCode(string: self.code)
+            cheat.enabled = self.enabled
+            CheatManager.update(cheat: cheat, in: persistence)
+            
+            dismiss()
+        } else {
+            do {
+                try CheatManager.create(
+                    name: self.label,
+                    code: normalizedCode,
+                    format: format,
+                    isEnabled: self.enabled,
+                    for: self.game,
+                    in: persistence
+                )
+                dismiss()
+            } catch {
+                print(error)
+            }
         }
-        
-        dismiss()
     }
 }
 
