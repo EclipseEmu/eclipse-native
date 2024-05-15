@@ -6,10 +6,12 @@ struct SaveStateItem: View {
 
     var saveState: SaveState
     var action: (SaveState, DismissAction) -> Void
-    
-    init(saveState: SaveState, action: @escaping (SaveState, DismissAction) -> Void) {
+    @Binding var renameDialogTarget: SaveState?
+
+    init(saveState: SaveState, action: @escaping (SaveState, DismissAction) -> Void, renameDialogTarget: Binding<SaveState?>) {
         self.saveState = saveState
         self.action = action
+        self._renameDialogTarget = renameDialogTarget
     }
     
     var body: some View {
@@ -19,12 +21,22 @@ struct SaveStateItem: View {
             VStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 8.0)
                     .aspectRatio(1.5, contentMode: .fit)
-                Text("\(saveState.isAuto ? "Auto" : "Manual") · \(saveState.date, format: .dateTime)")
+                Text("\(self.saveState.isAuto ? "Automatic State" : saveState.name ?? "Unnamed State")")
+                    .font(.subheadline)
+                Text("\(saveState.date, format: .dateTime)")
                     .foregroundStyle(.secondary)
+                    .font(.subheadline)
             }
         }
         .buttonStyle(.plain)
         .contextMenu {
+            if !self.saveState.isAuto {
+                Button {
+                    self.renameDialogTarget = self.saveState
+                } label: {
+                    Label("Rename", systemImage: "rectangle.and.pencil.and.ellipsis")
+                }
+            }
             Button(role: .destructive, action: self.deleteSaveState) {
                 Label("Delete", systemImage: "trash")
             }

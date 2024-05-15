@@ -214,6 +214,16 @@ struct EmulationView: View {
                 }
             }
         }
+        .onChange(of: self.model.isSaveStateViewShown, perform: { newValue in
+            guard case .loaded(let core) = self.model.state else { return }
+            Task {
+                if newValue {
+                    await core.pause(reason: .pendingUserInput)
+                } else {
+                    await core.play(reason: .pendingUserInput)
+                }
+            }
+        })
         .sheet(isPresented: $model.isSaveStateViewShown) {
             CompatNavigationStack {
                 SaveStatesListView(game: model.game, action: self.loadState, haveDismissButton: true)
