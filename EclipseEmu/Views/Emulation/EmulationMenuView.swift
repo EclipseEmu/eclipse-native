@@ -46,6 +46,11 @@ struct EmulationMenuView: View {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
 #endif
+            #if os(macOS)
+            Spacer()
+            #else
+            Divider()
+            #endif
             
             Button(action: {
                 model.saveState(isAuto: false)

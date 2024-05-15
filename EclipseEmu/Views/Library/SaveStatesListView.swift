@@ -8,10 +8,10 @@ struct SaveStatesListView: View {
     
     @FetchRequest<SaveState>(sortDescriptors: Self.sortDescriptors) var saveStates: FetchedResults<SaveState>
     var game: Game
-    var action: (SaveState) -> Void
+    var action: (SaveState, DismissAction) -> Void
     var haveDismissButton: Bool
     
-    init(game: Game, action: @escaping (SaveState) -> Void, haveDismissButton: Bool = false) {
+    init(game: Game, action: @escaping (SaveState, DismissAction) -> Void, haveDismissButton: Bool = false) {
         self.game = game
         self.action = action
         self.haveDismissButton = haveDismissButton

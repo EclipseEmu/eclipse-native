@@ -3,6 +3,7 @@ import SwiftUI
 struct GameViewHeader: View {
     var game: Game
     var safeAreaTop: CGFloat
+    @Environment(\.dismiss) var dismiss
     @Environment(\.playGame) var playGame
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.persistenceCoordinator) var persistence
@@ -66,6 +67,9 @@ struct GameViewHeader: View {
         Task.detached {
             do {
                 try await playGame(game: game, persistence: persistence)
+                await MainActor.run {
+                    dismiss()
+                }
             } catch {
                 print("failed to launch game: \(error.localizedDescription)")
             }

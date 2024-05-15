@@ -137,17 +137,6 @@ final class EmulationViewModel: ObservableObject {
             }
         }
     }
-    
-    func loadState(saveState: SaveState) {
-        guard case .loaded(let core) = self.state else { return }
-        
-        Task {
-            let path = saveState.path(in: persistence)
-            let _ = await core.loadState(for: path)
-            
-            // FIXME: show a message here
-        }
-    }
 }
 
 struct EmulationView: View {
@@ -227,7 +216,7 @@ struct EmulationView: View {
         }
         .sheet(isPresented: $model.isSaveStateViewShown) {
             CompatNavigationStack {
-                SaveStatesListView(game: model.game, action: self.model.loadState(saveState:), haveDismissButton: true)
+                SaveStatesListView(game: model.game, action: self.loadState, haveDismissButton: true)
                     .navigationTitle("Load State")
                 #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
@@ -251,5 +240,17 @@ struct EmulationView: View {
             Text("Any unsaved progress will be lost.")
         }
         .background(Color.black, ignoresSafeAreaEdges: .all)
+    }
+    
+    func loadState(saveState: SaveState, dismiss: DismissAction) {
+        guard case .loaded(let core) = self.model.state else { return }
+        
+        Task {
+            let path = saveState.path(in: self.model.persistence)
+            let _ = await core.loadState(for: path)
+            await MainActor.run {
+                dismiss()
+            }
+        }
     }
 }

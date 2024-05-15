@@ -2,18 +2,19 @@ import SwiftUI
 
 struct SaveStateItem: View {
     @Environment(\.persistenceCoordinator) var persistence
-    
+    @Environment(\.dismiss) var dismiss
+
     var saveState: SaveState
-    var action: (SaveState) -> Void
+    var action: (SaveState, DismissAction) -> Void
     
-    init(saveState: SaveState, action: @escaping (SaveState) -> Void) {
+    init(saveState: SaveState, action: @escaping (SaveState, DismissAction) -> Void) {
         self.saveState = saveState
         self.action = action
     }
     
     var body: some View {
         Button {
-            self.action(self.saveState)
+            self.action(self.saveState, self.dismiss)
         } label: {
             VStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 8.0)

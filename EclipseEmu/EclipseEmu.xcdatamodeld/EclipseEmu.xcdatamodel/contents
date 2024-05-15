@@ -38,6 +38,6 @@
         <attribute name="isAuto" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="saveStates" inverseEntity="Game"/>
-        <relationship name="preview" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageAsset" inverseName="saveState" inverseEntity="ImageAsset"/>
+        <relationship name="preview" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAsset" inverseName="saveState" inverseEntity="ImageAsset"/>
     </entity>
 </model>
