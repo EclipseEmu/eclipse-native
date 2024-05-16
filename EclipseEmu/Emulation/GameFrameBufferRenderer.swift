@@ -3,6 +3,7 @@ import Metal
 import QuartzCore
 import simd
 import EclipseKit
+import CoreImage
 
 fileprivate struct FrameBuffer: ~Copyable {
     let buffer: UnsafeMutableRawPointer
@@ -209,5 +210,15 @@ final class GameFrameBufferRenderer {
         }
         
         commandBuffer.commit()
+    }
+    
+    func screenshot(colorSpace: CGColorSpace) -> CIImage? {
+        guard
+            let renderTexture,
+            let image = CIImage(mtlTexture: renderTexture, options: [.nearestSampling: true, .colorSpace: colorSpace])
+        else { return nil }
+        
+        return image
+            .transformed(by: .identity.scaledBy(x: 1, y: -1).translatedBy(x: 0, y: image.extent.size.height))
     }
 }

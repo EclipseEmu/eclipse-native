@@ -19,8 +19,7 @@ struct SaveStateItem: View {
             self.action(self.saveState, self.dismiss)
         } label: {
             VStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 8.0)
-                    .aspectRatio(1.5, contentMode: .fit)
+                ImageAssetView(asset: self.saveState.preview, cornerRadius: 8.0)
                 Text("\(self.saveState.isAuto ? "Automatic State" : saveState.name ?? "Unnamed State")")
                     .font(.subheadline)
                 Text("\(saveState.date, format: .dateTime)")
@@ -44,10 +43,7 @@ struct SaveStateItem: View {
     }
     
     func deleteSaveState() {
-        do {
-            try SaveStateManager.delete(saveState, in: persistence)
-        } catch {
-            print(error)
-        }
+        SaveStateManager.delete(saveState, in: persistence)
+        persistence.saveIfNeeded()
     }
 }

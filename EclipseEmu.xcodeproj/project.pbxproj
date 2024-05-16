@@ -14,6 +14,9 @@
 		920A7AE02BF446950055BC24 /* CheatItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7ADF2BF446950055BC24 /* CheatItemView.swift */; };
 		920A7AE22BF459F10055BC24 /* ImageAsset+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */; };
 		920A7AE42BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */; };
+		920A7AE62BF4F7020055BC24 /* ImageAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */; };
+		920A7AE82BF4F9E60055BC24 /* ImageAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */; };
+		920A7AEA2BF58FA50055BC24 /* EmptyStateViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE92BF58FA50055BC24 /* EmptyStateViewModifier.swift */; };
 		920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */; };
 		920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */; };
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
@@ -127,6 +130,9 @@
 		920A7ADF2BF446950055BC24 /* CheatItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheatItemView.swift; sourceTree = "<group>"; };
 		920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageAsset+CoreDataClass.swift"; sourceTree = "<group>"; };
 		920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageAsset+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAssetManager.swift; sourceTree = "<group>"; };
+		920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAssetView.swift; sourceTree = "<group>"; };
+		920A7AE92BF58FA50055BC24 /* EmptyStateViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateViewModifier.swift; sourceTree = "<group>"; };
 		920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatNavigationStack.swift; sourceTree = "<group>"; };
 		920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonotomicClock.swift; sourceTree = "<group>"; };
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
@@ -420,6 +426,7 @@
 				92A5F61B2BF0198A00DCC338 /* GameManager.swift */,
 				920A7AD82BF408EC0055BC24 /* CheatManager.swift */,
 				920A7AD62BF3E4250055BC24 /* SaveStateManager.swift */,
+				920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -470,6 +477,7 @@
 				92115C352BD435840020D62F /* MessageBlock.swift */,
 				92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */,
 				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
+				920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -483,6 +491,7 @@
 				92D5D3712BC0DF1700F1116C /* MD5.swift */,
 				927973182BEEB6FA008F2FE4 /* LazySplitIterator.swift */,
 				92BFB78C2BC188470093B2E3 /* PlayGameAction.swift */,
+				920A7AE92BF58FA50055BC24 /* EmptyStateViewModifier.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -664,6 +673,7 @@
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
 				920A7AE22BF459F10055BC24 /* ImageAsset+CoreDataClass.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
+				920A7AE62BF4F7020055BC24 /* ImageAssetManager.swift in Sources */,
 				92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
 				92A5F61C2BF0198A00DCC338 /* GameManager.swift in Sources */,
@@ -694,9 +704,11 @@
 				920A7AE02BF446950055BC24 /* CheatItemView.swift in Sources */,
 				92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */,
 				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
+				920A7AEA2BF58FA50055BC24 /* EmptyStateViewModifier.swift in Sources */,
 				920A7AE42BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift in Sources */,
 				92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */,
 				92BFB7922BC190C30093B2E3 /* AppIconView.swift in Sources */,
+				920A7AE82BF4F9E60055BC24 /* ImageAssetView.swift in Sources */,
 				9294E5E32BC1D0BE00B174E1 /* Touch.swift in Sources */,
 				92115C342BD3F2550020D62F /* ReorderControllersView.swift in Sources */,
 			);

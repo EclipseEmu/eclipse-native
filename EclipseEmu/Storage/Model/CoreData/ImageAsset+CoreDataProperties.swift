@@ -6,6 +6,7 @@ extension ImageAsset {
     }
 
     @NSManaged public var id: UUID
+    @NSManaged public var fileExtension: String?
 
     @NSManaged public var game: Game?
     @NSManaged public var saveState: ImageAsset?

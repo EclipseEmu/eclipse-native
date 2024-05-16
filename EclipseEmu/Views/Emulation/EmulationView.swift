@@ -105,8 +105,20 @@ final class EmulationViewModel: ObservableObject {
     }
     
     func sceneHidden() async {
-        guard case .loaded(let core) = self.state else { return }
+        guard 
+            case .loaded(let core) = self.state,
+            await core.state != .backgrounded
+        else { return }
+        
         await core.pause(reason: .backgrounded)
+        
+        guard await core.state == .backgrounded else { return }
+        
+        do {
+            try await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
+        } catch {
+            print("creating save state failed:", error)
+        }
     }
     
     func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void {
@@ -128,7 +140,6 @@ final class EmulationViewModel: ObservableObject {
         guard case .loaded(let core) = self.state else { return }
         
         Task {
-            
             // FIXME: show a message here
             do {
                 try await SaveStateManager.create(isAuto: isAuto, for: game, with: core, in: persistence)

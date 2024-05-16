@@ -16,24 +16,34 @@ enum SaveStateManager {
     }
     
     static func create(isAuto: Bool, for game: Game, with coreCoordinator: GameCoreCoordinator, in persistence: PersistenceCoordinator) async throws {
-        let saveState = SaveState(context: persistence.context)
+        var saveState: SaveState
+        if isAuto {
+            let request = SaveState.fetchRequest()
+            request.fetchLimit = 1
+            request.predicate = NSPredicate(format: "(isAuto == true) AND (game == %@)", game)
+            if let item = try? persistence.context.fetch(request).first {
+                saveState = item
+                if let preview = saveState.preview {
+                    persistence.context.delete(preview)
+                }
+            } else {
+                saveState = SaveState(context: persistence.context)
+            }
+        } else {
+            saveState = SaveState(context: persistence.context)
+        }
+        
         saveState.id = UUID()
         saveState.date = .now
         saveState.isAuto = isAuto
         saveState.game = game
         
+        let screenshot = await coreCoordinator.screenshot()
+        saveState.preview = try? ImageAssetManager.create(from: screenshot, in: persistence, save: false)
+        
         let saveStatePath = saveState.path(in: persistence)
         guard await coreCoordinator.saveState(to: saveStatePath) else {
             throw Failure.failedToCreateSaveState
-        }
-        
-        // delete older auto save states
-        if isAuto {
-            let deleteFetchRequest = SaveState.fetchRequest()
-            deleteFetchRequest.predicate = NSPredicate(format: "(isAuto == true) AND (game == %@) AND (id != %@)", game, saveState.id as NSUUID)
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetchRequest as! NSFetchRequest<any NSFetchRequestResult>)
-            deleteRequest.resultType = .resultTypeStatusOnly
-            let _ = try? persistence.context.execute(deleteRequest) as? NSBatchDeleteResult
         }
         
         persistence.save()
@@ -44,8 +54,7 @@ enum SaveStateManager {
         persistence.save()
     }
     
-    static func delete(_ saveState: SaveState, in persistence: PersistenceCoordinator) throws {
+    static func delete(_ saveState: SaveState, in persistence: PersistenceCoordinator) {
         persistence.context.delete(saveState)
-        persistence.save()
     }
 }

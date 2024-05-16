@@ -26,29 +26,27 @@ struct CheatsView: View {
     }
     
     var body: some View {
-        Group {
-            if self.cheats.count == 0 {
-                ScrollView {
-                    MessageBlock {
-                        Text("No Cheats")
-                            .fontWeight(.medium)
-                            .padding([.top, .horizontal], 8.0)
-                        Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .padding([.bottom, .horizontal], 8.0)
-                    }
-                }
-            } else {
-                List {
-                    ForEach(self.cheats) { cheat in
-                        CheatItemView(cheat: cheat, editingCheat: $editingCheat)
-                    }
-                    .onDelete(perform: self.deleteCheats)
-                    .onMove(perform: self.moveCheat)
+        List {
+            ForEach(self.cheats) { cheat in
+                CheatItemView(cheat: cheat, editingCheat: $editingCheat)
+            }
+            .onDelete(perform: self.deleteCheats)
+            .onMove(perform: self.moveCheat)
+        }
+        .emptyState(self.cheats.isEmpty) {
+            ScrollView {
+                MessageBlock {
+                    Text("No Cheats")
+                        .fontWeight(.medium)
+                        .padding([.top, .horizontal], 8.0)
+                    Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding([.bottom, .horizontal], 8.0)
                 }
             }
-        }.toolbar {
+        }
+        .toolbar {
             #if !os(macOS)
             ToolbarItem {
                 EditButton()
@@ -86,7 +84,7 @@ struct CheatsView: View {
         for (i, cheat) in cheatsArray.enumerated() {
             cheat.priority = Int16(truncatingIfNeeded: i)
         }
-        try? viewContext.save()
+        persistence.saveIfNeeded()
     }
     
     func deleteCheats(offsets: IndexSet) {
@@ -94,7 +92,7 @@ struct CheatsView: View {
             let cheat = cheats[index]
             try? CheatManager.delete(cheat: cheat, in: self.persistence, save: false)
         }
-        try? viewContext.save()
+        persistence.saveIfNeeded()
     }
 }
 

@@ -27,6 +27,7 @@
         <relationship name="saveStates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SaveState" inverseName="game" inverseEntity="SaveState"/>
     </entity>
     <entity name="ImageAsset" representedClassName="ImageAsset" syncable="YES">
+        <attribute name="fileExtension" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="boxart" inverseEntity="Game"/>
         <relationship name="saveState" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SaveState" inverseName="preview" inverseEntity="SaveState"/>

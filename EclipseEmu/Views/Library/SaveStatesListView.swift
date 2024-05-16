@@ -7,7 +7,7 @@ struct SaveStatesListView: View {
     ]
     
     @Environment(\.persistenceCoordinator) var persistence
-    @FetchRequest<SaveState>(sortDescriptors: Self.sortDescriptors) var saveStates: FetchedResults<SaveState>
+    @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: Self.sortDescriptors) var saveStates: SectionedFetchResults<Bool, SaveState>
     @State var isRenameDialogOpen = false
     @State var renameDialogText: String = ""
     @State var renameDialogTarget: SaveState?
@@ -23,12 +23,24 @@ struct SaveStatesListView: View {
         
         let request = SaveStateManager.listRequest(for: game, limit: nil)
         request.sortDescriptors = Self.sortDescriptors
-        self._saveStates = FetchRequest(fetchRequest: request)
+        self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
     }
     
     var body: some View {
         ScrollView {
-            if self.saveStates.count == 0 {
+            LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
+                ForEach(self.saveStates) { section in
+                    Section {
+                        ForEach(section) { saveState in
+                            SaveStateItem(saveState: saveState, action: self.action, renameDialogTarget: $renameDialogTarget)
+                        }
+                    } header: {
+                        SectionHeader(title: section.id ? "Automatic" : "Manual")
+                    }
+                }
+            }
+            .padding()
+            .emptyState(self.saveStates.isEmpty) {
                 MessageBlock {
                     Text("No Save States")
                         .fontWeight(.medium)
@@ -38,12 +50,6 @@ struct SaveStatesListView: View {
                         .foregroundStyle(.secondary)
                         .padding([.bottom, .horizontal], 8.0)
                 }
-            } else {
-                LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
-                    ForEach(self.saveStates) { saveState in
-                        SaveStateItem(saveState: saveState, action: self.action, renameDialogTarget: $renameDialogTarget)
-                    }
-                }.padding()
             }
         }
         .onChange(of: renameDialogTarget, perform: { saveState in
@@ -60,6 +66,7 @@ struct SaveStatesListView: View {
                 self.renameDialogText = ""
             }
             Button("Rename") {
+                print("rename")
                 guard let renameDialogTarget else { return }
                 SaveStateManager.rename(renameDialogTarget, to: renameDialogText, in: persistence)
                 self.renameDialogTarget = nil

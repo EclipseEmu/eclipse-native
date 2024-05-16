@@ -15,6 +15,6 @@ public class ImageAsset: NSManagedObject {
     }
     
     func path(in persistence: PersistenceCoordinator) -> URL {
-        return persistence.getPath(name: self.id.uuidString, fileExtension: nil, base: persistence.imageDirectory)
+        return persistence.getPath(name: self.id.uuidString, fileExtension: self.fileExtension, base: persistence.imageDirectory)
     }
 }

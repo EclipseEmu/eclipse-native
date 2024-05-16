@@ -5,6 +5,7 @@ import simd
 import EclipseKit
 import Combine
 import AVFoundation
+import CoreGraphics
 
 extension NSNotification.Name {
     static let EKGameCoreDidSave = NSNotification.Name.init("EKGameCoreDidSaveNotification")
@@ -18,8 +19,8 @@ final actor GameCoreCoordinator {
     enum State: UInt8, RawRepresentable {
         case stopped = 0
         case running = 1
-        case pendingUserInput = 2
-        case backgrounded = 3
+        case backgrounded = 2
+        case pendingUserInput = 3
         case paused = 4
     }
     
@@ -249,7 +250,7 @@ final actor GameCoreCoordinator {
     func loadState(for url: URL) -> Bool {
         return self.core.pointee.loadState(self.core.pointee.data, url.path)
     }
-
+    
     // MARK: Cheats
     
     /// - Parameter cheats: A list of cheats to add
@@ -382,5 +383,17 @@ final actor GameCoreCoordinator {
     
     func playerDisconnected(player: UInt8) {
         return self.core.pointee.playerDisconnected(self.core.pointee.data, player)
+    }
+    
+    // MARK: Screenshot
+    
+    func screenshot() -> CIImage {
+        let colorSpace = self.renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
+        print(colorSpace.name)
+        let result = switch self.renderer {
+        case .frameBuffer(let renderer):
+            renderer.screenshot(colorSpace: colorSpace)
+        }
+        return result ?? CIImage.black
     }
 }

@@ -38,7 +38,7 @@ struct CheatItemView: View {
             #endif
         }
         .onChange(of: cheat.enabled, perform: { newValue in
-            try? viewContext.save()
+            persistence.saveIfNeeded()
         })
         .contextMenu(ContextMenu(menuItems: {
             Button {
