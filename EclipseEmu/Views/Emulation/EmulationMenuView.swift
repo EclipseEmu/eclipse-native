@@ -213,13 +213,14 @@ struct EmulationMenuView: View {
         EmulationMenuView(
             model: .init(
                 coreInfo: .init(),
-                game: .init(context: PersistenceCoordinator.preview.container.viewContext), 
-                persistence: .preview,
+                game: .init(context: PersistenceCoordinator.preview.container.viewContext),
+                saveState: nil,
                 emulationData: .init(
                     romPath: URL(string: "/")!,
                     savePath: URL(string: "/")!,
                     cheats: .init()
-                )
+                ),
+                persistence: .preview
             ),
             menuButtonLayout: .init(
                 xOrigin: .leading,

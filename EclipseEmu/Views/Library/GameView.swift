@@ -3,10 +3,16 @@ import SwiftUI
 struct GameViewHeader: View {
     var game: Game
     var safeAreaTop: CGFloat
+    var play: () -> Void
     @Environment(\.dismiss) var dismiss
-    @Environment(\.playGame) var playGame
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.persistenceCoordinator) var persistence
+    
+    init(game: Game, safeAreaTop: CGFloat, play: @escaping () -> Void) {
+        self.game = game
+        self.safeAreaTop = safeAreaTop
+        self.play = play
+    }
 
     var body: some View {
         ZStack {
@@ -62,31 +68,59 @@ struct GameViewHeader: View {
             , alignment: .bottom
         )
     }
-    
-    func play() {
-        Task.detached {
-            do {
-                try await playGame(game: game, persistence: persistence)
-                await MainActor.run {
-                    dismiss()
-                }
-            } catch {
-                print("failed to launch game: \(error.localizedDescription)")
-            }
-        }
-    }
 }
 
 struct GameView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     var game: Game
     
+    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.playGame) var playGame
+
+    @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: SaveStatesListView.sortDescriptors) var saveStates
+    @State var isRenameSaveStateDialogOpen = false
+    @State var renameSaveStateDialogText: String = ""
+    @State var renameSaveStateDialogTarget: SaveState?
+    
+    init(game: Game) {
+        self.game = game
+        let request = SaveStateManager.listRequest(for: game, limit: 10)
+        request.sortDescriptors = SaveStatesListView.sortDescriptors
+        self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
+    }
+
     var body: some View {
         CompatNavigationStack {
             GeometryReader { geometry in
                 ScrollView {
-                    GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top)
-//                    SectionHeader(title: "Save States").padding([.horizontal, .top])
+                    GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top) {
+                        self.play(saveState: nil)
+                    }
+                    SectionHeader(title: "Save States").padding([.horizontal, .top])
+                    ScrollView(.horizontal) {
+                        LazyHStack {
+                            ForEach(self.saveStates) { section in
+                                ForEach(section) { saveState in
+                                    SaveStateItem(saveState: saveState, action: self.selectedSaveState, renameDialogTarget: $renameSaveStateDialogTarget)
+                                        .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
+                                }
+                                if section.id {
+                                    Divider()
+                                }
+                            }
+                        }.padding([.horizontal, .bottom])
+                    }
+                    .emptyState(self.saveStates.isEmpty) {
+                        MessageBlock {
+                            Text("No Save States")
+                                .fontWeight(.medium)
+                                .padding([.top, .horizontal], 8.0)
+                            Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .padding([.bottom, .horizontal], 8.0)
+                        }
+                    }
                     
                     LazyVStack(alignment: .leading) {
                         NavigationLink(destination: CheatsView(game: game)) {
@@ -116,6 +150,44 @@ struct GameView: View {
                 ToolbarItem(placement: DismissButton.placement) {
                     DismissButton()
                 }
+            }
+            .onChange(of: renameSaveStateDialogTarget, perform: { saveState in
+                if let saveState {
+                    self.renameSaveStateDialogText = saveState.name ?? ""
+                    self.isRenameSaveStateDialogOpen = true
+                } else {
+                    self.renameSaveStateDialogText = ""
+                }
+            })
+           .alert("Rename State", isPresented: $isRenameSaveStateDialogOpen) {
+                Button("Cancel", role: .cancel) {
+                    self.renameSaveStateDialogTarget = nil
+                    self.renameSaveStateDialogText = ""
+                }
+                Button("Rename") {
+                    print("rename")
+                    guard let renameSaveStateDialogTarget else { return }
+                    SaveStateManager.rename(renameSaveStateDialogTarget, to: renameSaveStateDialogText, in: persistence)
+                    self.renameSaveStateDialogTarget = nil
+                }
+                TextField("Save State Name", text: $renameSaveStateDialogText)
+            }
+        }
+    }
+    
+    func selectedSaveState(saveState: SaveState, dismissAction: DismissAction) {
+        self.play(saveState: saveState)
+    }
+    
+    func play(saveState: SaveState?) {
+        Task.detached {
+            do {
+                try await playGame(game: game, saveState: saveState, persistence: persistence)
+                await MainActor.run {
+                    dismiss()
+                }
+            } catch {
+                print("failed to launch game: \(error.localizedDescription)")
             }
         }
     }

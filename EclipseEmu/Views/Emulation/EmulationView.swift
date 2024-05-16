@@ -50,13 +50,15 @@ final class EmulationViewModel: ObservableObject {
     
     var coreInfo: GameCoreInfo
     var game: Game
+    var initialSaveState: SaveState?
     var persistence: PersistenceCoordinator
     var emulationData: GameManager.EmulationData
     
-    init(coreInfo: GameCoreInfo, game: Game, persistence: PersistenceCoordinator, emulationData: GameManager.EmulationData) {
+    init(coreInfo: GameCoreInfo, game: Game, saveState: SaveState?, emulationData: GameManager.EmulationData, persistence: PersistenceCoordinator) {
         self.coreInfo = coreInfo
         self.game = game
         self.persistence = persistence
+        self.initialSaveState = saveState
         self.emulationData = emulationData
     }
 
@@ -81,6 +83,10 @@ final class EmulationViewModel: ObservableObject {
             if let failedCheats = await core.setCheats(cheats: emulationData.cheats) {
                 // FIXME: figure out what to do with these
                 print("failed to set the following cheats:", failedCheats)
+            }
+            if let initialSaveState {
+                let _ = await core.loadState(for: initialSaveState.path(in: persistence))
+                self.initialSaveState = nil
             }
         } catch {
             await MainActor.run {

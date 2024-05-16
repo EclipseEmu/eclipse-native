@@ -67,7 +67,7 @@ struct GameKeepPlayingItem: View {
     func play() {
         Task.detached {
             do {
-                try await playGame(game: game, persistence: persistence)
+                try await playGame(game: game, saveState: nil, persistence: persistence)
             } catch {
                 print("failed to launch game: \(error.localizedDescription)")
             }
