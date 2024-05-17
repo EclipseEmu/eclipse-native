@@ -17,6 +17,10 @@ fileprivate struct GameManageCollectionItem: View {
                 Text(collection.name ?? "Collection")
             } icon: {
                 CollectionIconView(icon: collection.icon)
+                    .foregroundStyle(collection.parsedColor.color)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .fixedSize()
+                    .frame(width: 32, height: 32)
             }
             Spacer()
             Toggle("", isOn: $isSelected).labelsHidden()
