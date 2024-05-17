@@ -8,10 +8,6 @@
         <attribute name="type" attributeType="String"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="cheats" inverseEntity="Game"/>
     </entity>
-    <entity name="Collection" representedClassName="Collection" syncable="YES" codeGenerationType="class">
-        <attribute name="name" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Game" inverseName="collections" inverseEntity="Game"/>
-    </entity>
     <entity name="Game" representedClassName="Game" syncable="YES">
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="datePlayed" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -23,8 +19,15 @@
         <attribute name="system" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="boxart" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAsset" inverseName="game" inverseEntity="ImageAsset"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Cheat" inverseName="game" inverseEntity="Cheat"/>
-        <relationship name="collections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Collection" inverseName="games" inverseEntity="Collection"/>
+        <relationship name="collections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameCollection" inverseName="games" inverseEntity="GameCollection"/>
         <relationship name="saveStates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SaveState" inverseName="game" inverseEntity="SaveState"/>
+    </entity>
+    <entity name="GameCollection" representedClassName="GameCollection" syncable="YES" codeGenerationType="class">
+        <attribute name="color" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="iconContent" optional="YES" attributeType="String"/>
+        <attribute name="iconKind" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Game" inverseName="collections" inverseEntity="Game"/>
     </entity>
     <entity name="ImageAsset" representedClassName="ImageAsset" syncable="YES">
         <attribute name="fileExtension" optional="YES" attributeType="String"/>

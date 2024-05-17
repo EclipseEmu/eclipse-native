@@ -27,6 +27,7 @@ struct LibraryView: View {
     @State var selectedGame: Game? = nil
     @State var isRomPickerOpen: Bool = false
     @State var isSettingsOpen = false
+    @State var isCreateCollectionOpen = false
     @State var isUnknownSystemDialogShown = false
     @State var isTargeted = false
     
@@ -36,72 +37,114 @@ struct LibraryView: View {
     private var recentlyPlayed: FetchedResults<Game>
 
     @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)],
+        animation: .default)
+    private var collections: FetchedResults<GameCollection>
+
+    @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Game.name, ascending: true)],
         animation: .default)
     private var games: FetchedResults<Game>
     
+    var collectionsSection: some View {
+        Section {
+            LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
+                ForEach(collections) { collection in
+                    NavigationLink {
+                        GameCollectionView(collection: collection)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            CollectionIconView(icon: collection.icon)
+                                .aspectRatio(1.0, contentMode: .fit)
+                                .fixedSize()
+                                .frame(width: 32, height: 32)
+                                .padding(.bottom, 8.0)
+                            
+                            Text(collection.name ?? "Unnamed Collection")
+                                .fontWeight(.medium)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(1)
+                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .backgroundGradient(color: collection.parsedColor.color)
+                        .clipShape(RoundedRectangle(cornerRadius: 16.0))
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            CollectionManager.delete(collection, in: persistence)
+                        } label: {
+                            Label("Delete Collection", systemImage: "trash")
+                        }
+                    }
+                }
+            }
+            .padding([.horizontal, .bottom])
+        } header: {
+            SectionHeader("Collections").padding([.horizontal, .top])
+        }
+        .emptyState(collections.isEmpty) {
+            EmptyView()
+        }
+    }
+    
     var body: some View {
         CompatNavigationStack {
             ScrollView {
-                if recentlyPlayed.count != 0 {
-                    VStack(alignment: .leading, spacing: 0.0) {
-                        SectionHeader(title: "Keep Playing")
-                            .padding([.horizontal, .top])
-                        
+                if !games.isEmpty {
+                    Section {
                         ScrollView(.horizontal) {
                             LazyHStack(alignment: .top, spacing: 16.0) {
                                 ForEach(recentlyPlayed) { item in
                                     GameKeepPlayingItem(game: item, selectedGame: $selectedGame)
                                 }
-                            }.padding()
+                            }
+                            .padding([.horizontal, .bottom])
                         }
+                        .emptyMessage(self.recentlyPlayed.isEmpty) {
+                            Text("No Played Games")
+                        } message: {
+                            Text("As you play games, they'll show up here so you can quickly jump back in.")
+                        }
+                    } header: {
+                        SectionHeader("Keep Playing")
+                            .padding([.horizontal, .top])
                     }
                 }
                 
-                HStack {
-                    SectionHeader(title: "All Games")
-                    Spacer()
-                    Menu {
-                        Menu("Sort") {
-                            Text("Name")
-                            Text("Date Added")
-                        }
-                    } label: {
-                        Label("Sort & Filter", systemImage: "line.3.horizontal.decrease")
-                    }
-                    .labelStyle(.iconOnly)
-                    .menuStyle(.borderlessButton)
-                    .menuIndicator(.hidden)
-                    .fixedSize()
-                }.padding([.horizontal, .top])
+                self.collectionsSection
                 
-                LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
-                    ForEach(games) { item in
-                        GameGridItem(game: item, selectedGame: $selectedGame)
+                Section {
+                    GameGrid(games: self.games, selectedGame: $selectedGame)
+                        .padding([.horizontal, .bottom])
+                        .emptyMessage(self.games.isEmpty) {
+                            Text("No Games")
+                        } message: {
+                            Text("You haven't added any games to your library. Use the \(Image(systemName: "plus")) button in the navigation bar to add games.")
+                        }
+                } header: {
+                    SectionHeader("All Games") {
+                        Menu {
+                            Menu("Sort") {
+                                Text("Name")
+                                Text("Date Added")
+                            }
+                        } label: {
+                            Label("Sort & Filter", systemImage: "line.3.horizontal.decrease")
+                        }
+                        .labelStyle(.iconOnly)
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
+                        .fixedSize()
                     }
-                }
-                .padding([.horizontal, .bottom])
-                .emptyState(self.games.isEmpty) {
-                    MessageBlock {
-                        Text("No Games")
-                            .fontWeight(.medium)
-                            .padding([.top, .horizontal], 8.0)
-                        Text("You haven't added any games to your library. Use the \(Image(systemName: "plus")) button to add games.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .padding([.bottom, .horizontal], 8.0)
-                    }
+                    .padding([.horizontal, .top])
                 }
             }
             .navigationTitle("Library")
             .searchable(text: $searchQuery)
             .fileImporter(isPresented: $isRomPickerOpen, allowedContentTypes: Self.romFileTypes, onCompletion: self.fileImported)
-            .alert(isPresented: $isUnknownSystemDialogShown, content: {
-                Alert(
-                    title: Text("Failed to add game"),
-                    message: Text("The game you tried to upload has an invalid file type and is not supported by Eclipse.")
-                )
-            })
             .toolbar {
                 ToolbarItem(placement: .navigation) {
                     Button {
@@ -111,10 +154,19 @@ struct LibraryView: View {
                     }
                 }
                 ToolbarItem {
-                    Button {
-                        self.isRomPickerOpen = true
+                    Menu {
+                        Button {
+                            self.isRomPickerOpen = true
+                        } label: {
+                            Label("Game", systemImage: "app.dashed")
+                        }
+                        Button {
+                            self.isCreateCollectionOpen = true
+                        } label: {
+                            Label("Collection", systemImage: "square.on.square")
+                        }
                     } label: {
-                        Label("Add Game", systemImage: "plus")
+                        Label("Add", systemImage: "plus")
                     }
                 }
             }
@@ -133,6 +185,18 @@ struct LibraryView: View {
                     .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
                 #endif
             }
+            .sheet(isPresented: $isCreateCollectionOpen) {
+                NewCollectionView()
+                #if os(macOS)
+                    .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
+                #endif
+            }
+            .alert(isPresented: $isUnknownSystemDialogShown, content: {
+                Alert(
+                    title: Text("Failed to add game"),
+                    message: Text("The game you tried to upload has an invalid file type and is not supported by Eclipse.")
+                )
+            })
         }
     }
     

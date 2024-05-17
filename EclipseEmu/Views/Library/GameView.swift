@@ -96,7 +96,8 @@ struct GameView: View {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top) {
                         self.play(saveState: nil)
                     }
-                    SectionHeader(title: "Save States").padding([.horizontal, .top])
+                    SectionHeader("Save States")
+                        .padding([.horizontal, .top])
                     ScrollView(.horizontal) {
                         LazyHStack {
                             ForEach(self.saveStates) { section in
@@ -110,36 +111,25 @@ struct GameView: View {
                             }
                         }.padding([.horizontal, .bottom])
                     }
-                    .emptyState(self.saveStates.isEmpty) {
-                        MessageBlock {
-                            Text("No Save States")
-                                .fontWeight(.medium)
-                                .padding([.top, .horizontal], 8.0)
-                            Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .padding([.bottom, .horizontal], 8.0)
-                        }
+                    .emptyMessage(self.saveStates.isEmpty) {
+                        Text("No Save States")
+                    } message: {
+                        Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
                     }
                     
                     LazyVStack(alignment: .leading) {
-                        NavigationLink(destination: CheatsView(game: game)) {
+                        NavigationLink {
+                            CheatsView(game: game)
+                        } label: {
                             Label("Cheats", systemImage: "doc.badge.gearshape")
-                                .padding()
                         }
-                        .modify {
-                            if #available(iOS 17.0, macOS 14.0, *) {
-                                $0.background(.background.secondary)
-                            } else {
-#if canImport(UIKit)
-                                $0.background(Color(uiColor: .secondarySystemGroupedBackground))
-#elseif canImport(AppKit)
-                                $0.background(Color(nsColor: .underPageBackgroundColor))
-#endif
-                            }
+                        Divider()
+                        NavigationLink {
+                            GameManageCollectionsView(game: game)
+                        } label: {
+                            Label("Manage Collections", systemImage: "square.on.square")
                         }
-                        .padding(.all)
-                    }
+                    }.padding()
                 }
                 .ignoresSafeArea(edges: .top)
             }

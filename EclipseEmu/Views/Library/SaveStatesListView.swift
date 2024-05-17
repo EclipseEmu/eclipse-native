@@ -35,21 +35,15 @@ struct SaveStatesListView: View {
                             SaveStateItem(saveState: saveState, action: self.action, renameDialogTarget: $renameDialogTarget)
                         }
                     } header: {
-                        SectionHeader(title: section.id ? "Automatic" : "Manual")
+                        SectionHeader(section.id ? "Automatic" : "Manual")
                     }
                 }
             }
             .padding()
-            .emptyState(self.saveStates.isEmpty) {
-                MessageBlock {
-                    Text("No Save States")
-                        .fontWeight(.medium)
-                        .padding([.top, .horizontal], 8.0)
-                    Text("You haven't made any save states for \(game.name ?? "this game"). Use the \"Save State\" button in the emulation menu to create some.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding([.bottom, .horizontal], 8.0)
-                }
+            .emptyMessage(self.saveStates.isEmpty) {
+                Text("No Save States")
+            } message: {
+                Text("You haven't made any save states for \(game.name ?? "this game"). Use the \"Save State\" button in the emulation menu to create some.")
             }
         }
         .onChange(of: renameDialogTarget, perform: { saveState in
@@ -60,7 +54,7 @@ struct SaveStatesListView: View {
                 self.renameDialogText = ""
             }
         })
-        .alert("Rename Save State", isPresented: $isRenameDialogOpen) {
+        .alert("Rename State", isPresented: $isRenameDialogOpen) {
             Button("Cancel", role: .cancel) {
                 self.renameDialogTarget = nil
                 self.renameDialogText = ""
@@ -71,7 +65,7 @@ struct SaveStatesListView: View {
                 SaveStateManager.rename(renameDialogTarget, to: renameDialogText, in: persistence)
                 self.renameDialogTarget = nil
             }
-            TextField("Save State Name", text: $renameDialogText)
+            TextField("State Name", text: $renameDialogText)
         }
         .modify {
             if haveDismissButton {

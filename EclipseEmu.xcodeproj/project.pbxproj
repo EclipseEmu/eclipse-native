@@ -17,6 +17,13 @@
 		920A7AE62BF4F7020055BC24 /* ImageAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */; };
 		920A7AE82BF4F9E60055BC24 /* ImageAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */; };
 		920A7AEA2BF58FA50055BC24 /* EmptyStateViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AE92BF58FA50055BC24 /* EmptyStateViewModifier.swift */; };
+		920A7AEC2BF65C1A0055BC24 /* CollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AEB2BF65C1A0055BC24 /* CollectionManager.swift */; };
+		920A7AEE2BF68E0C0055BC24 /* NewCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AED2BF68E0C0055BC24 /* NewCollectionView.swift */; };
+		920A7AF02BF6E6D80055BC24 /* GameCollection+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AEF2BF6E6D80055BC24 /* GameCollection+Extension.swift */; };
+		920A7AF22BF6F62B0055BC24 /* CollectionIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AF12BF6F62B0055BC24 /* CollectionIconView.swift */; };
+		920A7AF42BF700CC0055BC24 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AF32BF700CC0055BC24 /* CollectionView.swift */; };
+		920A7AF62BF7012D0055BC24 /* GameGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AF52BF7012D0055BC24 /* GameGrid.swift */; };
+		920A7AF82BF7050E0055BC24 /* GameManageCollectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920A7AF72BF7050E0055BC24 /* GameManageCollectionsView.swift */; };
 		920BB5DA2BD8988100392FFA /* CompatNavigationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */; };
 		920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */; };
 		92115C302BD33A9E0020D62F /* GameInputCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */; };
@@ -133,6 +140,13 @@
 		920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAssetManager.swift; sourceTree = "<group>"; };
 		920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAssetView.swift; sourceTree = "<group>"; };
 		920A7AE92BF58FA50055BC24 /* EmptyStateViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateViewModifier.swift; sourceTree = "<group>"; };
+		920A7AEB2BF65C1A0055BC24 /* CollectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionManager.swift; sourceTree = "<group>"; };
+		920A7AED2BF68E0C0055BC24 /* NewCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCollectionView.swift; sourceTree = "<group>"; };
+		920A7AEF2BF6E6D80055BC24 /* GameCollection+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameCollection+Extension.swift"; sourceTree = "<group>"; };
+		920A7AF12BF6F62B0055BC24 /* CollectionIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionIconView.swift; sourceTree = "<group>"; };
+		920A7AF32BF700CC0055BC24 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
+		920A7AF52BF7012D0055BC24 /* GameGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameGrid.swift; sourceTree = "<group>"; };
+		920A7AF72BF7050E0055BC24 /* GameManageCollectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManageCollectionsView.swift; sourceTree = "<group>"; };
 		920BB5D92BD8988100392FFA /* CompatNavigationStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatNavigationStack.swift; sourceTree = "<group>"; };
 		920BB5DB2BD95D8D00392FFA /* MonotomicClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonotomicClock.swift; sourceTree = "<group>"; };
 		92115C2F2BD33A9E0020D62F /* GameInputCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameInputCoordinator.swift; sourceTree = "<group>"; };
@@ -239,6 +253,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		920A7AF92BF706EA0055BC24 /* Collections */ = {
+			isa = PBXGroup;
+			children = (
+				920A7AED2BF68E0C0055BC24 /* NewCollectionView.swift */,
+				920A7AF32BF700CC0055BC24 /* CollectionView.swift */,
+				920A7AF72BF7050E0055BC24 /* GameManageCollectionsView.swift */,
+			);
+			path = Collections;
+			sourceTree = "<group>";
+		};
 		922358122BE15AFA0014BFFA /* Emulation */ = {
 			isa = PBXGroup;
 			children = (
@@ -345,6 +369,7 @@
 				920A7ADC2BF426240055BC24 /* SaveState+CoreDataProperties.swift */,
 				920A7AE12BF459F10055BC24 /* ImageAsset+CoreDataClass.swift */,
 				920A7AE32BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift */,
+				920A7AEF2BF6E6D80055BC24 /* GameCollection+Extension.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -382,6 +407,7 @@
 		9294E5D62BC1A72900B174E1 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				920A7AF92BF706EA0055BC24 /* Collections */,
 				922F00AB2BC0C26600B419D7 /* LibraryView.swift */,
 				92D5D72A2BC1723700659C37 /* GameView.swift */,
 				9279730B2BE9B3F7008F2FE4 /* CheatsView.swift */,
@@ -427,6 +453,7 @@
 				920A7AD82BF408EC0055BC24 /* CheatManager.swift */,
 				920A7AD62BF3E4250055BC24 /* SaveStateManager.swift */,
 				920A7AE52BF4F7020055BC24 /* ImageAssetManager.swift */,
+				920A7AEB2BF65C1A0055BC24 /* CollectionManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -478,6 +505,8 @@
 				92A5F6332BF2BD0A00DCC338 /* SaveStateItem.swift */,
 				92D5D7232BC1003B00659C37 /* SectionHeader.swift */,
 				920A7AE72BF4F9E60055BC24 /* ImageAssetView.swift */,
+				920A7AF12BF6F62B0055BC24 /* CollectionIconView.swift */,
+				920A7AF52BF7012D0055BC24 /* GameGrid.swift */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -646,6 +675,7 @@
 				920A7AD72BF3E4250055BC24 /* SaveStateManager.swift in Sources */,
 				922D78962BC23D5900695252 /* TouchControlsView.swift in Sources */,
 				92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */,
+				920A7AF22BF6F62B0055BC24 /* CollectionIconView.swift in Sources */,
 				922F00D52BC0C2EB00B419D7 /* System.swift in Sources */,
 				9279730C2BE9B3F7008F2FE4 /* CheatsView.swift in Sources */,
 				9294E5E92BC1D82000B174E1 /* Bindings.swift in Sources */,
@@ -673,6 +703,7 @@
 				925B14F02BCACA0900AD7257 /* MTLPixelFormat+Extension.swift in Sources */,
 				920A7AE22BF459F10055BC24 /* ImageAsset+CoreDataClass.swift in Sources */,
 				920BB5DC2BD95D8D00392FFA /* MonotomicClock.swift in Sources */,
+				920A7AF62BF7012D0055BC24 /* GameGrid.swift in Sources */,
 				920A7AE62BF4F7020055BC24 /* ImageAssetManager.swift in Sources */,
 				92A5F6142BEF123800DCC338 /* Data+Extension.swift in Sources */,
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
@@ -681,10 +712,12 @@
 				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,
 				922F00AC2BC0C26600B419D7 /* LibraryView.swift in Sources */,
 				922F00AA2BC0C26600B419D7 /* EclipseEmu.xcdatamodeld in Sources */,
+				920A7AEE2BF68E0C0055BC24 /* NewCollectionView.swift in Sources */,
 				9294E5DC2BC1A9AB00B174E1 /* SettingsBackupsView.swift in Sources */,
 				922358112BE15AF20014BFFA /* EmulationView.swift in Sources */,
 				927973102BEAB373008F2FE4 /* CheatCodeField.swift in Sources */,
 				92D5D7282BC103BC00659C37 /* SettingsView.swift in Sources */,
+				920A7AEC2BF65C1A0055BC24 /* CollectionManager.swift in Sources */,
 				9294E5E72BC1D6EF00B174E1 /* Gamepad.swift in Sources */,
 				92D5D7222BC0FFC100659C37 /* GameKeepPlayingItem.swift in Sources */,
 				92A5F6162BEFEFF300DCC338 /* PersistenceCoordinator.swift in Sources */,
@@ -693,6 +726,7 @@
 				92D5D72B2BC1723700659C37 /* GameView.swift in Sources */,
 				9281CCB02BCDD76F00E4FE48 /* AVAudioCommonFormat+Extension.swift in Sources */,
 				922358142BE15ECE0014BFFA /* GameScreenView.swift in Sources */,
+				920A7AF02BF6E6D80055BC24 /* GameCollection+Extension.swift in Sources */,
 				925B14EE2BCA487F00AD7257 /* ExpressibleByIntegerLiteral+Extension.swift in Sources */,
 				92D5D7312BC17C2800659C37 /* DismissButton.swift in Sources */,
 				92115C322BD366ED0020D62F /* Box.swift in Sources */,
@@ -702,7 +736,9 @@
 				928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */,
 				922F00D92BC0C75000B419D7 /* Game+CoreDataClass.swift in Sources */,
 				920A7AE02BF446950055BC24 /* CheatItemView.swift in Sources */,
+				920A7AF82BF7050E0055BC24 /* GameManageCollectionsView.swift in Sources */,
 				92A5F62C2BF27BCE00DCC338 /* SaveStatesListView.swift in Sources */,
+				920A7AF42BF700CC0055BC24 /* CollectionView.swift in Sources */,
 				92CC9CFF2BC3983A00D668DB /* FrameBuffer.metal in Sources */,
 				920A7AEA2BF58FA50055BC24 /* EmptyStateViewModifier.swift in Sources */,
 				920A7AE42BF45C3B0055BC24 /* ImageAsset+CoreDataProperties.swift in Sources */,

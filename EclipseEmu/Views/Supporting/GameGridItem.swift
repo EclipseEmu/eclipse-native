@@ -21,7 +21,7 @@ struct GameGridItem: View {
                 }
             }
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
         .contextMenu(menuItems: {
             Button(role: .destructive, action: self.deleteGame) {
                 Label("Delete Game", systemImage: "trash")

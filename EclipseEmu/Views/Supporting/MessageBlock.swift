@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MessageBlock<Content: View>: View {
-    var content: () -> Content
+    let content: () -> Content
     
     init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
@@ -11,26 +11,12 @@ struct MessageBlock<Content: View>: View {
         VStack {
             self.content()
         }
-            .padding()
-            .frame(minWidth: 0, maxWidth: .infinity)
-            .modify {
-                #if canImport(UIKit)
-                if #available(iOS 17.0, macOS 14.0, *) {
-                    $0.background(.background.secondary)
-                } else {
-                    $0.background(Color(uiColor: .secondarySystemBackground))
-                }
-                #else
-                if #available(macOS 14.0, *) {
-                    $0.background(Color(nsColor: .tertiarySystemFill))
-                } else {
-                    $0.background(Color(nsColor: .gridColor))
-                }
-                #endif
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-            .multilineTextAlignment(.center)
-            .padding(.horizontal)
+        .padding()
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .backgroundSecondary()
+        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+        .multilineTextAlignment(.center)
+        .padding(.horizontal)
     }
 }
 
