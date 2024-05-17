@@ -10,6 +10,12 @@ enum CollectionManager {
         return request
     }
     
+    static func searchPredicate(collection: GameCollection, query: String) -> NSPredicate {
+        return query.isEmpty
+            ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
+            : NSPredicate(format: "(%K CONTAINS %@) AND (name CONTAINS %@)", #keyPath(Game.collections), collection, query)
+    }
+    
     static func create(name: String, icon: GameCollection.Icon, color: GameCollection.Color, in persistence: PersistenceCoordinator) {
         let collection = GameCollection(context: persistence.context)
         collection.name = name

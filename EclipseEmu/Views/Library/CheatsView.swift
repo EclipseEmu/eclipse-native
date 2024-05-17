@@ -35,14 +35,10 @@ struct CheatsView: View {
         }
         .emptyState(self.cheats.isEmpty) {
             ScrollView {
-                MessageBlock {
+                EmptyMessage {
                     Text("No Cheats")
-                        .fontWeight(.medium)
-                        .padding([.top, .horizontal], 8.0)
+                } message: {
                     Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding([.bottom, .horizontal], 8.0)
                 }
             }
         }

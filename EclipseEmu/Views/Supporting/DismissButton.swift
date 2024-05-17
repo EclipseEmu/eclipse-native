@@ -3,21 +3,13 @@ import SwiftUI
 struct DismissButton: View {
     @Environment(\.dismiss) var dismiss
     
-    static var placement: ToolbarItemPlacement = {
-        #if os(macOS)
-        .primaryAction
-        #elseif os(iOS)
-        .topBarTrailing
-        #else
-        #error("unimplemented")
-        #endif
-    }()
+    static var placement: ToolbarItemPlacement = .cancellationAction
     
     var body: some View {
         Button {
             dismiss()
         } label: {
-            Label("Close", systemImage: "xmark")
+            Label("Cancel", systemImage: "xmark")
         }
         .labelStyle(.iconOnly)
         .buttonStyle(.bordered)

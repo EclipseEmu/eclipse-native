@@ -14,21 +14,17 @@ struct EmptyStateViewModifier<EmptyContent>: ViewModifier where EmptyContent: Vi
 }
 
 extension View {
+    func isHidden(_ isEmpty: Bool) -> some View {
+        modifier(EmptyStateViewModifier(isEmpty: isEmpty, emptyContent: { EmptyView() }))
+    }
+    
     func emptyState<EmptyContent>(_ isEmpty: Bool, emptyContent: @escaping () -> EmptyContent) -> some View where EmptyContent: View {
         modifier(EmptyStateViewModifier(isEmpty: isEmpty, emptyContent: emptyContent))
     }
     
     func emptyMessage(_ isEmpty: Bool, title: @escaping () -> Text, message: @escaping () -> Text) -> some View {
         modifier(EmptyStateViewModifier(isEmpty: isEmpty, emptyContent: {
-            MessageBlock {
-                title()
-                    .fontWeight(.medium)
-                    .padding([.top, .horizontal], 8.0)
-                message()
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding([.bottom, .horizontal], 8.0)
-            }
+            EmptyMessage(title: title, message: message) 
         }))
     }
 }

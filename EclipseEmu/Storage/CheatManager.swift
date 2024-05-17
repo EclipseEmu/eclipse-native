@@ -3,7 +3,7 @@ import CoreData
 enum CheatManager {
     static func listRequest(for game: Game) -> NSFetchRequest<Cheat> {
         let request = Cheat.fetchRequest()
-        request.predicate = NSPredicate(format: "game = %@", game)
+        request.predicate = NSPredicate(format: "game == %@", game)
         request.includesSubentities = false
         return request
     }

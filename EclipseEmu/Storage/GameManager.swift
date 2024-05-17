@@ -3,15 +3,25 @@ import CoreData
 import EclipseKit
 
 enum GameManager {
-    enum Failure: Error {
+    enum Failure: LocalizedError {
         case failedToAccessSecurityScopedResource
         case failedToGetRomPath
+        case failedToGetReadPermissions
+        case unknownFileType
     }
-    
+
     struct EmulationData {
         let romPath: URL
         let savePath: URL
         let cheats: Set<Cheat>
+    }
+    
+    static func recentlyPlayedRequest() -> NSFetchRequest<Game> {
+        let request = Game.fetchRequest()
+        request.fetchLimit = 10
+        request.predicate = NSPredicate(format: "datePlayed != nil")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Game.datePlayed, ascending: false)]
+        return request
     }
     
     static func insert(name: String, system: GameSystem, romPath: URL, romExtension: String?, in persistence: PersistenceCoordinator) async throws {

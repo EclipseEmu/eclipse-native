@@ -119,7 +119,9 @@ struct NewCollectionView: View {
                 }
             }
             .navigationTitle("New Collection")
+            #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     DismissButton()
