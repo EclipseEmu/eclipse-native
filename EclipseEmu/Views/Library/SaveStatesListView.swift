@@ -8,8 +8,6 @@ struct SaveStatesListView: View {
     
     @Environment(\.persistenceCoordinator) var persistence
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: Self.sortDescriptors) var saveStates: SectionedFetchResults<Bool, SaveState>
-    @State var isRenameDialogOpen = false
-    @State var renameDialogText: String = ""
     @State var renameDialogTarget: SaveState?
     
     var game: Game
@@ -46,27 +44,7 @@ struct SaveStatesListView: View {
                 Text("You haven't made any save states for \(game.name ?? "this game"). Use the \"Save State\" button in the emulation menu to create some.")
             }
         }
-        .onChange(of: renameDialogTarget, perform: { saveState in
-            if let saveState {
-                self.renameDialogText = saveState.name ?? ""
-                self.isRenameDialogOpen = true
-            } else {
-                self.renameDialogText = ""
-            }
-        })
-        .alert("Rename State", isPresented: $isRenameDialogOpen) {
-            Button("Cancel", role: .cancel) {
-                self.renameDialogTarget = nil
-                self.renameDialogText = ""
-            }
-            Button("Rename") {
-                print("rename")
-                guard let renameDialogTarget else { return }
-                SaveStateManager.rename(renameDialogTarget, to: renameDialogText, in: persistence)
-                self.renameDialogTarget = nil
-            }
-            TextField("State Name", text: $renameDialogText)
-        }
+        .renameAlert($renameDialogTarget, key: \.name, title: "Rename State", placeholder: "State Name", onChange: self.rename)
         .modify {
             if haveDismissButton {
                 $0.toolbar {
@@ -78,5 +56,9 @@ struct SaveStatesListView: View {
                 $0
             }
         }
+    }
+    
+    func rename(saveState: SaveState, newName: String) {
+        SaveStateManager.rename(saveState, to: newName, in: persistence)
     }
 }

@@ -1,15 +1,16 @@
 import SwiftUI
 
-struct GamePicker<ActionContent: View>: View {
+struct GamePicker: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.persistenceCoordinator) var persistence
     @FetchRequest<Game>(sortDescriptors: [NSSortDescriptor(keyPath: \Game.name, ascending: true)])
     var games: FetchedResults<Game>
-    
-    let actionContent: (Game) -> ActionContent
+    @ObservedObject var collection: GameCollection
     
     @State var searchQuery: String = ""
 
     var body: some View {
+        let _ = Self._printChanges()
         CompatNavigationStack {
             List(games) { game in
                 HStack(spacing: 12.0) {
@@ -24,9 +25,19 @@ struct GamePicker<ActionContent: View>: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
+                    
                     Spacer()
-                    actionContent(game)
-                }
+                    
+                    Button(action: { self.toggleGame(game: game) }) {
+                        if isGameInCollection(game: game) {
+                            Label("Remove Game", systemImage: "minus.circle")
+                                .labelStyle(.iconOnly)
+                        } else {
+                            Label("Add Game", systemImage: "plus.circle")
+                                .labelStyle(.iconOnly)
+                        }
+                    }
+                }.id(game.id)
             }
             .emptyState(games.isEmpty) {
                 ScrollView {
@@ -60,6 +71,21 @@ struct GamePicker<ActionContent: View>: View {
             }
         }
     }
+    
+    @inlinable
+    func isGameInCollection(game: Game) -> Bool {
+        guard !game.isDeleted else { return false }
+        return game.collections?.contains(self.collection) ?? false
+    }
+    
+    func toggleGame(game: Game) {
+        if isGameInCollection(game: game) {
+            collection.removeFromGames(game)
+        } else {
+            collection.addToGames(game)
+        }
+        persistence.saveIfNeeded()
+    }
 }
 
 #Preview {
@@ -68,14 +94,12 @@ struct GamePicker<ActionContent: View>: View {
     game.id = UUID()
     game.system = .gba
     game.name = "My Game"
+    let collection = GameCollection(context: context)
+    collection.name = "Foobar"
+    collection.icon = .symbol("list.bullet")
+    collection.color = GameCollection.Color.blue.rawValue
+    collection.addToGames(game)
     
-    return GamePicker { game in
-        Button {
-            print(game)
-        } label: {
-            Label("Add Game", systemImage: "plus")
-                .labelStyle(.iconOnly)
-        }
-    }
-    .environment(\.managedObjectContext, context)
+    return GamePicker(collection: collection)
+        .environment(\.managedObjectContext, context)
 }

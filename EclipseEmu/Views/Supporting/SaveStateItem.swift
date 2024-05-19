@@ -4,7 +4,7 @@ struct SaveStateItem: View {
     @Environment(\.persistenceCoordinator) var persistence
     @Environment(\.dismiss) var dismiss
 
-    var saveState: SaveState
+    @ObservedObject var saveState: SaveState
     var action: (SaveState, DismissAction) -> Void
     @Binding var renameDialogTarget: SaveState?
 

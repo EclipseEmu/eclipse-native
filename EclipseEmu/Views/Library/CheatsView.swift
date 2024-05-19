@@ -6,7 +6,7 @@ import Combine
 struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
     
-    var game: Game
+    @ObservedObject var game: Game
     let cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
     @Environment(\.managedObjectContext) var viewContext
     @Environment(\.persistenceCoordinator) var persistence

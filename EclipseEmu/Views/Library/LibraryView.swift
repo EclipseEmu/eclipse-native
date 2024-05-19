@@ -137,7 +137,7 @@ struct LibraryView: View {
                 #endif
             }
             .sheet(isPresented: $isCreateCollectionOpen) {
-                NewCollectionView()
+                EditCollectionView()
                 #if os(macOS)
                     .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
                 #endif

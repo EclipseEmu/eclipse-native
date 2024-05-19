@@ -83,10 +83,12 @@ final class PersistenceCoordinator {
     // MARK: Core Data helpers
     
     func save() {
-        do {
-            try context.save()
-        } catch {
-            print("CoreData save failure: \(error.localizedDescription)")
+        Task { @MainActor in
+            do {
+                try context.save()
+            } catch {
+                print("CoreData save failure: \(error.localizedDescription)")
+            }
         }
     }
     

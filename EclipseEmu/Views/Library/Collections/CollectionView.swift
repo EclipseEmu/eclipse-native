@@ -9,7 +9,9 @@ struct GameCollectionView: View {
     @State var selectedGame: Game?
     @State var isGamePickerPresented: Bool = false
     @State var searchQuery: String = ""
-    let collection: GameCollection
+    @State var isEditCollectionOpen: Bool = false
+    
+    @ObservedObject var collection: GameCollection
 
     init(collection: GameCollection) {
         self.collection = collection
@@ -33,17 +35,7 @@ struct GameCollectionView: View {
             games.nsPredicate = CollectionManager.searchPredicate(collection: collection, query: newValue)
         }
         .sheet(isPresented: $isGamePickerPresented) {
-            GamePicker { game in
-                Button(action: { self.toggleGame(game: game) }) {
-                    if isGameInCollection(game: game) {
-                        Label("Remove Game", systemImage: "minus.circle")
-                            .labelStyle(.iconOnly)
-                    } else {
-                        Label("Add Game", systemImage: "plus.circle")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-            }
+            GamePicker(collection: self.collection)
         }
         .sheet(item: $selectedGame) { game in
             GameView(game: game)
@@ -55,6 +47,12 @@ struct GameCollectionView: View {
         .toolbar {
             ToolbarItem {
                 Menu {
+                    Button {
+                        self.isEditCollectionOpen = true
+                    } label: {
+                        Label("Edit Info", systemImage: "rectangle.and.pencil.and.ellipsis")
+                    }
+                    
                     Button {
                         isGamePickerPresented = true
                     } label: {
@@ -73,19 +71,11 @@ struct GameCollectionView: View {
                 }
             }
         }
-    }
-    
-    @inlinable
-    func isGameInCollection(game: Game) -> Bool {
-        return game.collections?.contains(self.collection) ?? false
-    }
-    
-    func toggleGame(game: Game) {
-        if isGameInCollection(game: game) {
-            collection.removeFromGames(game)
-        } else {
-            collection.addToGames(game)
+        .sheet(isPresented: $isEditCollectionOpen) {
+            EditCollectionView(collection: self.collection)
+            #if os(macOS)
+                .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
+            #endif
         }
-        persistence.saveIfNeeded()
     }
 }

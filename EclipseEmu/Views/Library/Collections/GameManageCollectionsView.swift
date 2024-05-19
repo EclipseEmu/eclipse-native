@@ -34,8 +34,8 @@ fileprivate struct GameManageCollectionItem: View {
 }
 
 struct GameManageCollectionsView: View {
-    let game: Game
     let showDismissButton: Bool
+    @ObservedObject var game: Game
     @Environment(\.persistenceCoordinator) var persistence
     @Environment(\.dismiss) var dismiss
     @State var selectedCollections: Set<GameCollection>
@@ -68,7 +68,7 @@ struct GameManageCollectionsView: View {
             }
         }
         .sheet(isPresented: $isCreateCollectionOpen) {
-            NewCollectionView()
+            EditCollectionView()
             #if os(macOS)
                 .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
             #endif

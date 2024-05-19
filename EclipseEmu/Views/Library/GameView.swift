@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct GameViewHeader: View {
-    var game: Game
+    @ObservedObject var game: Game
     var safeAreaTop: CGFloat
     var play: () -> Void
     @Environment(\.dismiss) var dismiss

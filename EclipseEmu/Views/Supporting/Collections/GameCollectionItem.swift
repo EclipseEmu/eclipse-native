@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GameCollectionItem: View {
     @Environment(\.persistenceCoordinator) var persistence
-    let collection: GameCollection
+    @ObservedObject var collection: GameCollection
     
     var body: some View {
         NavigationLink {

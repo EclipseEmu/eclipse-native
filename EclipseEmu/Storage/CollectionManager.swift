@@ -16,8 +16,26 @@ enum CollectionManager {
             : NSPredicate(format: "(%K CONTAINS %@) AND (name CONTAINS %@)", #keyPath(Game.collections), collection, query)
     }
     
+    static func rename(collection: GameCollection, name: String, in persistence: PersistenceCoordinator) {
+        collection.name = name
+        persistence.save()
+    }
+    
     static func create(name: String, icon: GameCollection.Icon, color: GameCollection.Color, in persistence: PersistenceCoordinator) {
         let collection = GameCollection(context: persistence.context)
+        collection.name = name
+        collection.icon = icon
+        collection.color = color.rawValue
+        persistence.save()
+    }
+    
+    static func update(
+        _ collection: GameCollection,
+        name: String,
+        icon: GameCollection.Icon,
+        color: GameCollection.Color,
+        in persistence: PersistenceCoordinator
+    ) {
         collection.name = name
         collection.icon = icon
         collection.color = color.rawValue
