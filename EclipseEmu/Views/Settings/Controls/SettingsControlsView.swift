@@ -6,20 +6,24 @@ extension GCController: Identifiable {}
 struct SettingsControlsView: View {
     @Environment(\.refresh) var refreshAction
     @State var controllers = GCController.controllers()
-    
+
     var body: some View {
         List {
             Section("Built-in") {
-                if let keyboard = GCKeyboard.coalesced {
-                    NavigationLink(destination: EmptyView()) {
-                        Label(keyboard.description, systemImage: "keyboard")
-                    }
-                }
                 #if os(iOS)
-                NavigationLink(destination: EmptyView()) {
+                NavigationLink {
+                    SettingsTouchLayoutView()
+                } label: {
                     Label("Touch Controls", systemImage: "hand.draw")
                 }
                 #endif
+                if let keyboard = GCKeyboard.coalesced {
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        Label(keyboard.description, systemImage: "keyboard")
+                    }
+                }
             }
             
             Section("Connected Controllers") {

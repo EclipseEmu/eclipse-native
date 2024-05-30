@@ -131,7 +131,9 @@ struct EditCollectionView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    DismissButton()
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: self.upsert) {
@@ -162,7 +164,7 @@ struct EditCollectionView: View {
 }
 
 #Preview("Edit") {
-    let persistence = PersistenceCoordinator.shared
+    let persistence = PersistenceCoordinator.preview
     let collection = GameCollection(context: persistence.context)
     collection.name = "Hello"
     collection.color = GameCollection.Color.indigo.rawValue

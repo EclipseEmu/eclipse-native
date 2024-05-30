@@ -9,7 +9,7 @@ extension SaveState {
     @NSManaged public var id: UUID
     @NSManaged public var name: String?
     @NSManaged public var isAuto: Bool
-    @NSManaged public var date: Date
+    @NSManaged public var date: Date?
     @NSManaged public var fileExtension: String?
 
     @NSManaged public var game: Game?

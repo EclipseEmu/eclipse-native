@@ -17,10 +17,9 @@ struct GameViewHeader: View {
     var body: some View {
         ZStack {
             VStack(alignment: .center) {
-                RoundedRectangle(cornerRadius: 12.0)
-                    .aspectRatio(1.0, contentMode: .fit)
-                    .frame(minWidth: 0.0, maxWidth: 275)
-                
+                BoxartView(game: game, cornerRadius: 8.0)
+                    .frame(minWidth: 0.0, idealWidth: 275, maxWidth: 275)
+
                 VStack {
                     Text(game.name ?? "Unknown Game")
                         .font(.title3)
@@ -78,10 +77,10 @@ struct GameView: View {
     @Environment(\.playGame) var playGame
 
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: SaveStatesListView.sortDescriptors) var saveStates
-    @State var isRenameSaveStateDialogOpen = false
-    @State var renameSaveStateDialogText: String = ""
     @State var renameSaveStateDialogTarget: SaveState?
-    
+    @State var renameGameDialogTarget: Game?
+    @State var isChangeBoxartFromDatabaseOpen = false
+
     init(game: Game) {
         self.game = game
         let request = SaveStateManager.listRequest(for: game, limit: 10)
@@ -96,25 +95,29 @@ struct GameView: View {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top) {
                         self.play(saveState: nil)
                     }
+
                     SectionHeader("Save States")
                         .padding([.horizontal, .top])
                     ScrollView(.horizontal) {
                         LazyHStack {
                             ForEach(self.saveStates) { section in
                                 ForEach(section) { saveState in
-                                    SaveStateItem(saveState: saveState, action: self.selectedSaveState, renameDialogTarget: $renameSaveStateDialogTarget)
+                                    SaveStateItem(saveState: saveState, action: .startWithState(game), renameDialogTarget: $renameSaveStateDialogTarget)
                                         .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
                                 }
                                 if section.id {
                                     Divider()
                                 }
                             }
-                        }.padding([.horizontal, .bottom])
+                        }
+                        .padding([.horizontal, .bottom])
                     }
-                    .emptyMessage(self.saveStates.isEmpty) {
-                        Text("No Save States")
-                    } message: {
-                        Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
+                    .emptyState(self.saveStates.isEmpty) {
+                        EmptyMessage {
+                            Text("No Save States")
+                        } message: {
+                            Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
+                        }
                     }
                     
                     LazyVStack(alignment: .leading) {
@@ -129,7 +132,8 @@ struct GameView: View {
                         } label: {
                             Label("Manage Collections", systemImage: "square.on.square")
                         }
-                    }.padding()
+                    }
+                    .padding()
                 }
                 .ignoresSafeArea(edges: .top)
             }
@@ -137,34 +141,72 @@ struct GameView: View {
             .navigationBarTitleDisplayMode(.inline)
 #endif
             .toolbar {
-                ToolbarItem(placement: DismissButton.placement) {
-                    DismissButton()
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button {
+                            self.renameGameDialogTarget = self.game
+                        } label: {
+                            Label("Rename", systemImage: "rectangle.and.pencil.and.ellipsis")
+                        }
+
+                        Menu {
+                            Button {
+
+                            } label: {
+                                Label("From Photos", systemImage: "photo.on.rectangle")
+                            }.disabled(true)
+
+                            Button {
+                                self.isChangeBoxartFromDatabaseOpen = true
+                            } label: {
+                                Label("From Database", systemImage: "magnifyingglass")
+                            }
+                        } label: {
+                            Label("Replace Boxart", systemImage: "photo")
+                        }
+
+                        Divider()
+                        
+                        Button(role: .destructive, action: self.delete) {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } label: {
+                        Label("Game Options", systemImage: "ellipsis.circle")
+                    }
+                    .menuStyle(.borderlessButton)
                 }
             }
-            .onChange(of: renameSaveStateDialogTarget, perform: { saveState in
-                if let saveState {
-                    self.renameSaveStateDialogText = saveState.name ?? ""
-                    self.isRenameSaveStateDialogOpen = true
-                } else {
-                    self.renameSaveStateDialogText = ""
-                }
-            })
-           .alert("Rename State", isPresented: $isRenameSaveStateDialogOpen) {
-                Button("Cancel", role: .cancel) {
-                    self.renameSaveStateDialogTarget = nil
-                    self.renameSaveStateDialogText = ""
-                }
-                Button("Rename") {
-                    print("rename")
-                    guard let renameSaveStateDialogTarget else { return }
-                    SaveStateManager.rename(renameSaveStateDialogTarget, to: renameSaveStateDialogText, in: persistence)
-                    self.renameSaveStateDialogTarget = nil
-                }
-                TextField("Save State Name", text: $renameSaveStateDialogText)
+            .renameAlert($renameSaveStateDialogTarget, key: \.name, title: "Rename State", placeholder: "State Name") { saveState, name in
+                SaveStateManager.rename(saveState, to: name, in: persistence)
+            }
+            .renameAlert($renameGameDialogTarget, key: \.name, title: "Rename Game", placeholder: "Game Name") { game, name in
+                GameManager.rename(game, to: name, in: persistence)
+            }
+            .sheet(isPresented: $isChangeBoxartFromDatabaseOpen) {
+                BoxartPicker(system: game.system, initialQuery: game.name ?? "", finished: self.photoFromDatabase)
             }
         }
     }
-    
+
+    func photoFromDatabase(entry: OpenVGDB.Item) {
+        guard let url = entry.boxart else { return }
+        Task {
+            do {
+                game.boxart = try await ImageAssetManager.create(remote: url, in: persistence, save: false)
+                persistence.saveIfNeeded()
+            } catch {
+                // FIXME: present this to the user
+                print(error)
+            }
+        }
+    }
+
     func selectedSaveState(saveState: SaveState, dismissAction: DismissAction) {
         self.play(saveState: saveState)
     }
@@ -179,6 +221,15 @@ struct GameView: View {
             } catch {
                 print("failed to launch game: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    func delete() {
+        Task {
+            await MainActor.run {
+                dismiss()
+            }
+            try? await GameManager.delete(self.game, in: self.persistence)
         }
     }
 }

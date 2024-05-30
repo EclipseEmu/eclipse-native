@@ -5,7 +5,7 @@ import CoreData
 public class ImageAsset: NSManagedObject {
     override public func prepareForDeletion() {
         super.prepareForDeletion()
-        let persistence = PersistenceCoordinator.shared
+        let persistence = PersistenceCoordinator.preview
         let filePath = self.path(in: persistence)
         do {
             try persistence.deleteFile(path: filePath)

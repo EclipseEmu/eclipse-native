@@ -7,7 +7,7 @@ extension Game {
         return NSFetchRequest<Game>(entityName: "Game")
     }
 
-    @NSManaged public var dateAdded: Date
+    @NSManaged public var dateAdded: Date?
     @NSManaged public var datePlayed: Date?
     @NSManaged public var id: UUID
     @NSManaged public var md5: String!

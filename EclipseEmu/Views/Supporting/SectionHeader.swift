@@ -1,22 +1,16 @@
 import SwiftUI
 
-struct SectionHeader<AccessoryContent: View>: View {
-    var title: String
-    var accessory: () -> AccessoryContent
-    
-    init(_ title: String, accessory: @escaping () -> AccessoryContent = { EmptyView() }) {
+struct SectionHeader: View {
+    var title: LocalizedStringKey
+
+    init(_ title: LocalizedStringKey) {
         self.title = title
-        self.accessory = accessory
     }
     
     var body: some View {
-        HStack {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            Spacer()
-            self.accessory()
-        }
+        Text(title)
+            .font(.title3.weight(.semibold))
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
     }
 }
 

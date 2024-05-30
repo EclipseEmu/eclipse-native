@@ -88,6 +88,7 @@ final class EmulationViewModel: ObservableObject {
                 let _ = await core.loadState(for: initialSaveState.path(in: persistence))
                 self.initialSaveState = nil
             }
+            GameManager.updateDatePlayed(for: game, in: persistence)
         } catch {
             await MainActor.run {
                 self.state = .error(error)
@@ -97,6 +98,7 @@ final class EmulationViewModel: ObservableObject {
     
     func quit(playAction: PlayGameAction) async {
         if case .loaded(let core) = self.state {
+            try? await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
             await core.stop()
         }
         await MainActor.run {
@@ -199,10 +201,19 @@ struct EmulationView: View {
             switch model.state {
             case .loading:
                 VStack {
+                    Spacer()
                     ProgressView()
-                    Button(role: .cancel) {} label: {
+                    Spacer()
+                    Button(role: .cancel) {
+                        Task {
+                            await self.model.quit(playAction: playGame)
+                        }
+                    } label: {
                         Text("Cancel")
-                    }.buttonStyle(.borderedProminent)
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
@@ -243,7 +254,7 @@ struct EmulationView: View {
         })
         .sheet(isPresented: $model.isSaveStateViewShown) {
             CompatNavigationStack {
-                SaveStatesListView(game: model.game, action: self.loadState, haveDismissButton: true)
+                SaveStatesListView(game: model.game, action: .loadState(self.model), haveDismissButton: true)
                     .navigationTitle("Load State")
                 #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
@@ -271,13 +282,12 @@ struct EmulationView: View {
     
     func loadState(saveState: SaveState, dismiss: DismissAction) {
         guard case .loaded(let core) = self.model.state else { return }
-        
+
+        dismiss()
+
         Task {
             let path = saveState.path(in: self.model.persistence)
             let _ = await core.loadState(for: path)
-            await MainActor.run {
-                dismiss()
-            }
         }
     }
 }

@@ -3,6 +3,8 @@ import CoreData
 import EclipseKit
 
 enum GameManager {
+    static var openvgdb: OpenVGDB?
+    
     enum Failure: LocalizedError {
         case failedToAccessSecurityScopedResource
         case failedToGetRomPath
@@ -14,6 +16,15 @@ enum GameManager {
         let romPath: URL
         let savePath: URL
         let cheats: Set<Cheat>
+    }
+    
+    static func getOpenVGDB() async throws -> OpenVGDB {
+        if let openvgdb {
+            return openvgdb
+        } else {
+            self.openvgdb = try await OpenVGDB()
+            return self.openvgdb!
+        }
     }
     
     static func recentlyPlayedRequest() -> NSFetchRequest<Game> {
@@ -32,13 +43,23 @@ enum GameManager {
         let digest = MD5Hasher().hash(data: romData)
         let md5 = digest.hexString()
         
+        let info: OpenVGDB.Item? = if let openvgdb = try? await self.getOpenVGDB() {
+            (try? await openvgdb.get(md5: md5, system: system))?.first
+        } else {
+            nil
+        }
+        
         let game = Game(context: persistence.context)
         game.id = UUID()
-        game.name = name
+        game.name = info?.name ?? name
         game.system = system
         game.dateAdded = Date.now
         game.datePlayed = nil
         game.md5 = md5
+        
+        if let boxartUrl = info?.boxart {
+            game.boxart = try? await ImageAssetManager.create(remote: boxartUrl, in: persistence, save: false)
+        }
 
         try persistence.writeFile(path: game.romPath(in: persistence), contents: romData)
 
@@ -50,9 +71,14 @@ enum GameManager {
         persistence.save()
     }
     
-    static func delete(game: Game, in persistence: PersistenceCoordinator) async throws {
+    static func delete(_ game: Game, in persistence: PersistenceCoordinator) async throws {
         persistence.context.delete(game)
         persistence.save()
+    }
+    
+    static func rename(_ game: Game, to newName: String, in persistence: PersistenceCoordinator) {
+        game.name = newName
+        persistence.saveIfNeeded()
     }
     
     /// - Returns: Data needed by the emulator, including paths and cheats.

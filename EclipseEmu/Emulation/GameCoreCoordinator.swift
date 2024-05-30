@@ -389,7 +389,6 @@ final actor GameCoreCoordinator {
     
     func screenshot() -> CIImage {
         let colorSpace = self.renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
-        print(colorSpace.name)
         let result = switch self.renderer {
         case .frameBuffer(let renderer):
             renderer.screenshot(colorSpace: colorSpace)

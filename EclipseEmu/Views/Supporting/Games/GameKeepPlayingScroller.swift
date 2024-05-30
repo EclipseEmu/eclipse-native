@@ -2,13 +2,13 @@ import SwiftUI
 
 struct GameKeepPlayingScroller<Games: RandomAccessCollection>: View where Games.Element == Game {
     var games: Games
-    @Binding var selectedGame: Game?
-    
+    @ObservedObject var viewModel: GameListViewModel
+
     var body: some View {
         ScrollView(.horizontal) {
             LazyHStack(alignment: .top, spacing: 16.0) {
                 ForEach(games) { game in
-                    GameKeepPlayingItem(game: game, selectedGame: $selectedGame)
+                    GameKeepPlayingItem(game: game, viewModel: viewModel)
                 }
             }
             .padding([.horizontal, .bottom])
@@ -17,5 +17,5 @@ struct GameKeepPlayingScroller<Games: RandomAccessCollection>: View where Games.
 }
 
 #Preview {
-    GameKeepPlayingScroller(games: [], selectedGame: .constant(nil))
+    GameKeepPlayingScroller(games: [], viewModel: GameListViewModel(filter: .none))
 }

@@ -25,7 +25,20 @@ struct EclipseEmuApp: App {
             if let model = self.playGameAction.model {
                 EmulationView(model: model)
             } else {
-                LibraryView()
+                TabView {
+                    LibraryView()
+                        .tabItem {
+                            Label("Library", systemImage: "books.vertical")
+                        }
+                    GameCollectionsView()
+                        .tabItem {
+                            Label("Collections", systemImage: "square.stack")
+                        }
+                    SettingsView()
+                        .tabItem {
+                            Label("Settings", systemImage: "gear")
+                        }
+                }
             }
         }
         .environment(\.managedObjectContext, self.persistenceCoordinator.container.viewContext)

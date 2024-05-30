@@ -83,13 +83,13 @@ struct EditCheatView: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    DismissButton()
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: self.save) {
-                        Text(isCreatingCheat ? "Add" : "Save")
-                    }
-                    .disabled(label.isEmpty || !isCodeValid)
+                    Button("Done", action: self.save)
+                        .disabled(label.isEmpty || !isCodeValid)
                 }
             }
         }

@@ -3,19 +3,18 @@ import SwiftUI
 struct GamePicker: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.persistenceCoordinator) var persistence
+    @ObservedObject var collection: GameCollection
+    @State var searchQuery: String = ""
     @FetchRequest<Game>(sortDescriptors: [NSSortDescriptor(keyPath: \Game.name, ascending: true)])
     var games: FetchedResults<Game>
-    @ObservedObject var collection: GameCollection
-    
-    @State var searchQuery: String = ""
 
     var body: some View {
-        let _ = Self._printChanges()
         CompatNavigationStack {
             List(games) { game in
+                let hasGame = isGameInCollection(game: game)
                 HStack(spacing: 12.0) {
-                    BoxartView()
-                        .frame(minWidth: 44, maxWidth: 48)
+                    BoxartView(game: game, cornerRadius: 4.0)
+                        .frame(minWidth: 44, maxWidth: 44)
                         .clipShape(RoundedRectangle(cornerRadius: 8.0))
                     VStack(alignment: .leading) {
                         Text(game.name ?? "Unknown Game")
@@ -28,24 +27,32 @@ struct GamePicker: View {
                     
                     Spacer()
                     
-                    Button(action: { self.toggleGame(game: game) }) {
-                        if isGameInCollection(game: game) {
-                            Label("Remove Game", systemImage: "minus.circle")
-                                .labelStyle(.iconOnly)
+                    Button(role: hasGame ? .destructive : .none, action: { self.toggleGame(game: game) }) {
+                        Label(
+                            hasGame ? "Remove Game" : "Add Game",
+                            systemImage: hasGame ? "minus" : "plus"
+                        )
+                            .frame(width: 12, height: 12)
+                            .imageScale(.small)
+                            .aspectRatio(1.0, contentMode: .fit)
+                    }
+                    .modify {
+                        if #available(iOS 17.0, macOS 14.0, *) {
+                            $0.buttonBorderShape(.circle)
+                                .fontWeight(.semibold)
                         } else {
-                            Label("Add Game", systemImage: "plus.circle")
-                                .labelStyle(.iconOnly)
+                            $0
                         }
                     }
-                }.id(game.id)
+                    .buttonStyle(.borderedProminent)
+                    .labelStyle(.iconOnly)
+                }
             }
             .emptyState(games.isEmpty) {
-                ScrollView {
-                    EmptyMessage {
-                        Text("No Games")
-                    } message: {
-                        Text("You don't have any games in your library. You can add some by pressing the \(Image(systemName: "plus")) in your library.")
-                    }
+                ContentUnavailableMessage {
+                    Label("No Games", systemImage: "square.grid.2x2.fill")
+                } description: {
+                    Text("You don't have any games in your Library.")
                 }
             }
             .searchable(text: $searchQuery)
@@ -54,12 +61,15 @@ struct GamePicker: View {
                     ? nil
                     : NSPredicate(format: "name CONTAINS %@", newValue)
             }
+            .navigationTitle("Select Games")
             #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    DismissButton()
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
@@ -94,6 +104,7 @@ struct GamePicker: View {
     game.id = UUID()
     game.system = .gba
     game.name = "My Game"
+
     let collection = GameCollection(context: context)
     collection.name = "Foobar"
     collection.icon = .symbol("list.bullet")

@@ -16,7 +16,8 @@ struct ImageAssetView: View {
             case .failure(_):
                 Image(systemName: "exclamationmark.triangle")
             case .empty:
-                ProgressView()
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .foregroundStyle(.tertiary)
             @unknown default:
                 ProgressView()
             }

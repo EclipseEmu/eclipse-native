@@ -17,7 +17,7 @@ final class PersistenceCoordinator {
         case failedToCreateFile
     }
     
-    static let shared = PersistenceCoordinator()
+//    static let shared = PersistenceCoordinator()
 //    #if DEBUG
     static let preview = PersistenceCoordinator(inMemory: true)
 //    #endif

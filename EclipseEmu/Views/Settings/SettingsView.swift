@@ -38,10 +38,6 @@ struct SettingsView: View {
                         Label("Controls", systemImage: "gamecontroller.fill")
                             .labelStyle(SettingsLabelStyle())
                     }
-                    NavigationLink(destination: SettingsBackupsView()) {
-                        Label("Backups", systemImage: "archivebox.fill")
-                            .labelStyle(SettingsLabelStyle())
-                    }
                 }
                 
                 Section {
@@ -121,14 +117,6 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: DismissButton.placement) {
-                    DismissButton()
-                }
-            }
         }
     }
 }

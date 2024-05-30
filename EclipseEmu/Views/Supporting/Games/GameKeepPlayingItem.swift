@@ -1,30 +1,42 @@
 import SwiftUI
 
 struct GameKeepPlayingItem: View {
-    static let playedDateFormatter: RelativeDateTimeFormatter = {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter
-    }()
-    
-    var game: Game
-    @Binding var selectedGame: Game?
+    @ObservedObject var game: Game
+    @ObservedObject var viewModel: GameListViewModel
+    @State var color: Color? = nil
     @Environment(\.playGame) private var playGame
     @Environment(\.persistenceCoordinator) private var persistence
     
     var body: some View {
         Button {
-            selectedGame = game
+            viewModel.target = game
         } label: {
             VStack(alignment: .leading, spacing: 0.0) {
-                BoxartView()
-                
-                VStack(alignment: .leading) {
-                    Text("Resume · \(game.datePlayed ?? Date(), formatter: Self.playedDateFormatter)")
-                        .font(.caption.weight(.medium))
-                        .textCase(.uppercase)
+                AverageColorAsyncImage(url: game.boxart?.path(in: persistence), averageColor: $color) { imagePhase in
+                    switch imagePhase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    case .failure(_):
+                        Image(systemName: "exclamationmark.triangle")
+                    case .empty:
+                        Rectangle()
+                            .foregroundStyle(.tertiary)
+                    @unknown default:
+                        ProgressView()
+                    }
+                }
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .aspectRatio(1.0, contentMode: .fit)
+                .overlay {
+                    Rectangle()
+                        .stroke(lineWidth: 1.0)
                         .foregroundStyle(.secondary)
-                    
+                        .opacity(0.25)
+                }
+
+                VStack(alignment: .leading) {
                     Text(game.name ?? "Unknown Game")
                         .font(.headline)
                         .lineLimit(1)
@@ -33,6 +45,7 @@ struct GameKeepPlayingItem: View {
                     
                     Text(game.system.string)
                         .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     
@@ -55,13 +68,17 @@ struct GameKeepPlayingItem: View {
                 .multilineTextAlignment(.leading)
                 .padding()
                 .foregroundStyle(.white)
-                .background(Material.ultraThin)
+                .background((self.color ?? .gray).brightness(-0.3))
             }
-        }.buttonStyle(PlainButtonStyle())
-            .frame(minWidth: 140.0, idealWidth: 260.0, maxWidth: 260.0)
-            .background(.black)
-            .clipShape(RoundedRectangle(cornerRadius: 16.0))
-            .clipped()
+        }
+        .buttonStyle(.plain)
+        .frame(minWidth: 140.0, idealWidth: 260.0, maxWidth: 260.0)
+        .background(.black)
+        .clipShape(RoundedRectangle(cornerRadius: 16.0))
+        .clipped()
+        .contextMenu {
+            GameListItemContextMenu(viewModel: viewModel, game: game)
+        }
     }
     
     func play() {
@@ -77,11 +94,12 @@ struct GameKeepPlayingItem: View {
 
 #if DEBUG
 #Preview {
+    let viewModel = GameListViewModel(filter: .none)
     let viewContext = PersistenceCoordinator.preview.container.viewContext
     
     return GameKeepPlayingItem(
         game: Game(context: viewContext),
-        selectedGame: .constant(nil)
+        viewModel: viewModel
     )
     .environment(\.managedObjectContext, viewContext)
 }

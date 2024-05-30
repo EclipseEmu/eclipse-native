@@ -1,13 +1,17 @@
 import SwiftUI
 
 struct BoxartView: View {
-    var body: some View {
-        Rectangle()
-            .aspectRatio(1.0, contentMode: .fit)
-    }
-}
+    @ObservedObject var game: Game
+    let cornerRadius: CGFloat
 
-#Preview {
-    BoxartView()
-        .padding()
+    var body: some View {
+        ImageAssetView(asset: game.boxart, cornerRadius: cornerRadius)
+            .aspectRatio(1.0, contentMode: .fit)
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundStyle(.secondary)
+                    .opacity(0.25)
+            }
+    }
 }

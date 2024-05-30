@@ -17,8 +17,11 @@ struct CheatsView: View {
     init(game: Game) {
         self.game = game
 
-        let core = EclipseEmuApp.cores.get(for: game)!
-        self.cheatFormats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
+        if let core = EclipseEmuApp.cores.get(for: game) {
+            self.cheatFormats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
+        } else {
+            self.cheatFormats = UnsafeBufferPointer.init(start: nil, count: 0)
+        }
         
         let request = CheatManager.listRequest(for: game)
         request.sortDescriptors = Self.sortCheatsBy
@@ -34,12 +37,17 @@ struct CheatsView: View {
             .onMove(perform: self.moveCheat)
         }
         .emptyState(self.cheats.isEmpty) {
-            ScrollView {
-                EmptyMessage {
-                    Text("No Cheats")
-                } message: {
-                    Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
-                }
+            ContentUnavailableMessage {
+                Label("No Cheats", systemImage: "doc.badge.gearshape")
+            } description: {
+                Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
+            }
+        }
+        .emptyState(self.cheatFormats.isEmpty) {
+            ContentUnavailableMessage {
+                Label("No Supported Cheats", systemImage: "nosign")
+            } description: {
+                Text("You can't add cheats for this game. The core it uses doesn't support any cheat formats.")
             }
         }
         .toolbar {
@@ -54,6 +62,7 @@ struct CheatsView: View {
                 } label: {
                     Label("Add Cheat", systemImage: "plus")
                 }
+                .disabled(self.cheatFormats.isEmpty)
             }
         }
         .navigationTitle("Cheats")
@@ -98,7 +107,9 @@ struct CheatsView: View {
     let game = Game(context: context)
     game.system = .gba
     
-    return CheatsView(game: game)
-        .environment(\.managedObjectContext, context)
+    return CompatNavigationStack {
+        CheatsView(game: game)
+    }
+    .environment(\.managedObjectContext, context)
 }
 #endif

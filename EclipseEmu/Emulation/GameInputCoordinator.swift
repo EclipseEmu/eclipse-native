@@ -192,7 +192,7 @@ final class GameInputCoordinator {
                     (left.rawValue * UInt32(dpad.xAxis.value < -0.25)) |
                     (right.rawValue * UInt32(dpad.xAxis.value > 0.25))
             default:
-                print("unhandled")
+                break
             }
         }
         self.players[info.playerIndex].state = state

@@ -16,9 +16,7 @@ final class PlayGameAction: ObservableObject {
         
         let data = try GameManager.emulationData(for: game, in: persistence)
         let model = EmulationViewModel(coreInfo: core, game: game, saveState: saveState, emulationData: data, persistence: persistence)
-        
-        GameManager.updateDatePlayed(for: game, in: persistence)
-        
+                
         await MainActor.run {
             self.model = model
         }

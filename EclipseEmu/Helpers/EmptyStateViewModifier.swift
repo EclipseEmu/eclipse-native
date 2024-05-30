@@ -21,10 +21,4 @@ extension View {
     func emptyState<EmptyContent>(_ isEmpty: Bool, emptyContent: @escaping () -> EmptyContent) -> some View where EmptyContent: View {
         modifier(EmptyStateViewModifier(isEmpty: isEmpty, emptyContent: emptyContent))
     }
-    
-    func emptyMessage(_ isEmpty: Bool, title: @escaping () -> Text, message: @escaping () -> Text) -> some View {
-        modifier(EmptyStateViewModifier(isEmpty: isEmpty, emptyContent: {
-            EmptyMessage(title: title, message: message) 
-        }))
-    }
 }

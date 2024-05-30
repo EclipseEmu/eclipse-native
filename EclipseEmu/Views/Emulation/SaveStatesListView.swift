@@ -7,14 +7,15 @@ struct SaveStatesListView: View {
     ]
     
     @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.dismiss) var dismiss
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: Self.sortDescriptors) var saveStates: SectionedFetchResults<Bool, SaveState>
     @State var renameDialogTarget: SaveState?
-    
+
     var game: Game
-    var action: (SaveState, DismissAction) -> Void
+    var action: SaveStateItem.Action
     var haveDismissButton: Bool
     
-    init(game: Game, action: @escaping (SaveState, DismissAction) -> Void, haveDismissButton: Bool = false) {
+    init(game: Game, action: SaveStateItem.Action, haveDismissButton: Bool = false) {
         self.game = game
         self.action = action
         self.haveDismissButton = haveDismissButton
@@ -38,10 +39,12 @@ struct SaveStatesListView: View {
                 }
             }
             .padding()
-            .emptyMessage(self.saveStates.isEmpty) {
-                Text("No Save States")
-            } message: {
-                Text("You haven't made any save states for \(game.name ?? "this game"). Use the \"Save State\" button in the emulation menu to create some.")
+            .emptyState(self.saveStates.isEmpty) {
+                ContentUnavailableMessage {
+                    Label("No Save States", systemImage: "doc.on.doc")
+                } description: {
+                    Text("You haven't made any save states for \(game.name ?? "this game"). Use the \"Save State\" button in the emulation menu to create some.")
+                }
             }
         }
         .renameAlert($renameDialogTarget, key: \.name, title: "Rename State", placeholder: "State Name", onChange: self.rename)
@@ -49,7 +52,9 @@ struct SaveStatesListView: View {
             if haveDismissButton {
                 $0.toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        DismissButton()
+                        Button("Cancel", role: .cancel) {
+                            dismiss()
+                        }
                     }
                 }
             } else {

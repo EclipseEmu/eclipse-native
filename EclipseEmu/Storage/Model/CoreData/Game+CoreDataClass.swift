@@ -5,7 +5,7 @@ import CoreData
 public class Game: NSManagedObject {
     public override func prepareForDeletion() {
         super.prepareForDeletion()
-        let persistence = PersistenceCoordinator.shared
+        let persistence = PersistenceCoordinator.preview
         let romPath = self.romPath(in: persistence)
         let savePath = self.savePath(in: persistence)
         

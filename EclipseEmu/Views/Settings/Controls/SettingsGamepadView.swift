@@ -1,5 +1,6 @@
 import SwiftUI
 import GameController
+import EclipseKit
 
 struct SettingsGamepadView: View {
     var controller: GCController
