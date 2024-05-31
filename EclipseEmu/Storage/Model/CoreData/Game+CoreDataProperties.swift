@@ -1,25 +1,25 @@
-import Foundation
 import CoreData
 import EclipseKit
+import Foundation
 
-extension Game {
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Game> {
+public extension Game {
+    @nonobjc class func fetchRequest() -> NSFetchRequest<Game> {
         return NSFetchRequest<Game>(entityName: "Game")
     }
 
-    @NSManaged public var dateAdded: Date?
-    @NSManaged public var datePlayed: Date?
-    @NSManaged public var id: UUID
-    @NSManaged public var md5: String!
-    @NSManaged public var name: String?
-    @NSManaged public var romExtension: String?
-    @NSManaged public var saveExtension: String?
-    @NSManaged public var system: GameSystem
+    @NSManaged var dateAdded: Date?
+    @NSManaged var datePlayed: Date?
+    @NSManaged var id: UUID
+    @NSManaged var md5: String!
+    @NSManaged var name: String?
+    @NSManaged var romExtension: String?
+    @NSManaged var saveExtension: String?
+    @NSManaged var system: GameSystem
 
-    @NSManaged public var boxart: ImageAsset?
-    @NSManaged public var saveStates: NSSet?
-    @NSManaged public var cheats: NSSet?
-    @NSManaged public var collections: NSSet?
+    @NSManaged var boxart: ImageAsset?
+    @NSManaged var saveStates: NSSet?
+    @NSManaged var cheats: NSSet?
+    @NSManaged var collections: NSSet?
 }
 
 extension Game: Identifiable {}

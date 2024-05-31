@@ -5,7 +5,7 @@ extension URL {
         let fileName = self.lastPathComponent
         return if let fileExtensionIndex = fileName.firstIndex(of: ".") {
             (
-                String(fileName[fileName.startIndex..<fileExtensionIndex]),
+                String(fileName[fileName.startIndex ..< fileExtensionIndex]),
                 String(fileName[fileExtensionIndex...])
             )
         } else {

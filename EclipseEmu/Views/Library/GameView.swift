@@ -17,14 +17,14 @@ struct GameViewHeader: View {
     var body: some View {
         ZStack {
             VStack(alignment: .center) {
-                BoxartView(game: game, cornerRadius: 8.0)
+                BoxartView(game: self.game, cornerRadius: 8.0)
                     .frame(minWidth: 0.0, idealWidth: 275, maxWidth: 275)
 
                 VStack {
-                    Text(game.name ?? "Unknown Game")
+                    Text(self.game.name ?? "Unknown Game")
                         .font(.title3)
                         .fontWeight(.medium)
-                    Text(game.system.string)
+                    Text(self.game.system.string)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
@@ -45,16 +45,16 @@ struct GameViewHeader: View {
             }
             .padding()
             .padding(.bottom)
-            .padding(.top, safeAreaTop)
+            .padding(.top, self.safeAreaTop)
         }
         .background(Material.regular)
         .background(ignoresSafeAreaEdges: .all)
         .overlay(
             Rectangle()
                 .frame(width: nil, height: 1, alignment: .bottom)
-            #if os(macOS)
+#if os(macOS)
                 .foregroundStyle(Color(nsColor: .separatorColor))
-            #else
+#else
                 .opacity(0.25)
                 .modify {
                     if #available(iOS 17.0, *) {
@@ -63,7 +63,7 @@ struct GameViewHeader: View {
                         $0
                     }
                 }
-            #endif
+#endif
             , alignment: .bottom
         )
     }
@@ -161,9 +161,7 @@ struct GameView: View {
                         }
 
                         Menu {
-                            Button {
-
-                            } label: {
+                            Button {} label: {
                                 Label("From Photos", systemImage: "photo.on.rectangle")
                             }.disabled(true)
 

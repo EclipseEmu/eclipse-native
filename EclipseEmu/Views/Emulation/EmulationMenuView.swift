@@ -45,11 +45,11 @@ struct EmulationMenuView: View {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
 #endif
-            #if os(macOS)
+#if os(macOS)
             Spacer()
-            #else
+#else
             Divider()
-            #endif
+#endif
             Button {
                 model.saveState(isAuto: false)
             } label: {
@@ -72,7 +72,7 @@ struct EmulationMenuView: View {
             Divider()
 #endif
 
-            Slider(value: $model.volume, in: 0...1) {} minimumValueLabel: {
+            Slider(value: $model.volume, in: 0 ... 1) {} minimumValueLabel: {
                 Label("Lower Volume", systemImage: "speaker.fill")
             } maximumValueLabel: {
                 Label("Raise Volume", systemImage: "speaker.wave.3.fill")
@@ -106,11 +106,11 @@ struct EmulationMenuView: View {
             let halfWidth = menuButtonLayout.width / 2
             let halfHeight = menuButtonLayout.height / 2
             let menuButtonX = menuButtonLayout.xOrigin == .leading
-            ? menuButtonLayout.x + halfWidth
-            : proxy.size.width - menuButtonLayout.x - halfWidth
+                ? menuButtonLayout.x + halfWidth
+                : proxy.size.width - menuButtonLayout.x - halfWidth
             let menuButtonY = menuButtonLayout.yOrigin == .leading
-            ? menuButtonLayout.y + halfHeight
-            : proxy.size.height - menuButtonLayout.y - halfHeight
+                ? menuButtonLayout.y + halfHeight
+                : proxy.size.height - menuButtonLayout.y - halfHeight
 
 #if !os(macOS)
             Menu {
@@ -161,7 +161,7 @@ struct EmulationMenuView: View {
                         self.hideTaskInstant = .now + .seconds(5)
                         if self.hideTask == nil {
                             self.hideTask = Task.detached(priority: .low) {
-                                while await self.hideTaskInstant > .now && !Task.isCancelled {
+                                while await self.hideTaskInstant > .now, !Task.isCancelled {
                                     try? await Task.sleep(until: self.hideTaskInstant)
                                 }
                                 await MainActor.run {

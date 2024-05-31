@@ -17,9 +17,9 @@ class CheatFormatter {
 
     @inlinable
     func formatInput(value: String) -> String {
-        return self.formatInput(
+        return formatInput(
             value: value,
-            range: value.startIndex..<value.startIndex,
+            range: value.startIndex ..< value.startIndex,
             wasBackspace: false,
             insertion: ""
         ).formattedText
@@ -35,8 +35,8 @@ class CheatFormatter {
         let isNotBackspace = isBackspace ^ 1
         let cursorIndex = range.lowerBound
 
-        var output: String = ""
-        var offset = insertion.countValidCharacters(in: self.characterSet)
+        var output = ""
+        var offset = insertion.countValidCharacters(in: characterSet)
         var valueIndex = value.startIndex
         var formatIndex = formatString.startIndex
 

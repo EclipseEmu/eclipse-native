@@ -1,6 +1,6 @@
+import EclipseKit
 import Foundation
 import GameController
-import EclipseKit
 
 typealias KeyboardBindings = [GCKeyCode: GameInput]
 

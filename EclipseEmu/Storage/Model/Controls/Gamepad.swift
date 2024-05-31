@@ -1,5 +1,5 @@
-import Foundation
 import EclipseKit
+import Foundation
 import GameController
 
 struct GamepadBinding {

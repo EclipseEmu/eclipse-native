@@ -1,7 +1,7 @@
-import SwiftUI
 import EclipseKit
+import SwiftUI
 
-struct TouchLayout2 {
+enum TouchLayout2 {
     enum AxisPlacement {
         case start(Float)
         case end(Float)
@@ -40,7 +40,8 @@ let defaultTouchElements = [
             yOrigin: .trailing,
             x: 16.0,
             y: 149.0,
-            width: 75.0, height: 75.0, hidden: false),
+            width: 75.0, height: 75.0, hidden: false
+        ),
         bindings: .init(
             kind: .button,
             inputA: GameInput.faceButtonRight.rawValue,
@@ -196,7 +197,7 @@ final class TouchControlsController: UIViewController {
     private static let borderWidth = 2.0
     private static let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
-    private let valueChangedHandler: ((_ newState: UInt32) -> Void)
+    private let valueChangedHandler: (_ newState: UInt32) -> Void
 
     private var state: GameInput.RawValue = 0
     private var lockedTouches = [UITouch: (Int, TouchLayout.Element)]()
@@ -211,6 +212,7 @@ final class TouchControlsController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -222,10 +224,10 @@ final class TouchControlsController: UIViewController {
         self.touchControlsSubview.translatesAutoresizingMaskIntoConstraints = false
         self.touchControlsSubview.isMultipleTouchEnabled = true
         NSLayoutConstraint.activate([
-            touchControlsSubview.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            touchControlsSubview.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            touchControlsSubview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            touchControlsSubview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            self.touchControlsSubview.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            self.touchControlsSubview.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            self.touchControlsSubview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            self.touchControlsSubview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
         let preferredFont = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -391,7 +393,7 @@ final class TouchControlsController: UIViewController {
         }
 
         if self.state & ~oldState > 0 {
-            feedbackGenerator.impactOccurred()
+            self.feedbackGenerator.impactOccurred()
         }
 
         self.valueChangedHandler(self.state)
@@ -404,9 +406,9 @@ final class TouchControlsController: UIViewController {
 //                let view = self.touchControlsSubview.subviews[i]
                 self.state &= ~(
                     element.bindings.inputA |
-                    element.bindings.inputB.rawValue |
-                    element.bindings.inputC.rawValue |
-                    element.bindings.inputD.rawValue)
+                        element.bindings.inputB.rawValue |
+                        element.bindings.inputC.rawValue |
+                        element.bindings.inputD.rawValue)
                 self.valueChangedHandler(self.state)
                 continue
             }
@@ -420,9 +422,9 @@ final class TouchControlsController: UIViewController {
                 }
                 self.state &= ~(
                     element.bindings.inputA |
-                    element.bindings.inputB.rawValue |
-                    element.bindings.inputC.rawValue |
-                    element.bindings.inputD.rawValue)
+                        element.bindings.inputB.rawValue |
+                        element.bindings.inputC.rawValue |
+                        element.bindings.inputD.rawValue)
             }
         }
         self.valueChangedHandler(self.state)

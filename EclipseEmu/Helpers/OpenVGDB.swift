@@ -1,8 +1,8 @@
+import EclipseKit
 import Foundation
 import SQLite3
-import EclipseKit
 
-fileprivate extension GameSystem {
+private extension GameSystem {
     static func fromOpenVGDB(string: String) -> GameSystem {
         switch string {
         case "gb": .gb
@@ -108,7 +108,7 @@ actor OpenVGDB {
     }
 
     func get(md5: String, system: GameSystem) async throws -> [OpenVGDB.Item] {
-        let statementInt = UInt(bitPattern: self.md5Statement)
+        let statementInt = UInt(bitPattern: md5Statement)
         return try await withUnsafeThrowingContinuation { continuation in
             self.queue.async {
                 let statement = OpaquePointer(bitPattern: statementInt)
@@ -133,14 +133,14 @@ actor OpenVGDB {
     }
 
     func search(query: String, system: GameSystem) async throws -> [OpenVGDB.Item] {
-        // FIXME: The API uses FTS5, which I am pretty confident the SQLite3 library on iOS/macOS does not come with. 
+        // FIXME: The API uses FTS5, which I am pretty confident the SQLite3 library on iOS/macOS does not come with.
         //  Ideally we'd use FTS in some form, but will probably need to figure out something like FTS3/4,
         //  and if a device doesn't support it then just disable searching for boxart.
         //  See: https://github.com/EclipseEmu/api/blob/main/src/endpoints/boxart.rs
 
         let queryString = query
 
-        let statementInt = UInt(bitPattern: self.searchStatement)
+        let statementInt = UInt(bitPattern: searchStatement)
         return try await withUnsafeThrowingContinuation { continuation in
             self.queue.async {
                 let statement = OpaquePointer(bitPattern: statementInt)

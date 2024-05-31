@@ -1,6 +1,6 @@
-import Metal
 import AVFoundation
 import EclipseKit
+import Metal
 
 extension GameSystem {
     var string: String {

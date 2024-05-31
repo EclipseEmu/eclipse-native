@@ -60,34 +60,34 @@ struct GamePicker: View {
             .searchable(text: $searchQuery)
             .onChange(of: searchQuery) { newValue in
                 games.nsPredicate = newValue.isEmpty
-                ? nil
-                : NSPredicate(format: "name CONTAINS %@", newValue)
+                    ? nil
+                    : NSPredicate(format: "name CONTAINS %@", newValue)
             }
             .navigationTitle("Select Games")
 #if !os(macOS)
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
 #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel", role: .cancel) {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("Done")
+                        }
                     }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Done")
-                    }
-                }
-            }
         }
     }
 
     @inlinable
     func isGameInCollection(game: Game) -> Bool {
         guard !game.isDeleted else { return false }
-        return game.collections?.contains(self.collection) ?? false
+        return game.collections?.contains(collection) ?? false
     }
 
     func toggleGame(game: Game) {

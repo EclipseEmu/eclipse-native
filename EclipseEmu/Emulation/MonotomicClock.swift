@@ -1,7 +1,7 @@
 import Foundation
 
 // NOTE:
-//  This file is largely based on the Swift standard library for ContinuousClock, 
+//  This file is largely based on the Swift standard library for ContinuousClock,
 //  as a "polyfill" of sorts for older OS versions. As such, all credit really goes to the Swift people.
 
 @available(
@@ -21,13 +21,9 @@ enum MonotomicClock {
         return timebase
     }()
 
-    private static let nanosFactor: Double = {
-        return (Double(timebase.numer) / Double(timebase.denom))
-    }()
+    private static let nanosFactor: Double = .init(timebase.numer) / Double(timebase.denom)
 
-    private static let secondsFactor: Double = {
-        return nanosFactor / 1e9
-    }()
+    private static let secondsFactor: Double = nanosFactor / 1e9
 
     @usableFromInline
     static var now: Instant {

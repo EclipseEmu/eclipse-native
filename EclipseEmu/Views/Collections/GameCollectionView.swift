@@ -43,7 +43,7 @@ struct GameCollectionView: View {
                 .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
             #endif
         }
-        .navigationTitle(self.collection.name ?? "Collection")
+        .navigationTitle(collection.name ?? "Collection")
         .toolbar {
             ToolbarItem {
                 if !viewModel.isSelecting {
@@ -80,7 +80,7 @@ struct GameCollectionView: View {
             }
 
             #if !os(macOS)
-            GameListToolbarItems(viewModel: viewModel)
+                GameListToolbarItems(viewModel: viewModel)
             #endif
         }
         .sheet(isPresented: $isEditCollectionOpen) {

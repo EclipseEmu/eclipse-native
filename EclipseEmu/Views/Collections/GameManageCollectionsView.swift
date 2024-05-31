@@ -78,25 +78,15 @@ struct GameManageCollectionsView: View {
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
-        .modify {
-            if self.showDismissButton {
-                $0.toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        DismissButton()
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(action: self.finish) {
-                            Text("Done")
-                        }
-                    }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                if self.showDismissButton {
+                    DismissButton()
                 }
-            } else {
-                $0.toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(action: self.finish) {
-                            Text("Done")
-                        }
-                    }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button(action: self.finish) {
+                    Text("Done")
                 }
             }
         }

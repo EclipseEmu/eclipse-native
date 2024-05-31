@@ -1,6 +1,6 @@
-import SwiftUI
-import EclipseKit
 import CoreData
+import EclipseKit
+import SwiftUI
 
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
@@ -38,7 +38,7 @@ final class PlayGameAction: ObservableObject {
 // MARK: setup @Environment
 
 private struct PlayGameActionKey: EnvironmentKey {
-    static let defaultValue: PlayGameAction = PlayGameAction()
+    static let defaultValue: PlayGameAction = .init()
 }
 
 extension EnvironmentValues {

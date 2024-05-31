@@ -1,5 +1,5 @@
-import SwiftUI
 import mGBAEclipseCore
+import SwiftUI
 
 @main
 struct EclipseEmuApp: App {
@@ -34,8 +34,8 @@ struct EclipseEmuApp: App {
                 }
             }
         }
-        .environment(\.managedObjectContext, self.persistenceCoordinator.container.viewContext)
-        .environment(\.persistenceCoordinator, self.persistenceCoordinator)
-        .environment(\.playGame, self.playGameAction)
+        .environment(\.managedObjectContext, persistenceCoordinator.container.viewContext)
+        .environment(\.persistenceCoordinator, persistenceCoordinator)
+        .environment(\.playGame, playGameAction)
     }
 }

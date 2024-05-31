@@ -1,7 +1,7 @@
-import SwiftUI
+import AVFoundation
 import EclipseKit
 import MetalKit
-import AVFoundation
+import SwiftUI
 
 final class EmulationViewModel: ObservableObject {
     enum State {
@@ -35,15 +35,16 @@ final class EmulationViewModel: ObservableObject {
         didSet {
             Task {
                 guard case .loaded(let core) = state else { return }
-                core.audio.volume = volume
+                core.audio.volume = self.volume
             }
         }
     }
+
     @Published var isFastForwarding: Bool = false {
         didSet {
             Task {
                 guard case .loaded(let core) = state else { return }
-                await core.setFastForward(enabled: isFastForwarding)
+                await core.setFastForward(enabled: self.isFastForwarding)
             }
         }
     }
@@ -73,7 +74,7 @@ final class EmulationViewModel: ObservableObject {
             let core = try GameCoreCoordinator(
                 game: self.game,
                 coreInfo: self.coreInfo,
-                system: game.system,
+                system: self.game.system,
                 surface: surface,
                 reorderControls: self.reorderControllers
             )
@@ -85,16 +86,16 @@ final class EmulationViewModel: ObservableObject {
                 self.state = .loaded(core)
             }
 
-            await core.start(gamePath: emulationData.romPath, savePath: emulationData.savePath)
+            await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
             if let failedCheats = await core.setCheats(cheats: emulationData.cheats) {
                 // FIXME: figure out what to do with these
                 print("failed to set the following cheats:", failedCheats)
             }
             if let initialSaveState {
-                _ = await core.loadState(for: initialSaveState.path(in: persistence))
+                _ = await core.loadState(for: initialSaveState.path(in: self.persistence))
                 self.initialSaveState = nil
             }
-            GameManager.updateDatePlayed(for: game, in: persistence)
+            GameManager.updateDatePlayed(for: self.game, in: self.persistence)
         } catch {
             await MainActor.run {
                 self.state = .error(error)
@@ -104,7 +105,7 @@ final class EmulationViewModel: ObservableObject {
 
     func quit(playAction: PlayGameAction) async {
         if case .loaded(let core) = self.state {
-            try? await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
+            try? await SaveStateManager.create(isAuto: true, for: self.game, with: core, in: self.persistence)
             await core.stop()
         }
         await MainActor.run {
@@ -129,7 +130,7 @@ final class EmulationViewModel: ObservableObject {
         guard await core.state == .backgrounded else { return }
 
         do {
-            try await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
+            try await SaveStateManager.create(isAuto: true, for: self.game, with: core, in: self.persistence)
         } catch {
             print("creating save state failed:", error)
         }
@@ -156,7 +157,7 @@ final class EmulationViewModel: ObservableObject {
         Task {
             // FIXME: show a message here
             do {
-                try await SaveStateManager.create(isAuto: isAuto, for: game, with: core, in: persistence)
+                try await SaveStateManager.create(isAuto: isAuto, for: self.game, with: core, in: self.persistence)
             } catch {
                 print("creating save state failed:", error)
             }
@@ -173,13 +174,13 @@ struct EmulationView: View {
 
     var body: some View {
         ZStack {
-            GameScreenView(model: model)
+            GameScreenView(model: self.model)
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                .aspectRatio(model.aspectRatio, contentMode: .fit)
+                .aspectRatio(self.model.aspectRatio, contentMode: .fit)
 #if os(iOS)
-                .padding(.bottom, verticalSizeClass == .compact ? 0 : 240)
+                .padding(.bottom, self.verticalSizeClass == .compact ? 0 : 240)
 #endif
-                .onChange(of: scenePhase) { newPhase in
+                .onChange(of: self.scenePhase) { newPhase in
                     Task {
                         switch newPhase {
                         case .active:
@@ -189,14 +190,14 @@ struct EmulationView: View {
                         }
                     }
                 }
-                .focused($focusState)
+                .focused(self.$focusState)
                 .modify {
                     if #available(macOS 14.0, iOS 17.0, *) {
                         $0.focusable().focusEffectDisabled().onKeyPress { _ in
-                            return .handled
+                            .handled
                         }
                     } else {
-                        // FIXME: Figure out how to do the above but on older versions. 
+                        // FIXME: Figure out how to do the above but on older versions.
                         //  Really all its doing is disabling the "funk" sound.
                         $0
                     }
@@ -205,7 +206,7 @@ struct EmulationView: View {
                     print("game saved")
                 })
 
-            switch model.state {
+            switch self.model.state {
             case .loading:
                 VStack {
                     Spacer()
@@ -213,14 +214,16 @@ struct EmulationView: View {
                     Spacer()
                     Button(role: .cancel) {
                         Task {
-                            await self.model.quit(playAction: playGame)
+                            await self.model.quit(playAction: self.playGame)
                         }
                     } label: {
                         Text("Cancel")
                     }
                     .buttonStyle(.bordered)
-                    .buttonBorderShape(.capsule)
                     .controlSize(.large)
+                    #if !os(macOS)
+                        .buttonBorderShape(.capsule)
+                    #endif
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
@@ -240,7 +243,7 @@ struct EmulationView: View {
                 }.opacity(0.6)
 #endif
                 EmulationMenuView(
-                    model: model,
+                    model: self.model,
                     menuButtonLayout: .init(
                         xOrigin: .leading,
                         yOrigin: .trailing,
@@ -267,9 +270,9 @@ struct EmulationView: View {
                 }
             }
         })
-        .sheet(isPresented: $model.isSaveStateViewShown) {
+        .sheet(isPresented: self.$model.isSaveStateViewShown) {
             CompatNavigationStack {
-                SaveStatesListView(game: model.game, action: .loadState(self.model), haveDismissButton: true)
+                SaveStatesListView(game: self.model.game, action: .loadState(self.model), haveDismissButton: true)
                     .navigationTitle("Load State")
 #if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
@@ -283,10 +286,10 @@ struct EmulationView: View {
                 }
             }
         }
-        .confirmationDialog("Quit Game", isPresented: $model.isQuitConfirmationShown) {
+        .confirmationDialog("Quit Game", isPresented: self.$model.isQuitConfirmationShown) {
             Button("Quit", role: .destructive) {
                 Task {
-                    await model.quit(playAction: playGame)
+                    await self.model.quit(playAction: self.playGame)
                 }
             }
         } message: {

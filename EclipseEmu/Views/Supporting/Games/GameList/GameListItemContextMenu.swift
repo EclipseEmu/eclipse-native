@@ -21,9 +21,7 @@ struct GameListItemContextMenu: View {
             }
 
             Menu {
-                Button {
-
-                } label: {
+                Button {} label: {
                     Label("From Photos", systemImage: "photo.on.rectangle")
                 }.disabled(true)
                 Button {

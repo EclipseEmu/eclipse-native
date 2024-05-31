@@ -1,5 +1,5 @@
-import Foundation
 import EclipseKit
+import Foundation
 
 struct TouchLayout {
     var menuButton: ElementDisplay

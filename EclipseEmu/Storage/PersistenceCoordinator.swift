@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 import SwiftUI
 
 final class PersistenceCoordinator {
@@ -20,9 +20,9 @@ final class PersistenceCoordinator {
     let imageDirectory: URL
 
     @usableFromInline
-    var context: NSManagedObjectContext { self.container.viewContext }
+    var context: NSManagedObjectContext { container.viewContext }
 
-    lazy private(set) var container: NSPersistentContainer = {
+    private(set) lazy var container: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "EclipseEmu")
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
@@ -42,7 +42,7 @@ final class PersistenceCoordinator {
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 
-        container.loadPersistentStores(completionHandler: { (_, error) in
+        container.loadPersistentStores(completionHandler: { _, error in
             if let error = error as NSError? {
                 // FIXME: handle this error
                 /*
@@ -90,8 +90,8 @@ final class PersistenceCoordinator {
     }
 
     func saveIfNeeded() {
-        guard self.context.hasChanges else { return }
-        self.save()
+        guard context.hasChanges else { return }
+        save()
     }
 
     func remove(_ object: NSManagedObject) async {
@@ -126,7 +126,7 @@ final class PersistenceCoordinator {
 
     @inlinable
     func deleteFile(path: URL) throws {
-        guard self.fileManager.fileExists(atPath: path.path) else { return }
+        guard fileManager.fileExists(atPath: path.path) else { return }
         try fileManager.removeItem(at: path)
     }
 }
@@ -135,9 +135,9 @@ final class PersistenceCoordinator {
 
 private struct PersistenceCoordinatorKey: EnvironmentKey {
     #if DEBUG
-    static let defaultValue: PersistenceCoordinator = PersistenceCoordinator.preview
+    static let defaultValue: PersistenceCoordinator = .preview
     #else
-    static let defaultValue: PersistenceCoordinator = PersistenceCoordinator.shared
+    static let defaultValue: PersistenceCoordinator = .shared
     #endif
 }
 

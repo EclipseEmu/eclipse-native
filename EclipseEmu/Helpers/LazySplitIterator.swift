@@ -22,7 +22,7 @@ struct LazySplitIterator<T: BidirectionalCollection> where T.Element: Equatable 
             next = self.inner.index(after: next)
         }
 
-        let subsequence = self.inner[self.previousIndex..<next]
+        let subsequence = self.inner[self.previousIndex ..< next]
         self.previousIndex = next != self.inner.endIndex ? self.inner.index(after: next) : self.inner.endIndex
         return subsequence
     }

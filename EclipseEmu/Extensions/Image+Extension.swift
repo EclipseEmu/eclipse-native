@@ -29,7 +29,7 @@ extension CGImage {
         var totalBlue = 0
         var totalGreen = 0
 
-        for offset in 0..<totalPixels {
+        for offset in 0 ..< totalPixels {
             let pixel = pixelBufferPointer[offset]
             totalRed += Int((pixel >> 16) & 0xFF)
             totalGreen += Int((pixel >> 8) & 0xFF)
@@ -51,6 +51,7 @@ extension NSImage {
         return self.cgImage(forProposedRect: nil, context: nil, hints: nil)?.averageColor()
     }
 }
+
 #elseif canImport(UIKit)
 extension UIImage {
     func averageColor() -> Color? {

@@ -38,7 +38,7 @@ final class GameInputCoordinator {
         self.reorderPlayersCallback = reorderPlayers
     }
 
-    private func loadGamepadBindings(for controller: GCController) async -> [GamepadBinding] {
+    private func loadGamepadBindings(for _: GCController) async -> [GamepadBinding] {
         // FIXME: do proper binding loading
         return [
             .init(control: GCInputButtonA, kind: .button(.faceButtonRight)),
@@ -159,20 +159,20 @@ final class GameInputCoordinator {
     func handleKeyboardInput(_: GCKeyboardInput, _: GCControllerButtonInput, keyCode: GCKeyCode, isActive: Bool) {
         guard
             let input = self.keyboardBindings[keyCode],
-            self.builtinPlayer > -1 && self.builtinPlayer < Int8(self.maxPlayers)
+            self.builtinPlayer > -1, self.builtinPlayer < Int8(self.maxPlayers)
         else { return }
 
         let state = self.players[self.builtinPlayer].state
         self.players[self.builtinPlayer].state = isActive
-        ? state | input.rawValue
-        : state & (~input.rawValue)
+            ? state | input.rawValue
+            : state & (~input.rawValue)
     }
 
-    func handleGamepadInput(gamepad: GCExtendedGamepad, element: GCControllerElement) {
+    func handleGamepadInput(gamepad: GCExtendedGamepad, element _: GCControllerElement) {
         guard
             let id = gamepad.controller?.id,
             let info = self.gamepadBindings[id],
-            info.playerIndex > -1 && info.playerIndex < Int8(self.maxPlayers)
+            info.playerIndex > -1, info.playerIndex < Int8(self.maxPlayers)
         else { return }
 
         var state: UInt32 = 0
@@ -183,16 +183,16 @@ final class GameInputCoordinator {
             case .directionPad(up: let up, down: let down, left: let left, right: let right):
                 let dpad = gamepad.dpad
                 state |= (up.rawValue * UInt32(dpad.up.isPressed)) |
-                (down.rawValue * UInt32(dpad.down.isPressed)) |
-                (left.rawValue * UInt32(dpad.left.isPressed)) |
-                (right.rawValue * UInt32(dpad.right.isPressed))
+                    (down.rawValue * UInt32(dpad.down.isPressed)) |
+                    (left.rawValue * UInt32(dpad.left.isPressed)) |
+                    (right.rawValue * UInt32(dpad.right.isPressed))
             case .joystick(up: let up, down: let down, left: let left, right: let right):
                 guard let dpad = gamepad.dpads[binding.control] else { return }
                 // FIXME: make the deadzone configurable
                 state |= (up.rawValue * UInt32(dpad.yAxis.value > 0.25)) |
-                (down.rawValue * UInt32(dpad.yAxis.value < -0.25)) |
-                (left.rawValue * UInt32(dpad.xAxis.value < -0.25)) |
-                (right.rawValue * UInt32(dpad.xAxis.value > 0.25))
+                    (down.rawValue * UInt32(dpad.yAxis.value < -0.25)) |
+                    (left.rawValue * UInt32(dpad.xAxis.value < -0.25)) |
+                    (right.rawValue * UInt32(dpad.xAxis.value > 0.25))
             default:
                 break
             }
@@ -200,12 +200,12 @@ final class GameInputCoordinator {
         self.players[info.playerIndex].state = state
     }
 
-#if os(iOS)
-    func handleTouchInput(newState: UInt32) {
-        guard self.builtinPlayer > -1 && self.builtinPlayer < Int8(self.maxPlayers) else { return }
-        self.players[self.builtinPlayer].state = newState
-    }
-#endif
+    #if os(iOS)
+        func handleTouchInput(newState: UInt32) {
+            guard self.builtinPlayer > -1, self.builtinPlayer < Int8(self.maxPlayers) else { return }
+            self.players[self.builtinPlayer].state = newState
+        }
+    #endif
 }
 
 // MARK: UI related helpers for player listings
@@ -237,4 +237,3 @@ extension GameInputCoordinator.Player {
         }
     }
 }
-

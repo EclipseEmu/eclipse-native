@@ -1,7 +1,7 @@
+import Combine
+import EclipseKit
 import Foundation
 import SwiftUI
-import EclipseKit
-import Combine
 
 struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
@@ -20,7 +20,7 @@ struct CheatsView: View {
         if let core = EclipseEmuApp.cores.get(for: game) {
             self.cheatFormats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
         } else {
-            self.cheatFormats = UnsafeBufferPointer.init(start: nil, count: 0)
+            self.cheatFormats = UnsafeBufferPointer(start: nil, count: 0)
         }
 
         let request = CheatManager.listRequest(for: game)
@@ -36,14 +36,14 @@ struct CheatsView: View {
             .onDelete(perform: self.deleteCheats)
             .onMove(perform: self.moveCheat)
         }
-        .emptyState(self.cheats.isEmpty) {
+        .emptyState(cheats.isEmpty) {
             ContentUnavailableMessage {
                 Label("No Cheats", systemImage: "doc.badge.gearshape")
             } description: {
                 Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
             }
         }
-        .emptyState(self.cheatFormats.isEmpty) {
+        .emptyState(cheatFormats.isEmpty) {
             ContentUnavailableMessage {
                 Label("No Supported Cheats", systemImage: "nosign")
             } description: {
@@ -95,7 +95,7 @@ struct CheatsView: View {
     func deleteCheats(offsets: IndexSet) {
         for index in offsets {
             let cheat = cheats[index]
-            try? CheatManager.delete(cheat: cheat, in: self.persistence, save: false)
+            try? CheatManager.delete(cheat: cheat, in: persistence, save: false)
         }
         persistence.saveIfNeeded()
     }

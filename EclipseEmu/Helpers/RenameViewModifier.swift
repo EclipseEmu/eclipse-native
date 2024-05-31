@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreData
+import SwiftUI
 
 struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
     @Binding var target: T?
@@ -26,9 +26,9 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: target, perform: self.targetChanged(newTarget:))
-            .alert(title, isPresented: $isOpen) {
-                TextField(placeholder, text: $text)
+            .onChange(of: self.target, perform: self.targetChanged(newTarget:))
+            .alert(self.title, isPresented: self.$isOpen) {
+                TextField(self.placeholder, text: self.$text)
                 Button("Cancel", role: .cancel, action: self.cancel)
                 Button("Rename", action: self.rename)
             }

@@ -112,7 +112,7 @@ struct SettingsView: View {
                             .overlay { AppIconView() }
                             .frame(width: 44, height: 44)
                             .clipShape(RoundedRectangle(cornerRadius: 11.0))
-                        Text("v\(Bundle.main.releaseVersionNumber ?? "") (\( Bundle.main.buildVersionNumber ?? ""))")
+                        Text("v\(Bundle.main.releaseVersionNumber ?? "") (\(Bundle.main.buildVersionNumber ?? ""))")
                     }.frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
                 }
             }

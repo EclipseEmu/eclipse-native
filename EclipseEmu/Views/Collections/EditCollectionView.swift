@@ -14,7 +14,7 @@ struct CollectionColorPickerView: View {
                     self.selectedColor = color
                 } label: {
                     ZStack {
-                        let isSelected = selectedColor == color
+                        let isSelected = self.selectedColor == color
                         Circle()
                             .foregroundColor(color)
                             .scaleEffect(isSelected ? 0.8 : 1.0)
@@ -48,7 +48,7 @@ struct CollectionIconPickerView: View {
                 } label: {
                     ZStack {
                         let icon = GameCollection.Icon.symbol(image)
-                        let isSelected = selectedIcon == icon
+                        let isSelected = self.selectedIcon == icon
 
                         Circle()
                             .fill(.quaternary.opacity(0.45))
@@ -109,7 +109,7 @@ struct EditCollectionView: View {
                                 .clipShape(Circle())
                                 .padding()
 
-                            TextField("Collection Name", text: $name)
+                            TextField("Collection Name", text: self.$name)
                                 .padding()
                                 .multilineTextAlignment(.center)
                                 .background(.quaternary.opacity(0.45))
@@ -119,22 +119,19 @@ struct EditCollectionView: View {
                     }
 
                     Section {
-                        CollectionColorPickerView(selectedColor: $selectedColor)
+                        CollectionColorPickerView(selectedColor: self.$selectedColor)
                     }
 
                     Section {
-                        CollectionIconPickerView(selectedIcon: $selectedIcon)
+                        CollectionIconPickerView(selectedIcon: self.$selectedIcon)
                     }
                 }
             }
             .navigationTitle(self.collection == nil ? "New Collection" : "Edit Collection")
-#if !os(macOS)
-            .navigationBarTitleDisplayMode(.inline)
-#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
-                        dismiss()
+                        self.dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -144,6 +141,9 @@ struct EditCollectionView: View {
                     .disabled(self.name.isEmpty)
                 }
             }
+#if !os(macOS)
+            .navigationBarTitleDisplayMode(.inline)
+#endif
         }
     }
 

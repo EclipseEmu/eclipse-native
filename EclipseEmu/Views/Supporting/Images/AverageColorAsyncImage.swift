@@ -22,9 +22,9 @@ struct AverageColorAsyncImage<Content: View>: View {
 
     var body: some View {
         Group {
-            handlePhase(state)
+            self.handlePhase(self.state)
         }
-        .task(id: url) {
+        .task(id: self.url) {
             self.load()
         }
         .onDisappear {

@@ -2,7 +2,7 @@
 import SwiftUI
 
 fileprivate final class ControlModel: Identifiable, ObservableObject {
-    var id: UUID = UUID()
+    var id: UUID = .init()
     @Published var width: Double
     @Published var height: Double
     @Published var location: CGPoint
@@ -63,7 +63,7 @@ fileprivate struct Grabber: View {
 
     var drag: some Gesture {
         DragGesture()
-            .onChanged { value in
+            .onChanged { _ in
                 switch self.side {
                 case .top:
                     break
@@ -103,7 +103,7 @@ fileprivate struct ControlView: View {
                 newLocation.y += value.translation.height
                 self.model.location = newLocation
             }
-            .updating($startLocation) { (_, startLocation, _) in
+            .updating($startLocation) { _, startLocation, _ in
                 self.selection = self.model
                 startLocation = startLocation ?? model.location
             }
@@ -111,7 +111,7 @@ fileprivate struct ControlView: View {
 
     var fingerDrag: some Gesture {
         DragGesture()
-            .updating($fingerLocation) { (value, fingerLocation, _) in
+            .updating($fingerLocation) { value, fingerLocation, _ in
                 fingerLocation = value.location
             }
     }
@@ -214,9 +214,7 @@ struct SettingsTouchLayoutView: View {
 
                 HStack(spacing: 16.0) {
                     DismissButton()
-                    Button {
-
-                    } label: {
+                    Button {} label: {
                         Label("Add", systemImage: "plus")
                     }
                     .buttonStyle(.bordered)

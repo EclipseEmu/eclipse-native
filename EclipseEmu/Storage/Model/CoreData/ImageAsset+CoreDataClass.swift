@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 @objc(ImageAsset)
 public class ImageAsset: NSManagedObject {

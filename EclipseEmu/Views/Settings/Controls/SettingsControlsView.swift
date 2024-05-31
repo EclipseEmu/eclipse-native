@@ -1,5 +1,5 @@
-import SwiftUI
 import GameController
+import SwiftUI
 
 extension GCController: Identifiable {}
 
@@ -27,12 +27,12 @@ struct SettingsControlsView: View {
             }
 
             Section("Connected Controllers") {
-                ForEach(controllers) { controller in
+                ForEach(self.controllers) { controller in
                     if controller.extendedGamepad != nil {
                         NavigationLink(destination: SettingsGamepadView(controller: controller)) {
                             Label(
                                 controller.vendorName ?? "Unknown Controller",
-                                systemImage: controllerSymbol(controller: controller)
+                                systemImage: self.controllerSymbol(controller: controller)
                             )
                         }
                     }

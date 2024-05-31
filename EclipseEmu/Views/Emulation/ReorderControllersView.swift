@@ -1,5 +1,5 @@
-import SwiftUI
 import EclipseKit
+import SwiftUI
 
 struct PlayerOrderChangeRequest: Identifiable {
     var id = UUID()
@@ -25,7 +25,7 @@ struct ReorderControllersView: View {
     var body: some View {
         CompatNavigationStack {
             List {
-                ForEach(Array(request.players.enumerated()), id: \.element.id) { (index, player) in
+                ForEach(Array(request.players.enumerated()), id: \.element.id) { index, player in
                     HStack(alignment: .center) {
                         Label(player.displayName, systemImage: player.sfSymbol)
                         Spacer()
@@ -39,15 +39,15 @@ struct ReorderControllersView: View {
                 }
             }
             .navigationTitle("Reorder Controllers")
-            #if os(iOS)
-            .environment(\.editMode, .constant(EditMode.active))
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 ToolbarItem(placement: DismissButton.placement) {
                     DismissButton()
                 }
             }
+#if os(iOS)
+            .environment(\.editMode, .constant(EditMode.active))
+            .navigationBarTitleDisplayMode(.inline)
+#endif
         }
         .modify {
             if #available(iOS 16.0, *) {

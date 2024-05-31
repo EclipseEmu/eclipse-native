@@ -1,9 +1,9 @@
-import Foundation
 import CoreData
+import Foundation
 
 @objc(Game)
 public class Game: NSManagedObject {
-    public override func prepareForDeletion() {
+    override public func prepareForDeletion() {
         super.prepareForDeletion()
         let persistence = PersistenceCoordinator.preview
         let romPath = self.romPath(in: persistence)

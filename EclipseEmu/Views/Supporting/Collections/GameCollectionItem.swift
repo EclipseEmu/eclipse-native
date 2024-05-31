@@ -48,5 +48,5 @@ struct GameCollectionItem: View {
         GameCollectionItem(collection: collection)
             .frame(width: 180.0)
     }
-        .environment(\.managedObjectContext, context)
+    .environment(\.managedObjectContext, context)
 }

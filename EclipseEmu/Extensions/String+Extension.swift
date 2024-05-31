@@ -65,7 +65,7 @@ extension String {
         }
 
         // return the slice
-        return self[newStartIndex...newEndIndex]
+        return self[newStartIndex ... newEndIndex]
     }
 
     @inlinable

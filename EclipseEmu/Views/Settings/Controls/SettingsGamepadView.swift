@@ -1,6 +1,6 @@
-import SwiftUI
-import GameController
 import EclipseKit
+import GameController
+import SwiftUI
 
 struct SettingsGamepadView: View {
     var controller: GCController

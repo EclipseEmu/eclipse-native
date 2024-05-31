@@ -6,7 +6,7 @@ struct EmptyStateViewModifier<EmptyContent>: ViewModifier where EmptyContent: Vi
 
     func body(content: Content) -> some View {
         if isEmpty {
-            self.emptyContent()
+            emptyContent()
         } else {
             content
         }

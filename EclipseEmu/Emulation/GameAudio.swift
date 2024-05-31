@@ -1,5 +1,5 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 final class GameAudio {
     enum Failure: Error {
@@ -43,7 +43,7 @@ final class GameAudio {
         self.ringBuffer = RingBuffer(capacity: Int(format.sampleRate * Double(format.channelCount * 2)))
 
         self.engine = AVAudioEngine()
-        playback = AVAudioUnitTimePitch()
+        self.playback = AVAudioUnitTimePitch()
         self.engine.attach(self.playback)
         self.engine.connect(self.engine.mainMixerNode, to: self.playback, format: nil)
         self.engine.connect(self.playback, to: self.engine.outputNode, format: nil)
@@ -126,7 +126,7 @@ final class GameAudio {
 
     @inlinable
     func write(samples: UnsafeRawPointer, count: Int) -> Int {
-        return ringBuffer.write(src: samples, length: count)
+        return self.ringBuffer.write(src: samples, length: count)
     }
 
     // MARK: Source Node Handling
@@ -136,7 +136,7 @@ final class GameAudio {
             self.engine.detach(sourceNode)
         }
 
-        self.sourceNode = AVAudioSourceNode(format: inputFormat, renderBlock: renderBlock)
+        self.sourceNode = AVAudioSourceNode(format: self.inputFormat, renderBlock: self.renderBlock)
 
         if let sourceNode {
             self.engine.attach(sourceNode)
@@ -152,12 +152,12 @@ final class GameAudio {
     ) -> OSStatus {
         let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
         guard let buffer = buffers[0].mData else {
-            self.lastAvailableRead = ringBuffer.availableRead()
+            self.lastAvailableRead = self.ringBuffer.availableRead()
             return kAudioFileStreamError_UnspecifiedError
         }
 
         let requested = Int(frameCount * self.inputFormat.streamDescription.pointee.mBytesPerFrame)
-        let availableRead = ringBuffer.availableRead()
+        let availableRead = self.ringBuffer.availableRead()
         guard availableRead >= requested && availableRead >= self.lastAvailableRead else {
             self.lastAvailableRead = availableRead
             return kAudioFileStreamError_DataUnavailable
@@ -165,12 +165,12 @@ final class GameAudio {
 
         let amountRead = self.ringBuffer.read(dst: buffer, length: requested)
         guard amountRead > 0 else {
-            self.lastAvailableRead = ringBuffer.availableRead()
+            self.lastAvailableRead = self.ringBuffer.availableRead()
             return kAudioFileStreamError_DataUnavailable
         }
 
         buffers[0].mDataByteSize = UInt32(amountRead)
-        self.lastAvailableRead = ringBuffer.availableRead()
+        self.lastAvailableRead = self.ringBuffer.availableRead()
         return noErr
     }
 
@@ -183,7 +183,7 @@ final class GameAudio {
         ) { [weak self] _ in
             guard let self else { return }
 #if os(macOS)
-            self.setOutputDevice(self.isUsingDefaultOutput ? 0 : engine.outputNode.auAudioUnit.deviceID)
+            self.setOutputDevice(self.isUsingDefaultOutput ? 0 : self.engine.outputNode.auAudioUnit.deviceID)
 #else
             self.engine.stop()
 
@@ -191,7 +191,7 @@ final class GameAudio {
                 self.engine.connect(sourceNode, to: self.engine.mainMixerNode, format: self.inputFormat)
             }
 
-            guard self.running && !self.engine.isRunning else { return }
+            guard self.running, !self.engine.isRunning else { return }
             self.engine.prepare()
             self._resume()
 #endif
@@ -206,7 +206,7 @@ final class GameAudio {
     }
 
 #if os(macOS)
-    /// There was a bug, it may still be a thing, where with AirPods the audio engine 
+    /// There was a bug, it may still be a thing, where with AirPods the audio engine
     /// would prepare both input and output. This bug essentially degraded audio to the
     /// phone call quality, which is awful.
     func getDefaultDevice() -> AudioDeviceID {
@@ -240,10 +240,10 @@ final class GameAudio {
             deviceId
         }
 
-        engine.stop()
+        self.engine.stop()
 
         do {
-            try engine.outputNode.auAudioUnit.setDeviceID(id)
+            try self.engine.outputNode.auAudioUnit.setDeviceID(id)
         } catch {
             print("failed to set the audio output device", error)
         }
@@ -252,7 +252,7 @@ final class GameAudio {
             self.engine.connect(sourceNode, to: self.engine.mainMixerNode, format: self.inputFormat)
         }
 
-        guard self.running && !self.engine.isRunning else { return }
+        guard self.running, !self.engine.isRunning else { return }
         self.engine.prepare()
         self._resume()
     }

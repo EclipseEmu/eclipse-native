@@ -1,9 +1,9 @@
+import CoreImage
+import EclipseKit
 import Foundation
 import Metal
 import QuartzCore
 import simd
-import EclipseKit
-import CoreImage
 
 struct FrameBuffer: ~Copyable {
     let buffer: UnsafeMutableRawPointer
@@ -55,7 +55,7 @@ struct FrameBuffer: ~Copyable {
             return
         }
 
-        self.sourceBuffer.contents().copyMemory(from: buffer, byteCount: self.bufferSize)
+        sourceBuffer.contents().copyMemory(from: buffer, byteCount: bufferSize)
 
         guard let encoder = commandBuffer.makeBlitCommandEncoder() else { return }
         let len = sourceBuffer.length
@@ -196,14 +196,14 @@ final class GameFrameBufferRenderer {
         )
         textureDescriptor.storageMode = .private
         textureDescriptor.usage = [.shaderRead, .shaderWrite]
-        renderTexture = device.makeTexture(descriptor: textureDescriptor)
+        self.renderTexture = device.makeTexture(descriptor: textureDescriptor)
     }
 
     func render(in renderingSurface: CAMetalLayer) {
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
 
         guard let texture = renderTexture else { return }
-        self.frameBuffer.prepare(with: commandBuffer, texture: texture)
+        frameBuffer.prepare(with: commandBuffer, texture: texture)
 
         guard let drawable = renderingSurface.nextDrawable() else { return }
 
@@ -217,11 +217,11 @@ final class GameFrameBufferRenderer {
             return
         }
 
-        encoder.setRenderPipelineState(self.pipelineState)
+        encoder.setRenderPipelineState(pipelineState)
 
-        encoder.setVertexBuffer(self.quadBuffer, offset: 0, index: 0)
+        encoder.setVertexBuffer(quadBuffer, offset: 0, index: 0)
         encoder.setFragmentTexture(texture, index: 0)
-        encoder.setFragmentSamplerState(self.samplerState, index: 0)
+        encoder.setFragmentSamplerState(samplerState, index: 0)
 
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         encoder.endEncoding()

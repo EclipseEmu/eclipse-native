@@ -23,8 +23,8 @@ struct GameCollectionsView: View {
             .searchable(text: $searchQuery)
             .onChange(of: searchQuery) { newValue in
                 collections.nsPredicate = newValue.isEmpty
-                ? nil
-                : NSPredicate(format: "name CONTAINS %@", newValue)
+                    ? nil
+                    : NSPredicate(format: "name CONTAINS %@", newValue)
             }
             .navigationTitle("Collections")
             .toolbar {

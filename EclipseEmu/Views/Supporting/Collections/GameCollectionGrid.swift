@@ -1,7 +1,8 @@
 import SwiftUI
 
-struct GameCollectionGrid<GameCollections: RandomAccessCollection>: View
-    where GameCollections.Element == GameCollection {
+struct GameCollectionGrid<GameCollections: RandomAccessCollection>: View where
+    GameCollections.Element == GameCollection
+{
     let collections: GameCollections
 
     var body: some View {

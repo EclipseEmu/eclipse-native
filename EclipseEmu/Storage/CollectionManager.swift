@@ -1,5 +1,5 @@
-import Foundation
 import CoreData
+import Foundation
 
 enum CollectionManager {
     enum Failure {}
@@ -12,8 +12,13 @@ enum CollectionManager {
 
     static func searchPredicate(collection: GameCollection, query: String) -> NSPredicate {
         return query.isEmpty
-        ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
-        : NSPredicate(format: "(%K CONTAINS %@) AND (name CONTAINS %@)", #keyPath(Game.collections), collection, query)
+            ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
+            : NSPredicate(
+                format: "(%K CONTAINS %@) AND (name CONTAINS %@)",
+                #keyPath(Game.collections),
+                collection,
+                query
+            )
     }
 
     static func rename(collection: GameCollection, name: String, in persistence: PersistenceCoordinator) {

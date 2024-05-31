@@ -1,5 +1,5 @@
-import Foundation
 import Atomics
+import Foundation
 
 struct RingBuffer: ~Copyable {
     let capacity: Int

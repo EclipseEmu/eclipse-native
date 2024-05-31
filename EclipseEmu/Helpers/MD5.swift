@@ -12,10 +12,10 @@ struct MD5Hasher: ~Copyable {
 
     init() {
         input = .init(repeating: 0, count: 16)
-        // SAFTEY: we want a window of the u32 array, this gives us one. 16 * sizeof(uint32_t) = 64, 
+        // SAFTEY: we want a window of the u32 array, this gives us one. 16 * sizeof(uint32_t) = 64,
         //  so our BLOCK_SIZE will ensure no oob accesses.
         inputBytes = input.withUnsafeMutableBytes { ptr in
-            return ptr.bindMemory(to: UInt8.self)
+            ptr.bindMemory(to: UInt8.self)
         }
     }
 
@@ -222,8 +222,8 @@ struct MD5Hasher: ~Copyable {
 
     consuming func hash(file url: URL) async throws -> ContiguousArray<UInt8> {
         for try await byte in url.resourceBytes {
-            self.readByte(byte: byte)
+            readByte(byte: byte)
         }
-        return self.finish()
+        return finish()
     }
 }

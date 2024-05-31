@@ -9,7 +9,7 @@ struct SettingsEmulationView: View {
         Form {
             Section {
                 Toggle("Audio Enabled", isOn: $isAudioEnabled)
-                Slider(value: $volume, in: 0...1) {} minimumValueLabel: {
+                Slider(value: $volume, in: 0 ... 1) {} minimumValueLabel: {
                     Label("Lower Volume", systemImage: "speaker")
                 } maximumValueLabel: {
                     Label("Raise Volume", systemImage: "speaker.wave.3")

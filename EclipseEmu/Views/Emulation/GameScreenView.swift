@@ -1,5 +1,5 @@
-import SwiftUI
 import Metal
+import SwiftUI
 
 struct GameScreenView {
     var model: EmulationViewModel
@@ -50,6 +50,7 @@ class CustomMetalView: NSView {
         self.metalLayer?.magnificationFilter = .nearest
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -58,6 +59,7 @@ class CustomMetalView: NSView {
         return CAMetalLayer()
     }
 }
+
 #elseif canImport(UIKit)
 extension GameScreenView: UIViewRepresentable {
     typealias UIViewType = CustomMetalView
@@ -94,6 +96,7 @@ class CustomMetalView: UIView {
         self.metalLayer?.magnificationFilter = .nearest
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

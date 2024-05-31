@@ -4,7 +4,7 @@ struct CollectionIconView: View {
     let icon: GameCollection.Icon
 
     var body: some View {
-        switch self.icon {
+        switch icon {
         case .unknown:
             Text(Image(systemName: "exclamationmark.triangle"))
                 .fontWeight(.semibold)

@@ -1,5 +1,5 @@
-import SwiftUI
 import CoreData
+import SwiftUI
 
 // MARK: - View Model
 
@@ -98,7 +98,7 @@ final class GameListViewModel: ObservableObject {
 
     func nsPredicate(for query: String) -> NSPredicate? {
         let isEmpty = query.isEmpty
-        switch self.filter {
+        switch filter {
         case .none:
             return isEmpty
                 ? nil
@@ -110,7 +110,8 @@ final class GameListViewModel: ObservableObject {
                     format: "(%K CONTAINS %@) AND (name CONTAINS %@)",
                     #keyPath(Game.collections),
                     collection,
-                    query)
+                    query
+                )
         }
     }
 
@@ -313,7 +314,7 @@ struct GameList: View {
     let persistence = PersistenceCoordinator.preview
     let viewContext = persistence.context
 
-    for index in 0..<5 {
+    for index in 0 ..< 5 {
         let game = Game(context: viewContext)
         game.name = "Game \(index)"
         game.system = .gba

@@ -1,5 +1,5 @@
-import Foundation
 import EclipseKit
+import Foundation
 
 final class GameCoreRegistry {
     var allCores = [GameCoreInfo]()

@@ -1,14 +1,14 @@
+import AVFoundation
+import Combine
+import CoreGraphics
+import EclipseKit
 import Foundation
 import GameController
 import MetalKit
 import simd
-import EclipseKit
-import Combine
-import AVFoundation
-import CoreGraphics
 
 extension NSNotification.Name {
-    static let EKGameCoreDidSave = NSNotification.Name.init("EKGameCoreDidSaveNotification")
+    static let EKGameCoreDidSave = NSNotification.Name("EKGameCoreDidSaveNotification")
 }
 
 final actor GameCoreCoordinator {
@@ -40,9 +40,9 @@ final actor GameCoreCoordinator {
     private let game: Game
 
     let inputs: GameInputCoordinator
-    /// FIXME: there should be some sort of notification to indicate changes in state
+    // FIXME: there should be some sort of notification to indicate changes in state
     private(set) var state: State = .stopped
-    /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer 
+    /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer
     ///     can be written to syncronously by the core.
     nonisolated(unsafe) let audio: GameAudio
     /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.
@@ -91,12 +91,12 @@ final actor GameCoreCoordinator {
         do {
             self.game = game
 
-            self.callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
-            self.callbackContext.initialize(to: CallbackContext())
+            callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
+            callbackContext.initialize(to: CallbackContext())
 
-            self.callbacks = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
-            self.callbacks.initialize(to: GameCoreCallbacks(
-                callbackContext: self.callbackContext,
+            callbacks = UnsafeMutablePointer<GameCoreCallbacks>.allocate(capacity: 1)
+            callbacks.initialize(to: GameCoreCallbacks(
+                callbackContext: callbackContext,
                 didSave: Self.didSave,
                 writeAudio: Self.writeAudio
             ))
@@ -107,8 +107,8 @@ final actor GameCoreCoordinator {
 
             self.core = core
 
-            self.desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
-            self.frameDuration = 1.0 / desiredFrameRate
+            desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
+            frameDuration = 1.0 / desiredFrameRate
 
             guard let device = MTLCreateSystemDefaultDevice() else {
                 throw Failure.failedToGetMetalDevice
@@ -122,22 +122,22 @@ final actor GameCoreCoordinator {
             self.width = CGFloat(width)
             self.height = CGFloat(height)
 
-            self.renderingSurface = surface
-            self.renderingSurface.drawableSize = CGSize(width: self.width, height: self.height)
-            self.renderingSurface.device = device
-            self.renderingSurface.contentsScale = 1.0
-            self.renderingSurface.needsDisplayOnBoundsChange = true
-            self.renderingSurface.framebufferOnly = true
-            self.renderingSurface.isOpaque = true
-            self.renderingSurface.presentsWithTransaction = true
-#if canImport(AppKit)
-            self.renderingSurface.displaySyncEnabled = true
-#endif
+            renderingSurface = surface
+            renderingSurface.drawableSize = CGSize(width: self.width, height: self.height)
+            renderingSurface.device = device
+            renderingSurface.contentsScale = 1.0
+            renderingSurface.needsDisplayOnBoundsChange = true
+            renderingSurface.framebufferOnly = true
+            renderingSurface.isOpaque = true
+            renderingSurface.presentsWithTransaction = true
+            #if canImport(AppKit)
+            renderingSurface.displaySyncEnabled = true
+            #endif
 
             switch videoFormat.renderingType {
             case .frameBuffer:
                 guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
-                self.renderingSurface.pixelFormat = pixelFormat
+                renderingSurface.pixelFormat = pixelFormat
                 let renderer = try GameFrameBufferRenderer(
                     with: device,
                     width: Int(width),
@@ -155,16 +155,16 @@ final actor GameCoreCoordinator {
                 throw Failure.invalidAudioFormat
             }
 
-            self.audio = try GameAudio(format: audioFormat)
-            self.inputs = .init(
+            audio = try GameAudio(format: audioFormat)
+            inputs = .init(
                 maxPlayers: core.pointee.getMaxPlayers(core.pointee.data),
                 reorderPlayers: reorderControls
             )
 
-            self.callbackContext.pointee.parent = self
+            callbackContext.pointee.parent = self
         } catch {
-            self.callbackContext.deallocate()
-            self.callbacks.deallocate()
+            callbackContext.deallocate()
+            callbacks.deallocate()
             throw error
         }
     }
@@ -189,68 +189,68 @@ final actor GameCoreCoordinator {
                 savePath.path(percentEncoded: false).cString(using: .ascii)
             ) else { return }
         } else {
-            guard self.core.pointee.start(
-                self.core.pointee.data,
+            guard core.pointee.start(
+                core.pointee.data,
                 gamePath.path.cString(using: .ascii),
                 savePath.path.cString(using: .ascii)
             ) else { return }
         }
-        await self.inputs.start()
-        await self.audio.start()
-        await self.play(reason: .stopped)
+        await inputs.start()
+        await audio.start()
+        await play(reason: .stopped)
     }
 
     func stop() async {
-        await self.pause(reason: .stopped)
-        self.core.pointee.stop(core.pointee.data)
-        self.inputs.stop()
-        await self.audio.stop()
+        await pause(reason: .stopped)
+        core.pointee.stop(core.pointee.data)
+        inputs.stop()
+        await audio.stop()
     }
 
     func restart() async {
-        if self.state == .running {
-            await self.audio.pause()
-            self.frameTimerTask?.cancel()
-            self.frameTimerTask = nil
+        if state == .running {
+            await audio.pause()
+            frameTimerTask?.cancel()
+            frameTimerTask = nil
         }
-        self.audio.clear()
-        self.core.pointee.restart(core.pointee.data)
-        self.startFrameTimer()
-        await self.audio.resume()
-        self.state = .running
+        audio.clear()
+        core.pointee.restart(core.pointee.data)
+        startFrameTimer()
+        await audio.resume()
+        state = .running
     }
 
     func play(reason: State) async {
-        guard self.state.rawValue <= reason.rawValue else { return }
-        self.state = .running
-        self.core.pointee.play(core.pointee.data)
-        self.startFrameTimer()
-        await self.audio.resume()
+        guard state.rawValue <= reason.rawValue else { return }
+        state = .running
+        core.pointee.play(core.pointee.data)
+        startFrameTimer()
+        await audio.resume()
     }
 
     func pause(reason: State) async {
-        guard self.state.rawValue < reason.rawValue || reason == .stopped else { return }
-        self.state = reason
+        guard state.rawValue < reason.rawValue || reason == .stopped else { return }
+        state = reason
 
-        self.frameTimerTask?.cancel()
-        self.frameTimerTask = nil
+        frameTimerTask?.cancel()
+        frameTimerTask = nil
 
-        self.core.pointee.pause(core.pointee.data)
-        await self.audio.pause()
+        core.pointee.pause(core.pointee.data)
+        await audio.pause()
     }
 
     // MARK: Saving
 
     func save(to url: URL) -> Bool {
-        self.core.pointee.save(self.core.pointee.data, url.path)
+        core.pointee.save(core.pointee.data, url.path)
     }
 
     func saveState(to url: URL) -> Bool {
-        return self.core.pointee.saveState(self.core.pointee.data, url.path)
+        return core.pointee.saveState(core.pointee.data, url.path)
     }
 
     func loadState(for url: URL) -> Bool {
-        return self.core.pointee.loadState(self.core.pointee.data, url.path)
+        return core.pointee.loadState(core.pointee.data, url.path)
     }
 
     // MARK: Cheats
@@ -258,12 +258,12 @@ final actor GameCoreCoordinator {
     /// - Parameter cheats: A list of cheats to add
     /// - Returns: A set of the cheats that failed to set.
     func setCheats(cheats: Set<Cheat>) -> Set<Cheat>? {
-        self.core.pointee.clearCheats(self.core.pointee.data)
+        core.pointee.clearCheats(core.pointee.data)
         var response: Set<Cheat>?
         for cheat in cheats {
             guard let type = cheat.type, let code = cheat.code else { continue }
             // FIXME: what to do when this fails
-            let wasSuccessful = self.core.pointee.setCheat(self.core.pointee.data, type, code, cheat.enabled)
+            let wasSuccessful = core.pointee.setCheat(core.pointee.data, type, code, cheat.enabled)
             if !wasSuccessful {
                 response = response ?? Set()
                 response!.insert(cheat)
@@ -278,22 +278,22 @@ final actor GameCoreCoordinator {
         let rate: Float = enabled ? 2.0 : 1.0
         self.rate = rate
         #if canImport(AppKit)
-        self.renderingSurface.displaySyncEnabled = !enabled
+        renderingSurface.displaySyncEnabled = !enabled
         #endif
 
-        self.audio.setRate(rate: rate)
+        audio.setRate(rate: rate)
         let newFrameDuration = (1.0 / desiredFrameRate) / Double(rate)
-        switch self.renderer {
+        switch renderer {
         case .frameBuffer(let renderer):
             renderer.useAdaptiveSync = !enabled
             renderer.frameDuration = newFrameDuration
         }
-        self.frameDuration = newFrameDuration
+        frameDuration = newFrameDuration
     }
 
     // swiftlint:disable:next cyclomatic_complexity
     func startFrameTimer() {
-        self.frameTimerTask?.cancel()
+        frameTimerTask?.cancel()
         if #available(iOS 16.0, macOS 12.0, *) {
             self.frameTimerTask = Task(priority: .userInitiated) {
                 let initialTime: ContinuousClock.Instant = .now
@@ -333,11 +333,11 @@ final actor GameCoreCoordinator {
                 }
             }
         } else {
-            // NOTE: 
-            //  This version may be slightly less accurate because of the way MonotomicClock.sleep is implemented, 
+            // NOTE:
+            //  This version may be slightly less accurate because of the way MonotomicClock.sleep is implemented,
             //  hence having both. I don't think there's any way to make this more accurate, with public APIs,
             //  without blocking a thread (which defeats the purpose of a Task)
-            self.frameTimerTask = Task(priority: .userInitiated) {
+            frameTimerTask = Task(priority: .userInitiated) {
                 let initialTime: MonotomicClock.Instant = MonotomicClock.now
                 var time: MonotomicClock.Duration = 0
                 let renderInterval: MonotomicClock.Duration = MonotomicClock.seconds(1.0 / 60.0)
@@ -382,18 +382,18 @@ final actor GameCoreCoordinator {
     // MARK: Input handling
 
     func playerConnected(player: UInt8) -> Bool {
-        return self.core.pointee.playerConnected(self.core.pointee.data, player)
+        return core.pointee.playerConnected(core.pointee.data, player)
     }
 
     func playerDisconnected(player: UInt8) {
-        return self.core.pointee.playerDisconnected(self.core.pointee.data, player)
+        return core.pointee.playerDisconnected(core.pointee.data, player)
     }
 
     // MARK: Screenshot
 
     func screenshot() -> CIImage {
-        let colorSpace = self.renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
-        let result = switch self.renderer {
+        let colorSpace = renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
+        let result = switch renderer {
         case .frameBuffer(let renderer):
             renderer.screenshot(colorSpace: colorSpace)
         }

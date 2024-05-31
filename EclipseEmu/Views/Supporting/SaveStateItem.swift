@@ -21,7 +21,7 @@ struct SaveStateItem: View {
     }
 
     var body: some View {
-        Button(action: self.onSelected) {
+        Button(action: onSelected) {
             VStack(alignment: .leading) {
                 ImageAssetView(asset: self.saveState.preview, cornerRadius: 8.0)
                 Text("\(self.saveState.isAuto ? "Automatic State" : saveState.name ?? "Unnamed State")")
@@ -52,7 +52,7 @@ struct SaveStateItem: View {
     }
 
     func onSelected() {
-        switch self.action {
+        switch action {
         case .loadState(let model):
             guard case .loaded(let core) = model.state else { return }
             Task.detached {

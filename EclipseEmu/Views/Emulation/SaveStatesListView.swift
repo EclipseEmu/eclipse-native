@@ -60,7 +60,7 @@ struct SaveStatesListView: View {
             key: \.name,
             title: "Rename State",
             placeholder: "State Name",
-            onChange: self.rename
+            onChange: rename
         )
         .modify {
             if haveDismissButton {

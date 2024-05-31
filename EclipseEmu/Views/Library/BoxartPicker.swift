@@ -1,5 +1,5 @@
-import SwiftUI
 import EclipseKit
+import SwiftUI
 
 final class BoxartPickerViewModel: ObservableObject {
     enum SearchState {
@@ -48,7 +48,7 @@ final class BoxartPickerViewModel: ObservableObject {
 
     @MainActor
     func disappear() {
-        self.state = .pending
+        state = .pending
     }
 
     func search(query: String) {
@@ -214,9 +214,9 @@ struct BoxartPicker: View {
                 }
             }
             .navigationTitle("Boxart Picker")
-#if !os(macOS)
-            .navigationBarTitleDisplayMode(.inline)
-#endif
+            #if !os(macOS)
+                .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
     }
 }

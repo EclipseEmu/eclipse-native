@@ -1,19 +1,19 @@
-import Foundation
 import CoreData
+import Foundation
 
-extension SaveState {
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SaveState> {
+public extension SaveState {
+    @nonobjc class func fetchRequest() -> NSFetchRequest<SaveState> {
         return NSFetchRequest<SaveState>(entityName: "SaveState")
     }
 
-    @NSManaged public var id: UUID
-    @NSManaged public var name: String?
-    @NSManaged public var isAuto: Bool
-    @NSManaged public var date: Date?
-    @NSManaged public var fileExtension: String?
+    @NSManaged var id: UUID
+    @NSManaged var name: String?
+    @NSManaged var isAuto: Bool
+    @NSManaged var date: Date?
+    @NSManaged var fileExtension: String?
 
-    @NSManaged public var game: Game?
-    @NSManaged public var preview: ImageAsset?
+    @NSManaged var game: Game?
+    @NSManaged var preview: ImageAsset?
 }
 
 extension SaveState: Identifiable {}

@@ -1,5 +1,5 @@
-import SwiftUI
 import EclipseKit
+import SwiftUI
 
 struct EditCheatView: View {
     var game: Game
@@ -43,8 +43,8 @@ struct EditCheatView: View {
         CompatNavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $label)
-                    Toggle("Enabled", isOn: $enabled)
+                    TextField("Name", text: self.$label)
+                    Toggle("Enabled", isOn: self.$enabled)
                 } header: {
 #if !os(macOS)
                     Text("Name & State")
@@ -52,7 +52,7 @@ struct EditCheatView: View {
                 }
 
                 Section {
-                    Picker("Format", selection: $format) {
+                    Picker("Format", selection: self.$format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
                             Text(String(cString: format.displayName)).tag(format)
                         }
@@ -60,10 +60,10 @@ struct EditCheatView: View {
 
 #if os(macOS)
                     LabeledContent("Code") {
-                        CheatCodeField(value: $code, formatter: $formatter)
+                        CheatCodeField(value: self.$code, formatter: self.$formatter)
                     }
 #else
-                    CheatCodeField(value: $code, formatter: $formatter)
+                    CheatCodeField(value: self.$code, formatter: self.$formatter)
 #endif
                 } header: {
 #if !os(macOS)
@@ -75,23 +75,23 @@ struct EditCheatView: View {
             }
             .onChange(of: self.format, perform: self.formatChanged)
             .onChange(of: self.code, perform: self.codeChanged)
-            .navigationTitle(isCreatingCheat ? "Add Cheat" : "Edit Cheat")
+            .navigationTitle(self.isCreatingCheat ? "Add Cheat" : "Edit Cheat")
 #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
 #else
-            .padding()
+                .padding()
 #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel", role: .cancel) {
+                            self.dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Done", action: self.save)
+                            .disabled(self.label.isEmpty || !self.isCodeValid)
                     }
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Done", action: self.save)
-                        .disabled(label.isEmpty || !isCodeValid)
-                }
-            }
         }
     }
 
@@ -116,9 +116,9 @@ struct EditCheatView: View {
             cheat.label = self.label
             cheat.code = self.format.normalizeCode(string: self.code)
             cheat.enabled = self.enabled
-            CheatManager.update(cheat: cheat, in: persistence)
+            CheatManager.update(cheat: cheat, in: self.persistence)
 
-            dismiss()
+            self.dismiss()
         } else {
             do {
                 try CheatManager.create(
@@ -127,9 +127,9 @@ struct EditCheatView: View {
                     format: format,
                     isEnabled: self.enabled,
                     for: self.game,
-                    in: persistence
+                    in: self.persistence
                 )
-                dismiss()
+                self.dismiss()
             } catch {
                 print(error)
             }

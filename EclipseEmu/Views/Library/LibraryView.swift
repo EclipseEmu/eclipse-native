@@ -1,7 +1,7 @@
-import SwiftUI
 import CoreData
-import UniformTypeIdentifiers
 import EclipseKit
+import SwiftUI
+import UniformTypeIdentifiers
 
 struct LibraryView: View {
     static let romFileTypes: [UTType] = [
@@ -23,52 +23,53 @@ struct LibraryView: View {
 
     @FetchRequest(
         fetchRequest: GameManager.recentlyPlayedRequest(),
-        animation: .default)
+        animation: .default
+    )
     private var recentlyPlayed: FetchedResults<Game>
 
     var body: some View {
         CompatNavigationStack {
             ScrollView {
                 Section {
-                    GameKeepPlayingScroller(games: recentlyPlayed, viewModel: viewModel)
+                    GameKeepPlayingScroller(games: self.recentlyPlayed, viewModel: self.viewModel)
                 } header: {
                     SectionHeader("Keep Playing")
                         .padding([.horizontal, .top])
                 }
                 .isHidden(
-                    viewModel.isSelecting ||
-                    recentlyPlayed.isEmpty ||
-                    !viewModel.searchQuery.isEmpty
+                    self.viewModel.isSelecting ||
+                        self.recentlyPlayed.isEmpty ||
+                        !self.viewModel.searchQuery.isEmpty
                 )
 
                 Section {
-                    GameList(viewModel: viewModel)
+                    GameList(viewModel: self.viewModel)
                 } header: {
                     SectionHeader("All Games")
                         .padding([.horizontal, .top])
                         .padding(.bottom, -8)
                 }
             }
-            .allowsHitTesting(!viewModel.isEmpty)
-            .opacity(Double(!viewModel.isEmpty))
+            .allowsHitTesting(!self.viewModel.isEmpty)
+            .opacity(Double(!self.viewModel.isEmpty))
             .overlay {
-                EmptyGameListMessage(filter: viewModel.filter)
-                    .opacity(Double(viewModel.isEmpty))
+                EmptyGameListMessage(filter: self.viewModel.filter)
+                    .opacity(Double(self.viewModel.isEmpty))
                     .allowsHitTesting(false)
             }
-            .searchable(text: $viewModel.searchQuery)
-            .alert(isPresented: $isErrorDialogOpen, error: self.error) {}
+            .searchable(text: self.$viewModel.searchQuery)
+            .alert(isPresented: self.$isErrorDialogOpen, error: self.error) {}
             .fileImporter(
-                isPresented: $isRomPickerOpen,
+                isPresented: self.$isRomPickerOpen,
                 allowedContentTypes: Self.romFileTypes,
                 onCompletion: self.fileImported
             )
             .navigationTitle("Library")
             .toolbar {
                 ToolbarItem {
-                    if !viewModel.isSelecting {
+                    if !self.viewModel.isSelecting {
                         Menu {
-                            GameListMenuItems(viewModel: viewModel)
+                            GameListMenuItems(viewModel: self.viewModel)
                         } label: {
                             Label("List Options", systemImage: "ellipsis.circle")
                         }
@@ -76,7 +77,7 @@ struct LibraryView: View {
                 }
 
                 ToolbarItem {
-                    if !viewModel.isSelecting {
+                    if !self.viewModel.isSelecting {
                         Button {
                             self.isRomPickerOpen = true
                         } label: {
@@ -86,10 +87,10 @@ struct LibraryView: View {
                 }
 
                 #if !os(macOS)
-                GameListToolbarItems(viewModel: viewModel)
+                GameListToolbarItems(viewModel: self.viewModel)
                 #endif
             }
-            .sheet(item: $viewModel.target) { game in
+            .sheet(item: self.$viewModel.target) { game in
                 GameView(game: game)
                 #if os(macOS)
                     .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
@@ -127,7 +128,7 @@ struct LibraryView: View {
                         system: system,
                         romPath: url,
                         romExtension: romExtension,
-                        in: persistence
+                        in: self.persistence
                     )
                 } catch {
                     return await self.reportError(error: .unknownFileType)
@@ -150,7 +151,7 @@ struct LibraryView: View {
     let persistence = PersistenceCoordinator.preview
     let viewContext = persistence.context
 
-    for index in 0..<5 {
+    for index in 0 ..< 5 {
         let game = Game(context: viewContext)
         game.name = "Game \(index)"
         game.system = .gba

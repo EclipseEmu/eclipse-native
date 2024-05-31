@@ -50,27 +50,29 @@ struct AddToCollectionView: View {
                     Button("Create Collection") {
                         self.isCreateCollectionOpen = true
                     }
-                    .buttonBorderShape(.capsule)
                     .buttonStyle(.borderedProminent)
+                    #if !os(macOS)
+                        .buttonBorderShape(.capsule)
+                    #endif
                 }
             }
             .sheet(isPresented: $isCreateCollectionOpen) {
                 EditCollectionView()
-#if os(macOS)
+                #if os(macOS)
                     .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
-#endif
+                #endif
             }
             .navigationTitle("Add to Collection")
             #if !os(macOS)
-            .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.inline)
             #endif
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            dismiss()
+                        }
                     }
                 }
-            }
         }
     }
 }

@@ -1,6 +1,6 @@
+import EclipseKit
 import Foundation
 import UniformTypeIdentifiers
-import EclipseKit
 
 extension GameSystem {
     static func from(homebrew: String) -> Self {

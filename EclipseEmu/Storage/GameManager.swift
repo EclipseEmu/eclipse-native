@@ -1,6 +1,6 @@
-import Foundation
 import CoreData
 import EclipseKit
+import Foundation
 
 enum GameManager {
     static var openvgdb: OpenVGDB?
