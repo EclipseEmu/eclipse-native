@@ -15,11 +15,11 @@ extension Game {
     @NSManaged public var romExtension: String?
     @NSManaged public var saveExtension: String?
     @NSManaged public var system: GameSystem
-    
+
     @NSManaged public var boxart: ImageAsset?
     @NSManaged public var saveStates: NSSet?
     @NSManaged public var cheats: NSSet?
     @NSManaged public var collections: NSSet?
 }
 
-extension Game : Identifiable {}
+extension Game: Identifiable {}

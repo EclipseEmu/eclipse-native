@@ -13,7 +13,7 @@ extension GameSystem {
         default: Self.unknown
         }
     }
-    
+
     static func from(fileType: UTType) -> Self {
         return switch fileType.identifier {
         case "dev.magnetar.eclipseemu.rom.gb": Self.gb

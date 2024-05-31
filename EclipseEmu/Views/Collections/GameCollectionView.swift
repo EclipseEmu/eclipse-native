@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GameCollectionView: View {
     static let sortDescriptors = [NSSortDescriptor(keyPath: \Game.name, ascending: true)]
-    
+
     @Environment(\.dismiss) var dismiss
     @Environment(\.persistenceCoordinator) var persistence
     @FetchRequest<Game>(sortDescriptors: Self.sortDescriptors) var games
@@ -10,7 +10,7 @@ struct GameCollectionView: View {
     @State var isGamePickerPresented: Bool = false
     @State var searchQuery: String = ""
     @State var isEditCollectionOpen: Bool = false
-    
+
     @ObservedObject var collection: GameCollection
     @ObservedObject var viewModel: GameListViewModel
 
@@ -22,7 +22,7 @@ struct GameCollectionView: View {
         request.sortDescriptors = Self.sortDescriptors
         self._games = FetchRequest(fetchRequest: request)
     }
-    
+
     var body: some View {
         ScrollView {
             GameList(viewModel: viewModel)

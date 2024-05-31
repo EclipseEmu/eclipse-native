@@ -24,17 +24,19 @@ struct GamePicker: View {
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
-                    
+
                     Spacer()
-                    
-                    Button(role: hasGame ? .destructive : .none, action: { self.toggleGame(game: game) }) {
+
+                    Button(role: hasGame ? .destructive : .none) {
+                        self.toggleGame(game: game)
+                    } label: {
                         Label(
                             hasGame ? "Remove Game" : "Add Game",
                             systemImage: hasGame ? "minus" : "plus"
                         )
-                            .frame(width: 12, height: 12)
-                            .imageScale(.small)
-                            .aspectRatio(1.0, contentMode: .fit)
+                        .frame(width: 12, height: 12)
+                        .imageScale(.small)
+                        .aspectRatio(1.0, contentMode: .fit)
                     }
                     .modify {
                         if #available(iOS 17.0, macOS 14.0, *) {
@@ -58,13 +60,13 @@ struct GamePicker: View {
             .searchable(text: $searchQuery)
             .onChange(of: searchQuery) { newValue in
                 games.nsPredicate = newValue.isEmpty
-                    ? nil
-                    : NSPredicate(format: "name CONTAINS %@", newValue)
+                ? nil
+                : NSPredicate(format: "name CONTAINS %@", newValue)
             }
             .navigationTitle("Select Games")
-            #if !os(macOS)
+#if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -81,13 +83,13 @@ struct GamePicker: View {
             }
         }
     }
-    
+
     @inlinable
     func isGameInCollection(game: Game) -> Bool {
         guard !game.isDeleted else { return false }
         return game.collections?.contains(self.collection) ?? false
     }
-    
+
     func toggleGame(game: Game) {
         if isGameInCollection(game: game) {
             collection.removeFromGames(game)
@@ -110,7 +112,7 @@ struct GamePicker: View {
     collection.icon = .symbol("list.bullet")
     collection.color = GameCollection.Color.blue.rawValue
     collection.addToGames(game)
-    
+
     return GamePicker(collection: collection)
         .environment(\.managedObjectContext, context)
 }

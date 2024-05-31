@@ -101,12 +101,16 @@ final class GameListViewModel: ObservableObject {
         switch self.filter {
         case .none:
             return isEmpty
-            ? nil
-            : NSPredicate(format: "name CONTAINS %@", query)
+                ? nil
+                : NSPredicate(format: "name CONTAINS %@", query)
         case .collection(let collection):
             return isEmpty
-            ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
-            : NSPredicate(format: "(%K CONTAINS %@) AND (name CONTAINS %@)", #keyPath(Game.collections), collection, query)
+                ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
+                : NSPredicate(
+                    format: "(%K CONTAINS %@) AND (name CONTAINS %@)",
+                    #keyPath(Game.collections),
+                    collection,
+                    query)
         }
     }
 
@@ -153,7 +157,10 @@ struct GameList: View {
         Group {
             switch viewModel.displayMode {
             case .grid:
-                LazyVGrid(columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)], spacing: 16.0) {
+                LazyVGrid(
+                    columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)],
+                    spacing: 16.0
+                ) {
                     ForEach(games) { game in
                         Button {
                             self.gameAction(game: game)
@@ -209,7 +216,12 @@ struct GameList: View {
         .onChange(of: viewModel.sortDirection) { _ in
             self.sortChanged()
         }
-        .renameAlert($viewModel.renameTarget, key: \Game.name, title: "Rename Game", placeholder: "Game Name") { game, name in
+        .renameAlert(
+            $viewModel.renameTarget,
+            key: \Game.name,
+            title: "Rename Game",
+            placeholder: "Game Name"
+        ) { game, name in
             game.name = name
             persistence.saveIfNeeded()
         }
@@ -222,7 +234,7 @@ struct GameList: View {
             AddToCollectionView(viewModel: viewModel)
         }
         .confirmationDialog("", isPresented: $viewModel.isDeleteConfirmationOpen) {
-            if case .collection(_) = viewModel.filter {
+            if case .collection = viewModel.filter {
                 Button("Remove from Collection") {
                     viewModel.removeFromCollection(in: persistence)
                 }
@@ -301,9 +313,9 @@ struct GameList: View {
     let persistence = PersistenceCoordinator.preview
     let viewContext = persistence.context
 
-    for i in 0..<5 {
+    for index in 0..<5 {
         let game = Game(context: viewContext)
-        game.name = "Game \(i)"
+        game.name = "Game \(index)"
         game.system = .gba
         game.id = UUID()
         game.md5 = ""

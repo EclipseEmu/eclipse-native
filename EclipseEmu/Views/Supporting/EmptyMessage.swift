@@ -3,7 +3,7 @@ import SwiftUI
 struct EmptyMessage: View {
     let title: () -> Text
     let message: () -> Text
-    
+
     var body: some View {
         MessageBlock {
             title()

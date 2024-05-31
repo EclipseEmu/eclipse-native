@@ -13,8 +13,12 @@ public class ImageAsset: NSManagedObject {
             print("[warning] image deletion failed: \(error.localizedDescription)")
         }
     }
-    
+
     func path(in persistence: PersistenceCoordinator) -> URL {
-        return persistence.getPath(name: self.id.uuidString, fileExtension: self.fileExtension, base: persistence.imageDirectory)
+        return persistence.getPath(
+            name: self.id.uuidString,
+            fileExtension: self.fileExtension,
+            base: persistence.imageDirectory
+        )
     }
 }

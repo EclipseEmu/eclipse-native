@@ -9,7 +9,7 @@ struct LibraryView: View {
         UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gbc"),
         UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gba"),
         UTType(exportedAs: "dev.magnetar.eclipseemu.rom.nes"),
-        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes"),
+        UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes")
     ]
 
     @Environment(\.managedObjectContext) private var viewContext
@@ -25,7 +25,7 @@ struct LibraryView: View {
         fetchRequest: GameManager.recentlyPlayedRequest(),
         animation: .default)
     private var recentlyPlayed: FetchedResults<Game>
-    
+
     var body: some View {
         CompatNavigationStack {
             ScrollView {
@@ -97,7 +97,7 @@ struct LibraryView: View {
             }
         }
     }
-    
+
     func fileImported(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
@@ -106,21 +106,21 @@ struct LibraryView: View {
                     return await self.reportError(error: .failedToGetReadPermissions)
                 }
                 defer { url.stopAccessingSecurityScopedResource() }
-                
+
                 let fileType = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType
-                
+
                 let system = if let fileType {
                     GameSystem.from(fileType: fileType)
                 } else {
                     GameSystem.unknown
                 }
-                
+
                 guard system != .unknown else {
                     return await self.reportError(error: .unknownFileType)
                 }
-                
+
                 let (name, romExtension) = url.fileNameAndExtension()
-                
+
                 do {
                     try await GameManager.insert(
                         name: name,
@@ -133,13 +133,11 @@ struct LibraryView: View {
                     return await self.reportError(error: .unknownFileType)
                 }
             }
-            break
         case .failure(let err):
             print(err)
-            break
         }
     }
-    
+
     @MainActor
     func reportError(error: GameManager.Failure) {
         self.error = error
@@ -152,9 +150,9 @@ struct LibraryView: View {
     let persistence = PersistenceCoordinator.preview
     let viewContext = persistence.context
 
-    for i in 0..<5 {
+    for index in 0..<5 {
         let game = Game(context: viewContext)
-        game.name = "Game \(i)"
+        game.name = "Game \(index)"
         game.system = .gba
         game.id = UUID()
         game.md5 = ""

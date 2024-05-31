@@ -12,7 +12,7 @@ extension URL {
             (fileName, nil)
         }
     }
-    
+
     func fileExtension() -> String? {
         let fileName = self.lastPathComponent
         return if let fileExtensionIndex = fileName.firstIndex(of: ".") {

@@ -3,10 +3,10 @@ import SwiftUI
 struct GameKeepPlayingItem: View {
     @ObservedObject var game: Game
     @ObservedObject var viewModel: GameListViewModel
-    @State var color: Color? = nil
+    @State var color: Color?
     @Environment(\.playGame) private var playGame
     @Environment(\.persistenceCoordinator) private var persistence
-    
+
     var body: some View {
         Button {
             viewModel.target = game
@@ -18,7 +18,7 @@ struct GameKeepPlayingItem: View {
                         image
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                    case .failure(_):
+                    case .failure:
                         Image(systemName: "exclamationmark.triangle")
                     case .empty:
                         Rectangle()
@@ -42,13 +42,13 @@ struct GameKeepPlayingItem: View {
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                    
+
                     Text(game.system.string)
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                    
+
                     Button(action: self.play) {
                         Label("Play", systemImage: "play.fill")
                     }
@@ -80,7 +80,7 @@ struct GameKeepPlayingItem: View {
             GameListItemContextMenu(viewModel: viewModel, game: game)
         }
     }
-    
+
     func play() {
         Task.detached {
             do {
@@ -96,7 +96,7 @@ struct GameKeepPlayingItem: View {
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
     let viewContext = PersistenceCoordinator.preview.container.viewContext
-    
+
     return GameKeepPlayingItem(
         game: Game(context: viewContext),
         viewModel: viewModel

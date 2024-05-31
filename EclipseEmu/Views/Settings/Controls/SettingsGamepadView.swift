@@ -4,7 +4,7 @@ import EclipseKit
 
 struct SettingsGamepadView: View {
     var controller: GCController
-    
+
     var body: some View {
         Form {
             if controller.extendedGamepad != nil {
@@ -33,4 +33,3 @@ struct SettingsGamepadView: View {
         }.navigationTitle(controller.vendorName ?? "Controller")
     }
 }
-

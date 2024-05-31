@@ -6,11 +6,11 @@ struct EditCheatView: View {
     var cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
     var cheat: Cheat?
     var isCreatingCheat: Bool
-    
+
     @Environment(\.dismiss) var dismiss
     @Environment(\.persistenceCoordinator) var persistence
     @State var label: String
-    @State var format: GameCoreCheatFormat 
+    @State var format: GameCoreCheatFormat
     @State var formatter: CheatFormatter
     @State var code: String
     @State var enabled: Bool = true
@@ -21,7 +21,7 @@ struct EditCheatView: View {
         self.game = game
         self.cheatFormats = cheatFormats
         self.isCreatingCheat = cheat == nil
-        
+
         if let cheat {
             let format = cheatFormats.first { String(cString: $0.id) == cheat.type }!
             self.format = format
@@ -46,29 +46,29 @@ struct EditCheatView: View {
                     TextField("Name", text: $label)
                     Toggle("Enabled", isOn: $enabled)
                 } header: {
-                    #if !os(macOS)
+#if !os(macOS)
                     Text("Name & State")
-                    #endif
+#endif
                 }
-                
+
                 Section {
                     Picker("Format", selection: $format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
                             Text(String(cString: format.displayName)).tag(format)
                         }
                     }
-                    
-                    #if os(macOS)
+
+#if os(macOS)
                     LabeledContent("Code") {
                         CheatCodeField(value: $code, formatter: $formatter)
                     }
-                    #else
+#else
                     CheatCodeField(value: $code, formatter: $formatter)
-                    #endif
+#endif
                 } header: {
-                    #if !os(macOS)
+#if !os(macOS)
                     Text("Code")
-                    #endif
+#endif
                 } footer: {
                     Text("The code will automatically be formatted as \"\(String(cString: self.format.format).uppercased())\"")
                 }
@@ -76,11 +76,11 @@ struct EditCheatView: View {
             .onChange(of: self.format, perform: self.formatChanged)
             .onChange(of: self.code, perform: self.codeChanged)
             .navigationTitle(isCreatingCheat ? "Add Cheat" : "Edit Cheat")
-            #if os(iOS)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #else
+#else
             .padding()
-            #endif
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -94,20 +94,20 @@ struct EditCheatView: View {
             }
         }
     }
-    
+
     func formatChanged(value: GameCoreCheatFormat) {
         self.formatter = value.makeFormatter()
         self.code = self.formatter.formatInput(value: self.code)
         self.isCodeValid = self.formatter.validate(value: self.code)
     }
-    
+
     func codeChanged(value: String) {
         self.isCodeValid = self.formatter.validate(value: value)
     }
-    
+
     func save() {
         guard self.isCodeValid && !self.label.isEmpty else { return }
-        
+
         let format = String(cString: self.format.id)
         let normalizedCode = self.format.normalizeCode(string: self.code)
 
@@ -117,7 +117,7 @@ struct EditCheatView: View {
             cheat.code = self.format.normalizeCode(string: self.code)
             cheat.enabled = self.enabled
             CheatManager.update(cheat: cheat, in: persistence)
-            
+
             dismiss()
         } else {
             do {
@@ -142,10 +142,10 @@ struct EditCheatView: View {
     let context = PersistenceCoordinator.preview.container.viewContext
     let game = Game(context: context)
     game.system = .gba
-    
+
     let core = EclipseEmuApp.cores.allCores[0]
     let formats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
-    
+
     return EditCheatView(cheat: nil, game: game, cheatFormats: formats)
         .environment(\.managedObjectContext, context)
 }

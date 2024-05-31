@@ -3,15 +3,15 @@ import Metal
 
 struct GameScreenView {
     var model: EmulationViewModel
-    
+
     class Coordinator: NSObject {
         var parent: GameScreenView
-        
+
         init(_ parent: GameScreenView) {
             self.parent = parent
             super.init()
         }
-        
+
         @inlinable
         func surfaceCreated(surface: CAMetalLayer) async {
             await self.parent.model.renderingSurfaceCreated(surface: surface)
@@ -22,7 +22,7 @@ struct GameScreenView {
 #if canImport(AppKit)
 extension GameScreenView: NSViewRepresentable {
     typealias NSViewType = CustomMetalView
-    
+
     func makeNSView(context: Context) -> CustomMetalView {
         let view = CustomMetalView()
         view.delegate = context.coordinator
@@ -31,9 +31,9 @@ extension GameScreenView: NSViewRepresentable {
         }
         return view
     }
-    
+
     func updateNSView(_ nsView: CustomMetalView, context: Context) {}
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -42,18 +42,18 @@ extension GameScreenView: NSViewRepresentable {
 class CustomMetalView: NSView {
     var delegate: GameScreenView.Coordinator?
     var metalLayer: CAMetalLayer!
-    
+
     init() {
         super.init(frame: .zero)
         self.wantsLayer = true
         self.metalLayer = self.layer as? CAMetalLayer
         self.metalLayer?.magnificationFilter = .nearest
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func makeBackingLayer() -> CALayer {
         return CAMetalLayer()
     }
@@ -61,7 +61,7 @@ class CustomMetalView: NSView {
 #elseif canImport(UIKit)
 extension GameScreenView: UIViewRepresentable {
     typealias UIViewType = CustomMetalView
-    
+
     func makeUIView(context: Context) -> CustomMetalView {
         let view = CustomMetalView()
         view.delegate = context.coordinator
@@ -72,9 +72,9 @@ extension GameScreenView: UIViewRepresentable {
         }
         return view
     }
-    
+
     func updateUIView(_ uiView: CustomMetalView, context: Context) {}
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -83,17 +83,17 @@ extension GameScreenView: UIViewRepresentable {
 class CustomMetalView: UIView {
     var delegate: GameScreenView.Coordinator?
     var metalLayer: CAMetalLayer?
-    
+
     override class var layerClass: AnyClass {
         return CAMetalLayer.self
     }
-    
+
     init() {
         super.init(frame: .zero)
         self.metalLayer = self.layer as? CAMetalLayer
         self.metalLayer?.magnificationFilter = .nearest
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

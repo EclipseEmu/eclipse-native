@@ -6,7 +6,7 @@ struct SectionHeader: View {
     init(_ title: LocalizedStringKey) {
         self.title = title
     }
-    
+
     var body: some View {
         Text(title)
             .font(.title3.weight(.semibold))

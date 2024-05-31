@@ -49,7 +49,12 @@ extension GameCoreCommonAudioFormat {
 
 extension GameCoreAudioFormat {
     var avAudioFormat: AVAudioFormat? {
-        AVAudioFormat(commonFormat: self.commonFormat.avCommonFormat, sampleRate: self.sampleRate, channels: self.channelCount, interleaved: true)
+        AVAudioFormat(
+            commonFormat: self.commonFormat.avCommonFormat,
+            sampleRate: self.sampleRate,
+            channels: self.channelCount,
+            interleaved: true
+        )
     }
 }
 
@@ -68,7 +73,7 @@ extension GameCoreCheatFormat: Equatable, Hashable {
     public static func == (lhs: GameCoreCheatFormat, rhs: GameCoreCheatFormat) -> Bool {
         return lhs.id == rhs.id
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.id)
     }
@@ -80,7 +85,7 @@ extension GameCoreCheatFormat {
         let characterSet = self.characterSet.swiftCharacterSet.union(.onlyNewlineFeed)
         return string.normalize(with: characterSet)
     }
-    
+
     func makeFormatter() -> CheatFormatter {
         let characterSet = self.characterSet.swiftCharacterSet
         return .init(format: format, characterSet: characterSet)

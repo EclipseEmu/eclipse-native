@@ -16,7 +16,7 @@ struct EmulationMenuView: View {
     @StateObject var model: EmulationViewModel
     var menuButtonLayout: TouchLayout.ElementDisplay
     var buttonOpacity: Double
-    
+
     @Environment(\.playGame) var playGame
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 #if os(macOS)
@@ -24,7 +24,7 @@ struct EmulationMenuView: View {
     @State var hideTask: Task<Void, Never>?
     @State var hideTaskInstant: ContinuousClock.Instant = .now
 #endif
-    
+
     var content: some View {
         Group {
             Button(action: self.togglePlayPause) {
@@ -33,13 +33,12 @@ struct EmulationMenuView: View {
 #if os(macOS)
             .buttonStyle(EmulationMenuButtonStyle())
 #endif
-            
+
 #if os(macOS)
             Button(action: self.toggleFastForward) {
                 Label("Fast Forward", systemImage: "forward.fill")
             }
             .buttonStyle(EmulationMenuButtonStyle())
-            
             .foregroundStyle(model.isFastForwarding ? .primary : .secondary)
 #else
             Toggle(isOn: $model.isFastForwarding) {
@@ -51,10 +50,9 @@ struct EmulationMenuView: View {
             #else
             Divider()
             #endif
-            
-            Button(action: {
+            Button {
                 model.saveState(isAuto: false)
-            }) {
+            } label: {
                 Label("Save State", systemImage: "square.and.arrow.up.on.square")
             }
 #if os(macOS)
@@ -73,7 +71,7 @@ struct EmulationMenuView: View {
 #else
             Divider()
 #endif
-            
+
             Slider(value: $model.volume, in: 0...1) {} minimumValueLabel: {
                 Label("Lower Volume", systemImage: "speaker.fill")
             } maximumValueLabel: {
@@ -84,7 +82,7 @@ struct EmulationMenuView: View {
             .controlSize(.small)
             .frame(maxWidth: 140)
 #endif
-            
+
             Button(role: .destructive, action: self.showQuitDialog) {
                 Label("Quit", systemImage: "power")
             }
@@ -102,7 +100,7 @@ struct EmulationMenuView: View {
 #endif
         }
     }
-    
+
     var body: some View {
         GeometryReader { proxy in
             let halfWidth = menuButtonLayout.width / 2
@@ -113,7 +111,7 @@ struct EmulationMenuView: View {
             let menuButtonY = menuButtonLayout.yOrigin == .leading
             ? menuButtonLayout.y + halfHeight
             : proxy.size.height - menuButtonLayout.y - halfHeight
-            
+
 #if !os(macOS)
             Menu {
                 content
@@ -158,7 +156,7 @@ struct EmulationMenuView: View {
             .onContinuousHover(coordinateSpace: .global) { hoverPhase in
                 withAnimation {
                     switch hoverPhase {
-                    case .active(_):
+                    case .active:
                         self.isVisible = true
                         self.hideTaskInstant = .now + .seconds(5)
                         if self.hideTask == nil {
@@ -170,7 +168,7 @@ struct EmulationMenuView: View {
                                     withAnimation {
                                         self.isVisible = false
                                         self.hideTask = nil
-                                        
+
                                         NSCursor.setHiddenUntilMouseMoves(true)
                                     }
                                 }
@@ -187,21 +185,21 @@ struct EmulationMenuView: View {
 #endif
         }
     }
-    
+
     func toggleFastForward() {
         model.isFastForwarding.toggle()
     }
-    
+
     func togglePlayPause() {
         Task {
             await model.togglePlayPause()
         }
     }
-    
+
     func showQuitDialog() {
         model.isQuitConfirmationShown = true
     }
-    
+
     func showSaveStates() {
         model.isSaveStateViewShown = true
     }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-fileprivate struct GameManageCollectionItem: View {
+struct GameManageCollectionItem: View {
     let collection: GameCollection
     let stateChanged: (GameCollection, Bool) -> Void
     @State var isSelected: Bool
@@ -10,7 +10,7 @@ fileprivate struct GameManageCollectionItem: View {
         self.isSelected = isSelected
         self.stateChanged = stateChanged
     }
-    
+
     var body: some View {
         HStack {
             Label {
@@ -27,7 +27,7 @@ fileprivate struct GameManageCollectionItem: View {
                 .onChange(of: isSelected, perform: self.onChange(newState:))
         }
     }
-    
+
     func onChange(newState: Bool) {
         self.stateChanged(self.collection, newState)
     }
@@ -40,14 +40,15 @@ struct GameManageCollectionsView: View {
     @Environment(\.dismiss) var dismiss
     @State var selectedCollections: Set<GameCollection>
     @State var isCreateCollectionOpen = false
-    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)]) var collections
-    
+    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
+    var collections: FetchedResults<GameCollection>
+
     init(game: Game, showDismissButton: Bool = false) {
         self.game = game
         self.showDismissButton = showDismissButton
         self.selectedCollections = game.collections as? Set<GameCollection> ?? Set()
     }
-    
+
     var body: some View {
         List {
             Section {
@@ -100,7 +101,7 @@ struct GameManageCollectionsView: View {
             }
         }
     }
-    
+
     func stateChanged(collection: GameCollection, newState: Bool) {
         if newState {
             self.selectedCollections.insert(collection)
@@ -108,7 +109,7 @@ struct GameManageCollectionsView: View {
             self.selectedCollections.remove(collection)
         }
     }
-    
+
     func finish() {
         CollectionManager.updateGame(for: game, collections: selectedCollections, in: persistence)
         self.dismiss()

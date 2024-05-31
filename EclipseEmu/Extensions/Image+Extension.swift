@@ -29,8 +29,8 @@ extension CGImage {
         var totalBlue = 0
         var totalGreen = 0
 
-        for i in 0..<totalPixels {
-            let pixel = pixelBufferPointer[i]
+        for offset in 0..<totalPixels {
+            let pixel = pixelBufferPointer[offset]
             totalRed += Int((pixel >> 16) & 0xFF)
             totalGreen += Int((pixel >> 8) & 0xFF)
             totalBlue += Int(pixel & 0xFF)

@@ -8,7 +8,7 @@ struct CheatItemView: View {
     #endif
     @State var cheat: Cheat
     @Binding var editingCheat: Cheat?
-    
+
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -37,9 +37,9 @@ struct CheatItemView: View {
                 .labelsHidden()
             #endif
         }
-        .onChange(of: cheat.enabled, perform: { newValue in
+        .onChange(of: cheat.enabled) { _ in
             persistence.saveIfNeeded()
-        })
+        }
         .contextMenu(ContextMenu(menuItems: {
             Button {
                 self.editingCheat = cheat

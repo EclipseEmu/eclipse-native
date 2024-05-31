@@ -11,7 +11,7 @@ struct EmptyGameListMessage: View {
             } description: {
                 Text("You haven't added any games to your library.")
             }
-        case .collection(_):
+        case .collection:
             ContentUnavailableMessage {
                 Label("No Games", systemImage: "books.vertical.fill")
             } description: {

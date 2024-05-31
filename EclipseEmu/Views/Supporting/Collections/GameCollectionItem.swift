@@ -3,7 +3,7 @@ import SwiftUI
 struct GameCollectionItem: View {
     @Environment(\.persistenceCoordinator) var persistence
     @ObservedObject var collection: GameCollection
-    
+
     var body: some View {
         NavigationLink {
             GameCollectionView(collection: collection)
@@ -14,7 +14,7 @@ struct GameCollectionItem: View {
                     .fixedSize()
                     .frame(width: 32, height: 32)
                     .padding(.bottom, 8.0)
-                
+
                 Text(collection.name ?? "Unnamed Collection")
                     .fontWeight(.medium)
                     .multilineTextAlignment(.leading)
@@ -43,7 +43,7 @@ struct GameCollectionItem: View {
     collection.name = "Adventure"
     collection.icon = .symbol("tent.fill")
     collection.color = GameCollection.Color.indigo.rawValue
-    
+
     return CompatNavigationStack {
         GameCollectionItem(collection: collection)
             .frame(width: 180.0)

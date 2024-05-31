@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct CollectionColorPickerView: View {
-    static let colors: [Color] = [.red, .orange, .yellow, .green, .mint, .teal, .cyan, .blue, .indigo, .purple, .pink, .brown]
-    
+    static let colors: [Color] = [
+        .red, .orange, .yellow, .green, .mint, .teal, .cyan, .blue, .indigo, .purple, .pink, .brown
+    ]
+
     @Binding var selectedColor: Color
 
     var body: some View {
@@ -35,9 +37,9 @@ struct CollectionIconPickerView: View {
         "car.fill", "sailboat.fill", "tram.fill",
         "square.fill", "circle.fill", "triangle.fill", "diamond.fill", "heart.fill", "star.fill"
     ]
-    
+
     @Binding var selectedIcon: GameCollection.Icon
-    
+
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 42, maximum: 64))]) {
             ForEach(Self.icons, id: \.self) { image in
@@ -47,13 +49,13 @@ struct CollectionIconPickerView: View {
                     ZStack {
                         let icon = GameCollection.Icon.symbol(image)
                         let isSelected = selectedIcon == icon
-                        
+
                         Circle()
                             .fill(.quaternary.opacity(0.45))
-                        
+
                         CollectionIconView(icon: icon)
                             .font(.system(size: 18.0))
-                        
+
                         Circle()
                             .stroke(lineWidth: 3)
                             .foregroundStyle(.tint)
@@ -71,12 +73,12 @@ struct EditCollectionView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.self) var environment
     @State var name: String
-    
+
     @State var selectedColor: Color
     @State var selectedIcon: GameCollection.Icon
-    
+
     var collection: GameCollection?
-    
+
     init(collection: GameCollection? = nil) {
         self.collection = collection
         if let collection {
@@ -89,7 +91,7 @@ struct EditCollectionView: View {
             self.selectedIcon = .symbol("list.bullet")
         }
     }
-    
+
     var body: some View {
         CompatNavigationStack {
             ZStack {
@@ -115,20 +117,20 @@ struct EditCollectionView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
                         }
                     }
-                    
+
                     Section {
                         CollectionColorPickerView(selectedColor: $selectedColor)
                     }
-                    
+
                     Section {
                         CollectionIconPickerView(selectedIcon: $selectedIcon)
                     }
                 }
             }
             .navigationTitle(self.collection == nil ? "New Collection" : "Edit Collection")
-            #if !os(macOS)
+#if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -144,17 +146,23 @@ struct EditCollectionView: View {
             }
         }
     }
-    
+
     func upsert() {
         guard !self.name.isEmpty else { return }
-        
+
         let color = GameCollection.Color(color: self.selectedColor)
         if let collection {
-            CollectionManager.update(collection, name: self.name, icon: self.selectedIcon, color: color, in: self.persistence)
+            CollectionManager.update(
+                collection,
+                name: self.name,
+                icon: self.selectedIcon,
+                color: color,
+                in: self.persistence
+            )
         } else {
             CollectionManager.create(name: self.name, icon: self.selectedIcon, color: color, in: self.persistence)
         }
-        
+
         self.dismiss()
     }
 }
@@ -169,7 +177,7 @@ struct EditCollectionView: View {
     collection.name = "Hello"
     collection.color = GameCollection.Color.indigo.rawValue
     collection.icon = .symbol("heart.fill")
-    
+
     return EditCollectionView(collection: collection)
         .environment(\.managedObjectContext, persistence.context)
         .environment(\.persistenceCoordinator, persistence)

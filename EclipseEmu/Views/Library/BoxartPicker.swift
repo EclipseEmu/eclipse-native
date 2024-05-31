@@ -87,7 +87,7 @@ final class BoxartPickerViewModel: ObservableObject {
     }
 }
 
-fileprivate struct BoxartPickerItemView: View {
+struct BoxartPickerItemView: View {
     let entry: OpenVGDB.Item
     @Binding var selection: OpenVGDB.Item?
 
@@ -103,7 +103,7 @@ fileprivate struct BoxartPickerItemView: View {
                             .resizable()
                             .clipShape(RoundedRectangle(cornerRadius: 8.0))
                             .aspectRatio(1.0, contentMode: .fit)
-                    case .failure(_):
+                    case .failure:
                         Image(systemName: "exclamationmark.triangle")
                     case .empty:
                         ProgressView()
@@ -181,6 +181,7 @@ struct BoxartPicker: View {
                                 BoxartPickerItemView(entry: entry, selection: $selection)
                             }
                         } footer: {
+                            // swiftlint:disable:next line_length
                             Text("Eclipse is not associated with any of these game's developers, publishers, or other parties in anyway. This data is publically available at [OpenVGDB's GitHub](https://github.com/openvgdb/openvgdb).")
                         }
                     }
@@ -233,10 +234,22 @@ struct BoxartPicker: View {
 
         var body: some View {
             List {
-                BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil), selection: $selection)
-                BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil), selection: $selection)
-                BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil), selection: $selection)
-                BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil), selection: $selection)
+                BoxartPickerItemView(
+                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
+                    selection: $selection
+                )
+                BoxartPickerItemView(
+                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
+                    selection: $selection
+                )
+                BoxartPickerItemView(
+                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
+                    selection: $selection
+                )
+                BoxartPickerItemView(
+                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
+                    selection: $selection
+                )
             }
         }
     }

@@ -7,11 +7,11 @@ enum CheatManager {
         request.includesSubentities = false
         return request
     }
-    
+
     static func update(cheat: Cheat, in persistence: PersistenceCoordinator) {
         persistence.save()
     }
-    
+
     static func create(
         name: String,
         code: String,
@@ -29,7 +29,7 @@ enum CheatManager {
         cheat.game = game
         persistence.save()
     }
-    
+
     @inlinable
     static func delete(cheat: Cheat, in persistence: PersistenceCoordinator, save: Bool) throws {
         persistence.context.delete(cheat)

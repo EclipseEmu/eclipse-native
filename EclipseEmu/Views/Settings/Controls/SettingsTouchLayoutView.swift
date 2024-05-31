@@ -92,8 +92,8 @@ fileprivate struct ControlView: View {
     @ObservedObject var model: ControlModel
     @Binding var selection: ControlModel?
     @Binding var editorSelection: ControlModel?
-    @GestureState private var fingerLocation: CGPoint? = nil
-    @GestureState private var startLocation: CGPoint? = nil
+    @GestureState private var fingerLocation: CGPoint?
+    @GestureState private var startLocation: CGPoint?
 
     var simpleDrag: some Gesture {
         DragGesture()
@@ -193,7 +193,7 @@ struct SettingsTouchLayoutView: View {
         .init(label: "B", location: CGPoint(x: 50, y: 100), width: 50, height: 50)
     ]
 
-    var body:  some View {
+    var body: some View {
         GeometryReader { proxy in
             ZStack {
                 ZStack {

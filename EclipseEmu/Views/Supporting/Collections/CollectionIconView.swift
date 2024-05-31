@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CollectionIconView: View {
     let icon: GameCollection.Icon
-    
+
     var body: some View {
         switch self.icon {
         case .unknown:

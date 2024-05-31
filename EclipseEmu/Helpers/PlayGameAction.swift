@@ -4,24 +4,30 @@ import CoreData
 
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
-    
+
     enum Failure: Error {
         case missingCore
     }
-    
+
     public func callAsFunction(game: Game, saveState: SaveState?, persistence: PersistenceCoordinator) async throws {
         guard let core = await EclipseEmuApp.cores.get(for: game) else {
             throw Failure.missingCore
         }
-        
+
         let data = try GameManager.emulationData(for: game, in: persistence)
-        let model = EmulationViewModel(coreInfo: core, game: game, saveState: saveState, emulationData: data, persistence: persistence)
-                
+        let model = EmulationViewModel(
+            coreInfo: core,
+            game: game,
+            saveState: saveState,
+            emulationData: data,
+            persistence: persistence
+        )
+
         await MainActor.run {
             self.model = model
         }
     }
-    
+
     public func closeGame() async {
         await MainActor.run {
             self.model = nil

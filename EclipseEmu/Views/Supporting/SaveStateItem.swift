@@ -19,7 +19,7 @@ struct SaveStateItem: View {
         self.action = action
         self._renameDialogTarget = renameDialogTarget
     }
-    
+
     var body: some View {
         Button(action: self.onSelected) {
             VStack(alignment: .leading) {
@@ -45,7 +45,7 @@ struct SaveStateItem: View {
             }
         }
     }
-    
+
     func deleteSaveState() {
         SaveStateManager.delete(saveState, in: persistence)
         persistence.saveIfNeeded()
@@ -57,7 +57,7 @@ struct SaveStateItem: View {
             guard case .loaded(let core) = model.state else { return }
             Task.detached {
                 let url = await self.saveState.path(in: persistence)
-                let _ = await core.loadState(for: url)
+                _ = await core.loadState(for: url)
                 await MainActor.run {
                     dismiss()
                 }
@@ -73,7 +73,6 @@ struct SaveStateItem: View {
                     print("failed to launch game: \(error.localizedDescription)")
                 }
             }
-            break
         }
     }
 }

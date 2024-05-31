@@ -4,7 +4,7 @@ struct SettingsEmulationView: View {
     @State var isAudioEnabled = false
     @State var isIgnoreSilentModeEnabled = false
     @State var volume: Float16 = 0.6
-    
+
     var body: some View {
         Form {
             Section {
@@ -15,7 +15,7 @@ struct SettingsEmulationView: View {
                     Label("Raise Volume", systemImage: "speaker.wave.3")
                 }.labelStyle(.iconOnly).disabled(!isAudioEnabled)
             }
-            
+
             Section {
                 Toggle("Ignore Silent Mode", isOn: $isIgnoreSilentModeEnabled)
             } footer: {

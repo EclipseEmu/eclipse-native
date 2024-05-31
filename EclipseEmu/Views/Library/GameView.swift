@@ -7,7 +7,7 @@ struct GameViewHeader: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.persistenceCoordinator) var persistence
-    
+
     init(game: Game, safeAreaTop: CGFloat, play: @escaping () -> Void) {
         self.game = game
         self.safeAreaTop = safeAreaTop
@@ -31,7 +31,7 @@ struct GameViewHeader: View {
                 }
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 8.0)
-                
+
                 Button(action: self.play) {
                     Label("Play", systemImage: "play.fill")
                         .frame(maxWidth: 200)
@@ -72,11 +72,12 @@ struct GameViewHeader: View {
 struct GameView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     var game: Game
-    
+
     @Environment(\.persistenceCoordinator) var persistence
     @Environment(\.playGame) var playGame
 
-    @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: SaveStatesListView.sortDescriptors) var saveStates
+    @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: [])
+    var saveStates
     @State var renameSaveStateDialogTarget: SaveState?
     @State var renameGameDialogTarget: Game?
     @State var isChangeBoxartFromDatabaseOpen = false
@@ -102,8 +103,12 @@ struct GameView: View {
                         LazyHStack {
                             ForEach(self.saveStates) { section in
                                 ForEach(section) { saveState in
-                                    SaveStateItem(saveState: saveState, action: .startWithState(game), renameDialogTarget: $renameSaveStateDialogTarget)
-                                        .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
+                                    SaveStateItem(
+                                        saveState: saveState,
+                                        action: .startWithState(game),
+                                        renameDialogTarget: $renameSaveStateDialogTarget
+                                    )
+                                    .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
                                 }
                                 if section.id {
                                     Divider()
@@ -119,7 +124,7 @@ struct GameView: View {
                             Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
                         }
                     }
-                    
+
                     LazyVStack(alignment: .leading) {
                         NavigationLink {
                             CheatsView(game: game)
@@ -172,7 +177,7 @@ struct GameView: View {
                         }
 
                         Divider()
-                        
+
                         Button(role: .destructive, action: self.delete) {
                             Label("Delete", systemImage: "trash")
                         }
@@ -182,10 +187,20 @@ struct GameView: View {
                     .menuStyle(.borderlessButton)
                 }
             }
-            .renameAlert($renameSaveStateDialogTarget, key: \.name, title: "Rename State", placeholder: "State Name") { saveState, name in
+            .renameAlert(
+                $renameSaveStateDialogTarget,
+                key: \.name,
+                title: "Rename State",
+                placeholder: "State Name"
+            ) { saveState, name in
                 SaveStateManager.rename(saveState, to: name, in: persistence)
             }
-            .renameAlert($renameGameDialogTarget, key: \.name, title: "Rename Game", placeholder: "Game Name") { game, name in
+            .renameAlert(
+                $renameGameDialogTarget,
+                key: \.name,
+                title: "Rename Game",
+                placeholder: "Game Name"
+            ) { game, name in
                 GameManager.rename(game, to: name, in: persistence)
             }
             .sheet(isPresented: $isChangeBoxartFromDatabaseOpen) {
@@ -210,7 +225,7 @@ struct GameView: View {
     func selectedSaveState(saveState: SaveState, dismissAction: DismissAction) {
         self.play(saveState: saveState)
     }
-    
+
     func play(saveState: SaveState?) {
         Task.detached {
             do {
@@ -223,7 +238,7 @@ struct GameView: View {
             }
         }
     }
-    
+
     func delete() {
         Task {
             await MainActor.run {
@@ -239,7 +254,7 @@ struct GameView: View {
     let context = PersistenceCoordinator.preview.container.viewContext
     let game = Game(context: context)
     game.system = .gba
-    
+
     return GameView(game: game).environment(\.managedObjectContext, context)
 }
 #endif

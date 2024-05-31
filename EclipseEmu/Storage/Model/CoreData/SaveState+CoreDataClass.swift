@@ -13,8 +13,12 @@ public class SaveState: NSManagedObject {
             print("[warning] save state deletion failed: \(error.localizedDescription)")
         }
     }
-    
+
     func path(in persistence: PersistenceCoordinator) -> URL {
-        return persistence.getPath(name: self.id.uuidString, fileExtension: self.fileExtension, base: persistence.saveStateDirectory)
+        return persistence.getPath(
+            name: self.id.uuidString,
+            fileExtension: self.fileExtension,
+            base: persistence.saveStateDirectory
+        )
     }
 }

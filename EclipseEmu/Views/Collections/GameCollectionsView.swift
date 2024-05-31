@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct GameCollectionsView: View {
-    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)]) var collections
+    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
+    var collections: FetchedResults<GameCollection>
+
     @State var isCreateCollectionOpen = false
     @State var searchQuery = ""
 

@@ -1,6 +1,6 @@
 import SwiftUI
 
-fileprivate struct ContentUnavailableLabelStyle: LabelStyle {
+struct ContentUnavailableLabelStyle: LabelStyle {
     func makeBody(configuration: Configuration) -> some View {
         VStack {
             configuration.icon
@@ -41,7 +41,7 @@ struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: 
         self.description = description
         self.actions = actions
     }
-    
+
     var body: some View {
         if #available(iOS 17.0, macOS 14.0, *) {
             ContentUnavailableView(

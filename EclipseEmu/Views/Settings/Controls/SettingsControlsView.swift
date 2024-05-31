@@ -25,12 +25,15 @@ struct SettingsControlsView: View {
                     }
                 }
             }
-            
+
             Section("Connected Controllers") {
                 ForEach(controllers) { controller in
                     if controller.extendedGamepad != nil {
                         NavigationLink(destination: SettingsGamepadView(controller: controller)) {
-                            Label(controller.vendorName ?? "Unknown Controller", systemImage: controllerSymbol(controller: controller))
+                            Label(
+                                controller.vendorName ?? "Unknown Controller",
+                                systemImage: controllerSymbol(controller: controller)
+                            )
                         }
                     }
                 }
@@ -63,11 +66,11 @@ struct SettingsControlsView: View {
             }
         }
     }
-    
+
     func reloadControllers() {
         self.controllers = GCController.controllers()
     }
-    
+
     func controllerSymbol(controller: GCController) -> String {
         return switch controller.productCategory {
         case GCProductCategoryXboxOne:

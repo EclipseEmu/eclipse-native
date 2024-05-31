@@ -10,10 +10,10 @@ struct LazySplitIterator<T: BidirectionalCollection> where T.Element: Equatable 
         self.previousIndex = inner.startIndex
         self.seperator = seperator
     }
-    
+
     mutating func next() -> T.SubSequence? {
         guard self.previousIndex != self.inner.endIndex else { return nil }
-        
+
         var next = self.previousIndex
         while next < self.inner.endIndex {
             if self.inner[next] == self.seperator {

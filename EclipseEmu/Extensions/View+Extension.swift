@@ -4,7 +4,7 @@ extension View {
     func modify<T: View>(@ViewBuilder _ modifier: (Self) -> T) -> some View {
         return modifier(self)
     }
-    
+
     func backgroundSecondary() -> some View {
         self.modify {
 #if canImport(UIKit)
@@ -22,7 +22,7 @@ extension View {
 #endif
         }
     }
-    
+
     func backgroundGradient(color: Color) -> some View {
         return self.modify {
             if #available(iOS 16.0, *) {

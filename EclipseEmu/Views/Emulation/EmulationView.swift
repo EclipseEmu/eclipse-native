@@ -10,11 +10,11 @@ final class EmulationViewModel: ObservableObject {
         case error(Error)
         case loaded(GameCoreCoordinator)
     }
-    
+
     enum Failure: LocalizedError {
         case romMissing
         case romBadAccess
-        
+
         var errorDescription: String? {
             switch self {
             case .romBadAccess:
@@ -24,13 +24,13 @@ final class EmulationViewModel: ObservableObject {
             }
         }
     }
-    
+
     @Published var state: State = .loading
     @Published var aspectRatio: CGFloat = 1.0
-    
+
     @Published var isQuitConfirmationShown = false
     @Published var isSaveStateViewShown = false
-    
+
     @Published var volume: Float = 0.0 {
         didSet {
             Task {
@@ -47,14 +47,20 @@ final class EmulationViewModel: ObservableObject {
             }
         }
     }
-    
+
     var coreInfo: GameCoreInfo
     var game: Game
     var initialSaveState: SaveState?
     var persistence: PersistenceCoordinator
     var emulationData: GameManager.EmulationData
-    
-    init(coreInfo: GameCoreInfo, game: Game, saveState: SaveState?, emulationData: GameManager.EmulationData, persistence: PersistenceCoordinator) {
+
+    init(
+        coreInfo: GameCoreInfo,
+        game: Game,
+        saveState: SaveState?,
+        emulationData: GameManager.EmulationData,
+        persistence: PersistenceCoordinator
+    ) {
         self.coreInfo = coreInfo
         self.game = game
         self.persistence = persistence
@@ -71,21 +77,21 @@ final class EmulationViewModel: ObservableObject {
                 surface: surface,
                 reorderControls: self.reorderControllers
             )
-            
+
             let aspectRatio = core.width / core.height
             await MainActor.run {
                 self.aspectRatio = aspectRatio
                 self.volume = 0.5
                 self.state = .loaded(core)
             }
-            
+
             await core.start(gamePath: emulationData.romPath, savePath: emulationData.savePath)
             if let failedCheats = await core.setCheats(cheats: emulationData.cheats) {
                 // FIXME: figure out what to do with these
                 print("failed to set the following cheats:", failedCheats)
             }
             if let initialSaveState {
-                let _ = await core.loadState(for: initialSaveState.path(in: persistence))
+                _ = await core.loadState(for: initialSaveState.path(in: persistence))
                 self.initialSaveState = nil
             }
             GameManager.updateDatePlayed(for: game, in: persistence)
@@ -95,7 +101,7 @@ final class EmulationViewModel: ObservableObject {
             }
         }
     }
-    
+
     func quit(playAction: PlayGameAction) async {
         if case .loaded(let core) = self.state {
             try? await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
@@ -106,35 +112,35 @@ final class EmulationViewModel: ObservableObject {
         }
         await playAction.closeGame()
     }
-    
+
     func sceneMadeActive() async {
         guard case .loaded(let core) = self.state else { return }
         await core.play(reason: .backgrounded)
     }
-    
+
     func sceneHidden() async {
-        guard 
+        guard
             case .loaded(let core) = self.state,
             await core.state != .backgrounded
         else { return }
-        
+
         await core.pause(reason: .backgrounded)
-        
+
         guard await core.state == .backgrounded else { return }
-        
+
         do {
             try await SaveStateManager.create(isAuto: true, for: game, with: core, in: persistence)
         } catch {
             print("creating save state failed:", error)
         }
     }
-    
-    func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async -> Void {
+
+    func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
         guard case .loaded(let core) = self.state else { return }
         await core.pause(reason: .pendingUserInput)
         await core.play(reason: .pendingUserInput)
     }
-    
+
     func togglePlayPause() async {
         guard case .loaded(let core) = self.state else { return }
         if await core.state == .running {
@@ -143,10 +149,10 @@ final class EmulationViewModel: ObservableObject {
             await core.play(reason: .paused)
         }
     }
-    
+
     func saveState(isAuto: Bool) {
         guard case .loaded(let core) = self.state else { return }
-        
+
         Task {
             // FIXME: show a message here
             do {
@@ -164,15 +170,15 @@ struct EmulationView: View {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @FocusState var focusState
     @StateObject var model: EmulationViewModel
-    
+
     var body: some View {
         ZStack {
             GameScreenView(model: model)
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .aspectRatio(model.aspectRatio, contentMode: .fit)
-                #if os(iOS)
+#if os(iOS)
                 .padding(.bottom, verticalSizeClass == .compact ? 0 : 240)
-                #endif
+#endif
                 .onChange(of: scenePhase) { newPhase in
                     Task {
                         switch newPhase {
@@ -190,14 +196,15 @@ struct EmulationView: View {
                             return .handled
                         }
                     } else {
-                        // FIXME: Figure out how to do the above but on older versions. Really all its doing is disabling the "funk" sound.
+                        // FIXME: Figure out how to do the above but on older versions. 
+                        //  Really all its doing is disabling the "funk" sound.
                         $0
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .EKGameCoreDidSave), perform: { _ in
                     print("game saved")
                 })
-           
+
             switch model.state {
             case .loading:
                 VStack {
@@ -227,14 +234,22 @@ struct EmulationView: View {
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
             case .loaded(let core):
-                #if os(iOS)
+#if os(iOS)
                 TouchControlsView { newValue in
                     core.inputs.handleTouchInput(newState: newValue)
                 }.opacity(0.6)
-                #endif
+#endif
                 EmulationMenuView(
                     model: model,
-                    menuButtonLayout: .init(xOrigin: .leading, yOrigin: .trailing, x: 16, y: 0, width: 42, height: 42, hidden: false),
+                    menuButtonLayout: .init(
+                        xOrigin: .leading,
+                        yOrigin: .trailing,
+                        x: 16,
+                        y: 0,
+                        width: 42,
+                        height: 42,
+                        hidden: false
+                    ),
                     buttonOpacity: 0.6
                 )
                 .onAppear {
@@ -256,9 +271,9 @@ struct EmulationView: View {
             CompatNavigationStack {
                 SaveStatesListView(game: model.game, action: .loadState(self.model), haveDismissButton: true)
                     .navigationTitle("Load State")
-                #if !os(macOS)
+#if !os(macOS)
                     .navigationBarTitleDisplayMode(.inline)
-                #endif
+#endif
             }
             .modify {
                 if #available(iOS 16.0, *) {
@@ -279,7 +294,7 @@ struct EmulationView: View {
         }
         .background(Color.black, ignoresSafeAreaEdges: .all)
     }
-    
+
     func loadState(saveState: SaveState, dismiss: DismissAction) {
         guard case .loaded(let core) = self.model.state else { return }
 
@@ -287,7 +302,7 @@ struct EmulationView: View {
 
         Task {
             let path = saveState.path(in: self.model.persistence)
-            let _ = await core.loadState(for: path)
+            _ = await core.loadState(for: path)
         }
     }
 }

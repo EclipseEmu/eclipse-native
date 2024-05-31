@@ -75,11 +75,14 @@ struct AverageColorAsyncImage<Content: View>: View {
 
         var body: some View {
             VStack {
-                AverageColorAsyncImage(url: URL(string: "https://picsum.photos/200"), averageColor: $color) { imagePhase in
+                AverageColorAsyncImage(
+                    url: URL(string: "https://picsum.photos/200"),
+                    averageColor: $color
+                ) { imagePhase in
                     switch imagePhase {
                     case .empty:
                         ProgressView()
-                    case .failure(_):
+                    case .failure:
                         Image(systemName: "person.crop.circle.badge.exclamationmark")
                     case .success(let image):
                         image.resizable()

@@ -1,6 +1,6 @@
 import SwiftUI
 
-fileprivate struct SettingsLabelStyle: LabelStyle {
+struct SettingsLabelStyle: LabelStyle {
     func makeBody(configuration: Configuration) -> some View {
         HStack {
             ZStack {
@@ -21,7 +21,7 @@ fileprivate struct SettingsLabelStyle: LabelStyle {
 
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         CompatNavigationStack {
             List {
@@ -39,7 +39,7 @@ struct SettingsView: View {
                             .labelStyle(SettingsLabelStyle())
                     }
                 }
-                
+
                 Section {
                     Link(destination: URL(string: "https://eclipseemu.me/")!) {
                         HStack {
@@ -69,7 +69,7 @@ struct SettingsView: View {
                         }
                     }
                 }.buttonStyle(.plain)
-                
+
                 Section {
                     Link(destination: URL(string: "https://discord.gg/Mx2W9nec4Z")!) {
                         HStack {
@@ -90,7 +90,7 @@ struct SettingsView: View {
                         }
                     }
                 }.buttonStyle(.plain)
-                
+
                 Section {
                     Button(role: .destructive) {} label: {
                         Text("Reset Library")
@@ -105,7 +105,7 @@ struct SettingsView: View {
                         Text("Reset All Content & Settings")
                     }
                 }
-                
+
                 Section {} footer: {
                     VStack(alignment: .center) {
                         Rectangle()

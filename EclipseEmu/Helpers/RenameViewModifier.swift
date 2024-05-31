@@ -9,7 +9,7 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
     let placeholder: LocalizedStringKey
     let keyPath: KeyPath<T, String?>
     let onChange: (T, String) -> Void
-    
+
     init(
         target: Binding<T?>,
         keyPath: KeyPath<T, String?>,
@@ -23,7 +23,7 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
         self.placeholder = placeholder
         self.onChange = onChange
     }
-    
+
     func body(content: Content) -> some View {
         content
             .onChange(of: target, perform: self.targetChanged(newTarget:))
@@ -33,7 +33,7 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
                 Button("Rename", action: self.rename)
             }
     }
-    
+
     func targetChanged(newTarget: T?) {
         if let newTarget {
             self.text = newTarget[keyPath: self.keyPath] ?? ""
@@ -43,12 +43,12 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
             self.isOpen = false
         }
     }
-    
-    func cancel() -> Void {
+
+    func cancel() {
         self.target = nil
     }
-    
-    func rename() -> Void {
+
+    func rename() {
         guard let target else { return }
         self.onChange(target, self.text)
         self.target = nil
@@ -63,6 +63,8 @@ extension View {
         placeholder: LocalizedStringKey,
         onChange: @escaping (T, String) -> Void
     ) -> some View {
-        modifier(RenameViewModifier(target: target, keyPath: key, title: title, placeholder: placeholder, onChange: onChange))
+        modifier(
+            RenameViewModifier(target: target, keyPath: key, title: title, placeholder: placeholder, onChange: onChange)
+        )
     }
 }

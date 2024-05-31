@@ -1,31 +1,37 @@
 import Foundation
 
-fileprivate let BLOCK_SIZE: UInt8 = 64
-fileprivate let BLOCK_SIZE_MASK: UInt8 = 0b00111111 // 63, all bits before 64 are on.
-
 struct MD5Hasher: ~Copyable {
+    private static let blockSize: UInt8 = 64
+    private static let blockSizeMask: UInt8 = 0b00111111 // 63, all bits before 64 are on.
+
     private var input: ContiguousArray<UInt32>
     private var inputBytes: UnsafeMutableBufferPointer<UInt8>
     private var buffer: ContiguousArray<UInt32> = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
     private var size: UInt64 = 0
     private var offset: UInt8 = 0
-    
+
     init() {
         input = .init(repeating: 0, count: 16)
-        // SAFTEY: we want a window of the u32 array, this gives us one. 16 * sizeof(uint32_t) = 64, so our BLOCK_SIZE will ensure no oob accesses.
+        // SAFTEY: we want a window of the u32 array, this gives us one. 16 * sizeof(uint32_t) = 64, 
+        //  so our BLOCK_SIZE will ensure no oob accesses.
         inputBytes = input.withUnsafeMutableBytes { ptr in
             return ptr.bindMemory(to: UInt8.self)
         }
     }
-    
-    /// This function is largely based on the implementation written by Joseph Myers, except with the round functions inlined.
-    /// http://www.myersdaily.org/joseph/javascript/md5-text.html
+
+    // This function is largely based on the implementation written by Joseph Myers,
+    // except with the round functions inlined. http://www.myersdaily.org/joseph/javascript/md5-text.html
+    // swiftlint:disable:next function_body_length
     private mutating func step() {
-        var a = buffer[0];
-        var b = buffer[1];
-        var c = buffer[2];
-        var d = buffer[3];
-        
+        // swiftlint:disable:next identifier_name
+        var a = buffer[0]
+        // swiftlint:disable:next identifier_name
+        var b = buffer[1]
+        // swiftlint:disable:next identifier_name
+        var c = buffer[2]
+        // swiftlint:disable:next identifier_name
+        var d = buffer[3]
+
         // round 1 (f)
         a &+= (((b & c) | (~b & d)) &+ input[0] &- 680876936)
         a = (((a << 7) | (a >> 25)) &+ b)
@@ -172,48 +178,39 @@ struct MD5Hasher: ~Copyable {
     mutating func readByte(byte: UInt8) {
         size += 1
         inputBytes[Int(offset)] = byte
-        offset = (offset + 1) & BLOCK_SIZE_MASK
+        offset = (offset + 1) & Self.blockSizeMask
         if offset != 0 {
             return
         }
         step()
     }
-    
+
     consuming func finish() -> ContiguousArray<UInt8> {
-        let paddingIters = 56 + (offset >= 56 ? 1 : 0) * BLOCK_SIZE - offset
+        let paddingIters = 56 + (offset >= 56 ? 1 : 0) * Self.blockSize - offset
         var padding: UInt8 = 0x80
         for _ in 0..<paddingIters {
             inputBytes[Int(offset)] = padding
-            offset = (offset + 1) & BLOCK_SIZE_MASK
+            offset = (offset + 1) & Self.blockSizeMask
             padding = 0
-            if offset != 0 {
-                continue
-            }
+            guard offset == 0 else { continue }
             step()
         }
 
-        let bitSize: UInt64 = size * 8;
+        let bitSize: UInt64 = size * 8
         input[14] = UInt32(bitSize & 0xffffffff) // not sure if a UInt32 cast will trunc on its own
         input[15] = UInt32(bitSize >> 32)
-        step();
+        step()
 
-        var digest = ContiguousArray<UInt8>(repeating: 0, count: 16);
-        for i in 0..<4 {
-            let byte = buffer[i];
-            let digestStart = i << 2;
+        var digest = ContiguousArray<UInt8>(repeating: 0, count: 16)
+        for offset in 0..<4 {
+            let byte = buffer[offset]
+            let digestStart = offset << 2
             digest[digestStart] = UInt8(byte & 0x000000ff)
             digest[digestStart + 1] = UInt8((byte & 0x0000ff00) >> 8)
             digest[digestStart + 2] = UInt8((byte & 0x00ff0000) >> 16)
             digest[digestStart + 3] = UInt8((byte & 0xff000000) >> 24)
         }
         return digest
-    }
-    
-    consuming func hash<T: AsyncSequence>(seq: T) async throws -> ContiguousArray<UInt8> where T.Element == UInt8 {
-        for try await byte in seq {
-            readByte(byte: byte)
-        }
-        return finish()
     }
 
     consuming func hash(data: Data) -> ContiguousArray<UInt8> {
@@ -222,7 +219,7 @@ struct MD5Hasher: ~Copyable {
         }
         return finish()
     }
-    
+
     consuming func hash(file url: URL) async throws -> ContiguousArray<UInt8> {
         for try await byte in url.resourceBytes {
             self.readByte(byte: byte)

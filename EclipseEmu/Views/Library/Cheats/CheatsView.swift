@@ -5,7 +5,7 @@ import Combine
 
 struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
-    
+
     @ObservedObject var game: Game
     let cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
     @Environment(\.managedObjectContext) var viewContext
@@ -13,7 +13,7 @@ struct CheatsView: View {
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<Cheat>
     @State var isAddViewOpen = false
     @State var editingCheat: Cheat?
-    
+
     init(game: Game) {
         self.game = game
 
@@ -22,12 +22,12 @@ struct CheatsView: View {
         } else {
             self.cheatFormats = UnsafeBufferPointer.init(start: nil, count: 0)
         }
-        
+
         let request = CheatManager.listRequest(for: game)
         request.sortDescriptors = Self.sortCheatsBy
         self._cheats = FetchRequest(fetchRequest: request)
     }
-    
+
     var body: some View {
         List {
             ForEach(self.cheats) { cheat in
@@ -51,11 +51,11 @@ struct CheatsView: View {
             }
         }
         .toolbar {
-            #if !os(macOS)
+#if !os(macOS)
             ToolbarItem {
                 EditButton()
             }
-            #endif
+#endif
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     self.isAddViewOpen = true
@@ -81,17 +81,17 @@ struct CheatsView: View {
             )
         }
     }
-    
-    func moveCheat(fromOffsets: IndexSet, toOffset: Int) -> Void {
+
+    func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
         // FIXME: This function works, but is painful as it clones. This could definately be optimized.
         var cheatsArray = cheats.map { $0 }
         cheatsArray.move(fromOffsets: fromOffsets, toOffset: toOffset)
-        for (i, cheat) in cheatsArray.enumerated() {
-            cheat.priority = Int16(truncatingIfNeeded: i)
+        for (index, cheat) in cheatsArray.enumerated() {
+            cheat.priority = Int16(truncatingIfNeeded: index)
         }
         persistence.saveIfNeeded()
     }
-    
+
     func deleteCheats(offsets: IndexSet) {
         for index in offsets {
             let cheat = cheats[index]
@@ -106,7 +106,7 @@ struct CheatsView: View {
     let context = PersistenceCoordinator.preview.container.viewContext
     let game = Game(context: context)
     game.system = .gba
-    
+
     return CompatNavigationStack {
         CheatsView(game: game)
     }

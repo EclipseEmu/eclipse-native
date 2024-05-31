@@ -3,33 +3,45 @@ import CoreImage
 import QuartzCore
 
 enum ImageAssetManager {
-    static func create(from ciImage: CIImage, in persistence: PersistenceCoordinator, save: Bool = true) throws -> ImageAsset {
+    static func create(
+        from ciImage: CIImage,
+        in persistence: PersistenceCoordinator,
+        save: Bool = true
+    ) throws -> ImageAsset {
         let asset = ImageAsset(context: persistence.context)
         asset.id = UUID()
         asset.fileExtension = "jpeg"
-        
+
         let context = CIContext()
         try context.writeJPEGRepresentation(
             of: ciImage,
             to: asset.path(in: persistence),
             colorSpace: ciImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
         )
-        
+
         if save {
             persistence.save()
         }
-        
+
         return asset
     }
-    
-    static func create(remote: URL, in persistence: PersistenceCoordinator, save: Bool = true) async throws -> ImageAsset {
+
+    static func create(
+        remote: URL,
+        in persistence: PersistenceCoordinator,
+        save: Bool = true
+    ) async throws -> ImageAsset {
         let request = URLRequest(url: remote)
         let (tempUrl, _) = try await URLSession.shared.download(for: request)
-        
+
         let id = UUID()
         let fileExtension = remote.fileExtension()
-        
-        let destUrl = persistence.getPath(name: id.uuidString, fileExtension: fileExtension, base: persistence.imageDirectory)
+
+        let destUrl = persistence.getPath(
+            name: id.uuidString,
+            fileExtension: fileExtension,
+            base: persistence.imageDirectory
+        )
         try await withUnsafeThrowingContinuation { continuation in
             DispatchQueue.global(qos: .background).async {
                 do {
@@ -43,15 +55,15 @@ enum ImageAssetManager {
                 }
             }
         }
-        
+
         let asset = ImageAsset(context: persistence.context)
         asset.id = id
         asset.fileExtension = fileExtension
-        
+
         if save {
             persistence.save()
         }
-        
+
         return asset
     }
 }

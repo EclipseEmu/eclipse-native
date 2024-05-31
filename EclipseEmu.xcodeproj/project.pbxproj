@@ -654,6 +654,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				92EAF4972C0920CC00125EBE /* PBXTargetDependency */,
 			);
 			name = EclipseEmu;
 			packageProductDependencies = (
@@ -741,6 +742,7 @@
 				924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */,
 				92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */,
+				92EAF4952C09209100125EBE /* XCRemoteSwiftPackageReference "SwiftLint" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -915,6 +917,10 @@
 			isa = PBXTargetDependency;
 			target = 922F00A02BC0C26600B419D7 /* EclipseEmu */;
 			targetProxy = 922F00C22BC0C26700B419D7 /* PBXContainerItemProxy */;
+		};
+		92EAF4972C0920CC00125EBE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 92EAF4962C0920CC00125EBE /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1288,6 +1294,14 @@
 				kind = branch;
 			};
 		};
+		92EAF4952C09209100125EBE /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.55.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1317,6 +1331,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */;
 			productName = mGBAEclipseCore;
+		};
+		92EAF4962C0920CC00125EBE /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92EAF4952C09209100125EBE /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 

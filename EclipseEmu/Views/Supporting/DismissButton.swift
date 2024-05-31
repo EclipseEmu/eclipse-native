@@ -2,9 +2,9 @@ import SwiftUI
 
 struct DismissButton: View {
     @Environment(\.dismiss) var dismiss
-    
+
     static var placement: ToolbarItemPlacement = .cancellationAction
-    
+
     var body: some View {
         Button {
             dismiss()

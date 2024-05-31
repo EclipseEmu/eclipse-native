@@ -58,4 +58,3 @@ struct GameListItemSelectionToggle: View {
     .frame(minWidth: 0, maxWidth: .infinity)
     .background(.red)
 }
-
