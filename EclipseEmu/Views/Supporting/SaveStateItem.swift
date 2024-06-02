@@ -37,7 +37,7 @@ struct SaveStateItem: View {
                 Button {
                     self.renameDialogTarget = self.saveState
                 } label: {
-                    Label("Rename", systemImage: "rectangle.and.pencil.and.ellipsis")
+                    Label("Rename", systemImage: "character.cursor.ibeam")
                 }
             }
             Button(role: .destructive, action: self.deleteSaveState) {

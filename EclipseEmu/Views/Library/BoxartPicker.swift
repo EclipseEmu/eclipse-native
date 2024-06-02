@@ -89,66 +89,42 @@ final class BoxartPickerViewModel: ObservableObject {
 
 struct BoxartPickerItemView: View {
     let entry: OpenVGDB.Item
-    @Binding var selection: OpenVGDB.Item?
 
     var body: some View {
-        Button {
-            self.selection = entry
-        } label: {
-            HStack {
-                AsyncImage(url: entry.boxart) { imagePhase in
-                    switch imagePhase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                            .aspectRatio(1.0, contentMode: .fit)
-                    case .failure:
-                        Image(systemName: "exclamationmark.triangle")
-                    case .empty:
-                        ProgressView()
-                    @unknown default:
-                        Image(systemName: "exclamationmark.triangle")
-                    }
+        HStack {
+            AsyncImage(url: entry.boxart) { imagePhase in
+                switch imagePhase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                        .aspectRatio(1.0, contentMode: .fit)
+                case .failure:
+                    Image(systemName: "exclamationmark.triangle")
+                case .empty:
+                    ProgressView()
+                @unknown default:
+                    Image(systemName: "exclamationmark.triangle")
                 }
-                .frame(width: 44, height: 44)
-
-                VStack(alignment: .leading) {
-                    Text(verbatim: entry.name)
-                        .lineLimit(1)
-                    Text(verbatim: entry.region)
-                        .lineLimit(1)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Circle()
-                    .stroke(lineWidth: 1.5)
-                    .foregroundStyle(.secondary)
-                    .scaleEffect(0.9)
-                    .overlay {
-                        Image(systemName: "checkmark")
-                            .foregroundStyle(.white)
-                            .imageScale(.small)
-                            .padding()
-                            .background(.tint)
-                            .opacity(Double(selection?.id == entry.id))
-                    }
-                    .clipShape(Circle())
-                    .frame(width: 24, height: 24)
             }
-            .contentShape(Rectangle())
+            .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading) {
+                Text(verbatim: entry.name)
+                    .lineLimit(1)
+                Text(verbatim: entry.region)
+                    .lineLimit(1)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
-        .buttonStyle(.plain)
+        .contentShape(Rectangle())
     }
 }
 
 struct BoxartPicker: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: BoxartPickerViewModel
-    @State var selection: OpenVGDB.Item?
     let initialQuery: String
     let finished: (OpenVGDB.Item) -> Void
 
@@ -163,14 +139,19 @@ struct BoxartPicker: View {
             Group {
                 switch viewModel.searchState {
                 case .noQuery:
-                    EmptyView()
+                    ContentUnavailableMessage {
+                        Label("Search for Box Art", systemImage: "magnifyingglass")
+                    } description: {
+                        // swiftlint:disable:next line_length
+                        Text("Data is pulled from [OpenVGDB](https://github.com/openvgdb/openvgdb). Eclipse is not affiliated with any of these games' developers or publishers in any way.")
+                    }
                 case .pending:
                     ProgressView()
                 case .empty(let query):
                     ContentUnavailableMessage<EmptyView, EmptyView, EmptyView>.search(text: query)
                 case .failure(let error):
                     ContentUnavailableMessage {
-                        Label("Failed to Load Boxarts", systemImage: "exclamationmark.octagon.fill")
+                        Label("Failed to Load Box Art", systemImage: "exclamationmark.octagon.fill")
                     } description: {
                         Text("\(error.localizedDescription)")
                     }
@@ -178,11 +159,17 @@ struct BoxartPicker: View {
                     List {
                         Section {
                             ForEach(entries) { entry in
-                                BoxartPickerItemView(entry: entry, selection: $selection)
+                                Button {
+                                    dismiss()
+                                    self.finished(entry)
+                                } label: {
+                                    BoxartPickerItemView(entry: entry)
+                                }
+                                .buttonStyle(.plain)
                             }
                         } footer: {
                             // swiftlint:disable:next line_length
-                            Text("Eclipse is not associated with any of these game's developers, publishers, or other parties in anyway. This data is publically available at [OpenVGDB's GitHub](https://github.com/openvgdb/openvgdb).")
+                            Text("Data is pulled from [OpenVGDB](https://github.com/openvgdb/openvgdb). Eclipse is not affiliated with any of these games' developers or publishers in any way.")
                         }
                     }
                 }
@@ -204,16 +191,8 @@ struct BoxartPicker: View {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                        if let selection {
-                            self.finished(selection)
-                        }
-                    }.disabled(self.selection == nil)
-                }
             }
-            .navigationTitle("Boxart Picker")
+            .navigationTitle("Select Box Art")
             #if !os(macOS)
                 .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -229,30 +208,10 @@ struct BoxartPicker: View {
 }
 
 #Preview("Item") {
-    struct BoxartPickerItemPreviewView: View {
-        @State var selection: OpenVGDB.Item?
-
-        var body: some View {
-            List {
-                BoxartPickerItemView(
-                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
-                    selection: $selection
-                )
-                BoxartPickerItemView(
-                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
-                    selection: $selection
-                )
-                BoxartPickerItemView(
-                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
-                    selection: $selection
-                )
-                BoxartPickerItemView(
-                    entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil),
-                    selection: $selection
-                )
-            }
-        }
+    List {
+        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
     }
-
-    return BoxartPickerItemPreviewView()
 }

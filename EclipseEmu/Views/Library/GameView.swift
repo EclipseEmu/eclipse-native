@@ -162,7 +162,7 @@ struct GameView: View {
                         Button {
                             self.renameGameDialogTarget = self.game
                         } label: {
-                            Label("Rename", systemImage: "rectangle.and.pencil.and.ellipsis")
+                            Label("Rename", systemImage: "character.cursor.ibeam")
                         }
 
                         Menu {
@@ -176,7 +176,7 @@ struct GameView: View {
                                 Label("From Database", systemImage: "magnifyingglass")
                             }
                         } label: {
-                            Label("Replace Boxart", systemImage: "photo")
+                            Label("Replace Box Art", systemImage: "photo")
                         }
 
                         Divider()

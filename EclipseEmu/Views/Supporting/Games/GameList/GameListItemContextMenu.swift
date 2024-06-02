@@ -30,7 +30,7 @@ struct GameListItemContextMenu: View {
                     Label("From Database", systemImage: "magnifyingglass")
                 }
             } label: {
-                Label("Replace Boxart", systemImage: "photo")
+                Label("Replace Box Art", systemImage: "photo")
             }
             Divider()
             Button(role: .destructive) {
