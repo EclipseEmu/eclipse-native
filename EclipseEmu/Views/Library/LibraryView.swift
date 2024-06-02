@@ -68,20 +68,20 @@ struct LibraryView: View {
             .toolbar {
                 ToolbarItem {
                     if !self.viewModel.isSelecting {
-                        Menu {
-                            GameListMenuItems(viewModel: self.viewModel)
+                        Button {
+                            self.isRomPickerOpen = true
                         } label: {
-                            Label("List Options", systemImage: "ellipsis.circle")
+                            Label("Add Game", systemImage: "plus")
                         }
                     }
                 }
 
                 ToolbarItem {
                     if !self.viewModel.isSelecting {
-                        Button {
-                            self.isRomPickerOpen = true
+                        Menu {
+                            GameListMenuItems(viewModel: self.viewModel)
                         } label: {
-                            Label("Add Game", systemImage: "plus")
+                            Label("List Options", systemImage: "ellipsis.circle")
                         }
                     }
                 }

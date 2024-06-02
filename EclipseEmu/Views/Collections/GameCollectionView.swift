@@ -43,7 +43,13 @@ struct GameCollectionView: View {
                 .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
             #endif
         }
+        .searchable(text: self.$viewModel.searchQuery)
+        #if os(macOS)
+        .navigationTitle("Collection")
+        .navigationSubtitle(collection.name ?? "Collection")
+        #else
         .navigationTitle(collection.name ?? "Collection")
+        #endif
         .toolbar {
             ToolbarItem {
                 if !viewModel.isSelecting {

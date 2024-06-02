@@ -1,5 +1,21 @@
 import SwiftUI
 
+#if os(macOS)
+struct GameKeepPlayingPlayButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .fontWeight(.semibold)
+            .buttonStyle(.plain)
+            .padding(.horizontal, 12.0)
+            .padding(.vertical, 6.0)
+            .background(.white)
+            .foregroundStyle(.black)
+            .clipShape(Capsule())
+            .opacity(configuration.isPressed ? 0.8 : 1)
+    }
+}
+#endif
+
 struct GameKeepPlayingItem: View {
     @ObservedObject var game: Game
     @ObservedObject var viewModel: GameListViewModel
@@ -49,20 +65,16 @@ struct GameKeepPlayingItem: View {
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    Button(action: self.play) {
-                        Label("Play", systemImage: "play.fill")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .modify {
-                        if #available(macOS 14.0, *) {
-                            $0.buttonBorderShape(.capsule)
-                        } else {
-                            $0
-                        }
-                    }
-                    .tint(.white)
-                    .foregroundStyle(.black)
-                    .font(.subheadline.weight(.semibold))
+                    PlayGameButton(game: game)
+                    #if os(macOS)
+                        .buttonStyle(GameKeepPlayingPlayButtonStyle())
+                    #else
+                        .buttonStyle(.borderedProminent)
+                        .font(.subheadline.weight(.semibold))
+                        .tint(.white)
+                        .foregroundStyle(.black)
+                        .buttonBorderShape(.capsule)
+                    #endif
                 }
                 .frame(minWidth: 0, maxWidth: .infinity)
                 .multilineTextAlignment(.leading)
@@ -80,25 +92,20 @@ struct GameKeepPlayingItem: View {
             GameListItemContextMenu(viewModel: viewModel, game: game)
         }
     }
-
-    func play() {
-        Task.detached {
-            do {
-                try await playGame(game: game, saveState: nil, persistence: persistence)
-            } catch {
-                print("failed to launch game: \(error.localizedDescription)")
-            }
-        }
-    }
 }
 
 #if DEBUG
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
     let viewContext = PersistenceCoordinator.preview.container.viewContext
+    let game = Game(context: viewContext)
+    game.id = UUID()
+    game.md5 = "123"
+    game.name = "Test Game"
+    game.system = .gba
 
     return GameKeepPlayingItem(
-        game: Game(context: viewContext),
+        game: game,
         viewModel: viewModel
     )
     .environment(\.managedObjectContext, viewContext)

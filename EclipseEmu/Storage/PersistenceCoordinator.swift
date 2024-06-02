@@ -129,6 +129,11 @@ final class PersistenceCoordinator {
         guard fileManager.fileExists(atPath: path.path) else { return }
         try fileManager.removeItem(at: path)
     }
+
+    @inlinable
+    func fileExists(path: URL) -> Bool {
+        fileManager.fileExists(atPath: path.path)
+    }
 }
 
 // MARK: Make PersistenceCoordinator to be available from SwiftUI's envrionment

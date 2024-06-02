@@ -90,6 +90,8 @@
 		928237072BCB77B5001E27B3 /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928237062BCB77B5001E27B3 /* View+Extension.swift */; };
 		92875E9B2BCADDB900EABD63 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */; };
 		92875E9D2BCAF6EB00EABD63 /* GameCoreRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */; };
+		9292F43F2C0B91E5007F13CA /* PlayGameButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9292F43E2C0B91E5007F13CA /* PlayGameButton.swift */; };
+		9292F4412C0BBD4B007F13CA /* BlockingTaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9292F4402C0BBD4B007F13CA /* BlockingTaskRunner.swift */; };
 		9294A1C62C0170B200E00221 /* SettingsTouchLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294A1C52C0170B200E00221 /* SettingsTouchLayoutView.swift */; };
 		9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */; };
 		9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */; };
@@ -237,6 +239,8 @@
 		928237062BCB77B5001E27B3 /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		92875E9A2BCADDB900EABD63 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCoreRegistry.swift; sourceTree = "<group>"; };
+		9292F43E2C0B91E5007F13CA /* PlayGameButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayGameButton.swift; sourceTree = "<group>"; };
+		9292F4402C0BBD4B007F13CA /* BlockingTaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockingTaskRunner.swift; sourceTree = "<group>"; };
 		9294A1C52C0170B200E00221 /* SettingsTouchLayoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTouchLayoutView.swift; sourceTree = "<group>"; };
 		9294E5D72BC1A77F00B174E1 /* SettingsGeneralView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsGeneralView.swift; sourceTree = "<group>"; };
 		9294E5D92BC1A91900B174E1 /* SettingsControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsControlsView.swift; sourceTree = "<group>"; };
@@ -326,6 +330,7 @@
 				9298FEEE2BEEF47400F9881E /* BoxartView.swift */,
 				92D5D7212BC0FFC100659C37 /* GameKeepPlayingItem.swift */,
 				920A7B012BF7AF380055BC24 /* GameKeepPlayingScroller.swift */,
+				9292F43E2C0B91E5007F13CA /* PlayGameButton.swift */,
 			);
 			path = Games;
 			sourceTree = "<group>";
@@ -626,6 +631,7 @@
 			isa = PBXGroup;
 			children = (
 				92115C312BD366ED0020D62F /* Box.swift */,
+				9292F4402C0BBD4B007F13CA /* BlockingTaskRunner.swift */,
 				9279731A2BEEBA9E008F2FE4 /* CheatFormatter.swift */,
 				92875E9C2BCAF6EB00EABD63 /* GameCoreRegistry.swift */,
 				925EEBB42C028B4800587D5F /* HideTabBarModifier.swift */,
@@ -804,6 +810,7 @@
 				92D5D7242BC1003B00659C37 /* SectionHeader.swift in Sources */,
 				925EEBBE2C08F48400587D5F /* GameListItemSelectionToggle.swift in Sources */,
 				925EEBBB2C04CC7900587D5F /* AverageColorAsyncImage.swift in Sources */,
+				9292F4412C0BBD4B007F13CA /* BlockingTaskRunner.swift in Sources */,
 				92BFB78D2BC188470093B2E3 /* PlayGameAction.swift in Sources */,
 				92D5D3722BC0DF1700F1116C /* MD5.swift in Sources */,
 				922358162BE2B8B50014BFFA /* EmulationMenuView.swift in Sources */,
@@ -831,6 +838,7 @@
 				9294E5DA2BC1A91900B174E1 /* SettingsControlsView.swift in Sources */,
 				920A7B002BF7AEC50055BC24 /* GameCollectionGrid.swift in Sources */,
 				92A5F61C2BF0198A00DCC338 /* GameManager.swift in Sources */,
+				9292F43F2C0B91E5007F13CA /* PlayGameButton.swift in Sources */,
 				92A5F61E2BF01AE700DCC338 /* BidirectionalCollection+Extension.swift in Sources */,
 				925EEBC22C08F66400587D5F /* GameListListItem.swift in Sources */,
 				9294E5D82BC1A77F00B174E1 /* SettingsGeneralView.swift in Sources */,

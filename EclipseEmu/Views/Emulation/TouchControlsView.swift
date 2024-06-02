@@ -1,25 +1,6 @@
 import EclipseKit
 import SwiftUI
 
-enum TouchLayout2 {
-    enum AxisPlacement {
-        case start(Float)
-        case end(Float)
-    }
-
-    enum Input {
-        case dpad(up: GameInput, down: GameInput, left: GameInput, right: GameInput)
-        case joystick(positiveY: GameInput, negativeY: GameInput, negativeX: GameInput, positiveX: GameInput)
-        case button(input: GameInput)
-        case multiButton(inputs: UInt32)
-    }
-
-    enum ControlShape {
-        case capsule
-        case circle
-    }
-}
-
 #if canImport(UIKit)
 extension CGRect {
     @inlinable

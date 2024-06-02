@@ -42,17 +42,16 @@ enum ImageAssetManager {
             fileExtension: fileExtension,
             base: persistence.imageDirectory
         )
-        try await withUnsafeThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .background).async {
-                do {
-                    if FileManager.default.fileExists(atPath: destUrl.path) {
-                        try FileManager.default.removeItem(at: destUrl)
-                    }
-                    try FileManager.default.moveItem(at: tempUrl, to: destUrl)
-                    continuation.resume()
-                } catch {
-                    continuation.resume(throwing: error)
+
+        try await withUnsafeBlockingThrowingContinuation(queue: .global(qos: .background)) { continuation in
+            do {
+                if FileManager.default.fileExists(atPath: destUrl.path) {
+                    try FileManager.default.removeItem(at: destUrl)
                 }
+                try FileManager.default.moveItem(at: tempUrl, to: destUrl)
+                continuation.resume()
+            } catch {
+                continuation.resume(throwing: error)
             }
         }
 

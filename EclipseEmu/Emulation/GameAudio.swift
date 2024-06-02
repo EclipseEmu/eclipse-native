@@ -62,35 +62,29 @@ final class GameAudio {
     }
 
     func start() async {
-        await withUnsafeContinuation { continuation in
-            self.queue.async {
-                self.createSourceNode()
-                self.engine.prepare()
-                self.listenForHardwareChanges()
-                continuation.resume()
-            }
+        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+            self.createSourceNode()
+            self.engine.prepare()
+            self.listenForHardwareChanges()
+            continuation.resume()
         }
     }
 
     func stop() async {
-        await withUnsafeContinuation { continuation in
-            self.queue.async {
-                self.running = false
-                if let sourceNode = self.sourceNode {
-                    self.engine.detach(sourceNode)
-                    self.sourceNode = nil
-                }
-                continuation.resume()
+        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+            self.running = false
+            if let sourceNode = self.sourceNode {
+                self.engine.detach(sourceNode)
+                self.sourceNode = nil
             }
+            continuation.resume()
         }
     }
 
     func resume() async {
-        await withUnsafeContinuation { continuation in
-            self.queue.async {
-                self._resume()
-                continuation.resume()
-            }
+        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+            self._resume()
+            continuation.resume()
         }
     }
 
@@ -104,12 +98,10 @@ final class GameAudio {
     }
 
     func pause() async {
-        await withUnsafeContinuation { continuation in
-            self.queue.async {
-                self.engine.pause()
-                self.running = false
-                continuation.resume()
-            }
+        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+            self.engine.pause()
+            self.running = false
+            continuation.resume()
         }
     }
 

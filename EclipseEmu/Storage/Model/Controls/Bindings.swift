@@ -9,7 +9,7 @@ struct ControllerBindings {
     var system: GameSystem
     var gameId: UUID?
     var auxilaryId: UUID?
-    var bindings: Bindings
+    var bindings: Data
 
     enum Bindings {
         case touch(TouchLayout)

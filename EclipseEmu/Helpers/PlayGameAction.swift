@@ -5,8 +5,15 @@ import SwiftUI
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
 
-    enum Failure: Error {
+    enum MissingFile {
+        case none
+        case rom
+        case saveState
+    }
+
+    enum Failure: LocalizedError {
         case missingCore
+        case missingFile(MissingFile)
     }
 
     public func callAsFunction(game: Game, saveState: SaveState?, persistence: PersistenceCoordinator) async throws {
@@ -15,6 +22,23 @@ final class PlayGameAction: ObservableObject {
         }
 
         let data = try GameManager.emulationData(for: game, in: persistence)
+
+        let missingFile = await withUnsafeBlockingContinuation { continuation in
+            if let saveStatePath = saveState?.path(in: persistence) {
+                guard persistence.fileExists(path: saveStatePath) else {
+                    return continuation.resume(returning: MissingFile.saveState)
+                }
+            }
+            guard persistence.fileExists(path: data.romPath) else {
+                return continuation.resume(returning: MissingFile.rom)
+            }
+            return continuation.resume(returning: MissingFile.none)
+        }
+
+        guard missingFile == .none else {
+            throw Failure.missingFile(missingFile)
+        }
+
         let model = EmulationViewModel(
             coreInfo: core,
             game: game,

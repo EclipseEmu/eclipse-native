@@ -1,9 +1,18 @@
 import SwiftUI
 
+struct GameViewPlayButtonLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack {
+            configuration.icon
+            configuration.title
+        }
+        .frame(maxWidth: 200)
+    }
+}
+
 struct GameViewHeader: View {
     @ObservedObject var game: Game
     var safeAreaTop: CGFloat
-    var play: () -> Void
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.persistenceCoordinator) var persistence
@@ -11,7 +20,6 @@ struct GameViewHeader: View {
     init(game: Game, safeAreaTop: CGFloat, play: @escaping () -> Void) {
         self.game = game
         self.safeAreaTop = safeAreaTop
-        self.play = play
     }
 
     var body: some View {
@@ -32,16 +40,13 @@ struct GameViewHeader: View {
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 8.0)
 
-                Button(action: self.play) {
-                    Label("Play", systemImage: "play.fill")
-                        .frame(maxWidth: 200)
-                        .font(.headline)
-                }
-                .buttonStyle(.borderedProminent)
-                .font(.subheadline.weight(.semibold))
-                .controlSize(.large)
-                .tint(.black)
-                .foregroundStyle(.white)
+                PlayGameButton(game: game)
+                    .labelStyle(GameViewPlayButtonLabelStyle())
+                    .font(.subheadline.weight(.semibold))
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .tint(.black)
+                    .foregroundStyle(.white)
             }
             .padding()
             .padding(.bottom)
@@ -110,7 +115,7 @@ struct GameView: View {
                                     )
                                     .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
                                 }
-                                if section.id {
+                                if section.id == saveStates.first?.id && saveStates.count > 1 {
                                     Divider()
                                 }
                             }
@@ -202,12 +207,12 @@ struct GameView: View {
                 GameManager.rename(game, to: name, in: persistence)
             }
             .sheet(isPresented: $isChangeBoxartFromDatabaseOpen) {
-                BoxartPicker(system: game.system, initialQuery: game.name ?? "", finished: self.photoFromDatabase)
+                BoxartPicker(system: game.system, initialQuery: game.name ?? "", finished: self.boxartFromDatabase)
             }
         }
     }
 
-    func photoFromDatabase(entry: OpenVGDB.Item) {
+    func boxartFromDatabase(entry: OpenVGDB.Item) {
         guard let url = entry.boxart else { return }
         Task {
             do {
