@@ -46,8 +46,10 @@ enum GameManager {
         defer { romPath.stopAccessingSecurityScopedResource() }
 
         let romData = try await Data(asyncContentsOf: romPath)
-        let digest = MD5Hasher().hash(data: romData)
-        let md5 = digest.hexString()
+        let md5 = await withUnsafeBlockingContinuation { continuation in
+            let digest = MD5Hasher().hash(data: romData)
+            continuation.resume(returning: digest.hexString())
+        }
 
         let info: OpenVGDB.Item? = if let openvgdb = try? await self.getOpenVGDB() {
             (try? await openvgdb.get(md5: md5, system: system))?.first
