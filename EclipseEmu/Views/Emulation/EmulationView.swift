@@ -49,6 +49,8 @@ final class EmulationViewModel: ObservableObject {
         }
     }
 
+    var startTask: Task<Void, Never>?
+
     var coreInfo: GameCoreInfo
     var game: Game
     var initialSaveState: SaveState?
@@ -69,36 +71,45 @@ final class EmulationViewModel: ObservableObject {
         self.emulationData = emulationData
     }
 
-    func renderingSurfaceCreated(surface: CAMetalLayer) async {
-        do {
-            let core = try GameCoreCoordinator(
-                game: self.game,
-                coreInfo: self.coreInfo,
-                system: self.game.system,
-                surface: surface,
-                reorderControls: self.reorderControllers
-            )
+    func renderingSurfaceCreated(surface: CAMetalLayer) {
+        self.startTask = Task.detached {
+            do {
+                let core = try await withUnsafeBlockingThrowingContinuation { continuation in
+                    do {
+                        let core = try GameCoreCoordinator(
+                            game: self.game,
+                            coreInfo: self.coreInfo,
+                            system: self.game.system,
+                            surface: surface,
+                            reorderControls: self.reorderControllers
+                        )
+                        continuation.resume(returning: core)
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
 
-            let aspectRatio = core.width / core.height
-            await MainActor.run {
-                self.aspectRatio = aspectRatio
-                self.volume = 0.5
-                self.state = .loaded(core)
-            }
+                let aspectRatio = core.width / core.height
+                await MainActor.run {
+                    self.aspectRatio = aspectRatio
+                    self.volume = 0.5
+                    self.state = .loaded(core)
+                }
 
-            await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
-            if let failedCheats = await core.setCheats(cheats: emulationData.cheats) {
-                // FIXME: figure out what to do with these
-                print("failed to set the following cheats:", failedCheats)
-            }
-            if let initialSaveState {
-                _ = await core.loadState(for: initialSaveState.path(in: self.persistence))
-                self.initialSaveState = nil
-            }
-            GameManager.updateDatePlayed(for: self.game, in: self.persistence)
-        } catch {
-            await MainActor.run {
-                self.state = .error(error)
+                await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
+                if let failedCheats = await core.setCheats(cheats: self.emulationData.cheats) {
+                    // FIXME: figure out what to do with these
+                    print("failed to set the following cheats:", failedCheats)
+                }
+                if let initialSaveState = self.initialSaveState {
+                    _ = await core.loadState(for: initialSaveState.path(in: self.persistence))
+                    self.initialSaveState = nil
+                }
+                GameManager.updateDatePlayed(for: self.game, in: self.persistence)
+            } catch {
+                await MainActor.run {
+                    self.state = .error(error)
+                }
             }
         }
     }
@@ -214,6 +225,7 @@ struct EmulationView: View {
                     Spacer()
                     Button(role: .cancel) {
                         Task {
+                            self.model.startTask?.cancel()
                             await self.model.quit(playAction: self.playGame)
                         }
                     } label: {
@@ -221,18 +233,30 @@ struct EmulationView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large)
-                    #if !os(macOS)
+#if !os(macOS)
                         .buttonBorderShape(.capsule)
-                    #endif
+#endif
                 }
+                .padding()
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)
             case .quitting:
                 EmptyView()
             case .error(let error):
-                VStack {
-                    Text("Something went wrong")
+                ContentUnavailableMessage {
+                    Label("Something went wrong", systemImage: "exclamationmark.octagon.fill")
+                } description: {
                     Text(error.localizedDescription)
+                } actions: {
+                    Button("Close") {
+                        Task {
+                            await self.model.quit(playAction: self.playGame)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+#if !os(macOS)
+                        .buttonBorderShape(.capsule)
+#endif
                 }
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Material.regular, ignoresSafeAreaEdges: .all)

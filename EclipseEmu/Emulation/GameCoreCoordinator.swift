@@ -105,6 +105,8 @@ final actor GameCoreCoordinator {
                 throw Failure.failedToGetCoreInstance
             }
 
+            try Task.checkCancellation()
+
             self.core = core
 
             desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
@@ -114,11 +116,11 @@ final actor GameCoreCoordinator {
                 throw Failure.failedToGetMetalDevice
             }
 
-            let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
+            try Task.checkCancellation()
 
+            let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
             let width = videoFormat.width
             let height = videoFormat.height
-
             self.width = CGFloat(width)
             self.height = CGFloat(height)
 
@@ -133,6 +135,8 @@ final actor GameCoreCoordinator {
             #if canImport(AppKit)
             renderingSurface.displaySyncEnabled = true
             #endif
+
+            try Task.checkCancellation()
 
             switch videoFormat.renderingType {
             case .frameBuffer:
@@ -151,6 +155,8 @@ final actor GameCoreCoordinator {
                 throw Failure.invalidRendererFormat
             }
 
+            try Task.checkCancellation()
+
             guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
                 throw Failure.invalidAudioFormat
             }
@@ -160,6 +166,8 @@ final actor GameCoreCoordinator {
                 maxPlayers: core.pointee.getMaxPlayers(core.pointee.data),
                 reorderPlayers: reorderControls
             )
+
+            try Task.checkCancellation()
 
             callbackContext.pointee.parent = self
         } catch {

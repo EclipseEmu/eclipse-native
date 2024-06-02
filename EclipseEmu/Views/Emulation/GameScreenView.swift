@@ -13,8 +13,8 @@ struct GameScreenView {
         }
 
         @inlinable
-        func surfaceCreated(surface: CAMetalLayer) async {
-            await self.parent.model.renderingSurfaceCreated(surface: surface)
+        func surfaceCreated(surface: CAMetalLayer) {
+            self.parent.model.renderingSurfaceCreated(surface: surface)
         }
     }
 }
@@ -26,9 +26,7 @@ extension GameScreenView: NSViewRepresentable {
     func makeNSView(context: Context) -> CustomMetalView {
         let view = CustomMetalView()
         view.delegate = context.coordinator
-        Task.detached {
-            await context.coordinator.surfaceCreated(surface: view.metalLayer)
-        }
+        context.coordinator.surfaceCreated(surface: view.metalLayer)
         return view
     }
 
@@ -68,9 +66,7 @@ extension GameScreenView: UIViewRepresentable {
         let view = CustomMetalView()
         view.delegate = context.coordinator
         if let layer = view.metalLayer {
-            Task.detached {
-                await context.coordinator.surfaceCreated(surface: layer)
-            }
+            context.coordinator.surfaceCreated(surface: layer)
         }
         return view
     }
