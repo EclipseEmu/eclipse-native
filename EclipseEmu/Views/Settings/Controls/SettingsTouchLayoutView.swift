@@ -186,6 +186,7 @@ fileprivate struct ControlEditView: View {
 }
 
 struct SettingsTouchLayoutView: View {
+    @Environment(\.dismiss) var dismiss
     @State private var editorSelection: ControlModel?
     @State private var selection: ControlModel?
     @State private var controls: [ControlModel] = [
@@ -213,7 +214,19 @@ struct SettingsTouchLayoutView: View {
                 }
 
                 HStack(spacing: 16.0) {
-                    DismissButton()
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
+                    }
+                    .padding(8.0)
+                    .imageScale(.small)
+                    .labelStyle(.iconOnly)
+                    .background(.quaternary)
+                    .tint(.secondary)
+                    .font(.body.weight(.semibold))
+                    .clipShape(Circle())
+
                     Button {} label: {
                         Label("Add", systemImage: "plus")
                     }
@@ -232,8 +245,6 @@ struct SettingsTouchLayoutView: View {
             self.selection = nil
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarHidden(true)
         .background(.black, ignoresSafeAreaEdges: .all)
         .preferredColorScheme(.dark)
         .tabBarHidden()
@@ -251,8 +262,6 @@ struct SettingsTouchLayoutView: View {
 }
 
 #Preview {
-    CompatNavigationStack {
-        SettingsTouchLayoutView()
-    }
+    SettingsTouchLayoutView()
 }
 #endif

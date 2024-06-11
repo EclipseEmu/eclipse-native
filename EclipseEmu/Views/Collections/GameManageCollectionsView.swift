@@ -34,7 +34,6 @@ struct GameManageCollectionItem: View {
 }
 
 struct GameManageCollectionsView: View {
-    let showDismissButton: Bool
     @ObservedObject var game: Game
     @Environment(\.persistenceCoordinator) var persistence
     @Environment(\.dismiss) var dismiss
@@ -43,9 +42,8 @@ struct GameManageCollectionsView: View {
     @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
     var collections: FetchedResults<GameCollection>
 
-    init(game: Game, showDismissButton: Bool = false) {
+    init(game: Game) {
         self.game = game
-        self.showDismissButton = showDismissButton
         self.selectedCollections = game.collections as? Set<GameCollection> ?? Set()
     }
 
@@ -79,11 +77,6 @@ struct GameManageCollectionsView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                if self.showDismissButton {
-                    DismissButton()
-                }
-            }
             ToolbarItem(placement: .confirmationAction) {
                 Button(action: self.finish) {
                     Text("Done")

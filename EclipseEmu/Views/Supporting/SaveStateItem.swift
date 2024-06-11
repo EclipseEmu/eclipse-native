@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SaveStateItem: View {
     enum Action {
-        case startWithState(Game)
+        case startWithState(Game, (PlayGameAction.Failure, Game) -> Void)
         case loadState(EmulationViewModel)
     }
 
@@ -62,15 +62,17 @@ struct SaveStateItem: View {
                     dismiss()
                 }
             }
-        case .startWithState(let game):
+        case .startWithState(let game, let onError):
             Task.detached {
                 do {
                     try await playGame(game: game, saveState: saveState, persistence: persistence)
                     await MainActor.run {
                         dismiss()
                     }
+                } catch let error as PlayGameAction.Failure {
+                    onError(error, game)
                 } catch {
-                    print("failed to launch game: \(error.localizedDescription)")
+                    onError(.unknown(error), game)
                 }
             }
         }

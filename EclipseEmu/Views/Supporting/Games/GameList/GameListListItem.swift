@@ -8,6 +8,7 @@ struct GameListListItem: View {
         HStack(spacing: 16) {
             BoxartView(game: game, cornerRadius: 8.0)
                 .frame(width: 64, height: 64)
+                .aspectRatio(1.0, contentMode: .fit)
             VStack(alignment: .leading) {
                 Text(game.name ?? "Game")
                     .lineLimit(2)

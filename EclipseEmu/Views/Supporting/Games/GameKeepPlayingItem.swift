@@ -19,6 +19,8 @@ struct GameKeepPlayingPlayButtonStyle: ButtonStyle {
 struct GameKeepPlayingItem: View {
     @ObservedObject var game: Game
     @ObservedObject var viewModel: GameListViewModel
+    let onPlayError: (PlayGameAction.Failure, Game) -> Void
+
     @State var color: Color?
     @Environment(\.playGame) private var playGame
     @Environment(\.persistenceCoordinator) private var persistence
@@ -65,7 +67,7 @@ struct GameKeepPlayingItem: View {
                         .foregroundStyle(.secondary)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
-                    PlayGameButton(game: game)
+                    PlayGameButton(game: game, onError: onPlayError)
                     #if os(macOS)
                         .buttonStyle(GameKeepPlayingPlayButtonStyle())
                     #else
@@ -104,10 +106,9 @@ struct GameKeepPlayingItem: View {
     game.name = "Test Game"
     game.system = .gba
 
-    return GameKeepPlayingItem(
-        game: game,
-        viewModel: viewModel
-    )
-    .environment(\.managedObjectContext, viewContext)
+    return GameKeepPlayingItem(game: game, viewModel: viewModel) { error, game in
+        print(error, game)
+    }
+        .environment(\.managedObjectContext, viewContext)
 }
 #endif

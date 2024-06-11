@@ -4,6 +4,11 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct LibraryView: View {
+    enum Failure: LocalizedError {
+        case gameManager(GameManager.Failure)
+        case playAction(PlayGameAction.Failure)
+    }
+
     static let romFileTypes: [UTType] = [
         UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gb"),
         UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gbc"),
@@ -19,7 +24,7 @@ struct LibraryView: View {
 
     @State var isRomPickerOpen: Bool = false
     @State var isErrorDialogOpen = false
-    @State var error: GameManager.Failure?
+    @State var error: Self.Failure?
 
     @FetchRequest(
         fetchRequest: GameManager.recentlyPlayedRequest(),
@@ -31,7 +36,11 @@ struct LibraryView: View {
         CompatNavigationStack {
             ScrollView {
                 Section {
-                    GameKeepPlayingScroller(games: self.recentlyPlayed, viewModel: self.viewModel)
+                    GameKeepPlayingScroller(
+                        games: self.recentlyPlayed,
+                        viewModel: self.viewModel,
+                        onPlayError: onPlayFailure
+                    )
                 } header: {
                     SectionHeader("Keep Playing")
                         .padding([.horizontal, .top])
@@ -58,7 +67,9 @@ struct LibraryView: View {
                     .allowsHitTesting(false)
             }
             .searchable(text: self.$viewModel.searchQuery)
-            .alert(isPresented: self.$isErrorDialogOpen, error: self.error) {}
+            .alert(isPresented: self.$isErrorDialogOpen, error: self.error) {
+                Button("Cancel", role: .cancel) {}
+            }
             .fileImporter(
                 isPresented: self.$isRomPickerOpen,
                 allowedContentTypes: Self.romFileTypes,
@@ -104,7 +115,7 @@ struct LibraryView: View {
         case .success(let url):
             Task.detached(priority: .userInitiated) {
                 guard url.startAccessingSecurityScopedResource() else {
-                    return await self.reportError(error: .failedToGetReadPermissions)
+                    return await self.reportError(error: .gameManager(.failedToGetReadPermissions))
                 }
                 defer { url.stopAccessingSecurityScopedResource() }
 
@@ -117,7 +128,7 @@ struct LibraryView: View {
                 }
 
                 guard system != .unknown else {
-                    return await self.reportError(error: .unknownFileType)
+                    return await self.reportError(error: .gameManager(.unknownFileType))
                 }
 
                 let (name, romExtension) = url.fileNameAndExtension()
@@ -131,7 +142,7 @@ struct LibraryView: View {
                         in: self.persistence
                     )
                 } catch {
-                    return await self.reportError(error: .unknownFileType)
+                    return await self.reportError(error: .gameManager(.unknownFileType))
                 }
             }
         case .failure(let err):
@@ -139,8 +150,13 @@ struct LibraryView: View {
         }
     }
 
+    func onPlayFailure(error: PlayGameAction.Failure, game: Game) {
+        print(error, game)
+        self.reportError(error: .playAction(error))
+    }
+
     @MainActor
-    func reportError(error: GameManager.Failure) {
+    func reportError(error: Self.Failure) {
         self.error = error
         self.isErrorDialogOpen = true
     }

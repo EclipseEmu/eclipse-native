@@ -20,6 +20,7 @@ struct PlayerOrderChangeRequest: Identifiable {
 }
 
 struct ReorderControllersView: View {
+    @Environment(\.dismiss) var dismiss: DismissAction
     @State var request: PlayerOrderChangeRequest
 
     var body: some View {
@@ -40,8 +41,10 @@ struct ReorderControllersView: View {
             }
             .navigationTitle("Reorder Controllers")
             .toolbar {
-                ToolbarItem(placement: DismissButton.placement) {
-                    DismissButton()
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
                 }
             }
 #if os(iOS)

@@ -6,15 +6,19 @@ extension GCController: Identifiable {}
 struct SettingsControlsView: View {
     @Environment(\.refresh) var refreshAction
     @State var controllers = GCController.controllers()
+    @State var isTouchEditorOpen = false
 
     var body: some View {
         List {
             Section("Built-in") {
                 #if os(iOS)
-                NavigationLink {
-                    SettingsTouchLayoutView()
+                Button {
+                    isTouchEditorOpen = true
                 } label: {
                     Label("Touch Controls", systemImage: "hand.draw")
+                }
+                .fullScreenCover(isPresented: $isTouchEditorOpen) {
+                    SettingsTouchLayoutView()
                 }
                 #endif
                 if let keyboard = GCKeyboard.coalesced {

@@ -56,7 +56,7 @@ struct RenameViewModifier<T: NSManagedObject>: ViewModifier {
 }
 
 extension View {
-    func renameAlert<T: NSManagedObject>(
+    func renameItemAlert<T: NSManagedObject>(
         _ target: Binding<T?>,
         key: KeyPath<T, String?>,
         title: LocalizedStringKey,

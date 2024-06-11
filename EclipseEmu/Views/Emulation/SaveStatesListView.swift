@@ -55,7 +55,7 @@ struct SaveStatesListView: View {
                 }
             }
         }
-        .renameAlert(
+        .renameItemAlert(
             $renameDialogTarget,
             key: \.name,
             title: "Rename State",

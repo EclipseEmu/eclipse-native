@@ -3,7 +3,9 @@ import SwiftUI
 struct PlayGameButton: View {
     @Environment(\.persistenceCoordinator) var persistence
     @Environment(\.playGame) var playGame
-    var game: Game
+    
+    @ObservedObject var game: Game
+    let onError: (PlayGameAction.Failure, Game) -> Void
 
     var body: some View {
         Button(action: play) {
@@ -15,12 +17,10 @@ struct PlayGameButton: View {
         Task.detached(priority: .userInitiated) {
             do {
                 try await playGame(game: game, saveState: nil, persistence: persistence)
-            } catch let PlayGameAction.Failure.missingFile(missingKind) {
-                print("missing file: \(missingKind)")
-            } catch PlayGameAction.Failure.missingCore {
-                print("missing core")
+            } catch let error as PlayGameAction.Failure {
+                await onError(error, game)
             } catch {
-                print("An unknown error occured")
+                await onError(.unknown(error), game)
             }
         }
     }
@@ -33,7 +33,9 @@ struct PlayGameButton: View {
     game.system = .gba
     game.md5 = "123"
 
-    return PlayGameButton(game: game)
-        .environment(\.persistenceCoordinator, persistence)
-        .environment(\.managedObjectContext, moc)
+    return PlayGameButton(game: game) { error, game in
+        print(error, game)
+    }
+    .environment(\.persistenceCoordinator, persistence)
+    .environment(\.managedObjectContext, moc)
 }

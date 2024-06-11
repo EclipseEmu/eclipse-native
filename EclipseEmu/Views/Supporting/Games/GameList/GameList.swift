@@ -217,7 +217,7 @@ struct GameList: View {
         .onChange(of: viewModel.sortDirection) { _ in
             self.sortChanged()
         }
-        .renameAlert(
+        .renameItemAlert(
             $viewModel.renameTarget,
             key: \Game.name,
             title: "Rename Game",
@@ -227,7 +227,7 @@ struct GameList: View {
             persistence.saveIfNeeded()
         }
         .sheet(item: $viewModel.changeBoxartTarget) { game in
-            BoxartPicker(system: game.system, initialQuery: game.name ?? "") { entry in
+            BoxartDatabasePicker(system: game.system, initialQuery: game.name ?? "") { entry in
                 self.photoFromDatabase(entry: entry, game: game)
             }
         }

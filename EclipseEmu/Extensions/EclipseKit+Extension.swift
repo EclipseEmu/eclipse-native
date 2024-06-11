@@ -21,6 +21,17 @@ extension GameSystem {
             "Unknown System"
         }
     }
+
+    var fileType: UTType? {
+        return switch self {
+        case .gb: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gb")
+        case .gbc: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gbc")
+        case .gba: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gba")
+        case .nes: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.nes")
+        case .snes: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes")
+        default: nil
+        }
+    }
 }
 
 extension GameCoreVideoPixelFormat {

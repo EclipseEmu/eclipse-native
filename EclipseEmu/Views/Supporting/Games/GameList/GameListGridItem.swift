@@ -7,6 +7,7 @@ struct GameListGridItem: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             BoxartView(game: game, cornerRadius: 8.0)
+                .aspectRatio(1.0, contentMode: .fill)
                 .clipShape(RoundedRectangle(cornerRadius: 8.0))
                 .overlay(alignment: .bottomTrailing) {
                     GameListItemSelectionToggle(viewModel: viewModel, game: game)

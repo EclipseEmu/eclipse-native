@@ -38,7 +38,7 @@ struct CheatsView: View {
         }
         .emptyState(cheats.isEmpty) {
             ContentUnavailableMessage {
-                Label("No Cheats", systemImage: "doc.badge.gearshape")
+                Label("No Cheats", systemImage: "memorychip.fill")
             } description: {
                 Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
             }

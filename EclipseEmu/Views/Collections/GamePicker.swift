@@ -15,6 +15,7 @@ struct GamePicker: View {
                 HStack(spacing: 12.0) {
                     BoxartView(game: game, cornerRadius: 4.0)
                         .frame(minWidth: 44, maxWidth: 44)
+                        .aspectRatio(1.0, contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 8.0))
                     VStack(alignment: .leading) {
                         Text(game.name ?? "Unknown Game")

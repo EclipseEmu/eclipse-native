@@ -1,7 +1,7 @@
 import EclipseKit
 import SwiftUI
 
-final class BoxartPickerViewModel: ObservableObject {
+final class BoxartDatabasePickerViewModel: ObservableObject {
     enum SearchState {
         case noQuery
         case pending
@@ -87,7 +87,7 @@ final class BoxartPickerViewModel: ObservableObject {
     }
 }
 
-struct BoxartPickerItemView: View {
+struct BoxartDatabasePickerItemView: View {
     let entry: OpenVGDB.Item
 
     var body: some View {
@@ -98,7 +98,6 @@ struct BoxartPickerItemView: View {
                     image
                         .resizable()
                         .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                        .aspectRatio(1.0, contentMode: .fit)
                 case .failure:
                     Image(systemName: "exclamationmark.triangle")
                 case .empty:
@@ -108,6 +107,7 @@ struct BoxartPickerItemView: View {
                 }
             }
             .frame(width: 44, height: 44)
+            .aspectRatio(1.0, contentMode: .fit)
 
             VStack(alignment: .leading) {
                 Text(verbatim: entry.name)
@@ -122,14 +122,14 @@ struct BoxartPickerItemView: View {
     }
 }
 
-struct BoxartPicker: View {
+struct BoxartDatabasePicker: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel: BoxartPickerViewModel
+    @StateObject var viewModel: BoxartDatabasePickerViewModel
     let initialQuery: String
     let finished: (OpenVGDB.Item) -> Void
 
     init(system: GameSystem, initialQuery: String = "", finished: @escaping (OpenVGDB.Item) -> Void) {
-        self._viewModel = StateObject(wrappedValue: BoxartPickerViewModel(system: system))
+        self._viewModel = StateObject(wrappedValue: BoxartDatabasePickerViewModel(system: system))
         self.initialQuery = initialQuery
         self.finished = finished
     }
@@ -163,7 +163,7 @@ struct BoxartPicker: View {
                                     dismiss()
                                     self.finished(entry)
                                 } label: {
-                                    BoxartPickerItemView(entry: entry)
+                                    BoxartDatabasePickerItemView(entry: entry)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -201,7 +201,7 @@ struct BoxartPicker: View {
 }
 
 #Preview("View") {
-    BoxartPicker(system: .gba) { _ in }
+    BoxartDatabasePicker(system: .gba) { _ in }
     #if os(macOS)
         .frame(minWidth: 400, minHeight: 400)
     #endif
@@ -209,9 +209,9 @@ struct BoxartPicker: View {
 
 #Preview("Item") {
     List {
-        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartPickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
     }
 }
