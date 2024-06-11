@@ -174,7 +174,7 @@ let defaultTouchElements = [
 ]
 
 final class TouchControlsController: UIViewController {
-    private static let deadZone = 0.5
+    private static let deadZone = 0.25
     private static let borderWidth = 2.0
     private static let borderColor = CGColor(red: 1, green: 1, blue: 1, alpha: 1.0)
 
