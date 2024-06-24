@@ -6,7 +6,7 @@ struct SaveStatesListView: View {
         NSSortDescriptor(keyPath: \SaveState.date, ascending: false)
     ]
 
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @Environment(\.dismiss) var dismiss
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: [])
     var saveStates: SectionedFetchResults<Bool, SaveState>
@@ -21,7 +21,9 @@ struct SaveStatesListView: View {
         self.action = action
         self.haveDismissButton = haveDismissButton
 
-        let request = SaveStateManager.listRequest(for: game, limit: nil)
+        let request = SaveState.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
         request.sortDescriptors = Self.sortDescriptors
         self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
     }
@@ -78,6 +80,12 @@ struct SaveStatesListView: View {
     }
 
     func rename(saveState: SaveState, newName: String) {
-        SaveStateManager.rename(saveState, to: newName, in: persistence)
+        Task {
+            do {
+                try await persistence.rename(saveState: .init(object: saveState), to: newName)
+            } catch {
+                print("[error] failed to rename save state", error)
+            }
+        }
     }
 }

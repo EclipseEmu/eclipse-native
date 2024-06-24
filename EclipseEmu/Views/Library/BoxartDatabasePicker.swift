@@ -1,6 +1,7 @@
 import EclipseKit
 import SwiftUI
 
+@MainActor
 final class BoxartDatabasePickerViewModel: ObservableObject {
     enum SearchState {
         case noQuery

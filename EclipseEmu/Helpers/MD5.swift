@@ -226,4 +226,8 @@ struct MD5Hasher: ~Copyable {
         }
         return finish()
     }
+
+    static func hash(file url: URL) async throws -> ContiguousArray<UInt8> {
+        return try await MD5Hasher().hash(file: url)
+    }
 }

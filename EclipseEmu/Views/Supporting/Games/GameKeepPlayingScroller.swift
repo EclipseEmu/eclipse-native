@@ -3,7 +3,7 @@ import SwiftUI
 struct GameKeepPlayingScroller<Games: RandomAccessCollection>: View where Games.Element == Game {
     var games: Games
     @ObservedObject var viewModel: GameListViewModel
-    let onPlayError: (PlayGameAction.Failure, Game) -> Void
+    let onPlayError: (PlayGameAction.Failure, Persistence.Object<Game>) -> Void
 
     var body: some View {
         ScrollView(.horizontal) {

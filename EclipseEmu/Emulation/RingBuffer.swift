@@ -1,11 +1,11 @@
 import Atomics
 import Foundation
 
-struct RingBuffer: ~Copyable {
+struct RingBuffer: Sendable, ~Copyable {
     let capacity: Int
     private var head: ManagedAtomic<Int> = .init(0)
     private var tail: ManagedAtomic<Int> = .init(0)
-    private var inner: UnsafeMutableRawBufferPointer
+    nonisolated(unsafe) private let inner: UnsafeMutableRawBufferPointer
 
     init(capacity: Int) {
         self.capacity = capacity

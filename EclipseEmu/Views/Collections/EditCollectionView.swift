@@ -69,7 +69,7 @@ struct CollectionIconPickerView: View {
 }
 
 struct EditCollectionView: View {
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @Environment(\.dismiss) var dismiss
     @Environment(\.self) var environment
     @State var name: String
@@ -84,7 +84,7 @@ struct EditCollectionView: View {
         if let collection {
             self.name = collection.name ?? ""
             self.selectedIcon = collection.icon
-            self.selectedColor = collection.parsedColor.color
+            self.selectedColor = collection.color
         } else {
             self.name = ""
             self.selectedColor = .blue
@@ -149,20 +149,21 @@ struct EditCollectionView: View {
 
     func upsert() {
         guard !self.name.isEmpty else { return }
+        
+        let moc = persistence.viewContext
 
-        let color = GameCollection.Color(color: self.selectedColor)
         if let collection {
-            CollectionManager.update(
-                collection,
-                name: self.name,
-                icon: self.selectedIcon,
-                color: color,
-                in: self.persistence
-            )
+            collection.name = self.name
+            collection.icon = self.selectedIcon
+            collection.color = self.selectedColor
         } else {
-            CollectionManager.create(name: self.name, icon: self.selectedIcon, color: color, in: self.persistence)
+            let collection = GameCollection(context: moc)
+            collection.name = self.name
+            collection.icon = self.selectedIcon
+            collection.color = self.selectedColor
         }
 
+        try? moc.save()
         self.dismiss()
     }
 }
@@ -172,13 +173,13 @@ struct EditCollectionView: View {
 }
 
 #Preview("Edit") {
-    let persistence = PersistenceCoordinator.preview
-    let collection = GameCollection(context: persistence.context)
+    let persistence = Persistence.preview
+    let collection = GameCollection(context: persistence.viewContext)
     collection.name = "Hello"
-    collection.color = GameCollection.Color.indigo.rawValue
+    collection.color = .indigo
     collection.icon = .symbol("heart.fill")
 
     return EditCollectionView(collection: collection)
-        .environment(\.managedObjectContext, persistence.context)
-        .environment(\.persistenceCoordinator, persistence)
+        .environment(\.managedObjectContext, persistence.viewContext)
+        .environment(\.persistence, persistence)
 }

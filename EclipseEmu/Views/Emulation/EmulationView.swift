@@ -1,8 +1,9 @@
 import AVFoundation
-import EclipseKit
+@preconcurrency import EclipseKit
 import MetalKit
 import SwiftUI
 
+@MainActor
 final class EmulationViewModel: ObservableObject {
     enum State {
         case loading
@@ -51,18 +52,18 @@ final class EmulationViewModel: ObservableObject {
 
     var startTask: Task<Void, Never>?
 
-    var coreInfo: GameCoreInfo
-    var game: Game
+    nonisolated let coreInfo: GameCoreInfo
+    let game: Game
     var initialSaveState: SaveState?
-    var persistence: PersistenceCoordinator
-    var emulationData: GameManager.EmulationData
+    var persistence: Persistence
+    var emulationData: EmulationData
 
     init(
         coreInfo: GameCoreInfo,
         game: Game,
         saveState: SaveState?,
-        emulationData: GameManager.EmulationData,
-        persistence: PersistenceCoordinator
+        emulationData: EmulationData,
+        persistence: Persistence
     ) {
         self.coreInfo = coreInfo
         self.game = game
@@ -72,21 +73,11 @@ final class EmulationViewModel: ObservableObject {
     }
 
     func renderingSurfaceCreated(surface: CAMetalLayer) {
-        self.startTask = Task.detached {
+        self.startTask = Task {
             do {
-                let core = try await withUnsafeBlockingThrowingContinuation { continuation in
-                    do {
-                        let core = try GameCoreCoordinator(
-                            game: self.game,
-                            coreInfo: self.coreInfo,
-                            system: self.game.system,
-                            surface: surface,
-                            reorderControls: self.reorderControllers
-                        )
-                        continuation.resume(returning: core)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
+                let system = game.system
+                let core = try await Task.blocking {
+                    try GameCoreCoordinator(coreInfo: self.coreInfo, system: system, surface: surface)
                 }
 
                 let aspectRatio = core.width / core.height
@@ -96,16 +87,24 @@ final class EmulationViewModel: ObservableObject {
                     self.state = .loaded(core)
                 }
 
-                await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
-                if let failedCheats = await core.setCheats(cheats: self.emulationData.cheats) {
+                try await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
+                let failedCheats = await core.setCheats(cheats: self.emulationData.cheats)
+                if !failedCheats.isEmpty {
                     // FIXME: figure out what to do with these
                     print("failed to set the following cheats:", failedCheats)
                 }
-                if let initialSaveState = self.initialSaveState {
-                    _ = await core.loadState(for: initialSaveState.path(in: self.persistence))
-                    self.initialSaveState = nil
+                
+                if
+                    let initialSaveState = self.initialSaveState?.file,
+                    let path = initialSaveState.path(in: .shared)
+                {
+                    _ = await core.loadState(for: path)
+                    await MainActor.run {
+                        self.initialSaveState = nil
+                    }
                 }
-                GameManager.updateDatePlayed(for: self.game, in: self.persistence)
+
+                try? await persistence.markPlayed(game: .init(object: game))
             } catch {
                 await MainActor.run {
                     self.state = .error(error)
@@ -116,7 +115,7 @@ final class EmulationViewModel: ObservableObject {
 
     func quit(playAction: PlayGameAction) async {
         if case .loaded(let core) = self.state {
-            try? await SaveStateManager.create(isAuto: true, for: self.game, with: core, in: self.persistence)
+            try? await persistence.create(saveStateIn: core, for: .init(object: game), isAuto: true)
             await core.stop()
         }
         await MainActor.run {
@@ -141,16 +140,10 @@ final class EmulationViewModel: ObservableObject {
         guard await core.state == .backgrounded else { return }
 
         do {
-            try await SaveStateManager.create(isAuto: true, for: self.game, with: core, in: self.persistence)
+            try await persistence.create(saveStateIn: core, for: .init(object: game), isAuto: true)
         } catch {
             print("creating save state failed:", error)
         }
-    }
-
-    func reorderControllers(players: inout [GameInputCoordinator.Player], maxPlayers: UInt8) async {
-        guard case .loaded(let core) = self.state else { return }
-        await core.pause(reason: .pendingUserInput)
-        await core.play(reason: .pendingUserInput)
     }
 
     func togglePlayPause() async {
@@ -168,7 +161,7 @@ final class EmulationViewModel: ObservableObject {
         Task {
             // FIXME: show a message here
             do {
-                try await SaveStateManager.create(isAuto: isAuto, for: self.game, with: core, in: self.persistence)
+                try await persistence.create(saveStateIn: core, for: .init(object: game), isAuto: isAuto)
             } catch {
                 print("creating save state failed:", error)
             }
@@ -323,12 +316,14 @@ struct EmulationView: View {
     }
 
     func loadState(saveState: SaveState, dismiss: DismissAction) {
-        guard case .loaded(let core) = self.model.state else { return }
+        guard 
+            case .loaded(let core) = self.model.state,
+            let path = saveState.file.path(in: .shared)
+        else { return }
 
         dismiss()
 
         Task {
-            let path = saveState.path(in: self.model.persistence)
             _ = await core.loadState(for: path)
         }
     }

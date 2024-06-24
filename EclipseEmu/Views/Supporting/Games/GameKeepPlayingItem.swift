@@ -19,18 +19,18 @@ struct GameKeepPlayingPlayButtonStyle: ButtonStyle {
 struct GameKeepPlayingItem: View {
     @ObservedObject var game: Game
     @ObservedObject var viewModel: GameListViewModel
-    let onPlayError: (PlayGameAction.Failure, Game) -> Void
+    let onPlayError: (PlayGameAction.Failure, Persistence.Object<Game>) -> Void
 
     @State var color: Color?
     @Environment(\.playGame) private var playGame
-    @Environment(\.persistenceCoordinator) private var persistence
+    @Environment(\.persistence) private var persistence
 
     var body: some View {
         Button {
             viewModel.target = game
         } label: {
             VStack(alignment: .leading, spacing: 0.0) {
-                AverageColorAsyncImage(url: game.boxart?.path(in: persistence), averageColor: $color) { imagePhase in
+                AverageColorAsyncImage(url: game.boxart?.path?.path(in: Files.shared), averageColor: $color) { imagePhase in
                     switch imagePhase {
                     case .success(let image):
                         image
@@ -99,7 +99,7 @@ struct GameKeepPlayingItem: View {
 #if DEBUG
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
-    let viewContext = PersistenceCoordinator.preview.container.viewContext
+    let viewContext = Persistence.preview.viewContext
     let game = Game(context: viewContext)
     game.id = UUID()
     game.md5 = "123"
@@ -110,5 +110,6 @@ struct GameKeepPlayingItem: View {
         print(error, game)
     }
         .environment(\.managedObjectContext, viewContext)
+        .environment(\.persistence, Persistence.preview)
 }
 #endif

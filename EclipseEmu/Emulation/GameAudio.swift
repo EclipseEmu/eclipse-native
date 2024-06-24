@@ -1,7 +1,7 @@
 import AVFoundation
 import Foundation
 
-final class GameAudio {
+final class GameAudio: @unchecked Sendable {
     enum Failure: Error {
         case failedToGetAudioFormat
         case unknownSampleFormat
@@ -62,29 +62,26 @@ final class GameAudio {
     }
 
     func start() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+        await Task.blocking(on: queue) {
             self.createSourceNode()
             self.engine.prepare()
             self.listenForHardwareChanges()
-            continuation.resume()
         }
     }
 
     func stop() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+        await Task.blocking(on: queue) {
             self.running = false
             if let sourceNode = self.sourceNode {
                 self.engine.detach(sourceNode)
                 self.sourceNode = nil
             }
-            continuation.resume()
         }
     }
 
     func resume() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+        await Task.blocking(on: queue) {
             self._resume()
-            continuation.resume()
         }
     }
 
@@ -98,10 +95,9 @@ final class GameAudio {
     }
 
     func pause() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
+        await Task.blocking(on: queue) {
             self.engine.pause()
             self.running = false
-            continuation.resume()
         }
     }
 

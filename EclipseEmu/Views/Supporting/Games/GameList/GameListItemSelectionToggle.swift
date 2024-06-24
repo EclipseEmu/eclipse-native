@@ -30,8 +30,8 @@ struct GameListItemSelectionToggle: View {
     let model = GameListViewModel(filter: .none)
     model.isSelecting = true
 
-    let persistence = PersistenceCoordinator.preview
-    let game = Game(context: persistence.context)
+    let persistence = Persistence.preview
+    let game = Game(context: persistence.viewContext)
 
     return VStack {
         Spacer()
@@ -46,8 +46,8 @@ struct GameListItemSelectionToggle: View {
     let model = GameListViewModel(filter: .none)
     model.isSelecting = true
 
-    let persistence = PersistenceCoordinator.preview
-    let game = Game(context: persistence.context)
+    let persistence = Persistence.preview
+    let game = Game(context: persistence.viewContext)
     model.selection.insert(game)
 
     return VStack {

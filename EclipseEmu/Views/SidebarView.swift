@@ -7,7 +7,7 @@ struct SidebarView: View {
         case collection(GameCollection)
     }
 
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @Binding var selection: Self.Selection
     @State var isCreateCollectionOpen = false
 
@@ -30,7 +30,13 @@ struct SidebarView: View {
                     }
                     .contextMenu {
                         Button(role: .destructive) {
-                            CollectionManager.delete(collection, in: persistence)
+                            Task {
+                                do {
+                                    try await persistence.delete(.init(object: collection))
+                                } catch {
+                                    print("[error] failed to delete collection", error)
+                                }
+                            }
                         } label: {
                             Label("Delete Collection", systemImage: "trash")
                         }

@@ -1,9 +1,7 @@
 import Foundation
-import GameController
+@preconcurrency import GameController
 
-final class GameInputCoordinator {
-    typealias ReorderControllersCallback = (inout [Player], UInt8) async -> Void
-
+final class GameInputCoordinator: @unchecked Sendable {
     struct Player: Identifiable {
         var id = UUID()
         var state: UInt32 = 0
@@ -22,7 +20,6 @@ final class GameInputCoordinator {
     }
 
     weak var coreCoordinator: GameCoreCoordinator?
-    var reorderPlayersCallback: ReorderControllersCallback
 
     let maxPlayers: UInt8
     private let builtinPlayer: Int = 0
@@ -33,9 +30,8 @@ final class GameInputCoordinator {
     private var keyboardBindings: KeyboardBindings!
     private var gamepadBindings: [ObjectIdentifier: GamepadInfo] = [:]
 
-    init(maxPlayers: UInt8, reorderPlayers: @escaping ReorderControllersCallback) {
+    init(maxPlayers: UInt8) {
         self.maxPlayers = maxPlayers
-        self.reorderPlayersCallback = reorderPlayers
     }
 
     private func loadGamepadBindings(for _: GCController) async -> [GamepadBinding] {

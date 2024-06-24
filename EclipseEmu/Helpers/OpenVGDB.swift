@@ -33,7 +33,7 @@ actor OpenVGDB {
     static let searchStatementString =
         "SELECT name, system, region, boxart FROM games WHERE LOWER(name) LIKE LOWER(?1) AND (system = ?2);"
 
-    struct LoadResult {
+    struct LoadResult: @unchecked Sendable {
         let database: OpaquePointer
         let md5Statement: OpaquePointer
         let searchStatement: OpaquePointer
@@ -49,7 +49,7 @@ actor OpenVGDB {
         case failedToSetupQuery
     }
 
-    struct Item: Identifiable {
+    struct Item: Sendable, Identifiable {
         let id = UUID()
         let name: String
         let system: GameSystem
@@ -58,51 +58,43 @@ actor OpenVGDB {
     }
 
     private let queue: DispatchQueue
-    private let database: OpaquePointer
-    private nonisolated(unsafe) let md5Statement: OpaquePointer
-    private nonisolated(unsafe) let searchStatement: OpaquePointer
+    nonisolated(unsafe) private let database: OpaquePointer
+    nonisolated(unsafe) private let md5Statement: OpaquePointer
+    nonisolated(unsafe) private let searchStatement: OpaquePointer
 
     init(queue: DispatchQueue = DispatchQueue.global(qos: .userInitiated)) async throws {
         guard let dbPath = Bundle.main.url(forResource: "openvgdb-min", withExtension: "sqlite") else {
             throw Failure.missingUrl
         }
 
-        let loadResult: LoadResult = try await withUnsafeBlockingThrowingContinuation(queue: queue) { continuation in
-            var databasePtr: OpaquePointer?
-            guard
-                sqlite3_open(dbPath.path, &databasePtr) == SQLITE_OK,
-                let databasePtr
-            else {
-                return continuation.resume(throwing: Failure.failedToOpen)
-            }
-
-            var md5Statement: OpaquePointer?
-            guard
-                sqlite3_prepare_v2(databasePtr, Self.md5StatementString, -1, &md5Statement, nil) == SQLITE_OK,
-                let md5Statement
-            else {
-                return continuation.resume(throwing: Failure.failedToPrepareMD5Statement)
-            }
-
-            var searchStatement: OpaquePointer?
-            guard
-                sqlite3_prepare_v2(databasePtr, Self.searchStatementString, -1, &searchStatement, nil) == SQLITE_OK,
-                let searchStatement
-            else {
-                return continuation.resume(throwing: Failure.failedToPrepareSearchStatement)
-            }
-
-            continuation.resume(returning: Self.LoadResult(
-                database: databasePtr,
-                md5Statement: md5Statement,
-                searchStatement: searchStatement
-            ))
+        var databasePtr: OpaquePointer?
+        guard
+            sqlite3_open(dbPath.path, &databasePtr) == SQLITE_OK,
+            let databasePtr
+        else {
+            throw Failure.failedToOpen
         }
 
+        var md5Statement: OpaquePointer?
+        guard
+            sqlite3_prepare_v2(databasePtr, Self.md5StatementString, -1, &md5Statement, nil) == SQLITE_OK,
+            let md5Statement
+        else {
+            throw Failure.failedToPrepareMD5Statement
+        }
+
+        var searchStatement: OpaquePointer?
+        guard
+            sqlite3_prepare_v2(databasePtr, Self.searchStatementString, -1, &searchStatement, nil) == SQLITE_OK,
+            let searchStatement
+        else {
+            throw Failure.failedToPrepareSearchStatement
+        }
+
+        self.database = databasePtr
+        self.md5Statement = md5Statement
+        self.searchStatement = searchStatement
         self.queue = queue
-        database = loadResult.database
-        md5Statement = loadResult.md5Statement
-        searchStatement = loadResult.searchStatement
     }
 
     deinit {
@@ -113,25 +105,23 @@ actor OpenVGDB {
 
     func get(md5: String, system: GameSystem) async throws -> [OpenVGDB.Item] {
         let statementInt = UInt(bitPattern: md5Statement)
-        return try await withUnsafeBlockingThrowingContinuation(queue: queue) { continuation in
-            let statement = OpaquePointer(bitPattern: statementInt)
+        let statement = OpaquePointer(bitPattern: statementInt)
 
-            guard
-                let md5String = md5.uppercased().cString(using: .ascii),
-                let systemString = system.openVGDBString?.cString(using: .ascii)
-            else {
-                return continuation.resume(throwing: Failure.failedToGetCString)
-            }
-
-            guard
-                sqlite3_bind_text(statement, 1, md5String, -1, Self.sqliteTransient) == SQLITE_OK,
-                sqlite3_bind_text(statement, 2, systemString, -1, Self.sqliteTransient) == SQLITE_OK
-            else {
-                return continuation.resume(throwing: Failure.failedToSetupQuery)
-            }
-
-            continuation.resume(returning: self.getAllRows(statement: statement))
+        guard
+            let md5String = md5.uppercased().cString(using: .ascii),
+            let systemString = system.openVGDBString?.cString(using: .ascii)
+        else {
+            throw Failure.failedToGetCString
         }
+
+        guard
+            sqlite3_bind_text(statement, 1, md5String, -1, Self.sqliteTransient) == SQLITE_OK,
+            sqlite3_bind_text(statement, 2, systemString, -1, Self.sqliteTransient) == SQLITE_OK
+        else {
+            throw Failure.failedToSetupQuery
+        }
+
+        return self.getAllRows(statement: statement)
     }
 
     func search(query: String, system: GameSystem) async throws -> [OpenVGDB.Item] {
@@ -143,25 +133,23 @@ actor OpenVGDB {
         let queryString = query
 
         let statementInt = UInt(bitPattern: searchStatement)
-        return try await withUnsafeBlockingThrowingContinuation(queue: queue) { continuation in
-            let statement = OpaquePointer(bitPattern: statementInt)
+        let statement = OpaquePointer(bitPattern: statementInt)
 
-            guard
-                let queryString = queryString.cString(using: .utf8),
-                let systemString = system.openVGDBString?.cString(using: .ascii)
-            else {
-                return continuation.resume(throwing: Failure.failedToGetCString)
-            }
-
-            guard
-                sqlite3_bind_text(statement, 1, queryString, -1, Self.sqliteTransient) == SQLITE_OK,
-                sqlite3_bind_text(statement, 2, systemString, -1, Self.sqliteTransient) == SQLITE_OK
-            else {
-                return continuation.resume(throwing: Failure.failedToSetupQuery)
-            }
-
-            continuation.resume(returning: self.getAllRows(statement: statement))
+        guard
+            let queryString = queryString.cString(using: .utf8),
+            let systemString = system.openVGDBString?.cString(using: .ascii)
+        else {
+            throw Failure.failedToGetCString
         }
+
+        guard
+            sqlite3_bind_text(statement, 1, queryString, -1, Self.sqliteTransient) == SQLITE_OK,
+            sqlite3_bind_text(statement, 2, systemString, -1, Self.sqliteTransient) == SQLITE_OK
+        else {
+            throw Failure.failedToSetupQuery
+        }
+
+        return self.getAllRows(statement: statement)
     }
 
     private nonisolated func getAllRows(statement: OpaquePointer!) -> [OpenVGDB.Item] {

@@ -1,10 +1,10 @@
-import mGBAEclipseCore
 import SwiftUI
+@preconcurrency import mGBAEclipseCore
 
 @main
 struct EclipseEmuApp: App {
-    // FIXME: once the models are finalized, make this use shared
-    let persistenceCoordinator = PersistenceCoordinator.preview
+    let persistence = Persistence.preview
+
     @StateObject var playGameAction = PlayGameAction()
     static let cores: GameCoreRegistry = {
         let mGBACore = mGBAEclipseCore.coreInfo
@@ -51,15 +51,15 @@ struct EclipseEmuApp: App {
                 #endif
             }
         }
-        .environment(\.managedObjectContext, persistenceCoordinator.container.viewContext)
-        .environment(\.persistenceCoordinator, persistenceCoordinator)
+        .environment(\.managedObjectContext, persistence.viewContext)
+        .environment(\.persistence, persistence)
         .environment(\.playGame, playGameAction)
 
         #if os(macOS)
         Settings {
             SettingsView()
-                .environment(\.managedObjectContext, persistenceCoordinator.container.viewContext)
-                .environment(\.persistenceCoordinator, persistenceCoordinator)
+                .environment(\.managedObjectContext, persistence.viewContext)
+                .environment(\.persistence, persistence)
                 .environment(\.playGame, playGameAction)
         }
         #endif

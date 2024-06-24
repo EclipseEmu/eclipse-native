@@ -4,8 +4,7 @@ struct GameCollectionView: View {
     static let sortDescriptors = [NSSortDescriptor(keyPath: \Game.name, ascending: true)]
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
-    @FetchRequest<Game>(sortDescriptors: Self.sortDescriptors) var games
+    @Environment(\.persistence) var persistence
     @State var selectedGame: Game?
     @State var isGamePickerPresented: Bool = false
     @State var searchQuery: String = ""
@@ -17,17 +16,13 @@ struct GameCollectionView: View {
     init(collection: GameCollection) {
         self.collection = collection
         self.viewModel = GameListViewModel(filter: .collection(collection))
-
-        let request = CollectionManager.listRequest(collection: collection)
-        request.sortDescriptors = Self.sortDescriptors
-        self._games = FetchRequest(fetchRequest: request)
     }
 
     var body: some View {
         ScrollView {
             GameList(viewModel: viewModel)
         }
-        .emptyState(games.isEmpty) {
+        .emptyState(viewModel.isEmpty) {
             ContentUnavailableMessage {
                 Label("Empty Collection", systemImage: "square.stack.fill")
             } description: {
@@ -73,9 +68,15 @@ struct GameCollectionView: View {
                         Divider()
 
                         Button(role: .destructive) {
-                            let collection = self.collection
+                            let collection = Persistence.Object(object: self.collection)
                             self.dismiss()
-                            CollectionManager.delete(collection, in: persistence)
+                            Task {
+                                do {
+                                    try await persistence.delete(collection)
+                                } catch {
+                                    print("[error] failed to delete the collection", error)
+                                }
+                            }
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -99,12 +100,12 @@ struct GameCollectionView: View {
 }
 
 #Preview {
-    let persistence = PersistenceCoordinator.preview
-    let collection = GameCollection(context: persistence.context)
+    let persistence = Persistence.preview
+    let collection = GameCollection(context: persistence.viewContext)
 
     return CompatNavigationStack {
         GameCollectionView(collection: collection)
     }
-    .environment(\.persistenceCoordinator, persistence)
-    .environment(\.managedObjectContext, persistence.context)
+    .environment(\.persistence, persistence)
+    .environment(\.managedObjectContext, persistence.viewContext)
 }

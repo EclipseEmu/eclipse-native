@@ -8,7 +8,7 @@ struct EditCheatView: View {
     var isCreatingCheat: Bool
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @State var label: String
     @State var format: GameCoreCheatFormat
     @State var formatter: CheatFormatter
@@ -107,6 +107,7 @@ struct EditCheatView: View {
 
     func save() {
         guard self.isCodeValid && !self.label.isEmpty else { return }
+        let moc = persistence.viewContext
 
         let format = String(cString: self.format.id)
         let normalizedCode = self.format.normalizeCode(string: self.code)
@@ -116,30 +117,24 @@ struct EditCheatView: View {
             cheat.label = self.label
             cheat.code = self.format.normalizeCode(string: self.code)
             cheat.enabled = self.enabled
-            CheatManager.update(cheat: cheat, in: self.persistence)
-
-            self.dismiss()
         } else {
-            do {
-                try CheatManager.create(
-                    name: self.label,
-                    code: normalizedCode,
-                    format: format,
-                    isEnabled: self.enabled,
-                    for: self.game,
-                    in: self.persistence
-                )
-                self.dismiss()
-            } catch {
-                print(error)
-            }
+            let cheat = Cheat(context: moc)
+            cheat.label = self.label
+            cheat.type = format
+            cheat.code = normalizedCode
+            cheat.enabled = self.enabled
+            cheat.priority = Int16.max
+            cheat.game = self.game
         }
+
+        try? moc.save()
+        self.dismiss()
     }
 }
 
 #if DEBUG
 #Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
+    let context = Persistence.preview.viewContext
     let game = Game(context: context)
     game.system = .gba
 

@@ -26,5 +26,6 @@ struct EmptyGameListMessage: View {
 }
 
 #Preview("Collection") {
-    EmptyGameListMessage(filter: .collection(GameCollection(context: PersistenceCoordinator.preview.context)))
+    let collection = GameCollection(context: Persistence.preview.viewContext)
+    return EmptyGameListMessage(filter: .collection(collection))
 }

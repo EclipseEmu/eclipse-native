@@ -1,71 +1,27 @@
 import Foundation
 
-/// Wraps a blocking operation in a DispatchQueue, such that the Swift Concurrency pool will not be oversaturated.
-/// - Parameters:
-///   - queue: The dispatch queue to offload work to. Defaults to the global queue, with no specified QoS.
-///   - body: The code block to run
-/// - Returns: The continuation's return value
-@inlinable
-func withCheckedBlockingContinuation<T>(
-    queue: DispatchQueue = .global(),
-    body: @escaping (CheckedContinuation<T, Never>) -> Void
-) async -> T {
-    return await withCheckedContinuation { continuation in
-        queue.async {
-            body(continuation)
+extension Task where Success == Never, Failure == Never {
+    @inlinable
+    static func blocking<T>(on queue: DispatchQueue = .global(), body: @escaping @Sendable () -> T) async -> T {
+        await withUnsafeContinuation { continuation in
+            queue.async {
+                continuation.resume(returning: body())
+            }
         }
     }
-}
 
-/// Wraps a blocking operation in a DispatchQueue, such that the Swift Concurrency pool will not be oversaturated.
-/// - Parameters:
-///   - queue: The dispatch queue to offload work to. Defaults to the global queue, with no specified QoS.
-///   - body: The code block to run
-/// - Returns: The continuation's return value
-/// - Throws: The continuation's thrown value
-@inlinable
-func withCheckedBlockingThrowingContinuation<T>(
-    queue: DispatchQueue = .global(),
-    body: @escaping (CheckedContinuation<T, any Error>) -> Void
-) async throws -> T {
-    return try await withCheckedThrowingContinuation { continuation in
-        queue.async {
-            body(continuation)
+    @inlinable
+    static func blocking<T, E>(on queue: DispatchQueue = .global(), body: @escaping @Sendable () throws(E) -> T) async throws(E) -> T {
+        let result: Result<T, E> = await withUnsafeContinuation { continuation in
+            queue.async {
+                do {
+                    let response = try body()
+                    continuation.resume(returning: .success(response))
+                } catch {
+                    continuation.resume(returning: .failure(error as! E))
+                }
+            }
         }
-    }
-}
-
-/// Wraps a blocking operation in a DispatchQueue, such that the Swift Concurrency pool will not be oversaturated.
-/// - Parameters:
-///   - queue: The dispatch queue to offload work to. Defaults to the global queue, with no specified QoS.
-///   - body: The code block to run
-/// - Returns: The continuation's return value
-@inlinable
-func withUnsafeBlockingContinuation<T>(
-    queue: DispatchQueue = .global(),
-    body: @escaping (UnsafeContinuation<T, Never>) -> Void
-) async -> T {
-    return await withUnsafeContinuation { continuation in
-        queue.async {
-            body(continuation)
-        }
-    }
-}
-
-/// Wraps a blocking operation in a DispatchQueue, such that the Swift Concurrency pool will not be oversaturated.
-/// - Parameters:
-///   - queue: The dispatch queue to offload work to. Defaults to the global queue, with no specified QoS.
-///   - body: The code block to run
-/// - Returns: The continuation's return value
-/// - Throws: The continuation's thrown value
-@inlinable
-func withUnsafeBlockingThrowingContinuation<T>(
-    queue: DispatchQueue = .global(),
-    body: @escaping (UnsafeContinuation<T, any Error>) -> Void
-) async throws -> T {
-    return try await withUnsafeThrowingContinuation { continuation in
-        queue.async {
-            body(continuation)
-        }
+        return try result.get()
     }
 }

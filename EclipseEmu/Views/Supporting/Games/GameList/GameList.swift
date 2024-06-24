@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - View Model
 
+@MainActor
 final class GameListViewModel: ObservableObject {
     enum DisplayMode: Identifiable, CaseIterable, Equatable {
         case grid
@@ -115,28 +116,38 @@ final class GameListViewModel: ObservableObject {
         }
     }
 
-    func removeFromLibrary(in persistence: PersistenceCoordinator) {
+    func removeFromLibrary(in persistence: Persistence) {
         for game in selection {
-            persistence.context.delete(game)
+            persistence.viewContext.delete(game)
         }
-        persistence.saveIfNeeded()
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to remove selection from the library", error)
+        }
     }
 
-    func removeFromCollection(in persistence: PersistenceCoordinator) {
+    func removeFromCollection(in persistence: Persistence) {
         guard case .collection(let collection) = filter else {
             return
         }
         for game in selection {
             collection.removeFromGames(game)
         }
-        persistence.saveIfNeeded()
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to remove selection to the collection", error)
+        }
     }
 
-    func addSelectionToCollection(collection: GameCollection, in persistence: PersistenceCoordinator) {
-        for game in selection {
-            collection.addToGames(game)
+    func addSelectionToCollection(collection: GameCollection, in persistence: Persistence) {
+        collection.addToGames(selection as NSSet)
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to add selection to the collection", error)
         }
-        persistence.saveIfNeeded()
     }
 }
 
@@ -144,7 +155,7 @@ final class GameListViewModel: ObservableObject {
 
 struct GameList: View {
     @ObservedObject var viewModel: GameListViewModel
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @FetchRequest<Game>(sortDescriptors: [], animation: .default) var games: FetchedResults<Game>
 
     init(viewModel: GameListViewModel) {
@@ -224,7 +235,11 @@ struct GameList: View {
             placeholder: "Game Name"
         ) { game, name in
             game.name = name
-            persistence.saveIfNeeded()
+            do {
+                try persistence.save(in: persistence.viewContext)
+            } catch {
+                print("[error] failed to rename game", error)
+            }
         }
         .sheet(item: $viewModel.changeBoxartTarget) { game in
             BoxartDatabasePicker(system: game.system, initialQuery: game.name ?? "") { entry in
@@ -268,8 +283,9 @@ struct GameList: View {
         guard let url = entry.boxart else { return }
         Task {
             do {
-                game.boxart = try await ImageAssetManager.create(remote: url, in: persistence, save: false)
-                persistence.saveIfNeeded()
+                let preparedPath = try await persistence.prepareImage(from: .web(url))
+                game.boxart = try? persistence.create(image: preparedPath, in: persistence.viewContext)
+                try persistence.save(in: persistence.viewContext)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -311,8 +327,8 @@ struct GameList: View {
         }
     }
 
-    let persistence = PersistenceCoordinator.preview
-    let viewContext = persistence.context
+    let persistence = Persistence.preview
+    let viewContext = persistence.viewContext
 
     for index in 0 ..< 5 {
         let game = Game(context: viewContext)
@@ -325,6 +341,6 @@ struct GameList: View {
     }
 
     return MiniLibrary()
-        .environment(\.persistenceCoordinator, persistence)
+        .environment(\.persistence, persistence)
         .environment(\.managedObjectContext, viewContext)
 }

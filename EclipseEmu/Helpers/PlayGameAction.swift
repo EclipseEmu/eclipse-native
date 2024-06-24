@@ -2,18 +2,21 @@ import CoreData
 import EclipseKit
 import SwiftUI
 
+@MainActor
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
 
     enum MissingFile: Equatable {
         case none
-        case rom
+        case rom(NSManagedObjectID)
         case saveState(NSManagedObjectID)
     }
 
     enum Failure: LocalizedError {
         case badPermissions
         case failedToHash
+        case romPathInvalid
+        case savePathInvalid
         case hashMismatch(MissingFile, String, URL)
         case missingCore
         case missingFile(MissingFile)
@@ -23,6 +26,8 @@ final class PlayGameAction: ObservableObject {
             switch self {
             case .badPermissions: "Missing Permissions"
             case .failedToHash: "Failed to Hash"
+            case .romPathInvalid: "The path to the game's ROM failed to construct"
+            case .savePathInvalid: "The path to the game's save failed to construct"
             case .hashMismatch(let kind, _, _):
                 switch kind {
                 case .rom: "The ROM file does not match the one that was originally used for this game. This may cause issues with save data, save states, and cheats."
@@ -45,28 +50,17 @@ final class PlayGameAction: ObservableObject {
         }
     }
 
-    public func callAsFunction(game: Game, saveState: SaveState?, persistence: PersistenceCoordinator) async throws {
-        guard let core = await EclipseEmuApp.cores.get(for: game) else {
+    public func callAsFunction(game: Game, saveState: SaveState?, persistence: Persistence) async throws {
+        guard let core = EclipseEmuApp.cores.get(for: game) else {
             throw Failure.missingCore
         }
+        
+        let data = try EmulationData(game: game)
 
-        let data = try GameManager.emulationData(for: game, in: persistence)
-
-        let missingFile = await withUnsafeBlockingContinuation { continuation in
-            if let saveState {
-                guard persistence.fileExists(path: saveState.path(in: persistence)) else {
-                    return continuation.resume(returning: MissingFile.saveState(saveState.objectID))
-                }
-            }
-            guard persistence.fileExists(path: data.romPath) else {
-                return continuation.resume(returning: MissingFile.rom)
-            }
-            return continuation.resume(returning: MissingFile.none)
-        }
-
-        guard missingFile == .none else {
-            throw Failure.missingFile(missingFile)
-        }
+        _ = try await (
+            self.assertSaveStateExists(saveState: saveState),
+            self.assertRomExists(romPath: data.romPath, gameId: game.objectID)
+        )
 
         let model = EmulationViewModel(
             coreInfo: core,
@@ -76,22 +70,31 @@ final class PlayGameAction: ObservableObject {
             persistence: persistence
         )
 
-        await MainActor.run {
-            self.model = model
-        }
+        self.model = model
     }
 
     public func closeGame() async {
-        await MainActor.run {
-            self.model = nil
+        self.model = nil
+    }
+
+    private func assertSaveStateExists(saveState: SaveState?) async throws {
+        guard let saveState else { return }
+        guard await Files.shared.exists(file: .saveState(saveState.id)) else {
+            throw Failure.missingFile(.saveState(saveState.objectID))
+        }
+    }
+
+    private func assertRomExists(romPath: URL, gameId: NSManagedObjectID) async throws {
+        guard await Files.shared.exists(url: romPath) else {
+            throw Failure.missingFile(.rom(gameId))
         }
     }
 }
 
-// MARK: setup @Environment
+// MARK: Setup @Environment
 
 private struct PlayGameActionKey: EnvironmentKey {
-    static let defaultValue: PlayGameAction = .init()
+    static let defaultValue = PlayGameAction()
 }
 
 extension EnvironmentValues {

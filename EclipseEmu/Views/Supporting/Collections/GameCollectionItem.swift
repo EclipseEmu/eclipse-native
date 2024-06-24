@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct GameCollectionItem: View {
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @ObservedObject var collection: GameCollection
 
     var body: some View {
@@ -23,13 +23,13 @@ struct GameCollectionItem: View {
             }
             .foregroundColor(.white)
             .padding()
-            .backgroundGradient(color: collection.parsedColor.color)
+            .backgroundGradient(color: collection.color)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
         }
         .buttonStyle(.plain)
         .contextMenu {
             Button(role: .destructive) {
-                CollectionManager.delete(collection, in: persistence)
+                persistence.delete(collection, in: persistence.viewContext)
             } label: {
                 Label("Delete Collection", systemImage: "trash")
             }
@@ -38,11 +38,11 @@ struct GameCollectionItem: View {
 }
 
 #Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
+    let context = Persistence.preview.viewContext
     let collection = GameCollection(context: context)
     collection.name = "Adventure"
     collection.icon = .symbol("tent.fill")
-    collection.color = GameCollection.Color.indigo.rawValue
+    collection.color = .indigo
 
     return CompatNavigationStack {
         GameCollectionItem(collection: collection)

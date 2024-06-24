@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GamePicker: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @ObservedObject var collection: GameCollection
     @State var searchQuery: String = ""
     @FetchRequest<Game>(sortDescriptors: [NSSortDescriptor(keyPath: \Game.name, ascending: true)])
@@ -97,12 +97,17 @@ struct GamePicker: View {
         } else {
             collection.addToGames(game)
         }
-        persistence.saveIfNeeded()
+
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to toggle the game in the collection", error)
+        }
     }
 }
 
 #Preview {
-    let context = PersistenceCoordinator.preview.context
+    let context = Persistence.preview.viewContext
     let game = Game(context: context)
     game.id = UUID()
     game.system = .gba
@@ -111,7 +116,7 @@ struct GamePicker: View {
     let collection = GameCollection(context: context)
     collection.name = "Foobar"
     collection.icon = .symbol("list.bullet")
-    collection.color = GameCollection.Color.blue.rawValue
+    collection.color = .blue
     collection.addToGames(game)
 
     return GamePicker(collection: collection)

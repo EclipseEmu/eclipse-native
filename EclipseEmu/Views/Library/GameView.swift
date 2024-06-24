@@ -8,10 +8,10 @@ final class GameViewModel: ObservableObject {
 struct GameViewHeader: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @ObservedObject var game: Game
     var safeAreaTop: CGFloat
-    var onPlayError: (PlayGameAction.Failure, Game) -> Void
+    var onPlayError: (PlayGameAction.Failure, Persistence.Object<Game>) -> Void
 
     var body: some View {
         ZStack {
@@ -69,19 +69,26 @@ struct GameViewHeader: View {
 }
 
 struct GameViewSaveStatesList: View {
-    @ObservedObject var game: Game
+    @MainActor @ObservedObject var game: Game
     @Binding var renameTarget: SaveState?
-    let onPlayError: (PlayGameAction.Failure, Game) -> Void
+    let onPlayError: (PlayGameAction.Failure, Persistence.Object<Game>) -> Void
 
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: [])
     private var saveStates
 
-    init(game: Game, renameTarget: Binding<SaveState?>, onPlayError: @escaping (PlayGameAction.Failure, Game) -> Void) {
+    init(
+        game: Game,
+        renameTarget: Binding<SaveState?>,
+        onPlayError: @escaping (PlayGameAction.Failure, Persistence.Object<Game>) -> Void
+    ) {
         self.game = game
         self._renameTarget = renameTarget
         self.onPlayError = onPlayError
 
-        let request = SaveStateManager.listRequest(for: game, limit: 10)
+        let request = SaveState.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
+        request.fetchLimit = 10
         request.sortDescriptors = SaveStatesListView.sortDescriptors
         self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
     }
@@ -93,7 +100,7 @@ struct GameViewSaveStatesList: View {
                     ForEach(section) { saveState in
                         SaveStateItem(
                             saveState: saveState,
-                            action: .startWithState(game, onPlayError),
+                            action: .startWithState(.init(object: game), onPlayError),
                             renameDialogTarget: $renameTarget
                         )
                         .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
@@ -119,7 +126,7 @@ struct GameView: View {
     @ObservedObject var game: Game
 
     @Environment(\.dismiss) private var dismiss: DismissAction
-    @Environment(\.persistenceCoordinator) private var persistence
+    @Environment(\.persistence) private var persistence
     @Environment(\.playGame) private var playGame
 
     @StateObject private var playGameErrorModel = PlayGameErrorModel()
@@ -135,7 +142,11 @@ struct GameView: View {
         CompatNavigationStack {
             GeometryReader { geometry in
                 ScrollView {
-                    GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top, onPlayError: onPlayError)
+                    GameViewHeader(
+                        game: game,
+                        safeAreaTop: geometry.safeAreaInsets.top,
+                        onPlayError: onPlayError
+                    )
 
                     Section {
                         GameViewSaveStatesList(game: game, renameTarget: $renameSaveStateTarget, onPlayError: onPlayError)
@@ -230,7 +241,8 @@ struct GameView: View {
                 title: "Rename State",
                 placeholder: "State Name"
             ) { saveState, name in
-                SaveStateManager.rename(saveState, to: name, in: persistence)
+                saveState.name = name
+                try? persistence.save(in: persistence.viewContext)
             }
             .alert("Rename Game", isPresented: self.$isRenameGameOpen) {
                 TextField("Game Name", text: self.$renameGameText)
@@ -257,8 +269,14 @@ struct GameView: View {
     }
 
     private func rename() {
-        GameManager.rename(game, to: renameGameText, in: persistence)
-        renameGameText = ""
+        Task { @MainActor in
+            do {
+                try await persistence.rename(game: .init(object: game), to: renameGameText)
+                renameGameText = ""
+            } catch {
+                print("[error] an error occurred while renaming the game:", error)
+            }
+        }
     }
 
     private func renameCancelled() {
@@ -270,7 +288,11 @@ struct GameView: View {
             await MainActor.run {
                 dismiss()
             }
-            try? await GameManager.delete(self.game, in: self.persistence)
+            do {
+                try await persistence.delete(.init(object: game))
+            } catch {
+                print("[error] failed to delete game:", error)
+            }
         }
     }
 
@@ -278,27 +300,21 @@ struct GameView: View {
 
     private func boxartFromPhotos(entry: Result<URL, any Error>) {
         guard case .success(let url) = entry else { return }
-        Task {
-            do {
-                game.boxart = try await ImageAssetManager.create(
-                    copy: url,
-                    in: persistence,
-                    save: false
-                )
-                persistence.saveIfNeeded()
-            } catch {
-                // FIXME: present this to the user
-                print(error)
-            }
-        }
+        importBoxart(.local(url))
     }
 
     private func boxartFromDatabase(entry: OpenVGDB.Item) {
         guard let url = entry.boxart else { return }
-        Task {
+        importBoxart(.web(url))
+    }
+
+    @discardableResult
+    private func importBoxart(_ source: Persistence.ImageSource) -> Task<Void, Never> {
+        let object = Persistence.Object(object: game)
+        return Task {
             do {
-                game.boxart = try await ImageAssetManager.create(remote: url, in: persistence, save: false)
-                persistence.saveIfNeeded()
+                let preparedPath = try await persistence.prepareImage(from: source)
+                try await persistence.replaceBoxart(for: object, newPath: preparedPath)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -314,14 +330,14 @@ struct GameView: View {
 
     private func deleteSave() {}
 
-    private func onPlayError(error: PlayGameAction.Failure, game: Game) {
+    private func onPlayError(error: PlayGameAction.Failure, game: Persistence.Object<Game>) {
         print(error, game)
     }
 }
 
 #if DEBUG
 #Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
+    let context = Persistence.preview.viewContext
     let game = Game(context: context)
     game.id = UUID()
     game.name = "Test Game"
@@ -331,7 +347,7 @@ struct GameView: View {
 
     return GameView(game: game)
         .environment(\.managedObjectContext, context)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
+        .environment(\.persistence, Persistence.preview)
         .environment(\.playGame, PlayGameAction())
 }
 #endif

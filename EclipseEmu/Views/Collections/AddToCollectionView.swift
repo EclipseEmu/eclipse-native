@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddToCollectionView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
-    @Environment(\.persistenceCoordinator) var persistence: PersistenceCoordinator
+    @Environment(\.persistence) var persistence: Persistence
 
     @ObservedObject var viewModel: GameListViewModel
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
@@ -24,7 +24,7 @@ struct AddToCollectionView: View {
                                     .foregroundStyle(Color.primary)
                             } icon: {
                                 CollectionIconView(icon: collection.icon)
-                                    .foregroundStyle(collection.parsedColor.color)
+                                    .foregroundStyle(collection.color)
                                     .aspectRatio(1.0, contentMode: .fit)
                                     .fixedSize()
                                     .frame(width: 32, height: 32)
@@ -80,6 +80,6 @@ struct AddToCollectionView: View {
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
     return AddToCollectionView(viewModel: viewModel)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
-        .environment(\.managedObjectContext, PersistenceCoordinator.preview.context)
+        .environment(\.persistence, Persistence.preview)
+        .environment(\.managedObjectContext, Persistence.preview.viewContext)
 }

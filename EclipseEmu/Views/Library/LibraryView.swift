@@ -4,8 +4,16 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct LibraryView: View {
+    static let recentlyPlayedRequest: NSFetchRequest<Game> = {
+        let request = Game.fetchRequest()
+        request.fetchLimit = 10
+        request.predicate = NSPredicate(format: "datePlayed != nil")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Game.datePlayed, ascending: false)]
+        return request
+    }()
+
     enum Failure: LocalizedError {
-        case gameManager(GameManager.Failure)
+        case persistence(PersistenceError)
         case playAction(PlayGameAction.Failure)
     }
 
@@ -18,7 +26,7 @@ struct LibraryView: View {
     ]
 
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.persistenceCoordinator) private var persistence
+    @Environment(\.persistence) private var persistence
     @Environment(\.playGame) private var playGame
     @StateObject var viewModel: GameListViewModel = .init(filter: .none)
 
@@ -26,10 +34,7 @@ struct LibraryView: View {
     @State var isErrorDialogOpen = false
     @State var error: Self.Failure?
 
-    @FetchRequest(
-        fetchRequest: GameManager.recentlyPlayedRequest(),
-        animation: .default
-    )
+    @FetchRequest(fetchRequest: Self.recentlyPlayedRequest, animation: .default)
     private var recentlyPlayed: FetchedResults<Game>
 
     var body: some View {
@@ -73,6 +78,7 @@ struct LibraryView: View {
             .fileImporter(
                 isPresented: self.$isRomPickerOpen,
                 allowedContentTypes: Self.romFileTypes,
+                allowsMultipleSelection: true,
                 onCompletion: self.fileImported
             )
             .navigationTitle("Library")
@@ -110,39 +116,24 @@ struct LibraryView: View {
         }
     }
 
-    func fileImported(result: Result<URL, Error>) {
+    func fileImported(result: Result<[URL], Error>) {
         switch result {
-        case .success(let url):
+        case .success(let urls):
             Task.detached(priority: .userInitiated) {
-                guard url.startAccessingSecurityScopedResource() else {
-                    return await self.reportError(error: .gameManager(.failedToGetReadPermissions))
-                }
-                defer { url.stopAccessingSecurityScopedResource() }
-
-                let fileType = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType
-
-                let system = if let fileType {
-                    GameSystem.from(fileType: fileType)
-                } else {
-                    GameSystem.unknown
-                }
-
-                guard system != .unknown else {
-                    return await self.reportError(error: .gameManager(.unknownFileType))
-                }
-
-                let (name, romExtension) = url.fileNameAndExtension()
-
                 do {
-                    try await GameManager.insert(
-                        name: name,
-                        system: system,
-                        romPath: url,
-                        romExtension: romExtension,
-                        in: self.persistence
-                    )
+                    let openvgdb = try? await OpenVGDB()
+                    let results = try await persistence.create(games: urls, openvgdb: openvgdb)
+                    let errors = results.compactMap {
+                        switch $0 {
+                        case .failure(originalPath: let path, error: let error): (path, error)
+                        case .success(_): nil
+                        }
+                    }
+                    if !errors.isEmpty {
+                        print(errors)
+                    }
                 } catch {
-                    return await self.reportError(error: .gameManager(.unknownFileType))
+                    print(error)
                 }
             }
         case .failure(let err):
@@ -150,12 +141,10 @@ struct LibraryView: View {
         }
     }
 
-    func onPlayFailure(error: PlayGameAction.Failure, game: Game) {
-        print(error, game)
+    func onPlayFailure(error: PlayGameAction.Failure, game: Persistence.Object<Game>) {
         self.reportError(error: .playAction(error))
     }
 
-    @MainActor
     func reportError(error: Self.Failure) {
         self.error = error
         self.isErrorDialogOpen = true
@@ -164,8 +153,8 @@ struct LibraryView: View {
 
 #if DEBUG
 #Preview {
-    let persistence = PersistenceCoordinator.preview
-    let viewContext = persistence.context
+    let persistence = Persistence.preview
+    let viewContext = persistence.viewContext
 
     for index in 0 ..< 5 {
         let game = Game(context: viewContext)
@@ -179,6 +168,6 @@ struct LibraryView: View {
 
     return LibraryView()
         .environment(\.managedObjectContext, viewContext)
-        .environment(\.persistenceCoordinator, persistence)
+        .environment(\.persistence, persistence)
 }
 #endif

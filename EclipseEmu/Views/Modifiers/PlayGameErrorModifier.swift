@@ -2,6 +2,7 @@ import EclipseKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+@MainActor
 final class PlayGameErrorModel: ObservableObject {
     @Published var error: PlayGameAction.Failure?
     @Published var isPresented: Bool = false
@@ -13,7 +14,6 @@ final class PlayGameErrorModel: ObservableObject {
 
     init() {}
 
-    @MainActor
     func set(error: PlayGameAction.Failure, game: Game?) {
         self.error = error
         self.game = game
@@ -32,14 +32,15 @@ final class PlayGameErrorModel: ObservableObject {
     }
 
     func onFileCompletion(_ result: Result<URL, any Error>) {
-        Task {
-            switch result {
-            case .success(let url):
-                guard url.startAccessingSecurityScopedResource() else {
-                    return await self.set(error: .badPermissions, game: game)
-                }
-                defer { url.stopAccessingSecurityScopedResource() }
+        switch result {
+        case .success(let url):
+            guard url.startAccessingSecurityScopedResource() else {
+                return self.set(error: .badPermissions, game: game)
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
 
+
+            Task {
                 switch self.fileType {
                 case .none:
                     break
@@ -48,54 +49,39 @@ final class PlayGameErrorModel: ObservableObject {
                 case .saveState:
                     await handleSaveStateFile(url: url)
                 }
-            case .failure(let error):
-                return await self.set(error: .unknown(error), game: game)
             }
+        case .failure(let error):
+            return self.set(error: .unknown(error), game: game)
         }
     }
 
     func handleRomFile(url: URL) async {
+        guard let game else { return }
+
         guard let digest = try? await MD5Hasher().hash(file: url) else {
-            return await set(error: .failedToHash, game: game)
+            return set(error: .failedToHash, game: game)
         }
 
         let md5 = digest.hexString()
-        guard md5 == game?.md5 else {
-            return await set(error: .hashMismatch(.rom, md5, url), game: game)
+        guard md5 == game.md5 else {
+            return set(error: .hashMismatch(.rom(game.objectID), md5, url), game: game)
         }
 
-        replaceRom(url: url, md5: md5)
+        await replaceRom(url: url, md5: md5)
     }
 
-    func replaceRom(url: URL, md5: String) {
-        guard let game else { return }
+    func replaceRom(url: URL, md5: String) async {
+        guard let game, let romPath = game.romPath else { return }
 
-        let persistence = PersistenceCoordinator.preview
-        let romPath = game.romPath(in: persistence)
-        guard copyFile(from: url, to: romPath, in: persistence) else { return }
-
-        game.md5 = md5
+        do {
+            try await Files.shared.copy(from: url, to: romPath)
+            game.md5 = md5
+        } catch {
+            set(error: .unknown(error), game: game)
+        }
     }
 
     func handleSaveStateFile(url: URL) async {}
-
-    private func copyFile(from sourceUrl: URL, to destUrl: URL, in persistence: PersistenceCoordinator) -> Bool {
-        guard
-            persistence.fileManager.delegate?.fileManager?(
-                persistence.fileManager,
-                shouldCopyItemAt: sourceUrl,
-                to: destUrl
-            ) != false
-        else {
-            return false
-        }
-        do {
-            try persistence.fileManager.copyItem(at: sourceUrl, to: destUrl)
-            return true
-        } catch {
-            return false
-        }
-    }
 }
 
 struct PlayGameErrorHandlerModifier: ViewModifier {
@@ -107,9 +93,11 @@ struct PlayGameErrorHandlerModifier: ViewModifier {
                 Button("Cancel", role: .cancel) {}
                 switch errorModel.error {
                 case .hashMismatch(let kind, let md5, let url):
-                    if kind == .rom {
+                    if case .rom = kind {
                         Button("Use Anyway", role: .destructive) {
-                            self.errorModel.replaceRom(url: url, md5: md5)
+                            Task {
+                                await self.errorModel.replaceRom(url: url, md5: md5)
+                            }
                         }
                     }
                 case .missingFile(let kind):

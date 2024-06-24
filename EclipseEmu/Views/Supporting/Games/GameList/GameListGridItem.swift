@@ -28,7 +28,7 @@ struct GameListGridItem: View {
 
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
-    let game = Game(context: PersistenceCoordinator.preview.context)
+    let game = Game(context: Persistence.preview.viewContext)
     game.name = "Test Game"
     game.system = .gba
 

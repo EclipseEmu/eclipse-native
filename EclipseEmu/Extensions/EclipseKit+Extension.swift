@@ -80,7 +80,7 @@ extension GameCoreCheatCharacterSet {
     }
 }
 
-extension GameCoreCheatFormat: Equatable, Hashable {
+extension GameCoreCheatFormat: @retroactive Equatable, @retroactive Hashable {
     public static func == (lhs: GameCoreCheatFormat, rhs: GameCoreCheatFormat) -> Bool {
         return lhs.id == rhs.id
     }

@@ -207,17 +207,15 @@ struct EmulationMenuView: View {
 
 #if DEBUG
 #Preview {
+    let game = Game(context: Persistence.preview.viewContext)
+
     ZStack {
         EmulationMenuView(
             model: .init(
                 coreInfo: .init(),
-                game: .init(context: PersistenceCoordinator.preview.container.viewContext),
+                game: game,
                 saveState: nil,
-                emulationData: .init(
-                    romPath: URL(string: "/")!,
-                    savePath: URL(string: "/")!,
-                    cheats: .init()
-                ),
+                emulationData: try! .init(game: game),
                 persistence: .preview
             ),
             menuButtonLayout: .init(

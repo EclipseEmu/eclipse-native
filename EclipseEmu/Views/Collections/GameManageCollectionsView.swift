@@ -4,6 +4,7 @@ struct GameManageCollectionItem: View {
     let collection: GameCollection
     let stateChanged: (GameCollection, Bool) -> Void
     @State var isSelected: Bool
+    @Environment(\.persistence) var persistence
 
     init(collection: GameCollection, isSelected: Bool, stateChanged: @escaping (GameCollection, Bool) -> Void) {
         self.collection = collection
@@ -17,7 +18,7 @@ struct GameManageCollectionItem: View {
                 Text(collection.name ?? "Collection")
             } icon: {
                 CollectionIconView(icon: collection.icon)
-                    .foregroundStyle(collection.parsedColor.color)
+                    .foregroundStyle(collection.color)
                     .aspectRatio(1.0, contentMode: .fit)
                     .fixedSize()
                     .frame(width: 32, height: 32)
@@ -35,7 +36,7 @@ struct GameManageCollectionItem: View {
 
 struct GameManageCollectionsView: View {
     @ObservedObject var game: Game
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @Environment(\.dismiss) var dismiss
     @State var selectedCollections: Set<GameCollection>
     @State var isCreateCollectionOpen = false
@@ -94,7 +95,12 @@ struct GameManageCollectionsView: View {
     }
 
     func finish() {
-        CollectionManager.updateGame(for: game, collections: selectedCollections, in: persistence)
+        do {
+            game.collections = selectedCollections as NSSet
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] error while saving games")
+        }
         self.dismiss()
     }
 }

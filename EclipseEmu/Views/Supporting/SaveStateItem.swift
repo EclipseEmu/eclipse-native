@@ -1,14 +1,15 @@
+import CoreData
 import SwiftUI
 
 struct SaveStateItem: View {
-    enum Action {
-        case startWithState(Game, (PlayGameAction.Failure, Game) -> Void)
+    enum Action: Sendable {
+        case startWithState(Persistence.Object<Game>, (PlayGameAction.Failure, Persistence.Object<Game>) -> Void)
         case loadState(EmulationViewModel)
     }
 
-    @Environment(\.persistenceCoordinator) var persistence
-    @Environment(\.playGame) var playGame
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.persistence) var persistence: Persistence
+    @Environment(\.playGame) var playGame: PlayGameAction
+    @Environment(\.dismiss) var dismiss: DismissAction
 
     @ObservedObject var saveState: SaveState
     @Binding var renameDialogTarget: SaveState?
@@ -21,7 +22,11 @@ struct SaveStateItem: View {
     }
 
     var body: some View {
-        Button(action: onSelected) {
+        Button {
+            Task {
+                await onSelected()
+            }
+        } label: {
             VStack(alignment: .leading) {
                 ImageAssetView(asset: self.saveState.preview, cornerRadius: 8.0)
                 Text("\(self.saveState.isAuto ? "Automatic State" : saveState.name ?? "Unnamed State")")
@@ -47,33 +52,36 @@ struct SaveStateItem: View {
     }
 
     func deleteSaveState() {
-        SaveStateManager.delete(saveState, in: persistence)
-        persistence.saveIfNeeded()
+        Task {
+            do {
+                try await persistence.delete(.init(object: saveState))
+            } catch {
+                print("[error] failed to delete save state:", error)
+            }
+        }
     }
 
-    func onSelected() {
+    func onSelected() async {
         switch action {
         case .loadState(let model):
             guard case .loaded(let core) = model.state else { return }
-            Task.detached {
-                let url = await self.saveState.path(in: persistence)
-                _ = await core.loadState(for: url)
+            // FIXME: handle error
+            guard let url = saveState.file.path(in: Files.shared) else { return }
+            _ = await core.loadState(for: url)
+            await MainActor.run {
+                dismiss()
+            }
+        case .startWithState(let game, let onError):
+            do {
+                let game = try game.unwrap(in: persistence.viewContext)
+                try await playGame(game: game, saveState: saveState, persistence: persistence)
                 await MainActor.run {
                     dismiss()
                 }
-            }
-        case .startWithState(let game, let onError):
-            Task.detached {
-                do {
-                    try await playGame(game: game, saveState: saveState, persistence: persistence)
-                    await MainActor.run {
-                        dismiss()
-                    }
-                } catch let error as PlayGameAction.Failure {
-                    onError(error, game)
-                } catch {
-                    onError(.unknown(error), game)
-                }
+            } catch let error as PlayGameAction.Failure {
+                onError(error, game)
+            } catch {
+                onError(.unknown(error), game)
             }
         }
     }

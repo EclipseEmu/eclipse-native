@@ -1,6 +1,6 @@
 import Foundation
 
-class CheatFormatter {
+final class CheatFormatter {
     struct FormattedText {
         let formattedText: String
         let cursorOffset: Int

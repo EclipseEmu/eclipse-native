@@ -48,6 +48,6 @@ struct GameCollectionsView: View {
 
 #Preview {
     GameCollectionsView()
-        .environment(\.managedObjectContext, PersistenceCoordinator.preview.context)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
+        .environment(\.managedObjectContext, Persistence.preview.viewContext)
+        .environment(\.persistence, Persistence.preview)
 }

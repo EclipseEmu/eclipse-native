@@ -1,15 +1,12 @@
 import Foundation
 
 extension URL {
-    func fileNameAndExtension() -> (String, String?) {
+    func fileName() -> String {
         let fileName = self.lastPathComponent
         return if let fileExtensionIndex = fileName.firstIndex(of: ".") {
-            (
-                String(fileName[fileName.startIndex ..< fileExtensionIndex]),
-                String(fileName[fileExtensionIndex...])
-            )
+            String(fileName[fileName.startIndex ..< fileExtensionIndex])
         } else {
-            (fileName, nil)
+            fileName
         }
     }
 
@@ -19,6 +16,18 @@ extension URL {
             String(fileName[fileExtensionIndex...])
         } else {
             nil
+        }
+    }
+
+    func fileNameAndExtension() -> (String, String?) {
+        let fileName = self.lastPathComponent
+        return if let fileExtensionIndex = fileName.firstIndex(of: ".") {
+            (
+                String(fileName[fileName.startIndex ..< fileExtensionIndex]),
+                String(fileName[fileExtensionIndex...])
+            )
+        } else {
+            (fileName, nil)
         }
     }
 }

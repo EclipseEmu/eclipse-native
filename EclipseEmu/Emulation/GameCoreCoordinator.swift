@@ -11,7 +11,7 @@ extension NSNotification.Name {
     static let EKGameCoreDidSave = NSNotification.Name("EKGameCoreDidSaveNotification")
 }
 
-final actor GameCoreCoordinator {
+final actor GameCoreCoordinator: Sendable {
     enum VideoRenderer {
         case frameBuffer(GameFrameBufferRenderer)
     }
@@ -27,6 +27,7 @@ final actor GameCoreCoordinator {
     enum Failure: Error {
         case failedToGetCoreInstance
         case failedToGetMetalDevice
+        case failedToStart
 
         case invalidPixelFormat
         case invalidAudioFormat
@@ -36,8 +37,14 @@ final actor GameCoreCoordinator {
     let width: CGFloat
     let height: CGFloat
 
-    private let core: UnsafeMutablePointer<GameCore>
-    private let game: Game
+    private nonisolated(unsafe) let corePointer: UnsafeMutablePointer<GameCore>
+    private nonisolated(unsafe) let callbackContext: UnsafeMutablePointer<CallbackContext>
+    private nonisolated(unsafe) let callbacks: UnsafeMutablePointer<GameCoreCallbacks>
+
+    @usableFromInline
+    var core: GameCore {
+        corePointer.pointee
+    }
 
     let inputs: GameInputCoordinator
     // FIXME: there should be some sort of notification to indicate changes in state
@@ -53,8 +60,6 @@ final actor GameCoreCoordinator {
     private var frameDuration: Double
     private var frameTimerTask: Task<Void, Never>?
     private(set) var rate: Float = 1.0
-    private let callbackContext: UnsafeMutablePointer<CallbackContext>
-    private let callbacks: UnsafeMutablePointer<GameCoreCallbacks>
 
     struct CallbackContext {
         weak var parent: GameCoreCoordinator?
@@ -81,16 +86,8 @@ final actor GameCoreCoordinator {
         }
     }
 
-    init(
-        game: Game,
-        coreInfo: GameCoreInfo,
-        system: GameSystem,
-        surface: CAMetalLayer,
-        reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback
-    ) throws {
+    init(coreInfo: GameCoreInfo, system: GameSystem, surface: CAMetalLayer) throws {
         do {
-            self.game = game
-
             callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
             callbackContext.initialize(to: CallbackContext())
 
@@ -107,7 +104,7 @@ final actor GameCoreCoordinator {
 
             try Task.checkCancellation()
 
-            self.core = core
+            corePointer = core
 
             desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
             frameDuration = 1.0 / desiredFrameRate
@@ -162,10 +159,7 @@ final actor GameCoreCoordinator {
             }
 
             audio = try GameAudio(format: audioFormat)
-            inputs = .init(
-                maxPlayers: core.pointee.getMaxPlayers(core.pointee.data),
-                reorderPlayers: reorderControls
-            )
+            inputs = .init(maxPlayers: core.pointee.getMaxPlayers(core.pointee.data))
 
             try Task.checkCancellation()
 
@@ -181,27 +175,21 @@ final actor GameCoreCoordinator {
         self.frameTimerTask?.cancel()
         self.frameTimerTask = nil
 
-        core.pointee.clearCheats(core.pointee.data)
-        core.pointee.stop(core.pointee.data)
-        core.pointee.deallocate(core.pointee.data)
-        core.deallocate()
+        corePointer.pointee.clearCheats(corePointer.pointee.data)
+        corePointer.pointee.stop(corePointer.pointee.data)
+        corePointer.pointee.deallocate(corePointer.pointee.data)
+        corePointer.deallocate()
         callbackContext.deallocate()
         callbacks.deallocate()
     }
 
-    func start(gamePath: URL, savePath: URL) async {
-        if #available(iOS 16.0, *) {
-            guard self.core.pointee.start(
-                self.core.pointee.data,
-                gamePath.path(percentEncoded: false).cString(using: .ascii),
-                savePath.path(percentEncoded: false).cString(using: .ascii)
-            ) else { return }
-        } else {
-            guard core.pointee.start(
-                core.pointee.data,
-                gamePath.path.cString(using: .ascii),
-                savePath.path.cString(using: .ascii)
-            ) else { return }
+    func start(gamePath: URL, savePath: URL) async throws {
+        guard corePointer.pointee.start(
+            corePointer.pointee.data,
+            gamePath.path.cString(using: .ascii),
+            savePath.path.cString(using: .ascii)
+        ) else {
+            throw Failure.failedToStart
         }
         await inputs.start()
         await audio.start()
@@ -210,7 +198,7 @@ final actor GameCoreCoordinator {
 
     func stop() async {
         await pause(reason: .stopped)
-        core.pointee.stop(core.pointee.data)
+        corePointer.pointee.stop(corePointer.pointee.data)
         inputs.stop()
         await audio.stop()
     }
@@ -222,7 +210,7 @@ final actor GameCoreCoordinator {
             frameTimerTask = nil
         }
         audio.clear()
-        core.pointee.restart(core.pointee.data)
+        corePointer.pointee.restart(corePointer.pointee.data)
         startFrameTimer()
         await audio.resume()
         state = .running
@@ -231,7 +219,7 @@ final actor GameCoreCoordinator {
     func play(reason: State) async {
         guard state.rawValue <= reason.rawValue else { return }
         state = .running
-        core.pointee.play(core.pointee.data)
+        corePointer.pointee.play(corePointer.pointee.data)
         startFrameTimer()
         await audio.resume()
     }
@@ -243,38 +231,35 @@ final actor GameCoreCoordinator {
         frameTimerTask?.cancel()
         frameTimerTask = nil
 
-        core.pointee.pause(core.pointee.data)
+        corePointer.pointee.pause(corePointer.pointee.data)
         await audio.pause()
     }
 
     // MARK: Saving
 
     func save(to url: URL) -> Bool {
-        core.pointee.save(core.pointee.data, url.path)
+        corePointer.pointee.save(corePointer.pointee.data, url.path)
     }
 
     func saveState(to url: URL) -> Bool {
-        return core.pointee.saveState(core.pointee.data, url.path)
+        return corePointer.pointee.saveState(corePointer.pointee.data, url.path)
     }
 
     func loadState(for url: URL) -> Bool {
-        return core.pointee.loadState(core.pointee.data, url.path)
+        return corePointer.pointee.loadState(corePointer.pointee.data, url.path)
     }
 
     // MARK: Cheats
 
     /// - Parameter cheats: A list of cheats to add
     /// - Returns: A set of the cheats that failed to set.
-    func setCheats(cheats: Set<Cheat>) -> Set<Cheat>? {
-        core.pointee.clearCheats(core.pointee.data)
-        var response: Set<Cheat>?
+    func setCheats(cheats: [EmulationData.CheatData]) -> [EmulationData.CheatData] {
+        corePointer.pointee.clearCheats(corePointer.pointee.data)
+        var response = [EmulationData.CheatData]()
         for cheat in cheats {
-            guard let type = cheat.type, let code = cheat.code else { continue }
-            // FIXME: what to do when this fails
-            let wasSuccessful = core.pointee.setCheat(core.pointee.data, type, code, cheat.enabled)
+            let wasSuccessful = corePointer.pointee.setCheat(corePointer.pointee.data, cheat.type, cheat.code, true)
             if !wasSuccessful {
-                response = response ?? Set()
-                response!.insert(cheat)
+                response.append(cheat)
             }
         }
         return response
@@ -316,14 +301,14 @@ final actor GameCoreCoordinator {
                     let expectedTime = start - initialTime
                     time = max(time, expectedTime - maxCatchupRate)
 
-                    self.core.pointee.playerSetInputs(self.core.pointee.data, 0, inputs.players[0].state)
+                    self.corePointer.pointee.playerSetInputs(self.corePointer.pointee.data, 0, inputs.players[0].state)
 
                     while time <= expectedTime {
                         time += frameDuration
                         let doRender = time >= expectedTime && expectedTime >= nextRenderTime
                         nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
 
-                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
+                        self.corePointer.pointee.executeFrame(self.corePointer.pointee.data, doRender)
                         if doRender {
                             switch self.renderer {
                             case .frameBuffer(let renderer):
@@ -359,7 +344,7 @@ final actor GameCoreCoordinator {
                     time = max(time, UInt64(expectedTime > maxCatchupRate) * (expectedTime &- maxCatchupRate))
 
                     for (playerIndex, player) in self.inputs.players.enumerated() {
-                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(playerIndex), player.state)
+                        self.corePointer.pointee.playerSetInputs(self.corePointer.pointee.data, UInt8(playerIndex), player.state)
                     }
 
                     while time <= expectedTime {
@@ -367,7 +352,7 @@ final actor GameCoreCoordinator {
                         let doRender = time >= expectedTime && expectedTime >= nextRenderTime
                         nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
 
-                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
+                        self.corePointer.pointee.executeFrame(self.corePointer.pointee.data, doRender)
                         if doRender {
                             switch self.renderer {
                             case .frameBuffer(let renderer):
@@ -390,21 +375,30 @@ final actor GameCoreCoordinator {
     // MARK: Input handling
 
     func playerConnected(player: UInt8) -> Bool {
-        return core.pointee.playerConnected(core.pointee.data, player)
+        return corePointer.pointee.playerConnected(corePointer.pointee.data, player)
     }
 
     func playerDisconnected(player: UInt8) {
-        return core.pointee.playerDisconnected(core.pointee.data, player)
+        return corePointer.pointee.playerDisconnected(corePointer.pointee.data, player)
     }
 
     // MARK: Screenshot
 
-    func screenshot() -> CIImage {
+    func writeScreenshot(to path: Files.Path) async throws {
+        guard 
+            case .image = path,
+            let url = path.path(in: .shared)
+        else { return }
+
+
         let colorSpace = renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
+
         let result = switch renderer {
         case .frameBuffer(let renderer):
             renderer.screenshot(colorSpace: colorSpace)
         }
-        return result ?? CIImage.black
+
+        let image = result ?? CIImage.black
+        try CIContext().writeJPEGRepresentation(of: image, to: url, colorSpace: colorSpace)
     }
 }

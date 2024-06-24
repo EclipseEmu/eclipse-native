@@ -9,7 +9,7 @@ struct CheatsView: View {
     @ObservedObject var game: Game
     let cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
     @Environment(\.managedObjectContext) var viewContext
-    @Environment(\.persistenceCoordinator) var persistence
+    @Environment(\.persistence) var persistence
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<Cheat>
     @State var isAddViewOpen = false
     @State var editingCheat: Cheat?
@@ -23,7 +23,9 @@ struct CheatsView: View {
             self.cheatFormats = UnsafeBufferPointer(start: nil, count: 0)
         }
 
-        let request = CheatManager.listRequest(for: game)
+        let request = Cheat.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
         request.sortDescriptors = Self.sortCheatsBy
         self._cheats = FetchRequest(fetchRequest: request)
     }
@@ -89,21 +91,30 @@ struct CheatsView: View {
         for (index, cheat) in cheatsArray.enumerated() {
             cheat.priority = Int16(truncatingIfNeeded: index)
         }
-        persistence.saveIfNeeded()
+
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to reorder cheats", error)
+        }
     }
 
     func deleteCheats(offsets: IndexSet) {
         for index in offsets {
-            let cheat = cheats[index]
-            try? CheatManager.delete(cheat: cheat, in: persistence, save: false)
+            persistence.viewContext.delete(cheats[index])
         }
-        persistence.saveIfNeeded()
+        
+        do {
+            try persistence.save(in: persistence.viewContext)
+        } catch {
+            print("[error] failed to delete cheats", error)
+        }
     }
 }
 
 #if DEBUG
 #Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
+    let context = Persistence.preview.viewContext
     let game = Game(context: context)
     game.system = .gba
 
