@@ -26,9 +26,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.faceButtonRight.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -46,9 +46,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.faceButtonDown.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -66,9 +66,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .multiButton,
             inputA: GameInput.faceButtonDown.rawValue | GameInput.faceButtonRight.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -86,9 +86,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.shoulderLeft.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -106,9 +106,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.shoulderRight.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -126,9 +126,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.startButton.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -146,9 +146,9 @@ let defaultTouchElements = [
         bindings: .init(
             kind: .button,
             inputA: GameInput.selectButton.rawValue,
-            inputB: .none,
-            inputC: .none,
-            inputD: .none
+            inputB: [],
+            inputC: [],
+            inputD: []
         )
     ),
     TouchLayout.Element(
@@ -373,7 +373,12 @@ final class TouchControlsController: UIViewController {
             }
         }
 
-        if self.state & ~oldState > 0 {
+        let dpadMask = GameInput.dpadUp.rawValue
+            | GameInput.dpadDown.rawValue
+            | GameInput.dpadLeft.rawValue
+            | GameInput.dpadRight.rawValue
+
+        if self.state & ~oldState > 0 || (self.state & dpadMask) != (oldState & dpadMask) {
             self.feedbackGenerator.impactOccurred()
         }
 

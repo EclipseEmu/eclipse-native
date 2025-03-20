@@ -1,44 +1,41 @@
 import AVFoundation
 import Foundation
 
-final class GameAudio {
-    enum Failure: Error {
-        case failedToGetAudioFormat
-        case unknownSampleFormat
-        case failedToInitializeRingBuffer
-    }
+enum GameAudioFailure: Error {
+    case getAudioFormat
+    case unknownSampleFormat
+    case initializeRingBuffer
+}
 
-    // Unfortunately, AVAudioEngine blocks which causes major issues when used within Swift Concurrency (i.e. deadlocks)
-    // so we have to use a DispatchQueue here.
-    private let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.audio")
-    private var ringBuffer: RingBuffer
+extension AVAudioFormat: @unchecked @retroactive Sendable {}
 
-    private let inputFormat: AVAudioFormat
+final actor GameAudio {
+    private let executor: BlockingSerialExecutor
+    nonisolated let unownedExecutor: UnownedSerialExecutor
+
+    private nonisolated(unsafe) var ringBuffer: RingBuffer
+
+    private nonisolated let inputFormat: AVAudioFormat
     private let engine: AVAudioEngine
     private let playback: AVAudioUnitTimePitch
     private var sourceNode: AVAudioSourceNode?
 
     private(set) var running = false
-    private var lastAvailableRead: Int = -1
+    private nonisolated(unsafe) var lastAvailableRead: Int = -1
     private var hardwareListener: Any?
     private var isUsingDefaultOutput = true
 
-    var volume: Float {
-        get {
-            return self.engine.mainMixerNode.outputVolume
-        }
-        set {
-            self.queue.async {
-                self.engine.mainMixerNode.outputVolume = newValue
-            }
-        }
+    func setVolume(to newValue: Float) {
+        self.engine.mainMixerNode.outputVolume = newValue
     }
 
-    init(format: AVAudioFormat?) throws {
-        guard let format else { throw Failure.failedToGetAudioFormat }
+    init(format: AVAudioFormat) throws(GameAudioFailure) {
+        let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.audio")
+        self.executor = BlockingSerialExecutor(queue: queue)
+        self.unownedExecutor = executor.asUnownedSerialExecutor()
 
         let bytesPerSample = format.commonFormat.bytesPerSample
-        guard bytesPerSample != -1 else { throw Failure.unknownSampleFormat }
+        guard bytesPerSample != -1 else { throw .unknownSampleFormat }
         self.inputFormat = format
         self.ringBuffer = RingBuffer(capacity: Int(format.sampleRate * Double(format.channelCount * 2)))
 
@@ -49,46 +46,38 @@ final class GameAudio {
         self.engine.connect(self.playback, to: self.engine.outputNode, format: nil)
 
 #if os(macOS)
-        self.setOutputDevice(0)
+        Task {
+            await self.setOutputDevice(0)
+        }
 #endif
     }
 
     deinit {
-        if let sourceNode {
-            engine.detach(sourceNode)
-        }
-        engine.detach(playback)
-        self.stopListeningForHardwareChanges()
+        // FIXME: we probably don't need this.
+        //        if let sourceNode {
+        //            engine.detach(sourceNode)
+        //        }
+        //        engine.detach(playback)
+        //        if let hardwareListener {
+        //            NotificationCenter.default.removeObserver(hardwareListener)
+        //        }
     }
 
-    func start() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
-            self.createSourceNode()
-            self.engine.prepare()
-            self.listenForHardwareChanges()
-            continuation.resume()
-        }
+    func start() {
+        self.createSourceNode()
+        self.engine.prepare()
+        self.listenForHardwareChanges()
     }
 
-    func stop() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
-            self.running = false
-            if let sourceNode = self.sourceNode {
-                self.engine.detach(sourceNode)
-                self.sourceNode = nil
-            }
-            continuation.resume()
+    func stop() {
+        self.running = false
+        if let sourceNode = self.sourceNode {
+            self.engine.detach(sourceNode)
+            self.sourceNode = nil
         }
     }
 
-    func resume() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
-            self._resume()
-            continuation.resume()
-        }
-    }
-
-    private func _resume() {
+    func resume() {
         self.running = true
         do {
             try self.engine.start()
@@ -97,18 +86,13 @@ final class GameAudio {
         }
     }
 
-    func pause() async {
-        await withUnsafeBlockingContinuation(queue: queue) { continuation in
-            self.engine.pause()
-            self.running = false
-            continuation.resume()
-        }
+    func pause() {
+        self.engine.pause()
+        self.running = false
     }
 
     func setRate(rate: Float) {
-        self.queue.async {
-            self.playback.rate = rate
-        }
+        self.playback.rate = rate
     }
 
     @inlinable
@@ -117,7 +101,7 @@ final class GameAudio {
     }
 
     @inlinable
-    func write(samples: UnsafeRawPointer, count: Int) -> Int {
+    nonisolated func write(samples: UnsafeRawPointer, count: Int) -> Int {
         return self.ringBuffer.write(src: samples, length: count)
     }
 
@@ -136,7 +120,7 @@ final class GameAudio {
         }
     }
 
-    private func renderBlock(
+    private nonisolated func renderBlock(
         isSilence: UnsafeMutablePointer<ObjCBool>,
         timestamp: UnsafePointer<AudioTimeStamp>,
         frameCount: AVAudioFrameCount,
@@ -168,29 +152,34 @@ final class GameAudio {
 
     // MARK: Output Change Handling
 
-    func listenForHardwareChanges() {
+    func hardwareChanged() {
+#if os(macOS)
+        self.setOutputDevice(self.isUsingDefaultOutput ? 0 : self.engine.outputNode.auAudioUnit.deviceID)
+#else
+        self.engine.stop()
+
+        if let sourceNode {
+            self.engine.connect(sourceNode, to: self.engine.mainMixerNode, format: self.inputFormat)
+        }
+
+        guard self.running, !self.engine.isRunning else { return }
+        self.engine.prepare()
+        self.resume()
+#endif
+    }
+
+    private func listenForHardwareChanges() {
         self.hardwareListener = NotificationCenter.default.addObserver(
             forName: .AVAudioEngineConfigurationChange,
             object: self.engine, queue: .current
         ) { [weak self] _ in
-            guard let self else { return }
-#if os(macOS)
-            self.setOutputDevice(self.isUsingDefaultOutput ? 0 : self.engine.outputNode.auAudioUnit.deviceID)
-#else
-            self.engine.stop()
-
-            if let sourceNode {
-                self.engine.connect(sourceNode, to: self.engine.mainMixerNode, format: self.inputFormat)
+            Task {
+                await self?.hardwareChanged()
             }
-
-            guard self.running, !self.engine.isRunning else { return }
-            self.engine.prepare()
-            self._resume()
-#endif
         }
     }
 
-    func stopListeningForHardwareChanges() {
+    private func stopListeningForHardwareChanges() {
         if let hardwareListener {
             NotificationCenter.default.removeObserver(hardwareListener)
             self.hardwareListener = nil
@@ -246,7 +235,7 @@ final class GameAudio {
 
         guard self.running, !self.engine.isRunning else { return }
         self.engine.prepare()
-        self._resume()
+        self.resume()
     }
 #else
     static func setRequireRinger(requireRinger: Bool) {

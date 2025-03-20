@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct ImageAssetView: View {
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     var asset: ImageAsset?
     var cornerRadius: CGFloat
 
     var body: some View {
-        AsyncImage(url: asset?.path(in: persistence)) { imagePhase in
+        AsyncImage(url: persistence.files.url(path: asset?.path)) { imagePhase in
             switch imagePhase {
             case .success(let image):
                 image

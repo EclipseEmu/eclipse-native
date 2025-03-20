@@ -3,6 +3,6 @@
 
 #include <EclipseKit.h>
 
-extern EKCoreInfo coreInfo;
+extern const EKCoreInfo dummyCoreInfo;
 
 #endif /* DummyCore_hpp */

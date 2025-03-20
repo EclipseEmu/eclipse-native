@@ -23,14 +23,14 @@ struct GameKeepPlayingItem: View {
 
     @State var color: Color?
     @Environment(\.playGame) private var playGame
-    @Environment(\.persistenceCoordinator) private var persistence
+    @EnvironmentObject private var persistence: Persistence
 
     var body: some View {
         Button {
             viewModel.target = game
         } label: {
             VStack(alignment: .leading, spacing: 0.0) {
-                AverageColorAsyncImage(url: game.boxart?.path(in: persistence), averageColor: $color) { imagePhase in
+                AverageColorAsyncImage(url: persistence.files.url(path: game.boxart?.path) , averageColor: $color) { imagePhase in
                     switch imagePhase {
                     case .success(let image):
                         image
@@ -96,19 +96,11 @@ struct GameKeepPlayingItem: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    let viewModel = GameListViewModel(filter: .none)
-    let viewContext = PersistenceCoordinator.preview.container.viewContext
-    let game = Game(context: viewContext)
-    game.id = UUID()
-    game.md5 = "123"
-    game.name = "Test Game"
-    game.system = .gba
-
-    return GameKeepPlayingItem(game: game, viewModel: viewModel) { error, game in
-        print(error, game)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        GameKeepPlayingItem(game: game, viewModel: GameListViewModel(filter: .none)) { error, game in
+            print(error, game)
+        }
     }
-        .environment(\.managedObjectContext, viewContext)
 }
-#endif

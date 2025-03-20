@@ -23,7 +23,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             List {
                 Section {
                     NavigationLink(destination: SettingsGeneralView()) {

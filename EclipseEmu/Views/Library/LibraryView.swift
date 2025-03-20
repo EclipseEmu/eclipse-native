@@ -4,8 +4,18 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct LibraryView: View {
+    static let recentlyPlayedRequest: NSFetchRequest<Game> = {
+        let request = Game.fetchRequest()
+        request.fetchLimit = 10
+        request.predicate = NSPredicate(format: "datePlayed != nil")
+        request.sortDescriptors = [
+            NSSortDescriptor(keyPath: \Game.datePlayed, ascending: false)
+        ]
+        return request
+    }()
+
     enum Failure: LocalizedError {
-        case gameManager(GameManager.Failure)
+        case gameManager(GameError)
         case playAction(PlayGameAction.Failure)
     }
 
@@ -18,7 +28,7 @@ struct LibraryView: View {
     ]
 
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.persistenceCoordinator) private var persistence
+    @EnvironmentObject private var persistence: Persistence
     @Environment(\.playGame) private var playGame
     @StateObject var viewModel: GameListViewModel = .init(filter: .none)
 
@@ -27,13 +37,13 @@ struct LibraryView: View {
     @State var error: Self.Failure?
 
     @FetchRequest(
-        fetchRequest: GameManager.recentlyPlayedRequest(),
+        fetchRequest: Self.recentlyPlayedRequest,
         animation: .default
     )
     private var recentlyPlayed: FetchedResults<Game>
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             ScrollView {
                 Section {
                     GameKeepPlayingScroller(
@@ -134,13 +144,20 @@ struct LibraryView: View {
                 let (name, romExtension) = url.fileNameAndExtension()
 
                 do {
-                    try await GameManager.insert(
+                    try await persistence.library.createGame(
                         name: name,
                         system: system,
                         romPath: url,
-                        romExtension: romExtension,
-                        in: self.persistence
+                        romExtension: romExtension
                     )
+
+//                    try await GameManager.insert(
+//                        name: name,
+//                        system: system,
+//                        romPath: url,
+//                        romExtension: romExtension,
+//                        in: self.persistence
+//                    )
                 } catch {
                     return await self.reportError(error: .gameManager(.unknownFileType))
                 }
@@ -162,23 +179,8 @@ struct LibraryView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    let persistence = PersistenceCoordinator.preview
-    let viewContext = persistence.context
-
-    for index in 0 ..< 5 {
-        let game = Game(context: viewContext)
-        game.name = "Game \(index)"
-        game.system = .gba
-        game.id = UUID()
-        game.md5 = ""
-        game.datePlayed = Date.now
-        game.dateAdded = Date.now
-    }
-
-    return LibraryView()
-        .environment(\.managedObjectContext, viewContext)
-        .environment(\.persistenceCoordinator, persistence)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    LibraryView()
 }
-#endif
+

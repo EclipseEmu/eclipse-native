@@ -3,9 +3,9 @@ import Foundation
 
 struct RingBuffer: ~Copyable {
     let capacity: Int
-    private var head: ManagedAtomic<Int> = .init(0)
-    private var tail: ManagedAtomic<Int> = .init(0)
-    private var inner: UnsafeMutableRawBufferPointer
+    private let head: ManagedAtomic<Int> = .init(0)
+    private let tail: ManagedAtomic<Int> = .init(0)
+    private let inner: UnsafeMutableRawBufferPointer
 
     init(capacity: Int) {
         self.capacity = capacity

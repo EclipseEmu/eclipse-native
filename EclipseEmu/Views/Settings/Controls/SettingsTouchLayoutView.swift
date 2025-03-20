@@ -169,7 +169,7 @@ fileprivate struct ControlEditView: View {
     @ObservedObject var control: ControlModel
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             Form {
                 Text("\(control.label)")
                 Text("\(control.location.debugDescription)")
@@ -250,13 +250,7 @@ struct SettingsTouchLayoutView: View {
         .tabBarHidden()
         .sheet(item: $editorSelection) { control in
             ControlEditView(control: control)
-                .modify {
-                    if #available(iOS 16.0, *) {
-                        $0.presentationDetents([.medium])
-                    } else {
-                        $0
-                    }
-                }
+                .presentationDetents([.medium])
         }
     }
 }

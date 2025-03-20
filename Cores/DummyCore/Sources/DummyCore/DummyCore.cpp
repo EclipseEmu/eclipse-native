@@ -191,7 +191,7 @@ namespace dummycore {
     }
 }
 
-EKCoreInfo coreInfo = {
+const EKCoreInfo dummyCoreInfo = {
     .id = "dev.magnetar.dummycore",
     .name = "Dummy Core",
     .developer = "Magnetar",

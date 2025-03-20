@@ -44,14 +44,15 @@ struct GameListItemContextMenu: View {
     }
 }
 
-#Preview {
-    let viewModel = GameListViewModel(filter: .none)
-    let game = Game(context: PersistenceCoordinator.preview.context)
-    game.name = "Test Game"
-    game.system = .gba
-
-    return Text("Context Menu")
-        .contextMenu {
-            GameListItemContextMenu(viewModel: viewModel, game: game)
-        }
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        Text("Context Menu")
+            .contextMenu {
+                GameListItemContextMenu(
+                    viewModel: .init(filter: .none),
+                    game: game
+                )
+            }
+    }
 }

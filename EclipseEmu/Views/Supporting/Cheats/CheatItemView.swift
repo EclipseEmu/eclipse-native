@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CheatItemView: View {
     @Environment(\.managedObjectContext) var viewContext
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     #if !os(macOS)
     @Environment(\.editMode) var editMode
     #endif
@@ -38,7 +38,7 @@ struct CheatItemView: View {
             #endif
         }
         .onChange(of: cheat.enabled) { _ in
-            persistence.saveIfNeeded()
+            try? persistence.mainContext.saveIfNeeded()
         }
         .contextMenu(ContextMenu(menuItems: {
             Button {
@@ -47,7 +47,14 @@ struct CheatItemView: View {
                 Label("Edit", systemImage: "pencil")
             }
             Button(role: .destructive) {
-                try? CheatManager.delete(cheat: cheat, in: persistence, save: true)
+                Task {
+                    do {
+                        try await persistence.library.delete(.init(cheat))
+                    } catch {
+                        // FIXME: Surface error
+                        print(error)
+                    }
+                }
             } label: {
                 Label("Delete", systemImage: "trash")
             }

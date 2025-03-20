@@ -2,7 +2,6 @@ import SwiftUI
 
 /// A view that loads an image asynchronously and also gets its average color.
 struct AverageColorAsyncImage<Content: View>: View {
-    @Environment(\.persistenceCoordinator) private var persistence
     @State private var task: Task<Void, Never>?
 
     private var url: URL?

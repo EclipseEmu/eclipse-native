@@ -11,7 +11,7 @@ struct EmptyGameListMessage: View {
             } description: {
                 Text("You haven't added any games to your library.")
             }
-        case .collection:
+        case .tag:
             ContentUnavailableMessage {
                 Label("No Games", systemImage: "books.vertical.fill")
             } description: {
@@ -21,10 +21,16 @@ struct EmptyGameListMessage: View {
     }
 }
 
-#Preview("Library") {
+@available(iOS 18.0, macOS 15.0, *)
+#Preview("Library", traits: .modifier(PreviewStorage())) {
     EmptyGameListMessage(filter: .none)
 }
 
-#Preview("Collection") {
-    EmptyGameListMessage(filter: .collection(GameCollection(context: PersistenceCoordinator.preview.context)))
+@available(iOS 18.0, macOS 15.0, *)
+#Preview("Tag", traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
+        NavigationStack {
+            EmptyGameListMessage(filter: .tag(tag))
+        }
+    }
 }

@@ -33,7 +33,7 @@ actor OpenVGDB {
     static let searchStatementString =
         "SELECT name, system, region, boxart FROM games WHERE LOWER(name) LIKE LOWER(?1) AND (system = ?2);"
 
-    struct LoadResult {
+    struct LoadResult: @unchecked Sendable {
         let database: OpaquePointer
         let md5Statement: OpaquePointer
         let searchStatement: OpaquePointer
@@ -58,7 +58,7 @@ actor OpenVGDB {
     }
 
     private let queue: DispatchQueue
-    private let database: OpaquePointer
+    private nonisolated(unsafe) let database: OpaquePointer
     private nonisolated(unsafe) let md5Statement: OpaquePointer
     private nonisolated(unsafe) let searchStatement: OpaquePointer
 

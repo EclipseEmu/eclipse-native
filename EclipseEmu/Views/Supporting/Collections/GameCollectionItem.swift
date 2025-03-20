@@ -1,15 +1,15 @@
 import SwiftUI
 
 struct GameCollectionItem: View {
-    @Environment(\.persistenceCoordinator) var persistence
-    @ObservedObject var collection: GameCollection
+    @EnvironmentObject var persistence: Persistence
+    @ObservedObject var collection: Tag
 
     var body: some View {
         NavigationLink {
             GameCollectionView(collection: collection)
         } label: {
             VStack(alignment: .leading) {
-                CollectionIconView(icon: collection.icon)
+                Image(systemName: "tag")
                     .aspectRatio(1.0, contentMode: .fit)
                     .fixedSize()
                     .frame(width: 32, height: 32)
@@ -23,13 +23,20 @@ struct GameCollectionItem: View {
             }
             .foregroundColor(.white)
             .padding()
-            .backgroundGradient(color: collection.parsedColor.color)
+            .background(collection.parsedColor.color.gradient)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
         }
         .buttonStyle(.plain)
         .contextMenu {
             Button(role: .destructive) {
-                CollectionManager.delete(collection, in: persistence)
+                Task {
+                    do {
+                        try await persistence.library.delete(.init(collection))
+                    } catch {
+                        // FIXME: surface error
+                        print(error)
+                    }
+                }
             } label: {
                 Label("Delete Collection", systemImage: "trash")
             }
@@ -37,16 +44,12 @@ struct GameCollectionItem: View {
     }
 }
 
-#Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
-    let collection = GameCollection(context: context)
-    collection.name = "Adventure"
-    collection.icon = .symbol("tent.fill")
-    collection.color = GameCollection.Color.indigo.rawValue
-
-    return CompatNavigationStack {
-        GameCollectionItem(collection: collection)
-            .frame(width: 180.0)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
+        NavigationStack {
+            GameCollectionItem(collection: tag)
+                .frame(width: 180.0)
+        }
     }
-    .environment(\.managedObjectContext, context)
 }

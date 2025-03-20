@@ -2,14 +2,14 @@ import SwiftUI
 
 struct GamePicker: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
-    @ObservedObject var collection: GameCollection
+    @EnvironmentObject var persistence: Persistence
+    @ObservedObject var collection: Tag
     @State var searchQuery: String = ""
     @FetchRequest<Game>(sortDescriptors: [NSSortDescriptor(keyPath: \Game.name, ascending: true)])
     var games: FetchedResults<Game>
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             List(games) { game in
                 let hasGame = isGameInCollection(game: game)
                 HStack(spacing: 12.0) {
@@ -88,32 +88,28 @@ struct GamePicker: View {
     @inlinable
     func isGameInCollection(game: Game) -> Bool {
         guard !game.isDeleted else { return false }
-        return game.collections?.contains(collection) ?? false
+        return game.tags?.contains(collection) ?? false
     }
 
     func toggleGame(game: Game) {
-        if isGameInCollection(game: game) {
-            collection.removeFromGames(game)
-        } else {
-            collection.addToGames(game)
+        Task {
+            do {
+                try await persistence.library.toggleTag(tag: .init(collection), for: .init(game))
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
         }
-        persistence.saveIfNeeded()
     }
 }
 
-#Preview {
-    let context = PersistenceCoordinator.preview.context
-    let game = Game(context: context)
-    game.id = UUID()
-    game.system = .gba
-    game.name = "My Game"
-
-    let collection = GameCollection(context: context)
-    collection.name = "Foobar"
-    collection.icon = .symbol("list.bullet")
-    collection.color = GameCollection.Color.blue.rawValue
-    collection.addToGames(game)
-
-    return GamePicker(collection: collection)
-        .environment(\.managedObjectContext, context)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
+            NavigationStack {
+                GamePicker(collection: tag)
+            }
+        }
+    }
 }

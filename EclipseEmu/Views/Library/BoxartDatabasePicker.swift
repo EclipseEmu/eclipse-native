@@ -1,6 +1,7 @@
 import EclipseKit
 import SwiftUI
 
+@MainActor
 final class BoxartDatabasePickerViewModel: ObservableObject {
     enum SearchState {
         case noQuery
@@ -32,17 +33,11 @@ final class BoxartDatabasePickerViewModel: ObservableObject {
         guard case .pending = state else { return }
         do {
             let openvgdb = try await OpenVGDB()
-            await MainActor.run {
-                self.state = .success(openvgdb)
-            }
+            self.state = .success(openvgdb)
         } catch let error as OpenVGDB.Failure {
-            await MainActor.run {
-                self.state = .failure(error)
-            }
+            self.state = .failure(error)
         } catch {
-            await MainActor.run {
-                self.state = .failure(.unknown)
-            }
+            self.state = .failure(.unknown)
         }
     }
 
@@ -135,7 +130,7 @@ struct BoxartDatabasePicker: View {
     }
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             Group {
                 switch viewModel.searchState {
                 case .noQuery:

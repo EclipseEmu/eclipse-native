@@ -5,7 +5,7 @@ struct EmptyMessage: View {
     let message: () -> Text
 
     var body: some View {
-        MessageBlock {
+        VStack {
             title()
                 .fontWeight(.medium)
                 .padding([.top, .horizontal], 8.0)
@@ -14,6 +14,12 @@ struct EmptyMessage: View {
                 .foregroundStyle(.secondary)
                 .padding([.bottom, .horizontal], 8.0)
         }
+        .padding()
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .backgroundSecondary()
+        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+        .multilineTextAlignment(.center)
+        .padding(.horizontal)
     }
 }
 

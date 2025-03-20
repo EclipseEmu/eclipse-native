@@ -30,82 +30,40 @@ struct CollectionColorPickerView: View {
     }
 }
 
-struct CollectionIconPickerView: View {
-    static let icons: [String] = [
-        "list.bullet", "gamecontroller.fill", "tv.fill", "questionmark.app.fill", "backpack.fill", "pills.fill",
-        "tent.fill", "shippingbox.fill",
-        "car.fill", "sailboat.fill", "tram.fill",
-        "square.fill", "circle.fill", "triangle.fill", "diamond.fill", "heart.fill", "star.fill"
-    ]
-
-    @Binding var selectedIcon: GameCollection.Icon
-
-    var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 42, maximum: 64))]) {
-            ForEach(Self.icons, id: \.self) { image in
-                Button {
-                    self.selectedIcon = .symbol(image)
-                } label: {
-                    ZStack {
-                        let icon = GameCollection.Icon.symbol(image)
-                        let isSelected = self.selectedIcon == icon
-
-                        Circle()
-                            .fill(.quaternary.opacity(0.45))
-
-                        CollectionIconView(icon: icon)
-                            .font(.system(size: 18.0))
-
-                        Circle()
-                            .stroke(lineWidth: 3)
-                            .foregroundStyle(.tint)
-                            .opacity(isSelected ? 1.0 : 0)
-                    }
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-}
-
 struct EditCollectionView: View {
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss
-    @Environment(\.self) var environment
     @State var name: String
 
     @State var selectedColor: Color
-    @State var selectedIcon: GameCollection.Icon
 
-    var collection: GameCollection?
+    var tag: Tag?
 
-    init(collection: GameCollection? = nil) {
-        self.collection = collection
-        if let collection {
-            self.name = collection.name ?? ""
-            self.selectedIcon = collection.icon
-            self.selectedColor = collection.parsedColor.color
+    init(tag: Tag? = nil) {
+        self.tag = tag
+        if let tag {
+            self.name = tag.name ?? ""
+            self.selectedColor = tag.parsedColor.color
         } else {
             self.name = ""
             self.selectedColor = .blue
-            self.selectedIcon = .symbol("list.bullet")
         }
     }
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             ZStack {
                 Form {
                     Section {
                         VStack {
-                            CollectionIconView(icon: self.selectedIcon)
+                            Image(systemName: "tag")
                                 .font(.system(size: 42.0))
                                 .fixedSize()
                                 .aspectRatio(1.0, contentMode: .fit)
                                 .frame(width: 64.0, height: 64.0)
                                 .foregroundStyle(.white)
                                 .padding()
-                                .backgroundGradient(color: self.selectedColor)
+                                .background(self.selectedColor.gradient)
                                 .clipShape(Circle())
                                 .padding()
 
@@ -121,13 +79,9 @@ struct EditCollectionView: View {
                     Section {
                         CollectionColorPickerView(selectedColor: self.$selectedColor)
                     }
-
-                    Section {
-                        CollectionIconPickerView(selectedIcon: self.$selectedIcon)
-                    }
                 }
             }
-            .navigationTitle(self.collection == nil ? "New Collection" : "Edit Collection")
+            .navigationTitle(self.tag == nil ? "New Collection" : "Edit Collection")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -136,7 +90,7 @@ struct EditCollectionView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: self.upsert) {
-                        Text(self.collection == nil ? "Create" : "Save")
+                        Text(self.tag == nil ? "Create" : "Save")
                     }
                     .disabled(self.name.isEmpty)
                 }
@@ -150,20 +104,26 @@ struct EditCollectionView: View {
     func upsert() {
         guard !self.name.isEmpty else { return }
 
-        let color = GameCollection.Color(color: self.selectedColor)
-        if let collection {
-            CollectionManager.update(
-                collection,
-                name: self.name,
-                icon: self.selectedIcon,
-                color: color,
-                in: self.persistence
-            )
-        } else {
-            CollectionManager.create(name: self.name, icon: self.selectedIcon, color: color, in: self.persistence)
-        }
+        let color = Tag.Color(color: self.selectedColor)
+        Task {
+            do {
+                if let tag {
+                    try await persistence.library.update(
+                        tag: .init(tag),
+                        name: self.name,
+                        color: color
+                    )
+                } else {
+                    try await persistence.library.createTag(name: self.name, color: color)
+                }
 
-        self.dismiss()
+                self.dismiss()
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
+
+        }
     }
 }
 
@@ -171,14 +131,11 @@ struct EditCollectionView: View {
     EditCollectionView()
 }
 
-#Preview("Edit") {
-    let persistence = PersistenceCoordinator.preview
-    let collection = GameCollection(context: persistence.context)
-    collection.name = "Hello"
-    collection.color = GameCollection.Color.indigo.rawValue
-    collection.icon = .symbol("heart.fill")
-
-    return EditCollectionView(collection: collection)
-        .environment(\.managedObjectContext, persistence.context)
-        .environment(\.persistenceCoordinator, persistence)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview("Edit", traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
+        NavigationStack {
+            EditCollectionView(tag: tag)
+        }
+    }
 }

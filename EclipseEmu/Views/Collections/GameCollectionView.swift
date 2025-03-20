@@ -4,21 +4,22 @@ struct GameCollectionView: View {
     static let sortDescriptors = [NSSortDescriptor(keyPath: \Game.name, ascending: true)]
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @FetchRequest<Game>(sortDescriptors: Self.sortDescriptors) var games
     @State var selectedGame: Game?
     @State var isGamePickerPresented: Bool = false
     @State var searchQuery: String = ""
     @State var isEditCollectionOpen: Bool = false
 
-    @ObservedObject var collection: GameCollection
+    @ObservedObject var collection: Tag
     @ObservedObject var viewModel: GameListViewModel
 
-    init(collection: GameCollection) {
+    init(collection: Tag) {
         self.collection = collection
-        self.viewModel = GameListViewModel(filter: .collection(collection))
+        self.viewModel = GameListViewModel(filter: .tag(collection))
 
-        let request = CollectionManager.listRequest(collection: collection)
+        let request = Game.fetchRequest()
+        request.predicate = NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.tags), collection)
         request.sortDescriptors = Self.sortDescriptors
         self._games = FetchRequest(fetchRequest: request)
     }
@@ -75,7 +76,14 @@ struct GameCollectionView: View {
                         Button(role: .destructive) {
                             let collection = self.collection
                             self.dismiss()
-                            CollectionManager.delete(collection, in: persistence)
+                            Task {
+                                do {
+                                    try await persistence.library.delete(.init(collection))
+                                } catch {
+                                    // FIXME: Surface error
+                                    print(error)
+                                }
+                            }
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -90,7 +98,7 @@ struct GameCollectionView: View {
             #endif
         }
         .sheet(isPresented: $isEditCollectionOpen) {
-            EditCollectionView(collection: self.collection)
+            EditCollectionView(tag: self.collection)
             #if os(macOS)
                 .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
             #endif
@@ -98,13 +106,11 @@ struct GameCollectionView: View {
     }
 }
 
-#Preview {
-    let persistence = PersistenceCoordinator.preview
-    let collection = GameCollection(context: persistence.context)
-
-    return CompatNavigationStack {
-        GameCollectionView(collection: collection)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
+        NavigationStack {
+            GameCollectionView(collection: tag)
+        }
     }
-    .environment(\.persistenceCoordinator, persistence)
-    .environment(\.managedObjectContext, persistence.context)
 }

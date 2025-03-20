@@ -18,17 +18,18 @@ struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: 
     private let description: () -> Description
     private let actions: () -> Action
 
+    @ViewBuilder
     static func search(text: String) -> some View {
-        return if #available(iOS 17.0, macOS 14.0, *) {
-            AnyView(ContentUnavailableView.search(text: text))
+        if #available(iOS 17.0, macOS 14.0, *) {
+            ContentUnavailableView.search(text: text)
         } else {
-            AnyView(ContentUnavailableMessage<SwiftUI.Label, Text, EmptyView> {
+            ContentUnavailableMessage<SwiftUI.Label, Text, EmptyView> {
                 SwiftUI.Label("No Results for \"\(text)\"", systemImage: "magnifyingglass")
             } description: {
                 Text("Check the spelling or try a new search.")
             } actions: {
                 EmptyView()
-            })
+            }
         }
     }
 

@@ -26,12 +26,12 @@ struct GameListGridItem: View {
     }
 }
 
-#Preview {
-    let viewModel = GameListViewModel(filter: .none)
-    let game = Game(context: PersistenceCoordinator.preview.context)
-    game.name = "Test Game"
-    game.system = .gba
-
-    return GameListGridItem(viewModel: viewModel, game: game)
-        .padding()
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        GameListGridItem(
+            viewModel: .init(filter: .none),
+            game: game
+        ).padding()
+    }
 }

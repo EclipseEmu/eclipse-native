@@ -50,9 +50,7 @@ struct EmulationMenuView: View {
 #else
             Divider()
 #endif
-            Button {
-                model.saveState(isAuto: false)
-            } label: {
+            Button(action: model.saveState) {
                 Label("Save State", systemImage: "square.and.arrow.up.on.square")
             }
 #if os(macOS)
@@ -130,13 +128,7 @@ struct EmulationMenuView: View {
                     .foregroundStyle(.white)
                     .opacity(buttonOpacity)
             }
-            .modify {
-                if #available(iOS 16.0, *) {
-                    $0.menuOrder(.fixed)
-                } else {
-                    $0
-                }
-            }
+            .menuOrder(.fixed)
             .position(.init(x: menuButtonX, y: menuButtonY))
 #else
             VStack {
@@ -205,33 +197,34 @@ struct EmulationMenuView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    ZStack {
-        EmulationMenuView(
-            model: .init(
-                coreInfo: .init(),
-                game: .init(context: PersistenceCoordinator.preview.container.viewContext),
-                saveState: nil,
-                emulationData: .init(
-                    romPath: URL(string: "/")!,
-                    savePath: URL(string: "/")!,
-                    cheats: .init()
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, persistence in
+        ZStack {
+            EmulationMenuView(
+                model: .init(
+                    coreInfo: .init(),
+                    game: game,
+                    saveState: nil,
+                    emulationData: .init(
+                        romPath: URL(string: "/")!,
+                        savePath: URL(string: "/")!,
+                        cheats: .init()
+                    ),
+                    persistence: persistence
                 ),
-                persistence: .preview
-            ),
-            menuButtonLayout: .init(
-                xOrigin: .leading,
-                yOrigin: .trailing,
-                x: 16,
-                y: 0,
-                width: 50,
-                height: 50,
-                hidden: false
-            ),
-            buttonOpacity: 0.6
-        )
+                menuButtonLayout: .init(
+                    xOrigin: .leading,
+                    yOrigin: .trailing,
+                    x: 16,
+                    y: 0,
+                    width: 50,
+                    height: 50,
+                    hidden: false
+                ),
+                buttonOpacity: 0.6
+            )
+        }
+        .background(Color.red)
     }
-    .background(Color.red)
 }
-#endif

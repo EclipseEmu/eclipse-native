@@ -9,7 +9,7 @@ struct CheatsView: View {
     @ObservedObject var game: Game
     let cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
     @Environment(\.managedObjectContext) var viewContext
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<Cheat>
     @State var isAddViewOpen = false
     @State var editingCheat: Cheat?
@@ -23,7 +23,9 @@ struct CheatsView: View {
             self.cheatFormats = UnsafeBufferPointer(start: nil, count: 0)
         }
 
-        let request = CheatManager.listRequest(for: game)
+        let request = Cheat.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
         request.sortDescriptors = Self.sortCheatsBy
         self._cheats = FetchRequest(fetchRequest: request)
     }
@@ -84,32 +86,35 @@ struct CheatsView: View {
 
     func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
         // FIXME: This function works, but is painful as it clones. This could definately be optimized.
-        var cheatsArray = cheats.map { $0 }
-        cheatsArray.move(fromOffsets: fromOffsets, toOffset: toOffset)
-        for (index, cheat) in cheatsArray.enumerated() {
-            cheat.priority = Int16(truncatingIfNeeded: index)
+        let cheats = cheats.map { ObjectBox($0) }
+        Task {
+            do {
+                try await persistence.library.reorderCheatPriority(cheats: cheats)
+            } catch {
+                // FIXME: Surface errors
+                print(error)
+            }
         }
-        persistence.saveIfNeeded()
     }
 
     func deleteCheats(offsets: IndexSet) {
-        for index in offsets {
-            let cheat = cheats[index]
-            try? CheatManager.delete(cheat: cheat, in: persistence, save: false)
+        let cheats = cheats.boxedItems(for: offsets)
+        Task {
+            do {
+                try await persistence.library.deleteMany(cheats)
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
         }
-        persistence.saveIfNeeded()
     }
 }
 
-#if DEBUG
-#Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
-    let game = Game(context: context)
-    game.system = .gba
-
-    return CompatNavigationStack {
-        CheatsView(game: game)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        NavigationStack {
+            CheatsView(game: game)
+        }
     }
-    .environment(\.managedObjectContext, context)
 }
-#endif

@@ -25,11 +25,9 @@ struct GameListListItem: View {
     }
 }
 
-#Preview {
-    let viewModel = GameListViewModel(filter: .none)
-    let game = Game(context: PersistenceCoordinator.preview.context)
-    game.name = "Test Game"
-    game.system = .gba
-
-    return GameListListItem(viewModel: viewModel, game: game)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        GameListListItem(viewModel: .init(filter: .none), game: game)
+    }
 }

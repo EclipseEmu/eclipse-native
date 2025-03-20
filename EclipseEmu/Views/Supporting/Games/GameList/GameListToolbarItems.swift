@@ -42,7 +42,7 @@ struct GameListToolbarItems: ToolbarContent {
 #Preview {
     let viewModel = GameListViewModel(filter: .none)
 
-    return CompatNavigationStack {
+    return NavigationStack {
         Button("Toggle Selection") {
             viewModel.isSelecting.toggle()
         }

@@ -25,12 +25,8 @@ struct ReplaceBoxartMenu: View {
 }
 
 #Preview {
-    if #available(iOS 16.0, *) {
-        ReplaceBoxartMenu(
-            isDatabaseOpen: .constant(false),
-            isPhotosOpen: .constant(false)
-        )
-    } else {
-        EmptyView()
-    }
+    ReplaceBoxartMenu(
+        isDatabaseOpen: .constant(false),
+        isPhotosOpen: .constant(false)
+    )
 }

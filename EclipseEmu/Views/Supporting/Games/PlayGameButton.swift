@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PlayGameButton: View {
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @Environment(\.playGame) var playGame
     
     @ObservedObject var game: Game
@@ -14,28 +14,29 @@ struct PlayGameButton: View {
     }
 
     func play() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             do {
-                try await playGame(game: game, saveState: nil, persistence: persistence)
+                try await playGame(
+                    game: game,
+                    saveState: nil,
+                    persistence: persistence
+                )
             } catch let error as PlayGameAction.Failure {
-                await onError(error, game)
+                onError(error, game)
             } catch {
-                await onError(.unknown(error), game)
+                onError(.unknown(error), game)
             }
         }
     }
 }
 
-#Preview {
-    let persistence = PersistenceCoordinator.preview
-    let moc = persistence.context
-    let game = Game(context: moc)
-    game.system = .gba
-    game.md5 = "123"
-
-    return PlayGameButton(game: game) { error, game in
-        print(error, game)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        NavigationStack {
+            PlayGameButton(game: game) { error, game in
+                print(error, game)
+            }
+        }
     }
-    .environment(\.persistenceCoordinator, persistence)
-    .environment(\.managedObjectContext, moc)
 }

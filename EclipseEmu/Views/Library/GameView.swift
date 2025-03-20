@@ -8,7 +8,7 @@ final class GameViewModel: ObservableObject {
 struct GameViewHeader: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @ObservedObject var game: Game
     var safeAreaTop: CGFloat
     var onPlayError: (PlayGameAction.Failure, Game) -> Void
@@ -69,6 +69,10 @@ struct GameViewHeader: View {
 }
 
 struct GameViewSaveStatesList: View {
+    @EnvironmentObject private var persistence: Persistence
+    @Environment(\.playGame) private var playGame
+    @Environment(\.dismiss) private var dismiss
+
     @ObservedObject var game: Game
     @Binding var renameTarget: SaveState?
     let onPlayError: (PlayGameAction.Failure, Game) -> Void
@@ -81,7 +85,10 @@ struct GameViewSaveStatesList: View {
         self._renameTarget = renameTarget
         self.onPlayError = onPlayError
 
-        let request = SaveStateManager.listRequest(for: game, limit: 10)
+        let request = SaveState.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
+        request.fetchLimit = 10
         request.sortDescriptors = SaveStatesListView.sortDescriptors
         self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
     }
@@ -93,7 +100,7 @@ struct GameViewSaveStatesList: View {
                     ForEach(section) { saveState in
                         SaveStateItem(
                             saveState: saveState,
-                            action: .startWithState(game, onPlayError),
+                            action: self.saveStateSelected,
                             renameDialogTarget: $renameTarget
                         )
                         .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
@@ -113,13 +120,30 @@ struct GameViewSaveStatesList: View {
             }
         }
     }
+
+    func saveStateSelected(_ state: SaveState) {
+        Task {
+            do {
+                try await playGame(
+                    game: game,
+                    saveState: state,
+                    persistence: persistence
+                )
+                dismiss()
+            } catch let error as PlayGameAction.Failure {
+                onPlayError(error, game)
+            } catch {
+                onPlayError(.unknown(error), game)
+            }
+        }
+    }
 }
 
 struct GameView: View {
     @ObservedObject var game: Game
 
     @Environment(\.dismiss) private var dismiss: DismissAction
-    @Environment(\.persistenceCoordinator) private var persistence
+    @EnvironmentObject private var persistence: Persistence
     @Environment(\.playGame) private var playGame
 
     @StateObject private var playGameErrorModel = PlayGameErrorModel()
@@ -132,7 +156,7 @@ struct GameView: View {
     @State private var renameSaveStateTarget: SaveState?
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             GeometryReader { geometry in
                 ScrollView {
                     GameViewHeader(game: game, safeAreaTop: geometry.safeAreaInsets.top, onPlayError: onPlayError)
@@ -230,7 +254,9 @@ struct GameView: View {
                 title: "Rename State",
                 placeholder: "State Name"
             ) { saveState, name in
-                SaveStateManager.rename(saveState, to: name, in: persistence)
+                Task {
+                    try await persistence.library.rename(.init(saveState), to: name)
+                }
             }
             .alert("Rename Game", isPresented: self.$isRenameGameOpen) {
                 TextField("Game Name", text: self.$renameGameText)
@@ -257,8 +283,10 @@ struct GameView: View {
     }
 
     private func rename() {
-        GameManager.rename(game, to: renameGameText, in: persistence)
-        renameGameText = ""
+        Task {
+            try await persistence.library.rename(ObjectBox(game), to: renameGameText)
+            renameGameText = ""
+        }
     }
 
     private func renameCancelled() {
@@ -270,7 +298,7 @@ struct GameView: View {
             await MainActor.run {
                 dismiss()
             }
-            try? await GameManager.delete(self.game, in: self.persistence)
+            try? await persistence.library.delete(.init(self.game))
         }
     }
 
@@ -280,12 +308,7 @@ struct GameView: View {
         guard case .success(let url) = entry else { return }
         Task {
             do {
-                game.boxart = try await ImageAssetManager.create(
-                    copy: url,
-                    in: persistence,
-                    save: false
-                )
-                persistence.saveIfNeeded()
+                try await persistence.library.replaceCoverArt(game: .init(game), copying: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -297,8 +320,7 @@ struct GameView: View {
         guard let url = entry.boxart else { return }
         Task {
             do {
-                game.boxart = try await ImageAssetManager.create(remote: url, in: persistence, save: false)
-                persistence.saveIfNeeded()
+                try await persistence.library.replaceCoverArt(game: .init(game), fromRemote: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -319,19 +341,13 @@ struct GameView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
-    let game = Game(context: context)
-    game.id = UUID()
-    game.name = "Test Game"
-    game.system = .gba
-    game.dateAdded = .now
-    game.md5 = "abababababababababababababababab"
 
-    return GameView(game: game)
-        .environment(\.managedObjectContext, context)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
-        .environment(\.playGame, PlayGameAction())
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        NavigationStack {
+            GameView(game: game)
+                .environment(\.playGame, PlayGameAction())
+        }
+    }
 }
-#endif

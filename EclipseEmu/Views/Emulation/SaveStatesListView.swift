@@ -6,22 +6,24 @@ struct SaveStatesListView: View {
         NSSortDescriptor(keyPath: \SaveState.date, ascending: false)
     ]
 
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss
     @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: [])
     var saveStates: SectionedFetchResults<Bool, SaveState>
     @State var renameDialogTarget: SaveState?
 
     var game: Game
-    var action: SaveStateItem.Action
+    var action: (SaveState) -> Void
     var haveDismissButton: Bool
 
-    init(game: Game, action: SaveStateItem.Action, haveDismissButton: Bool = false) {
+    init(game: Game, action: @escaping (SaveState) -> Void, haveDismissButton: Bool = false) {
         self.game = game
         self.action = action
         self.haveDismissButton = haveDismissButton
 
-        let request = SaveStateManager.listRequest(for: game, limit: nil)
+        let request = SaveState.fetchRequest()
+        request.predicate = NSPredicate(format: "game == %@", game)
+        request.includesSubentities = false
         request.sortDescriptors = Self.sortDescriptors
         self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
     }
@@ -78,6 +80,13 @@ struct SaveStatesListView: View {
     }
 
     func rename(saveState: SaveState, newName: String) {
-        SaveStateManager.rename(saveState, to: newName, in: persistence)
+        Task {
+            do {
+                try await persistence.library.rename(.init(saveState), to: newName)
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
+        }
     }
 }

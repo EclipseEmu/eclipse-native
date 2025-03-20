@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - View Model
 
+@MainActor
 final class GameListViewModel: ObservableObject {
     enum DisplayMode: Identifiable, CaseIterable, Equatable {
         case grid
@@ -71,7 +72,7 @@ final class GameListViewModel: ObservableObject {
 
     enum Filter {
         case none
-        case collection(GameCollection)
+        case tag(Tag)
     }
 
     let filter: Filter
@@ -103,40 +104,54 @@ final class GameListViewModel: ObservableObject {
             return isEmpty
                 ? nil
                 : NSPredicate(format: "name CONTAINS %@", query)
-        case .collection(let collection):
+        case .tag(let collection):
             return isEmpty
-                ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.collections), collection)
+                ? NSPredicate(format: "%K CONTAINS %@", #keyPath(Game.tags), collection)
                 : NSPredicate(
                     format: "(%K CONTAINS %@) AND (name CONTAINS %@)",
-                    #keyPath(Game.collections),
+                    #keyPath(Game.tags),
                     collection,
                     query
                 )
         }
     }
 
-    func removeFromLibrary(in persistence: PersistenceCoordinator) {
-        for game in selection {
-            persistence.context.delete(game)
+    func removeFromLibrary(in persistence: Persistence) {
+        Task {
+            do {
+                try await persistence.library.deleteMany(selection.boxedItems())
+            } catch {
+                // FIXME: Handle error
+                print(error)
+            }
         }
-        persistence.saveIfNeeded()
     }
 
-    func removeFromCollection(in persistence: PersistenceCoordinator) {
-        guard case .collection(let collection) = filter else {
+    func removeFromCollection(in persistence: Persistence) {
+        guard case .tag(let collection) = filter else {
             return
         }
         for game in selection {
             collection.removeFromGames(game)
         }
-        persistence.saveIfNeeded()
+        do {
+            try persistence.mainContext.saveIfNeeded()
+        } catch {
+            // FIXME: Handle error
+            print(error)
+        }
     }
 
-    func addSelectionToCollection(collection: GameCollection, in persistence: PersistenceCoordinator) {
+    func addSelectionToCollection(collection: Tag, in persistence: Persistence) {
         for game in selection {
             collection.addToGames(game)
         }
-        persistence.saveIfNeeded()
+
+        do {
+            try persistence.mainContext.saveIfNeeded()
+        } catch {
+            print(error)
+        }
     }
 }
 
@@ -144,8 +159,9 @@ final class GameListViewModel: ObservableObject {
 
 struct GameList: View {
     @ObservedObject var viewModel: GameListViewModel
-    @Environment(\.persistenceCoordinator) var persistence
-    @FetchRequest<Game>(sortDescriptors: [], animation: .default) var games: FetchedResults<Game>
+    @EnvironmentObject var persistence: Persistence
+    @FetchRequest<Game>(sortDescriptors: [], animation: .default)
+    var games: FetchedResults<Game>
 
     init(viewModel: GameListViewModel) {
         self.viewModel = viewModel
@@ -155,50 +171,29 @@ struct GameList: View {
     }
 
     var body: some View {
-        Group {
-            switch viewModel.displayMode {
-            case .grid:
-                LazyVGrid(
-                    columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)],
-                    spacing: 16.0
-                ) {
-                    ForEach(games) { game in
-                        Button {
-                            self.gameAction(game: game)
-                        } label: {
-                            GameListGridItem(viewModel: viewModel, game: game)
-                        }
-                        .buttonStyle(.plain)
-                        .contextMenu {
-                            GameListItemContextMenu(viewModel: viewModel, game: game)
-                        }
-                    }
+        LazyVGrid(
+            columns: [
+                .init(
+                    .adaptive(minimum: 160.0, maximum: 240.0),
+                    spacing: 16.0,
+                    alignment: .top
+                )
+            ],
+            spacing: 16.0
+        ) {
+            ForEach(games) { game in
+                Button {
+                    self.gameAction(game: game)
+                } label: {
+                    GameListGridItem(viewModel: viewModel, game: game)
                 }
-                .padding()
-            case .list:
-                LazyVStack(alignment: .leading, spacing: 0.0) {
-                    ForEach(games) { game in
-                        Button {
-                            self.gameAction(game: game)
-                        } label: {
-                            GameListListItem(viewModel: viewModel, game: game)
-                                .overlay(alignment: .bottom) {
-                                    Rectangle()
-                                        .padding(.horizontal)
-                                        .foregroundStyle(.tertiary)
-                                        .opacity(0.6)
-                                        .frame(height: 1)
-                                        .opacity(Double(game != games.last))
-                                }
-                        }
-                        .buttonStyle(.plain)
-                        .contextMenu {
-                            GameListItemContextMenu(viewModel: viewModel, game: game)
-                        }
-                    }
+                .buttonStyle(.plain)
+                .contextMenu {
+                    GameListItemContextMenu(viewModel: viewModel, game: game)
                 }
             }
         }
+        .padding()
         .onAppear {
             viewModel.isEmpty = games.isEmpty
         }
@@ -224,7 +219,8 @@ struct GameList: View {
             placeholder: "Game Name"
         ) { game, name in
             game.name = name
-            persistence.saveIfNeeded()
+            // FIXME: Handle
+            try? persistence.mainContext.saveIfNeeded()
         }
         .sheet(item: $viewModel.changeBoxartTarget) { game in
             BoxartDatabasePicker(system: game.system, initialQuery: game.name ?? "") { entry in
@@ -235,7 +231,7 @@ struct GameList: View {
             AddToCollectionView(viewModel: viewModel)
         }
         .confirmationDialog("", isPresented: $viewModel.isDeleteConfirmationOpen) {
-            if case .collection = viewModel.filter {
+            if case .tag = viewModel.filter {
                 Button("Remove from Collection") {
                     viewModel.removeFromCollection(in: persistence)
                 }
@@ -268,8 +264,7 @@ struct GameList: View {
         guard let url = entry.boxart else { return }
         Task {
             do {
-                game.boxart = try await ImageAssetManager.create(remote: url, in: persistence, save: false)
-                persistence.saveIfNeeded()
+                try await persistence.library.replaceCoverArt(game: .init(game), fromRemote: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -278,53 +273,35 @@ struct GameList: View {
     }
 }
 
-#Preview {
-    struct MiniLibrary: View {
-        @StateObject var viewModel = GameListViewModel(filter: .none)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    @Previewable @StateObject var viewModel = GameListViewModel(filter: .none)
 
-        var body: some View {
-            CompatNavigationStack {
-                ScrollView {
-                    GameList(viewModel: viewModel)
-                }
-                .emptyState(viewModel.isEmpty) {
-                    EmptyGameListMessage(filter: viewModel.filter)
-                }
-                .navigationTitle("Library")
-                .toolbar {
-                    ToolbarItem {
-                        if !viewModel.isSelecting {
-                            Menu {
-                                GameListMenuItems(viewModel: viewModel)
-                            } label: {
-                                Label("Game Options", systemImage: "ellipsis.circle")
-                            }
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+         NavigationStack {
+            ScrollView {
+                GameList(viewModel: viewModel)
+            }
+            .emptyState(viewModel.isEmpty) {
+                EmptyGameListMessage(filter: viewModel.filter)
+            }
+            .navigationTitle("Library")
+            .toolbar {
+                ToolbarItem {
+                    if !viewModel.isSelecting {
+                        Menu {
+                            GameListMenuItems(viewModel: viewModel)
+                        } label: {
+                            Label("Game Options", systemImage: "ellipsis.circle")
                         }
                     }
-
-                    #if !os(macOS)
-                    GameListToolbarItems(viewModel: viewModel)
-                    #endif
                 }
-                .searchable(text: $viewModel.searchQuery)
+
+                #if !os(macOS)
+                GameListToolbarItems(viewModel: viewModel)
+                #endif
             }
+            .searchable(text: $viewModel.searchQuery)
         }
     }
-
-    let persistence = PersistenceCoordinator.preview
-    let viewContext = persistence.context
-
-    for index in 0 ..< 5 {
-        let game = Game(context: viewContext)
-        game.name = "Game \(index)"
-        game.system = .gba
-        game.id = UUID()
-        game.md5 = ""
-        game.datePlayed = Date.now
-        game.dateAdded = Date.now
-    }
-
-    return MiniLibrary()
-        .environment(\.persistenceCoordinator, persistence)
-        .environment(\.managedObjectContext, viewContext)
 }

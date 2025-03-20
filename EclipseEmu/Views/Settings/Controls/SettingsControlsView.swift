@@ -1,7 +1,7 @@
 import GameController
 import SwiftUI
 
-extension GCController: Identifiable {}
+extension GCController: @retroactive Identifiable {}
 
 struct SettingsControlsView: View {
     @Environment(\.refresh) var refreshAction

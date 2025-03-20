@@ -1,7 +1,7 @@
 import EclipseKit
 import Foundation
 
-final class GameCoreRegistry {
+final class GameCoreRegistry: @unchecked Sendable {
     var allCores = [GameCoreInfo]()
     private var systemToCore = [GameSystem: Int]()
 

@@ -26,35 +26,43 @@ struct GameListItemSelectionToggle: View {
     }
 }
 
-#Preview("Unchecked") {
-    let model = GameListViewModel(filter: .none)
-    model.isSelecting = true
+@available(iOS 18.0, macOS 15.0, *)
+#Preview("Unchecked", traits: .modifier(PreviewStorage())) {
+    let model: GameListViewModel = {
+        let model = GameListViewModel(filter: .none)
+        model.isSelecting = true
+        return model
+    }()
 
-    let persistence = PersistenceCoordinator.preview
-    let game = Game(context: persistence.context)
-
-    return VStack {
-        Spacer()
-        GameListItemSelectionToggle(viewModel: model, game: game)
-        Spacer()
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        VStack {
+            Spacer()
+            GameListItemSelectionToggle(viewModel: model, game: game)
+            Spacer()
+        }
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .background(.red)
     }
-    .frame(minWidth: 0, maxWidth: .infinity)
-    .background(.red)
 }
 
-#Preview("Checked") {
-    let model = GameListViewModel(filter: .none)
-    model.isSelecting = true
+@available(iOS 18.0, macOS 15.0, *)
+#Preview("Checked", traits: .modifier(PreviewStorage())) {
+    let model: GameListViewModel = {
+        let model = GameListViewModel(filter: .none)
+        model.isSelecting = true
+        return model
+    }()
 
-    let persistence = PersistenceCoordinator.preview
-    let game = Game(context: persistence.context)
-    model.selection.insert(game)
-
-    return VStack {
-        Spacer()
-        GameListItemSelectionToggle(viewModel: model, game: game)
-        Spacer()
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        VStack {
+            Spacer()
+            GameListItemSelectionToggle(viewModel: model, game: game)
+            Spacer()
+        }
+        .frame(minWidth: 0, maxWidth: .infinity)
+        .background(.red)
+        .onAppear {
+            model.selection.insert(game)
+        }
     }
-    .frame(minWidth: 0, maxWidth: .infinity)
-    .background(.red)
 }

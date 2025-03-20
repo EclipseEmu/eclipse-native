@@ -1,44 +1,185 @@
 import Foundation
+import Atomics
 import GameController
+import EclipseKit
 
+struct GameInputPlayer {}
+
+private struct GamepadInfo {
+    var playerIndex: Int
+    var bindings: [GamepadBinding]
+}
+
+@MainActor
 final class GameInputCoordinator {
-    typealias ReorderControllersCallback = (inout [Player], UInt8) async -> Void
+    typealias ReorderCallback = @MainActor (inout [GameInputPlayer], UInt8) async -> Void
 
-    struct Player: Identifiable {
-        var id = UUID()
-        var state: UInt32 = 0
-        var kind: PlayerKind
-        var gamepadId: ObjectIdentifier?
-    }
+    nonisolated let running: ManagedAtomic<Bool> = .init(false)
+    nonisolated let maxPlayerCount: UInt8
+    nonisolated let playerCount: ManagedAtomic<UInt8> = .init(1)
 
-    enum PlayerKind: UInt8, RawRepresentable {
-        case builtin = 0
-        case controller = 1
-    }
-
-    struct GamepadInfo {
-        var playerIndex: Int
-        var bindings: [GamepadBinding]
-    }
-
-    weak var coreCoordinator: GameCoreCoordinator?
-    var reorderPlayersCallback: ReorderControllersCallback
-
-    let maxPlayers: UInt8
-    private let builtinPlayer: Int = 0
-    private(set) var players: [Player] = [
-        .init(kind: .builtin)
-    ]
+    nonisolated private let builtinPlayer: Int = .init(0)
+    nonisolated let states: [ManagedAtomic<GameInput.RawValue>]
+    var players: [GameInputPlayer] = []
 
     private var keyboardBindings: KeyboardBindings!
     private var gamepadBindings: [ObjectIdentifier: GamepadInfo] = [:]
 
-    init(maxPlayers: UInt8, reorderPlayers: @escaping ReorderControllersCallback) {
-        self.maxPlayers = maxPlayers
-        self.reorderPlayersCallback = reorderPlayers
+    private let reorder: ReorderCallback
+
+    private var controllerConnectObserver: Task<Void, Never>!
+    private var controllerDisconnectObserver: Task<Void, Never>!
+    private var keyboardConnectObserver: Task<Void, Never>!
+    private var keyboardDisconnectObserver: Task<Void, Never>!
+
+    init(maxPlayers: UInt8, reorder: @escaping ReorderCallback) {
+        self.maxPlayerCount = maxPlayers
+        self.reorder = reorder
+
+        states = .init(repeating: .init(0), count: Int(maxPlayerCount))
+
+        controllerConnectObserver = Task(operation: controllerDidConnect)
+        controllerDisconnectObserver = Task(operation: controllerDidDisconnect)
+        keyboardConnectObserver = Task(operation: keyboardDidConnect)
+        keyboardDisconnectObserver = Task(operation: keyboardDidDisconnect)
     }
 
-    private func loadGamepadBindings(for _: GCController) async -> [GamepadBinding] {
+    func start() {
+        self.running.store(true, ordering: .relaxed)
+    }
+
+    func stop() {
+        self.running.store(false, ordering: .relaxed)
+    }
+
+    // MARK: Binding listeners
+
+    nonisolated func handleKeyboardInput(_: GCKeyboardInput, _: GCControllerButtonInput, keyCode: GCKeyCode, isActive: Bool) {
+        MainActor.assumeIsolated {
+            guard
+                let input = keyboardBindings[keyCode],
+                builtinPlayer > -1,
+                builtinPlayer < Int8(self.maxPlayerCount)
+            else { return }
+
+            let state = states[builtinPlayer]
+            _ = if isActive {
+                state.bitwiseOrThenLoad(with: input.rawValue, ordering: .relaxed)
+            } else {
+                state.bitwiseAndThenLoad(with: ~input.rawValue, ordering: .relaxed)
+            }
+        }
+    }
+
+    nonisolated func handleGamepadInput(gamepad: GCExtendedGamepad, element _: GCControllerElement) {
+        guard let id = gamepad.controller?.id else { return }
+        let info = MainActor.assumeIsolated { self.gamepadBindings[id] }
+        guard let info, info.playerIndex > -1, info.playerIndex < Int8(maxPlayerCount) else { return }
+
+        var state: UInt32 = 0
+        for binding in info.bindings {
+            switch binding.kind {
+            case .button(let input):
+                state |= input.rawValue * UInt32(gamepad.buttons[binding.control]?.isPressed ?? false)
+            case .directionPad(up: let up, down: let down, left: let left, right: let right):
+                let dpad = gamepad.dpad
+                state |= (up.rawValue * UInt32(dpad.up.isPressed)) |
+                (down.rawValue * UInt32(dpad.down.isPressed)) |
+                (left.rawValue * UInt32(dpad.left.isPressed)) |
+                (right.rawValue * UInt32(dpad.right.isPressed))
+            case .joystick(up: let up, down: let down, left: let left, right: let right):
+                guard let dpad = gamepad.dpads[binding.control] else { return }
+                // FIXME: make the deadzone configurable
+                state |= (up.rawValue * UInt32(dpad.yAxis.value > 0.25)) |
+                (down.rawValue * UInt32(dpad.yAxis.value < -0.25)) |
+                (left.rawValue * UInt32(dpad.xAxis.value < -0.25)) |
+                (right.rawValue * UInt32(dpad.xAxis.value > 0.25))
+            default:
+                break
+            }
+        }
+        self.states[info.playerIndex].store(state, ordering: .relaxed)
+    }
+
+#if os(iOS)
+    func handleTouchInput(newState: UInt32) {
+        guard
+            builtinPlayer > -1,
+            builtinPlayer < Int8(maxPlayerCount)
+        else { return }
+        self.states[builtinPlayer].store(newState, ordering: .relaxed)
+    }
+#endif
+
+    // MARK: Connection Change Listeners
+
+    nonisolated func controllerDidConnect() async {
+        let stream = NotificationCenter.default.notifications(named: .GCControllerDidConnect)
+        for await notification in stream {
+            guard
+                !Task.isCancelled,
+                let device = notification.object as? GCController,
+                let gamepad = device.extendedGamepad
+            else { continue }
+
+            let id = device.id
+            let bindings = await self.loadGamepadBindings(for: id)
+            await MainActor.run {
+                self.gamepadBindings[id] = .init(playerIndex: 0, bindings: bindings)
+            }
+
+            gamepad.valueChangedHandler = self.handleGamepadInput
+        }
+    }
+
+    nonisolated func controllerDidDisconnect() async {
+        let stream = NotificationCenter.default.notifications(named: .GCControllerDidDisconnect)
+        for await notification in stream {
+            guard
+                !Task.isCancelled,
+                let device = notification.object as? GCController,
+                let gamepad = device.extendedGamepad
+            else { continue }
+
+            gamepad.valueChangedHandler = nil
+        }
+    }
+
+    nonisolated func keyboardDidConnect() async {
+        let stream = NotificationCenter.default.notifications(named: .GCKeyboardDidConnect)
+        for await notification in stream {
+            guard
+                !Task.isCancelled,
+                let device = notification.object as? GCKeyboard,
+                let keyboardInput = device.keyboardInput
+            else { continue }
+
+            await Task { @MainActor in
+                if self.keyboardBindings == nil {
+                    self.keyboardBindings = await self.loadKeyboardBindings()
+                }
+            }.value
+
+            keyboardInput.keyChangedHandler = handleKeyboardInput
+        }
+    }
+
+    nonisolated func keyboardDidDisconnect() async {
+        let stream = NotificationCenter.default.notifications(named: .GCKeyboardDidDisconnect)
+        for await notification in stream {
+            guard
+                !Task.isCancelled,
+                let device = notification.object as? GCKeyboard,
+                let keyboardInput = device.keyboardInput
+            else { continue }
+
+            keyboardInput.keyChangedHandler = nil
+        }
+    }
+}
+
+extension GameInputCoordinator {
+    func loadGamepadBindings(for _: GCController.ID) async -> [GamepadBinding] {
         // FIXME: do proper binding loading
         return [
             .init(control: GCInputButtonA, kind: .button(.faceButtonRight)),
@@ -58,7 +199,7 @@ final class GameInputCoordinator {
         ]
     }
 
-    private func loadKeyboardBindings() async -> KeyboardBindings {
+    func loadKeyboardBindings() async -> KeyboardBindings {
         // FIXME: do proper binding loading
         return [
             .keyZ: .faceButtonDown,
@@ -72,168 +213,5 @@ final class GameInputCoordinator {
             .returnOrEnter: .startButton,
             .rightShift: .selectButton
         ]
-    }
-
-    func start() async {
-        NotificationCenter.default.addObserver(forName: .GCControllerDidConnect, object: nil, queue: nil) { [weak self] note in
-            guard
-                let self,
-                let controller = note.object as? GCController,
-                let gamepad = controller.extendedGamepad
-            else { return }
-
-            Task {
-                let bindings = await self.loadGamepadBindings(for: controller)
-
-                self.gamepadBindings[controller.id] = .init(playerIndex: 0, bindings: bindings)
-                gamepad.valueChangedHandler = self.handleGamepadInput
-            }
-        }
-
-        NotificationCenter.default.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: nil) { note in
-            guard
-                let controller = note.object as? GCController,
-                let gamepad = controller.extendedGamepad
-            else { return }
-
-            gamepad.valueChangedHandler = nil
-        }
-
-        NotificationCenter.default.addObserver(forName: .GCKeyboardDidConnect, object: nil, queue: nil) { [weak self] note in
-            guard
-                let self,
-                let keyboard = note.object as? GCKeyboard,
-                let keyboardInput = keyboard.keyboardInput
-            else { return }
-
-            Task {
-                if self.keyboardBindings == nil {
-                    self.keyboardBindings = await self.loadKeyboardBindings()
-                }
-                keyboardInput.keyChangedHandler = self.handleKeyboardInput
-            }
-        }
-
-        NotificationCenter.default.addObserver(forName: .GCKeyboardDidDisconnect, object: nil, queue: nil) { note in
-            guard
-                let keyboard = note.object as? GCKeyboard,
-                let keyboardInput = keyboard.keyboardInput
-            else { return }
-
-            keyboardInput.keyChangedHandler = nil
-        }
-
-        if let keyboard = GCKeyboard.coalesced, let input = keyboard.keyboardInput {
-            if self.keyboardBindings == nil {
-                self.keyboardBindings = await self.loadKeyboardBindings()
-            }
-            input.keyChangedHandler = self.handleKeyboardInput
-        }
-
-        for gamepad in GCController.controllers() {
-            if let extended = gamepad.extendedGamepad {
-                let bindings = await self.loadGamepadBindings(for: gamepad)
-                self.gamepadBindings[gamepad.id] = .init(playerIndex: 0, bindings: bindings)
-                extended.valueChangedHandler = self.handleGamepadInput
-            }
-        }
-    }
-
-    func stop() {
-        NotificationCenter.default.removeObserver(self, name: .GCControllerDidConnect, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .GCControllerDidDisconnect, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .GCKeyboardDidConnect, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .GCKeyboardDidDisconnect, object: nil)
-
-        if let keyboard = GCKeyboard.coalesced {
-            keyboard.keyboardInput?.keyChangedHandler = nil
-        }
-
-        for gamepad in GCController.controllers() {
-            if let gamepad = gamepad.extendedGamepad {
-                gamepad.valueChangedHandler = nil
-            }
-        }
-    }
-
-    func handleKeyboardInput(_: GCKeyboardInput, _: GCControllerButtonInput, keyCode: GCKeyCode, isActive: Bool) {
-        guard
-            let input = self.keyboardBindings[keyCode],
-            self.builtinPlayer > -1, self.builtinPlayer < Int8(self.maxPlayers)
-        else { return }
-
-        let state = self.players[self.builtinPlayer].state
-        self.players[self.builtinPlayer].state = isActive
-            ? state | input.rawValue
-            : state & (~input.rawValue)
-    }
-
-    func handleGamepadInput(gamepad: GCExtendedGamepad, element _: GCControllerElement) {
-        guard
-            let id = gamepad.controller?.id,
-            let info = self.gamepadBindings[id],
-            info.playerIndex > -1, info.playerIndex < Int8(self.maxPlayers)
-        else { return }
-
-        var state: UInt32 = 0
-        for binding in info.bindings {
-            switch binding.kind {
-            case .button(let input):
-                state |= input.rawValue * UInt32(gamepad.buttons[binding.control]?.isPressed ?? false)
-            case .directionPad(up: let up, down: let down, left: let left, right: let right):
-                let dpad = gamepad.dpad
-                state |= (up.rawValue * UInt32(dpad.up.isPressed)) |
-                    (down.rawValue * UInt32(dpad.down.isPressed)) |
-                    (left.rawValue * UInt32(dpad.left.isPressed)) |
-                    (right.rawValue * UInt32(dpad.right.isPressed))
-            case .joystick(up: let up, down: let down, left: let left, right: let right):
-                guard let dpad = gamepad.dpads[binding.control] else { return }
-                // FIXME: make the deadzone configurable
-                state |= (up.rawValue * UInt32(dpad.yAxis.value > 0.25)) |
-                    (down.rawValue * UInt32(dpad.yAxis.value < -0.25)) |
-                    (left.rawValue * UInt32(dpad.xAxis.value < -0.25)) |
-                    (right.rawValue * UInt32(dpad.xAxis.value > 0.25))
-            default:
-                break
-            }
-        }
-        self.players[info.playerIndex].state = state
-    }
-
-    #if os(iOS)
-        func handleTouchInput(newState: UInt32) {
-            guard self.builtinPlayer > -1, self.builtinPlayer < Int8(self.maxPlayers) else { return }
-            self.players[self.builtinPlayer].state = newState
-        }
-    #endif
-}
-
-// MARK: UI related helpers for player listings
-
-extension GameInputCoordinator.Player {
-    var displayName: String {
-        switch self.kind {
-        case .builtin:
-            return "Touch/Keyboard"
-        case .controller:
-            return "Controller"
-            //            return GCController.controllers().first(where: { $0.id == id })?.vendorName ?? "Controller"
-        }
-    }
-
-    var sfSymbol: String {
-        switch self.kind {
-        case .builtin:
-            return "keyboard"
-        case .controller:
-            //            switch GCController.controllers().first(where: { $0.id == id })?.productCategory {
-            //            case GCProductCategoryXboxOne:
-            //                return "xbox.logo"
-            //            case GCProductCategoryDualShock4, GCProductCategoryDualSense:
-            //                return "playstation.logo"
-            //            default:
-            return "gamecontroller"
-            //            }
-        }
     }
 }

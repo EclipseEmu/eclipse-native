@@ -2,6 +2,7 @@ import CoreData
 import Foundation
 import SwiftUI
 
+@available(*, deprecated, renamed: "Persistence", message: "")
 final class PersistenceCoordinator {
     enum Failure: LocalizedError {
         case missingRomPath
@@ -9,7 +10,7 @@ final class PersistenceCoordinator {
         case failedToCreateFile
     }
 
-    static let preview = PersistenceCoordinator(inMemory: true)
+    nonisolated(unsafe) static let preview = PersistenceCoordinator(inMemory: true)
 
     private let inMemory: Bool
 
@@ -80,12 +81,10 @@ final class PersistenceCoordinator {
     // MARK: Core Data helpers
 
     func save() {
-        Task { @MainActor in
-            do {
-                try context.save()
-            } catch {
-                print("CoreData save failure: \(error.localizedDescription)")
-            }
+        do {
+            try context.save()
+        } catch {
+            print("CoreData save failure: \(error.localizedDescription)")
         }
     }
 
@@ -133,22 +132,5 @@ final class PersistenceCoordinator {
     @inlinable
     func fileExists(path: URL) -> Bool {
         fileManager.fileExists(atPath: path.path)
-    }
-}
-
-// MARK: Make PersistenceCoordinator to be available from SwiftUI's envrionment
-
-private struct PersistenceCoordinatorKey: EnvironmentKey {
-    #if DEBUG
-    static let defaultValue: PersistenceCoordinator = .preview
-    #else
-    static let defaultValue: PersistenceCoordinator = .shared
-    #endif
-}
-
-extension EnvironmentValues {
-    var persistenceCoordinator: PersistenceCoordinator {
-        get { self[PersistenceCoordinatorKey.self] }
-        set { self[PersistenceCoordinatorKey.self] = newValue }
     }
 }

@@ -2,13 +2,13 @@ import EclipseKit
 import SwiftUI
 
 struct EditCheatView: View {
-    var game: Game
-    var cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
-    var cheat: Cheat?
-    var isCreatingCheat: Bool
+    private let game: Game
+    private let cheatFormats: UnsafeBufferPointer<GameCoreCheatFormat>
+    private let cheat: Cheat?
+    private let isCreatingCheat: Bool
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @State var label: String
     @State var format: GameCoreCheatFormat
     @State var formatter: CheatFormatter
@@ -40,7 +40,7 @@ struct EditCheatView: View {
     }
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             Form {
                 Section {
                     TextField("Name", text: self.$label)
@@ -111,24 +111,25 @@ struct EditCheatView: View {
         let format = String(cString: self.format.id)
         let normalizedCode = self.format.normalizeCode(string: self.code)
 
-        if let cheat {
-            cheat.type = String(cString: self.format.id)
-            cheat.label = self.label
-            cheat.code = self.format.normalizeCode(string: self.code)
-            cheat.enabled = self.enabled
-            CheatManager.update(cheat: cheat, in: self.persistence)
-
-            self.dismiss()
-        } else {
+        Task {
             do {
-                try CheatManager.create(
-                    name: self.label,
-                    code: normalizedCode,
-                    format: format,
-                    isEnabled: self.enabled,
-                    for: self.game,
-                    in: self.persistence
-                )
+                if let cheat {
+                    try await persistence.library.update(
+                        cheat: .init(cheat),
+                        name: self.label,
+                        code: self.format.normalizeCode(string: self.code),
+                        format: String(cString: self.format.id),
+                        enabled: self.enabled
+                    )
+                } else {
+                    try await persistence.library.createCheat(
+                        name: self.label,
+                        code: normalizedCode,
+                        format: format,
+                        isEnabled: self.enabled,
+                        for: .init(self.game)
+                    )
+                }
                 self.dismiss()
             } catch {
                 print(error)
@@ -137,16 +138,14 @@ struct EditCheatView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    let context = PersistenceCoordinator.preview.container.viewContext
-    let game = Game(context: context)
-    game.system = .gba
-
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
     let core = EclipseEmuApp.cores.allCores[0]
     let formats = UnsafeBufferPointer(start: core.cheatFormats, count: core.cheatFormatsCount)
 
-    return EditCheatView(cheat: nil, game: game, cheatFormats: formats)
-        .environment(\.managedObjectContext, context)
+    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+        NavigationStack {
+            EditCheatView(cheat: nil, game: game, cheatFormats: formats)
+        }
+    }
 }
-#endif

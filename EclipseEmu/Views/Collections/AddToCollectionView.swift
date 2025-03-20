@@ -2,28 +2,29 @@ import SwiftUI
 
 struct AddToCollectionView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
-    @Environment(\.persistenceCoordinator) var persistence: PersistenceCoordinator
+    @EnvironmentObject var persistence: Persistence
 
     @ObservedObject var viewModel: GameListViewModel
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
-    var collections: FetchedResults<GameCollection>
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
+    var collections: FetchedResults<Tag>
 
     @State var isCreateCollectionOpen = false
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             List {
                 Section {
                     ForEach(collections) { collection in
                         Button {
-                            viewModel.addSelectionToCollection(collection: collection, in: persistence)
+                            // FIXME: Re-enable
+                            //                            viewModel.addSelectionToCollection(collection: collection, in: persistence)
                             dismiss()
                         } label: {
                             Label {
                                 Text(verbatim: collection.name ?? "Collection")
                                     .foregroundStyle(Color.primary)
                             } icon: {
-                                CollectionIconView(icon: collection.icon)
+                                Image(systemName: "tag")
                                     .foregroundStyle(collection.parsedColor.color)
                                     .aspectRatio(1.0, contentMode: .fit)
                                     .fixedSize()
@@ -77,9 +78,7 @@ struct AddToCollectionView: View {
     }
 }
 
-#Preview {
-    let viewModel = GameListViewModel(filter: .none)
-    return AddToCollectionView(viewModel: viewModel)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
-        .environment(\.managedObjectContext, PersistenceCoordinator.preview.context)
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    AddToCollectionView(viewModel: GameListViewModel(filter: .none))
 }

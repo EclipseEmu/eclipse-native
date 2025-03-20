@@ -12,7 +12,7 @@ struct GameScreenView {
             super.init()
         }
 
-        @inlinable
+        @MainActor @inlinable
         func surfaceCreated(surface: CAMetalLayer) {
             self.parent.model.renderingSurfaceCreated(surface: surface)
         }

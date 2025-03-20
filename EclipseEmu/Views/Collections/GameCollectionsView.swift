@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct GameCollectionsView: View {
-    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
-    var collections: FetchedResults<GameCollection>
+    @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
+    var collections: FetchedResults<Tag>
 
     @State var isCreateCollectionOpen = false
     @State var searchQuery = ""
 
     var body: some View {
-        CompatNavigationStack {
+        NavigationStack {
             ScrollView {
                 GameCollectionGrid(collections: collections)
                     .padding()
@@ -46,8 +46,7 @@ struct GameCollectionsView: View {
     }
 }
 
-#Preview {
+@available(iOS 18.0, macOS 15.0, *)
+#Preview(traits: .modifier(PreviewStorage())) {
     GameCollectionsView()
-        .environment(\.managedObjectContext, PersistenceCoordinator.preview.context)
-        .environment(\.persistenceCoordinator, PersistenceCoordinator.preview)
 }

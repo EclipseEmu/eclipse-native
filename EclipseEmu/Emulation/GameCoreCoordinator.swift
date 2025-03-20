@@ -11,9 +11,13 @@ extension NSNotification.Name {
     static let EKGameCoreDidSave = NSNotification.Name("EKGameCoreDidSaveNotification")
 }
 
+enum SaveStateError: Error {
+    case failedToCreateSaveState
+}
+
 final actor GameCoreCoordinator {
     enum VideoRenderer {
-        case frameBuffer(GameFrameBufferRenderer)
+        case frameBuffer(FrameBufferRenderer)
     }
 
     enum State: UInt8, RawRepresentable {
@@ -36,25 +40,22 @@ final actor GameCoreCoordinator {
     let width: CGFloat
     let height: CGFloat
 
-    private let core: UnsafeMutablePointer<GameCore>
-    private let game: Game
+    private nonisolated(unsafe) let core: UnsafeMutablePointer<GameCore>
 
     let inputs: GameInputCoordinator
     // FIXME: there should be some sort of notification to indicate changes in state
     private(set) var state: State = .stopped
     /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer
     ///     can be written to syncronously by the core.
-    nonisolated(unsafe) let audio: GameAudio
-    /// SAFTEY: this is only nonisolated so the game screen can add the layer to its layer hierarchy.
-    nonisolated(unsafe) let renderingSurface: CAMetalLayer
+    let audio: GameAudio
 
     private let renderer: VideoRenderer
     private let desiredFrameRate: Double
     private var frameDuration: Double
     private var frameTimerTask: Task<Void, Never>?
     private(set) var rate: Float = 1.0
-    private let callbackContext: UnsafeMutablePointer<CallbackContext>
-    private let callbacks: UnsafeMutablePointer<GameCoreCallbacks>
+    private nonisolated(unsafe) let callbackContext: UnsafeMutablePointer<CallbackContext>
+    private nonisolated(unsafe) let callbacks: UnsafeMutablePointer<GameCoreCallbacks>
 
     struct CallbackContext {
         weak var parent: GameCoreCoordinator?
@@ -81,16 +82,8 @@ final actor GameCoreCoordinator {
         }
     }
 
-    init(
-        game: Game,
-        coreInfo: GameCoreInfo,
-        system: GameSystem,
-        surface: CAMetalLayer,
-        reorderControls: @escaping GameInputCoordinator.ReorderControllersCallback
-    ) throws {
+    init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderCallback) async throws {
         do {
-            self.game = game
-
             callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
             callbackContext.initialize(to: CallbackContext())
 
@@ -112,44 +105,49 @@ final actor GameCoreCoordinator {
             desiredFrameRate = core.pointee.getDesiredFrameRate(core.pointee.data)
             frameDuration = 1.0 / desiredFrameRate
 
-            guard let device = MTLCreateSystemDefaultDevice() else {
-                throw Failure.failedToGetMetalDevice
-            }
-
-            try Task.checkCancellation()
-
             let videoFormat = core.pointee.getVideoFormat(core.pointee.data)
             let width = videoFormat.width
             let height = videoFormat.height
             self.width = CGFloat(width)
             self.height = CGFloat(height)
 
-            renderingSurface = surface
-            renderingSurface.drawableSize = CGSize(width: self.width, height: self.height)
-            renderingSurface.device = device
-            renderingSurface.contentsScale = 1.0
-            renderingSurface.needsDisplayOnBoundsChange = true
-            renderingSurface.framebufferOnly = true
-            renderingSurface.isOpaque = true
-            renderingSurface.presentsWithTransaction = true
-            #if canImport(AppKit)
-            renderingSurface.displaySyncEnabled = true
-            #endif
-
             try Task.checkCancellation()
 
             switch videoFormat.renderingType {
             case .frameBuffer:
                 guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
-                renderingSurface.pixelFormat = pixelFormat
-                let renderer = try GameFrameBufferRenderer(
-                    with: device,
-                    width: Int(width),
-                    height: Int(height),
-                    pixelFormat: pixelFormat,
-                    frameDuration: frameDuration,
-                    core: core
-                )
+                let graphicsContext = try await GlobalMetalContext()
+                let renderer: FrameBufferRenderer
+                if core.pointee.canSetVideoPointer(core.pointee.data) {
+                    renderer = try await FrameBufferRenderer(
+                        context: graphicsContext,
+                        width: Int(width),
+                        height: Int(height),
+                        pixelFormat: pixelFormat,
+                        pointer: nil
+                    )
+                    let pointer = await renderer.getBufferPointer()
+                    _ = core.pointee.getVideoPointer(core.pointee.data, pointer.value)
+                } else {
+                    let buf = UnsafeMutableRawPointer(mutating: core.pointee.getVideoPointer(core.pointee.data, nil))
+                    renderer = try await FrameBufferRenderer(
+                        context: graphicsContext,
+                        width: Int(width),
+                        height: Int(height),
+                        pixelFormat: pixelFormat,
+                        pointer: buf.map { .init($0) }
+                    )
+                }
+
+
+//                let renderer = try GameFrameBufferRenderer(
+//                    with: device,
+//                    width: Int(width),
+//                    height: Int(height),
+//                    pixelFormat: pixelFormat,
+//                    frameDuration: frameDuration,
+//                    core: core
+//                )
                 self.renderer = .frameBuffer(renderer)
             @unknown default:
                 throw Failure.invalidRendererFormat
@@ -162,9 +160,9 @@ final actor GameCoreCoordinator {
             }
 
             audio = try GameAudio(format: audioFormat)
-            inputs = .init(
+            inputs = await .init(
                 maxPlayers: core.pointee.getMaxPlayers(core.pointee.data),
-                reorderPlayers: reorderControls
+                reorder: reorderControls
             )
 
             try Task.checkCancellation()
@@ -190,19 +188,11 @@ final actor GameCoreCoordinator {
     }
 
     func start(gamePath: URL, savePath: URL) async {
-        if #available(iOS 16.0, *) {
-            guard self.core.pointee.start(
-                self.core.pointee.data,
-                gamePath.path(percentEncoded: false).cString(using: .ascii),
-                savePath.path(percentEncoded: false).cString(using: .ascii)
-            ) else { return }
-        } else {
-            guard core.pointee.start(
-                core.pointee.data,
-                gamePath.path.cString(using: .ascii),
-                savePath.path.cString(using: .ascii)
-            ) else { return }
-        }
+        guard self.core.pointee.start(
+            self.core.pointee.data,
+            gamePath.path(percentEncoded: false).cString(using: .ascii),
+            savePath.path(percentEncoded: false).cString(using: .ascii)
+        ) else { return }
         await inputs.start()
         await audio.start()
         await play(reason: .stopped)
@@ -211,7 +201,7 @@ final actor GameCoreCoordinator {
     func stop() async {
         await pause(reason: .stopped)
         core.pointee.stop(core.pointee.data)
-        inputs.stop()
+        await inputs.stop()
         await audio.stop()
     }
 
@@ -221,7 +211,7 @@ final actor GameCoreCoordinator {
             frameTimerTask?.cancel()
             frameTimerTask = nil
         }
-        audio.clear()
+        await audio.clear()
         core.pointee.restart(core.pointee.data)
         startFrameTimer()
         await audio.resume()
@@ -265,9 +255,9 @@ final actor GameCoreCoordinator {
 
     /// - Parameter cheats: A list of cheats to add
     /// - Returns: A set of the cheats that failed to set.
-    func setCheats(cheats: Set<Cheat>) -> Set<Cheat>? {
+    func setCheats(cheats: [EmulationData.OwnedCheat]) -> Set<EmulationData.OwnedCheat>? {
         core.pointee.clearCheats(core.pointee.data)
-        var response: Set<Cheat>?
+        var response: Set<EmulationData.OwnedCheat>?
         for cheat in cheats {
             guard let type = cheat.type, let code = cheat.code else { continue }
             // FIXME: what to do when this fails
@@ -285,16 +275,20 @@ final actor GameCoreCoordinator {
     func setFastForward(enabled: Bool) {
         let rate: Float = enabled ? 2.0 : 1.0
         self.rate = rate
-        #if canImport(AppKit)
-        renderingSurface.displaySyncEnabled = !enabled
-        #endif
+//        #if canImport(AppKit)
+//        renderingSurface.displaySyncEnabled = !enabled
+//        #endif
 
-        audio.setRate(rate: rate)
+        Task {
+            await audio.setRate(rate: rate)
+        }
         let newFrameDuration = (1.0 / desiredFrameRate) / Double(rate)
         switch renderer {
-        case .frameBuffer(let renderer):
-            renderer.useAdaptiveSync = !enabled
-            renderer.frameDuration = newFrameDuration
+        case .frameBuffer:
+            // FIXME: todo
+            // renderer.useAdaptiveSync = !enabled
+            // renderer.frameDuration = newFrameDuration
+            break
         }
         frameDuration = newFrameDuration
     }
@@ -302,86 +296,46 @@ final actor GameCoreCoordinator {
     // swiftlint:disable:next cyclomatic_complexity
     func startFrameTimer() {
         frameTimerTask?.cancel()
-        if #available(iOS 16.0, macOS 12.0, *) {
-            self.frameTimerTask = Task(priority: .userInitiated) {
-                let initialTime: ContinuousClock.Instant = .now
-                var time: ContinuousClock.Duration = .zero
-                let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
-                var nextRenderTime: ContinuousClock.Duration = .zero
+        self.frameTimerTask = Task(priority: .userInitiated) {
+            let initialTime: ContinuousClock.Instant = .now
+            var time: ContinuousClock.Duration = .zero
+            let renderInterval: ContinuousClock.Duration = .seconds(1.0 / 60.0)
+            var nextRenderTime: ContinuousClock.Duration = .zero
 
-                while !Task.isCancelled {
-                    let start: ContinuousClock.Instant = .now
-                    let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
-                    let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
-                    let expectedTime = start - initialTime
-                    time = max(time, expectedTime - maxCatchupRate)
+            while !Task.isCancelled {
+                let start: ContinuousClock.Instant = .now
+                let frameDuration: ContinuousClock.Duration = .seconds(self.frameDuration)
+                let maxCatchupRate: ContinuousClock.Duration = .seconds(5 * self.frameDuration)
+                let expectedTime = start - initialTime
+                time = max(time, expectedTime - maxCatchupRate)
 
-                    self.core.pointee.playerSetInputs(self.core.pointee.data, 0, inputs.players[0].state)
+                for i in 0..<inputs.playerCount.load(ordering: .relaxed) {
+                    self.core.pointee.playerSetInputs(
+                        self.core.pointee.data,
+                        i,
+                        inputs.states[Int(i)].load(ordering: .relaxed)
+                    )
+                }
 
-                    while time <= expectedTime {
-                        time += frameDuration
-                        let doRender = time >= expectedTime && expectedTime >= nextRenderTime
-                        nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
+                while time <= expectedTime {
+                    time += frameDuration
+                    let doRender = time >= expectedTime && expectedTime >= nextRenderTime
+                    nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
 
-                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
-                        if doRender {
-                            switch self.renderer {
-                            case .frameBuffer(let renderer):
-                                renderer.render(in: self.renderingSurface)
-                            }
+                    self.core.pointee.executeFrame(self.core.pointee.data, doRender)
+                    if doRender {
+                        switch self.renderer {
+                        case .frameBuffer(let renderer):
+                            await renderer.render()
                         }
-                    }
-
-                    let framesTime: ContinuousClock.Duration = .now - start
-                    if framesTime < frameDuration {
-                        try? await Task.sleep(until: start + frameDuration)
-                    } else {
-                        await Task.yield()
                     }
                 }
-            }
-        } else {
-            // NOTE:
-            //  This version may be slightly less accurate because of the way MonotomicClock.sleep is implemented,
-            //  hence having both. I don't think there's any way to make this more accurate, with public APIs,
-            //  without blocking a thread (which defeats the purpose of a Task)
-            frameTimerTask = Task(priority: .userInitiated) {
-                let initialTime: MonotomicClock.Instant = MonotomicClock.now
-                var time: MonotomicClock.Duration = 0
-                let renderInterval: MonotomicClock.Duration = MonotomicClock.seconds(1.0 / 60.0)
-                var nextRenderTime: MonotomicClock.Duration = 0
 
-                while !Task.isCancelled {
-                    let start: MonotomicClock.Instant = MonotomicClock.now
-                    let frameDuration: MonotomicClock.Duration = MonotomicClock.seconds(self.frameDuration)
-                    let maxCatchupRate: MonotomicClock.Duration = MonotomicClock.seconds(5 * self.frameDuration)
-                    let expectedTime = start - initialTime
-                    time = max(time, UInt64(expectedTime > maxCatchupRate) * (expectedTime &- maxCatchupRate))
-
-                    for (playerIndex, player) in self.inputs.players.enumerated() {
-                        self.core.pointee.playerSetInputs(self.core.pointee.data, UInt8(playerIndex), player.state)
-                    }
-
-                    while time <= expectedTime {
-                        time += frameDuration
-                        let doRender = time >= expectedTime && expectedTime >= nextRenderTime
-                        nextRenderTime = doRender ? expectedTime + renderInterval : nextRenderTime
-
-                        self.core.pointee.executeFrame(self.core.pointee.data, doRender)
-                        if doRender {
-                            switch self.renderer {
-                            case .frameBuffer(let renderer):
-                                renderer.render(in: self.renderingSurface)
-                            }
-                        }
-                    }
-
-                    let framesTime: MonotomicClock.Duration = MonotomicClock.now - start
-                    if framesTime < frameDuration {
-                        try? await MonotomicClock.sleep(until: start + frameDuration)
-                    } else {
-                        await Task.yield()
-                    }
+                let framesTime: ContinuousClock.Duration = .now - start
+                if framesTime < frameDuration {
+                    try? await Task.sleep(until: start + frameDuration)
+                } else {
+                    await Task.yield()
                 }
             }
         }
@@ -397,13 +351,20 @@ final actor GameCoreCoordinator {
         return core.pointee.playerDisconnected(core.pointee.data, player)
     }
 
-    // MARK: Screenshot
+    // MARK: Video
 
-    func screenshot() -> CIImage {
-        let colorSpace = renderingSurface.colorspace ?? CGColorSpaceCreateDeviceRGB()
+    @MainActor
+    func attach(surface: CAMetalLayer) {
+        switch renderer {
+        case .frameBuffer(let renderer):
+            renderer.attach(surface: surface)
+        }
+    }
+
+    func screenshot() async -> CIImage {
         let result = switch renderer {
         case .frameBuffer(let renderer):
-            renderer.screenshot(colorSpace: colorSpace)
+            await renderer.screenshot()
         }
         return result ?? CIImage.black
     }

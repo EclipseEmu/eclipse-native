@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct GameManageCollectionItem: View {
-    let collection: GameCollection
-    let stateChanged: (GameCollection, Bool) -> Void
+    let collection: Tag
+    let stateChanged: (Tag, Bool) -> Void
     @State var isSelected: Bool
 
-    init(collection: GameCollection, isSelected: Bool, stateChanged: @escaping (GameCollection, Bool) -> Void) {
+    init(collection: Tag, isSelected: Bool, stateChanged: @escaping (Tag, Bool) -> Void) {
         self.collection = collection
         self.isSelected = isSelected
         self.stateChanged = stateChanged
@@ -16,7 +16,7 @@ struct GameManageCollectionItem: View {
             Label {
                 Text(collection.name ?? "Collection")
             } icon: {
-                CollectionIconView(icon: collection.icon)
+                Image(systemName: "tag")
                     .foregroundStyle(collection.parsedColor.color)
                     .aspectRatio(1.0, contentMode: .fit)
                     .fixedSize()
@@ -35,16 +35,16 @@ struct GameManageCollectionItem: View {
 
 struct GameManageCollectionsView: View {
     @ObservedObject var game: Game
-    @Environment(\.persistenceCoordinator) var persistence
+    @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss
-    @State var selectedCollections: Set<GameCollection>
+    @State var selectedCollections: Set<Tag>
     @State var isCreateCollectionOpen = false
-    @FetchRequest<GameCollection>(sortDescriptors: [NSSortDescriptor(keyPath: \GameCollection.name, ascending: true)])
-    var collections: FetchedResults<GameCollection>
+    @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
+    var collections: FetchedResults<Tag>
 
     init(game: Game) {
         self.game = game
-        self.selectedCollections = game.collections as? Set<GameCollection> ?? Set()
+        self.selectedCollections = game.tags as? Set<Tag> ?? Set()
     }
 
     var body: some View {
@@ -85,7 +85,7 @@ struct GameManageCollectionsView: View {
         }
     }
 
-    func stateChanged(collection: GameCollection, newState: Bool) {
+    func stateChanged(collection: Tag, newState: Bool) {
         if newState {
             self.selectedCollections.insert(collection)
         } else {
@@ -94,7 +94,14 @@ struct GameManageCollectionsView: View {
     }
 
     func finish() {
-        CollectionManager.updateGame(for: game, collections: selectedCollections, in: persistence)
-        self.dismiss()
+        Task {
+            do {
+                try await persistence.library.setTags(selectedCollections.map { ObjectBox($0) }, for: .init(game))
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
+            self.dismiss()
+        }
     }
 }
