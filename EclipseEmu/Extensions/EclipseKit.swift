@@ -32,6 +32,17 @@ extension GameSystem {
         default: nil
         }
     }
+
+    init(fileType: UTType) {
+        self = switch fileType.identifier {
+        case "dev.magnetar.eclipseemu.rom.gb": Self.gb
+        case "dev.magnetar.eclipseemu.rom.gbc": Self.gbc
+        case "dev.magnetar.eclipseemu.rom.gba": Self.gba
+        case "dev.magnetar.eclipseemu.rom.nes": Self.nes
+        case "dev.magnetar.eclipseemu.rom.snes": Self.snes
+        default: Self.unknown
+        }
+    }
 }
 
 extension GameCoreVideoPixelFormat {
@@ -104,6 +115,5 @@ extension GameCoreCheatFormat {
 }
 
 // MARK: Conformances
-
 
 extension GameCoreInfo: @retroactive @unchecked Sendable {}

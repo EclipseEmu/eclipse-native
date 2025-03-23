@@ -20,7 +20,7 @@ extension SaveState {
         self.game = game
     }
 
-    var path: FileSystem.Path {
+    var path: FileSystemPath {
         .saveState(fileName: id!, fileExtension: fileExtension)
     }
 

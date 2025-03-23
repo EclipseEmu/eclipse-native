@@ -1,4 +1,5 @@
 import MetalKit
+import OSLog
 
 enum FrameBufferRendererError: Error {
     case makeTextureBuffer
@@ -174,11 +175,11 @@ final actor FrameBufferRenderer {
 
     func render() {
         guard let target = self.nextDrawingTarget() else {
-            print("could not get drawable")
+            Logger.emulation.warning("framebuffer renderer - failed to get drawable")
             return
         }
         guard let commandBuffer = context.makeCommandBuffer()?.value else {
-            print("could not make command buffer")
+            Logger.emulation.warning("framebuffer renderer - failed to make command buffer")
             return
         }
 
@@ -190,7 +191,7 @@ final actor FrameBufferRenderer {
         renderPassDescriptor.colorAttachments[0].clearColor = .init(red: 0, green: 0, blue: 0, alpha: 1.0)
 
         guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
-            print("could not create encoder")
+            Logger.emulation.warning("framebuffer renderer - failed to create encoder")
             return
         }
 

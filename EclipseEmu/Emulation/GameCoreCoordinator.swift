@@ -1,5 +1,4 @@
 import AVFoundation
-import Combine
 import CoreGraphics
 import EclipseKit
 import Foundation
@@ -11,32 +10,26 @@ extension NSNotification.Name {
     static let EKGameCoreDidSave = NSNotification.Name("EKGameCoreDidSaveNotification")
 }
 
-enum SaveStateError: Error {
-    case failedToCreateSaveState
+private enum VideoRenderer {
+    case frameBuffer(FrameBufferRenderer)
+}
+
+enum GameCoreCoordinatorState: UInt8, RawRepresentable {
+    case stopped = 0
+    case running = 1
+    case backgrounded = 2
+    case pendingUserInput = 3
+    case paused = 4
+}
+
+enum GameCoreCoordinatorError: Error {
+    case failedToGetCoreInstance
+    case invalidPixelFormat
+    case invalidAudioFormat
+    case invalidRendererFormat
 }
 
 final actor GameCoreCoordinator {
-    enum VideoRenderer {
-        case frameBuffer(FrameBufferRenderer)
-    }
-
-    enum State: UInt8, RawRepresentable {
-        case stopped = 0
-        case running = 1
-        case backgrounded = 2
-        case pendingUserInput = 3
-        case paused = 4
-    }
-
-    enum Failure: Error {
-        case failedToGetCoreInstance
-        case failedToGetMetalDevice
-
-        case invalidPixelFormat
-        case invalidAudioFormat
-        case invalidRendererFormat
-    }
-
     let width: CGFloat
     let height: CGFloat
 
@@ -44,9 +37,7 @@ final actor GameCoreCoordinator {
 
     let inputs: GameInputCoordinator
     // FIXME: there should be some sort of notification to indicate changes in state
-    private(set) var state: State = .stopped
-    /// SAFTEY: this is an actor itself and it is only nonisolated so the ring buffer
-    ///     can be written to syncronously by the core.
+    private(set) var state: GameCoreCoordinatorState = .stopped
     let audio: GameAudio
 
     private let renderer: VideoRenderer
@@ -95,7 +86,7 @@ final actor GameCoreCoordinator {
             ))
 
             guard let core = coreInfo.setup(system, callbacks) else {
-                throw Failure.failedToGetCoreInstance
+                throw GameCoreCoordinatorError.failedToGetCoreInstance
             }
 
             try Task.checkCancellation()
@@ -115,7 +106,9 @@ final actor GameCoreCoordinator {
 
             switch videoFormat.renderingType {
             case .frameBuffer:
-                guard let pixelFormat = videoFormat.pixelFormat.metal else { throw Failure.invalidPixelFormat }
+                guard let pixelFormat = videoFormat.pixelFormat.metal else {
+                    throw GameCoreCoordinatorError.invalidPixelFormat
+                }
                 let graphicsContext = try await GlobalMetalContext()
                 let renderer: FrameBufferRenderer
                 if core.pointee.canSetVideoPointer(core.pointee.data) {
@@ -139,24 +132,15 @@ final actor GameCoreCoordinator {
                     )
                 }
 
-
-//                let renderer = try GameFrameBufferRenderer(
-//                    with: device,
-//                    width: Int(width),
-//                    height: Int(height),
-//                    pixelFormat: pixelFormat,
-//                    frameDuration: frameDuration,
-//                    core: core
-//                )
                 self.renderer = .frameBuffer(renderer)
             @unknown default:
-                throw Failure.invalidRendererFormat
+                throw GameCoreCoordinatorError.invalidRendererFormat
             }
 
             try Task.checkCancellation()
 
             guard let audioFormat = core.pointee.getAudioFormat(core.pointee.data).avAudioFormat else {
-                throw Failure.invalidAudioFormat
+                throw GameCoreCoordinatorError.invalidAudioFormat
             }
 
             audio = try GameAudio(format: audioFormat)
@@ -218,7 +202,7 @@ final actor GameCoreCoordinator {
         state = .running
     }
 
-    func play(reason: State) async {
+    func play(reason: GameCoreCoordinatorState) async {
         guard state.rawValue <= reason.rawValue else { return }
         state = .running
         core.pointee.play(core.pointee.data)
@@ -226,7 +210,7 @@ final actor GameCoreCoordinator {
         await audio.resume()
     }
 
-    func pause(reason: State) async {
+    func pause(reason: GameCoreCoordinatorState) async {
         guard state.rawValue < reason.rawValue || reason == .stopped else { return }
         state = reason
 
@@ -260,7 +244,6 @@ final actor GameCoreCoordinator {
         var response: Set<EmulationData.OwnedCheat>?
         for cheat in cheats {
             guard let type = cheat.type, let code = cheat.code else { continue }
-            // FIXME: what to do when this fails
             let wasSuccessful = core.pointee.setCheat(core.pointee.data, type, code, cheat.enabled)
             if !wasSuccessful {
                 response = response ?? Set()

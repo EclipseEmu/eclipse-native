@@ -1,18 +1,19 @@
 import Atomics
 import Foundation
 
-struct RingBuffer: ~Copyable {
+struct RingBuffer: Sendable, ~Copyable {
     let capacity: Int
     private let head: ManagedAtomic<Int> = .init(0)
     private let tail: ManagedAtomic<Int> = .init(0)
-    private let inner: UnsafeMutableRawBufferPointer
+    // SAFETY: This pointer is managed entirely in the scope of this struct,
+    private nonisolated(unsafe) let inner: UnsafeMutableRawBufferPointer
 
     init(capacity: Int) {
         self.capacity = capacity
-        self.inner = UnsafeMutableRawBufferPointer.allocate(
+        self.inner = .init(UnsafeMutableRawBufferPointer.allocate(
             byteCount: MemoryLayout<UInt8>.stride * capacity,
             alignment: MemoryLayout<UInt8>.alignment
-        )
+        ))
     }
 
     deinit {

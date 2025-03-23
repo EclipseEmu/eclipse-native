@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct PreviewStorage: PreviewModifier {
-    static func makeSharedContext() throws -> Persistence {
+    static func makeSharedContext() throws(PersistenceError) -> Persistence {
         let persistence = Persistence(inMemory: true)
-        try insertGames(into: persistence)
+        insertGames(into: persistence)
         try persistence.mainContext.saveIfNeeded()
         return persistence
     }
 
-    static func insertGames(into persistence: Persistence) throws {
+    private static func insertGames(into persistence: Persistence) {
         let ctx = persistence.mainContext
 
         let tags = [
@@ -26,7 +26,7 @@ struct PreviewStorage: PreviewModifier {
             let game = Game(
                 name: "Game \(i)",
                 system: .gba,
-                md5: "abcdef1234567890",
+                sha1: "abcdef1234567890",
                 romExtension: "gba",
                 saveExtension: "sav",
                 boxart: nil

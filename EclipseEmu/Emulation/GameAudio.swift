@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import OSLog
 
 enum GameAudioFailure: Error {
     case getAudioFormat
@@ -13,17 +14,22 @@ final actor GameAudio {
     private let executor: BlockingSerialExecutor
     nonisolated let unownedExecutor: UnownedSerialExecutor
 
-    private nonisolated(unsafe) var ringBuffer: RingBuffer
+    private(set) var running = false
 
-    private nonisolated let inputFormat: AVAudioFormat
     private let engine: AVAudioEngine
     private let playback: AVAudioUnitTimePitch
     private var sourceNode: AVAudioSourceNode?
+    private nonisolated let inputFormat: AVAudioFormat
 
-    private(set) var running = false
+    // SAFETY: The ring buffer is safe for concurrency.
+    private nonisolated(unsafe) var ringBuffer: RingBuffer
+    // SAFETY: this is only read from the audio callback.
     private nonisolated(unsafe) var lastAvailableRead: Int = -1
-    private var hardwareListener: Any?
+
+    private var hardwareListener: Task<Void, Never>?
+    #if os(macOS)
     private var isUsingDefaultOutput = true
+    #endif
 
     func setVolume(to newValue: Float) {
         self.engine.mainMixerNode.outputVolume = newValue
@@ -82,7 +88,7 @@ final actor GameAudio {
         do {
             try self.engine.start()
         } catch {
-            print(error.localizedDescription)
+            Logger.emulation.error("audio renderer - failed to start engine: \(error.localizedDescription)")
         }
     }
 
@@ -169,21 +175,18 @@ final actor GameAudio {
     }
 
     private func listenForHardwareChanges() {
-        self.hardwareListener = NotificationCenter.default.addObserver(
-            forName: .AVAudioEngineConfigurationChange,
-            object: self.engine, queue: .current
-        ) { [weak self] _ in
-            Task {
-                await self?.hardwareChanged()
+        self.hardwareListener = Task {
+            let stream = NotificationCenter.default.notifications(named: .AVAudioEngineConfigurationChange).map { _ in }
+            for await _ in stream {
+                guard !Task.isCancelled else { return }
+                self.hardwareChanged()
             }
         }
     }
 
     private func stopListeningForHardwareChanges() {
-        if let hardwareListener {
-            NotificationCenter.default.removeObserver(hardwareListener)
-            self.hardwareListener = nil
-        }
+        hardwareListener?.cancel()
+        hardwareListener = nil
     }
 
 #if os(macOS)
@@ -226,7 +229,7 @@ final actor GameAudio {
         do {
             try self.engine.outputNode.auAudioUnit.setDeviceID(id)
         } catch {
-            print("failed to set the audio output device", error)
+            Logger.emulation.warning("audio renderer - failed to set the audio output device: \(error)")
         }
 
         if let sourceNode {
@@ -242,7 +245,7 @@ final actor GameAudio {
         do {
             try AVAudioSession.sharedInstance().setCategory(requireRinger ? .ambient : .playback)
         } catch {
-            print("failed to set audio category", error)
+            Logger.emulation.warning("audio renderer - failed to set audio category: \(error)")
         }
     }
 #endif

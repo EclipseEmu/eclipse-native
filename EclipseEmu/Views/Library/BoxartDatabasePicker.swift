@@ -7,13 +7,13 @@ final class BoxartDatabasePickerViewModel: ObservableObject {
         case noQuery
         case pending
         case empty(String)
-        case success([OpenVGDB.Item])
-        case failure(OpenVGDB.Failure)
+        case success([OpenVGDBItem])
+        case failure(OpenVGDBError)
     }
 
     enum State {
         case pending
-        case failure(OpenVGDB.Failure)
+        case failure(OpenVGDBError)
         case success(OpenVGDB)
     }
 
@@ -32,12 +32,10 @@ final class BoxartDatabasePickerViewModel: ObservableObject {
     func appeared() async {
         guard case .pending = state else { return }
         do {
-            let openvgdb = try await OpenVGDB()
+            let openvgdb = try OpenVGDB()
             self.state = .success(openvgdb)
-        } catch let error as OpenVGDB.Failure {
-            self.state = .failure(error)
         } catch {
-            self.state = .failure(.unknown)
+            self.state = .failure(error)
         }
     }
 
@@ -72,22 +70,19 @@ final class BoxartDatabasePickerViewModel: ObservableObject {
                     }
                 }
             } catch {
-                let properError = (error as? OpenVGDB.Failure) ?? .unknown
                 guard !Task.isCancelled else { return }
-                await MainActor.run {
-                    self.searchState = .failure(properError)
-                }
+                self.searchState = .failure(error as! OpenVGDBError)
             }
         }
     }
 }
 
 struct BoxartDatabasePickerItemView: View {
-    let entry: OpenVGDB.Item
+    let entry: OpenVGDBItem
 
     var body: some View {
         HStack {
-            AsyncImage(url: entry.boxart) { imagePhase in
+            AsyncImage(url: entry.cover) { imagePhase in
                 switch imagePhase {
                 case .success(let image):
                     image
@@ -121,9 +116,9 @@ struct BoxartDatabasePicker: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: BoxartDatabasePickerViewModel
     let initialQuery: String
-    let finished: (OpenVGDB.Item) -> Void
+    let finished: (OpenVGDBItem) -> Void
 
-    init(system: GameSystem, initialQuery: String = "", finished: @escaping (OpenVGDB.Item) -> Void) {
+    init(system: GameSystem, initialQuery: String = "", finished: @escaping (OpenVGDBItem) -> Void) {
         self._viewModel = StateObject(wrappedValue: BoxartDatabasePickerViewModel(system: system))
         self.initialQuery = initialQuery
         self.finished = finished
@@ -182,9 +177,7 @@ struct BoxartDatabasePicker: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
-                    }
+                    Button("Cancel", role: .cancel, action: dismiss)
                 }
             }
             .navigationTitle("Select Box Art")
@@ -204,9 +197,9 @@ struct BoxartDatabasePicker: View {
 
 #Preview("Item") {
     List {
-        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
-        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", boxart: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", cover: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", cover: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", cover: nil))
+        BoxartDatabasePickerItemView(entry: .init(name: "Hello, world", system: .gbc, region: "USA", cover: nil))
     }
 }

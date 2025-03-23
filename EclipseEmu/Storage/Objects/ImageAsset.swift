@@ -9,7 +9,7 @@ extension ImageAsset {
         self.fileExtension = fileExtension
     }
 
-    var path: FileSystem.Path {
+    var path: FileSystemPath {
         .image(fileName: id!, fileExtension: fileExtension)
     }
 

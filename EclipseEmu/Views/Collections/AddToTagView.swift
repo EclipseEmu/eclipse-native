@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AddToCollectionView: View {
+struct AddToTagView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @EnvironmentObject var persistence: Persistence
 
@@ -17,11 +17,11 @@ struct AddToCollectionView: View {
                     ForEach(collections) { collection in
                         Button {
                             // FIXME: Re-enable
-                            //                            viewModel.addSelectionToCollection(collection: collection, in: persistence)
+//                            viewModel.addSelectionToCollection(collection: collection, in: persistence)
                             dismiss()
                         } label: {
                             Label {
-                                Text(verbatim: collection.name ?? "Collection")
+                                Text(verbatim: collection.name ?? "Tag")
                                     .foregroundStyle(Color.primary)
                             } icon: {
                                 Image(systemName: "tag")
@@ -38,27 +38,12 @@ struct AddToCollectionView: View {
                     Button {
                         self.isCreateCollectionOpen = true
                     } label: {
-                        Label("New Collection", systemImage: "plus")
+                        Label("New Tag", systemImage: "plus")
                     }
-                }
-            }
-            .emptyState(collections.isEmpty) {
-                ContentUnavailableMessage {
-                    Label("No Collections", systemImage: "square.stack.fill")
-                } description: {
-                    Text("You haven't created any collections yet.")
-                } actions: {
-                    Button("Create Collection") {
-                        self.isCreateCollectionOpen = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                    #if !os(macOS)
-                        .buttonBorderShape(.capsule)
-                    #endif
                 }
             }
             .sheet(isPresented: $isCreateCollectionOpen) {
-                EditCollectionView()
+                EditTagView()
                 #if os(macOS)
                     .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
                 #endif
@@ -69,9 +54,7 @@ struct AddToCollectionView: View {
             #endif
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") {
-                            dismiss()
-                        }
+                        Button("Done", action: dismiss)
                     }
                 }
         }
@@ -80,5 +63,5 @@ struct AddToCollectionView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    AddToCollectionView(viewModel: GameListViewModel(filter: .none))
+    AddToTagView(viewModel: GameListViewModel(filter: .none))
 }

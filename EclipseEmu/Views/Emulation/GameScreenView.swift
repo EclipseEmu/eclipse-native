@@ -37,7 +37,7 @@ extension GameScreenView: NSViewRepresentable {
     }
 }
 
-class CustomMetalView: NSView {
+final class CustomMetalView: NSView {
     var delegate: GameScreenView.Coordinator?
     var metalLayer: CAMetalLayer!
 
@@ -78,7 +78,7 @@ extension GameScreenView: UIViewRepresentable {
     }
 }
 
-class CustomMetalView: UIView {
+final class CustomMetalView: UIView {
     var delegate: GameScreenView.Coordinator?
     var metalLayer: CAMetalLayer?
 

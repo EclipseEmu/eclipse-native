@@ -6,7 +6,7 @@ extension Cheat {
         code: String,
         format: String,
         isEnabled: Bool,
-        for game: Game
+        for game: Game?
     ) {
         self.init(entity: Cheat.entity(), insertInto: nil)
         self.label = name

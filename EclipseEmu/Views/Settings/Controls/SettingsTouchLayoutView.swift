@@ -247,7 +247,6 @@ struct SettingsTouchLayoutView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .background(.black, ignoresSafeAreaEdges: .all)
         .preferredColorScheme(.dark)
-        .tabBarHidden()
         .sheet(item: $editorSelection) { control in
             ControlEditView(control: control)
                 .presentationDetents([.medium])

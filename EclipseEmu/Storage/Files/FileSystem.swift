@@ -26,42 +26,6 @@ final actor FileSystem: Sendable {
     let romDirectory: URL
     let coreDirectory: URL
 
-    enum Path {
-        case rom(fileName: String, fileExtension: String?)
-        case save(fileName: UUID, fileExtension: String?)
-        case saveState(fileName: UUID, fileExtension: String?)
-        case image(fileName: UUID, fileExtension: String?)
-        case other(URL)
-
-        @usableFromInline
-        var fileName: String {
-            switch self {
-            case .rom(let hash, _): hash
-            case .save(let id, _), .saveState(let id, _), .image(let id, _): id.uuidString
-            case .other(let url): url.fileName()
-            }
-        }
-
-        @usableFromInline
-        var fileExtension: String? {
-            switch self {
-            case .image(_, let ext), .rom(_, let ext), .save(_, let ext), .saveState(_, let ext): ext
-            case .other(let url): url.fileExtension()
-            }
-        }
-
-        @inlinable
-        func base(in files: FileSystem) -> URL {
-            switch self {
-            case .image: files.imageDirectory
-            case .rom: files.romDirectory
-            case .save: files.saveDirectory
-            case .saveState: files.saveStateDirectory
-            case .other(let url): url.baseURL ?? url
-            }
-        }
-    }
-
     init(fileManager: FileManager = .default) {
         self.fileManager = fileManager
 
@@ -77,19 +41,29 @@ final actor FileSystem: Sendable {
         coreDirectory = createDirectory(path: "core", base: documentDirectory, with: fileManager)
     }
 
-    func download(from url: URL, to destination: FileSystem.Path) async throws {
+    func download(from url: URL, to destination: FileSystemPath) async throws(FileSystemError) {
         Logger.fs.info("downloading \(url)")
-        let (temporaryURL, _) = try await URLSession.shared.download(for: .init(url: url))
+        let temporaryURL: URL
+        do {
+            (temporaryURL, _) = try await URLSession.shared.download(for: .init(url: url))
+        } catch {
+            throw .network(error)
+        }
         try move(from: .other(temporaryURL), to: destination)
     }
 
-    func download(from url: URL, overwriting destination: FileSystem.Path) async throws {
+    func download(from url: URL, overwriting destination: FileSystemPath) async throws(FileSystemError) {
         Logger.fs.info("downloading \(url)")
-        let (temporaryURL, _) = try await URLSession.shared.download(for: .init(url: url))
+        let temporaryURL: URL
+        do {
+            (temporaryURL, _) = try await URLSession.shared.download(for: .init(url: url))
+        } catch {
+            throw .network(error)
+        }
         try overwrite(moving: .other(temporaryURL), to: destination)
     }
 
-    func delete(at path: FileSystem.Path) throws(FileSystemError) {
+    func delete(at path: FileSystemPath) throws(FileSystemError) {
         let url = self.url(for: path)
         do {
             Logger.fs.info("deleting \(url)")
@@ -103,7 +77,7 @@ final actor FileSystem: Sendable {
         }
     }
 
-    func copy(from sourcePath: FileSystem.Path, to destinationPath: FileSystem.Path) throws(FileSystemError) {
+    func copy(from sourcePath: FileSystemPath, to destinationPath: FileSystemPath) throws(FileSystemError) {
         let sourceUrl = url(for: sourcePath)
         let destinationUrl = url(for: destinationPath)
         do {
@@ -118,17 +92,17 @@ final actor FileSystem: Sendable {
         }
     }
 
-    func overwrite(copying sourcePath: FileSystem.Path, to destinationPath: FileSystem.Path) throws(FileSystemError) {
+    func overwrite(copying sourcePath: FileSystemPath, to destinationPath: FileSystemPath) throws(FileSystemError) {
         try? self.delete(at: destinationPath)
         try self.copy(from: sourcePath, to: destinationPath)
     }
 
-    func overwrite(moving sourcePath: FileSystem.Path, to destinationPath: FileSystem.Path) throws(FileSystemError) {
+    func overwrite(moving sourcePath: FileSystemPath, to destinationPath: FileSystemPath) throws(FileSystemError) {
         try? self.delete(at: destinationPath)
         try self.copy(from: sourcePath, to: destinationPath)
     }
 
-    func move(from sourcePath: FileSystem.Path, to destinationPath: FileSystem.Path) throws(FileSystemError) {
+    func move(from sourcePath: FileSystemPath, to destinationPath: FileSystemPath) throws(FileSystemError) {
         let sourceUrl = url(for: sourcePath)
         let destinationUrl = url(for: destinationPath)
         do {
@@ -143,16 +117,16 @@ final actor FileSystem: Sendable {
         }
     }
 
-    func create(at path: FileSystem.Path, with contents: Data) -> Bool {
+    func create(at path: FileSystemPath, with contents: Data) -> Bool {
         let url = self.url(for: path)
         Logger.fs.info("creating file at \(url)")
         return self.fileManager.createFile(atPath: url.path(percentEncoded: false), contents: contents)
     }
 
-    func md5(for file: URL) async throws(FileSystemError) -> String {
+    func sha1(for file: URL) async throws(FileSystemError) -> String {
         let stream = try FileStream(at: file)
         await Task.yield()
-        var hasher = Insecure.MD5()
+        var hasher = Insecure.SHA1()
         var buf = [UInt8](repeating: 0, count: 1024)
         while case let amount = try stream.read(into: &buf), amount > 0 {
             hasher.update(data: buf[..<amount])
@@ -161,20 +135,24 @@ final actor FileSystem: Sendable {
         return hasher.finalize().hexString()
     }
 
-    func exists(path: FileSystem.Path) -> Bool {
+    func exists(path: FileSystemPath) -> Bool {
         self.fileManager.fileExists(atPath: self.url(for: path).path(percentEncoded: false))
     }
 
-    func writeJPEG(of image: CIImage, to path: FileSystem.Path) throws {
+    func writeJPEG(of image: CIImage, to path: FileSystemPath) throws(FileSystemError) {
         let context = CIContext()
-        try context.writeJPEGRepresentation(
-            of: image,
-            to: self.url(for: path),
-            colorSpace: image.colorSpace ?? CGColorSpaceCreateDeviceRGB()
-        )
+        do {
+            try context.writeJPEGRepresentation(
+                of: image,
+                to: self.url(for: path),
+                colorSpace: image.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+            )
+        } catch {
+            throw .other(error)
+        }
     }
 
-    nonisolated func url(for path: FileSystem.Path) -> URL {
+    nonisolated func url(for path: FileSystemPath) -> URL {
         if case .other(let url) = path {
             return url
         }
@@ -188,14 +166,16 @@ final actor FileSystem: Sendable {
         }
 
         if let fileExtension, !fileExtension.isEmpty {
-            fileName.append(".")
+            if fileExtension.first != "." {
+                fileName.append(".")
+            }
             fileName.append(fileExtension)
         }
 
         return base.appending(component: fileName, directoryHint: .notDirectory)
     }
 
-    nonisolated func url(path: FileSystem.Path?) -> URL? {
+    nonisolated func url(path: FileSystemPath?) -> URL? {
         guard let path else { return nil }
         return self.url(for: path)
     }

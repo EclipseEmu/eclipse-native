@@ -2,10 +2,10 @@ import SwiftUI
 
 struct PlayGameButton: View {
     @EnvironmentObject var persistence: Persistence
-    @Environment(\.playGame) var playGame
-    
+    @Environment(\.playGame) var playGame: PlayGameAction
+
     @ObservedObject var game: Game
-    let onError: (PlayGameAction.Failure, Game) -> Void
+    let onError: (PlayGameError, Game) -> Void
 
     var body: some View {
         Button(action: play) {
@@ -21,10 +21,8 @@ struct PlayGameButton: View {
                     saveState: nil,
                     persistence: persistence
                 )
-            } catch let error as PlayGameAction.Failure {
-                onError(error, game)
             } catch {
-                onError(.unknown(error), game)
+                onError(error as! PlayGameError, game)
             }
         }
     }

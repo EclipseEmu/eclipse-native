@@ -6,22 +6,6 @@ enum GlobalGraphicsContextError: Error {
     case noShaderSource
 }
 
-struct UnsafeOwned<T>: ~Copyable, @unchecked Sendable {
-    let value: T
-
-    init(_ value: T) {
-        self.value = value
-    }
-}
-
-struct UnsafeSendable<T>: @unchecked Sendable {
-    let value: T
-
-    init(_ value: T) {
-        self.value = value
-    }
-}
-
 @MainActor
 struct GlobalMetalContext {
     let device: any MTLDevice

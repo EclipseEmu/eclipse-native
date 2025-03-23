@@ -24,9 +24,13 @@ struct ReplaceBoxartMenu: View {
     }
 }
 
+@available(iOS 18.0, macOS 15.0, *)
 #Preview {
+    @Previewable @State var isDatabaseOpen = false
+    @Previewable @State var isPhotosOpen = false
+
     ReplaceBoxartMenu(
-        isDatabaseOpen: .constant(false),
-        isPhotosOpen: .constant(false)
+        isDatabaseOpen: $isDatabaseOpen,
+        isPhotosOpen: $isPhotosOpen
     )
 }

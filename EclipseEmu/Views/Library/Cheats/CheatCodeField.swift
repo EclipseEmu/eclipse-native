@@ -125,9 +125,10 @@ extension CheatCodeField.Coordinator: NSTextViewDelegate {
 
 final class CheatFormatter {
     struct FormattedText {
+        static let zero = Self(formattedText: "", cursorOffset: 0)
+
         let formattedText: String
         let cursorOffset: Int
-        static let zero = Self(formattedText: "", cursorOffset: 0)
     }
 
     private let formatString: String

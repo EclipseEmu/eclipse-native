@@ -82,7 +82,7 @@ struct SaveStatesListView: View {
     func rename(saveState: SaveState, newName: String) {
         Task {
             do {
-                try await persistence.library.rename(.init(saveState), to: newName)
+                try await persistence.objects.rename(.init(saveState), to: newName)
             } catch {
                 // FIXME: Surface error
                 print(error)

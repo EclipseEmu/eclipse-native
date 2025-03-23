@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		92019FC72BFC072C004233C3 /* openvgdb-min.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 92019FC62BFC072C004233C3 /* openvgdb-min.sqlite */; };
 		922F00BC2BC0C26700B419D7 /* EclipseEmuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */; };
 		922F00C62BC0C26700B419D7 /* EclipseEmuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */; };
 		922F00C82BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */; };
+		92404F0D2D8CA43400A22A8A /* openvgdb-min.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 92404F0C2D8CA43400A22A8A /* openvgdb-min.sqlite */; };
 		924B218C2BE8156700ED02F4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218B2BE8156700ED02F4 /* Atomics */; };
 		924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; };
 		924B21902BE97A9000ED02F4 /* mGBAEclipseCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -52,13 +52,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		92019FC62BFC072C004233C3 /* openvgdb-min.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = "openvgdb-min.sqlite"; sourceTree = "<group>"; };
 		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuTests.swift; sourceTree = "<group>"; };
 		922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuUITests.swift; sourceTree = "<group>"; };
 		922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		92404F0C2D8CA43400A22A8A /* openvgdb-min.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = "openvgdb-min.sqlite"; sourceTree = "<group>"; };
 		928237052BCB540C001E27B3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,7 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				928237052BCB540C001E27B3 /* README.md */,
-				92019FC62BFC072C004233C3 /* openvgdb-min.sqlite */,
+				92404F0C2D8CA43400A22A8A /* openvgdb-min.sqlite */,
 				927A25772D6A789B004218D2 /* Cores */,
 				927A26E02D6A7F93004218D2 /* EclipseEmu */,
 				922F00BA2BC0C26700B419D7 /* EclipseEmuTests */,
@@ -278,7 +278,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92019FC72BFC072C004233C3 /* openvgdb-min.sqlite in Resources */,
+				92404F0D2D8CA43400A22A8A /* openvgdb-min.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

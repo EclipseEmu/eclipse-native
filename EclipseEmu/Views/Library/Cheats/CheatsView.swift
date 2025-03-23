@@ -85,11 +85,10 @@ struct CheatsView: View {
     }
 
     func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
-        // FIXME: This function works, but is painful as it clones. This could definately be optimized.
         let cheats = cheats.map { ObjectBox($0) }
         Task {
             do {
-                try await persistence.library.reorderCheatPriority(cheats: cheats)
+                try await persistence.objects.reorderCheatPriority(cheats: cheats)
             } catch {
                 // FIXME: Surface errors
                 print(error)
@@ -101,7 +100,7 @@ struct CheatsView: View {
         let cheats = cheats.boxedItems(for: offsets)
         Task {
             do {
-                try await persistence.library.deleteMany(cheats)
+                try await persistence.objects.deleteMany(cheats)
             } catch {
                 // FIXME: Surface error
                 print(error)

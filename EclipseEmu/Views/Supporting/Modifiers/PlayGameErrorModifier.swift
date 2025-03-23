@@ -4,21 +4,21 @@ import UniformTypeIdentifiers
 
 @MainActor
 final class PlayGameErrorModel: ObservableObject {
-    @Published var error: PlayGameAction.Failure?
+    @Published var error: PlayGameError?
     @Published var isPresented: Bool = false
     @Published var isFileImporterOpen = false
     @Published var allowedContentTypes: [UTType] = []
 
     var game: Game?
-    var fileType: PlayGameAction.MissingFile = .none
+    var fileType: PlayGameMissingFile = .none
 
-    func set(error: PlayGameAction.Failure, game: Game?) {
+    func set(error: PlayGameError, game: Game?) {
         self.error = error
         self.game = game
         isPresented = true
     }
 
-    func selectFile(_ kind: PlayGameAction.MissingFile) {
+    func selectFile(_ kind: PlayGameMissingFile) {
         guard kind != .none else { return }
         fileType = kind
         allowedContentTypes = if let fileType = game?.system.fileType {
@@ -53,24 +53,23 @@ final class PlayGameErrorModel: ObservableObject {
     }
 
     func handleRomFile(url: URL) async {
-        guard let md5 = try? await FileSystem.shared.md5(for: url) else {
+        guard let sha1 = try? await FileSystem.shared.sha1(for: url) else {
             return set(error: .failedToHash, game: game)
         }
 
-        guard md5 == game?.md5 else {
-            return set(error: .hashMismatch(.rom, md5, url), game: game)
+        guard sha1 == game?.sha1 else {
+            return set(error: .hashMismatch(.rom, sha1, url), game: game)
         }
 
-
-        await replaceRom(url: url, md5: md5)
+        await replaceRom(url: url, sha1: sha1)
     }
 
-    func replaceRom(url: URL, md5: String) async {
+    func replaceRom(url: URL, sha1: String) async {
         guard let game else { return }
 
         do {
             try await FileSystem.shared.overwrite(copying: .other(url), to: game.romPath)
-            game.md5 = md5
+            game.sha1 = sha1
         } catch {
             return set(error: .failedToReplaceRom, game: game)
         }
@@ -87,11 +86,11 @@ struct PlayGameErrorHandlerModifier: ViewModifier {
             .alert(isPresented: $errorModel.isPresented, error: errorModel.error) {
                 Button("Cancel", role: .cancel) {}
                 switch errorModel.error {
-                case .hashMismatch(let kind, let md5, let url):
+                case .hashMismatch(let kind, let sha1, let url):
                     if kind == .rom {
                         Button("Use Anyway", role: .destructive) {
                             Task {
-                                await self.errorModel.replaceRom(url: url, md5: md5)
+                                await self.errorModel.replaceRom(url: url, sha1: sha1)
                             }
                         }
                     }

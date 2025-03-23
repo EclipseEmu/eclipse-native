@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct GameManageCollectionItem: View {
+private struct TagSelectionView: View {
     let collection: Tag
     let stateChanged: (Tag, Bool) -> Void
     @State var isSelected: Bool
@@ -33,41 +33,41 @@ struct GameManageCollectionItem: View {
     }
 }
 
-struct GameManageCollectionsView: View {
+struct GameTagsView: View {
     @ObservedObject var game: Game
     @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss
-    @State var selectedCollections: Set<Tag>
-    @State var isCreateCollectionOpen = false
+    @State var selection: Set<Tag>
+    @State var isCreateTagOpen = false
     @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
     var collections: FetchedResults<Tag>
 
     init(game: Game) {
         self.game = game
-        self.selectedCollections = game.tags as? Set<Tag> ?? Set()
+        self.selection = game.tags as? Set<Tag> ?? Set()
     }
 
     var body: some View {
         List {
             Section {
                 ForEach(collections) { collection in
-                    GameManageCollectionItem(
+                    TagSelectionView(
                         collection: collection,
-                        isSelected: selectedCollections.contains(collection),
-                        stateChanged: self.stateChanged(collection:newState:)
+                        isSelected: selection.contains(collection),
+                        stateChanged: stateChanged
                     )
                 }
             }
             Section {
                 Button {
-                    self.isCreateCollectionOpen = true
+                    self.isCreateTagOpen = true
                 } label: {
-                    Label("Create Collection", systemImage: "plus")
+                    Label("Create Tag", systemImage: "plus")
                 }
             }
         }
-        .sheet(isPresented: $isCreateCollectionOpen) {
-            EditCollectionView()
+        .sheet(isPresented: $isCreateTagOpen) {
+            EditTagView()
             #if os(macOS)
                 .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
             #endif
@@ -78,25 +78,23 @@ struct GameManageCollectionsView: View {
         #endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button(action: self.finish) {
-                    Text("Done")
-                }
+                Button("Done", action: self.finish)
             }
         }
     }
 
-    func stateChanged(collection: Tag, newState: Bool) {
+    private func stateChanged(collection: Tag, newState: Bool) {
         if newState {
-            self.selectedCollections.insert(collection)
+            selection.insert(collection)
         } else {
-            self.selectedCollections.remove(collection)
+            selection.remove(collection)
         }
     }
 
-    func finish() {
+    private func finish() {
         Task {
             do {
-                try await persistence.library.setTags(selectedCollections.map { ObjectBox($0) }, for: .init(game))
+                try await persistence.objects.setTags(selection.map { ObjectBox($0) }, for: .init(game))
             } catch {
                 // FIXME: Surface error
                 print(error)

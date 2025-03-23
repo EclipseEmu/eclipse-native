@@ -4,11 +4,11 @@ import EclipseKit
 import OSLog
 
 extension Game {
-    var romPath: FileSystem.Path {
-        .rom(fileName: md5!, fileExtension: romExtension)
+    var romPath: FileSystemPath {
+        .rom(fileName: sha1!, fileExtension: romExtension)
     }
 
-    var savePath: FileSystem.Path {
+    var savePath: FileSystemPath {
         .save(fileName: id!, fileExtension: saveExtension)
     }
 
@@ -25,7 +25,7 @@ extension Game {
         uuid: UUID = UUID(),
         name: String,
         system: GameSystem,
-        md5: String,
+        sha1: String,
         romExtension: String?,
         saveExtension: String?,
         boxart: ImageAsset?
@@ -36,7 +36,7 @@ extension Game {
         self.name = name
         self.system = system
         self.dateAdded = Date()
-        self.md5 = md5
+        self.sha1 = sha1
         self.romExtension = romExtension
         self.saveExtension = saveExtension
         self.boxart = boxart
@@ -45,7 +45,7 @@ extension Game {
     override public func didSave() {
         super.didSave()
 
-        guard isDeleted, let md5 else { return }
+        guard isDeleted, let sha1 else { return }
         let romPath = self.romPath
         let savePath = self.savePath
 
@@ -58,7 +58,7 @@ extension Game {
         }
 
         Task {
-            guard await Persistence.shared.library.canDeleteRom(md5: md5) else { return }
+            guard await Persistence.shared.objects.canDeleteRom(sha1: sha1) else { return }
             do {
                 try await FileSystem.shared.delete(at: romPath)
             } catch {

@@ -30,7 +30,7 @@ extension Array where Element == CChar {
         var pointer = cString
         var index = 0
         while index < self.count {
-            if self[index] != pointer.pointee || pointer.pointee == 0 {
+            guard self[index] == pointer.pointee && pointer.pointee != 0 else {
                 return false
             }
 

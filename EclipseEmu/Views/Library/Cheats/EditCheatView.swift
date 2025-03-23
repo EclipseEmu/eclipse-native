@@ -114,7 +114,7 @@ struct EditCheatView: View {
         Task {
             do {
                 if let cheat {
-                    try await persistence.library.update(
+                    try await persistence.objects.update(
                         cheat: .init(cheat),
                         name: self.label,
                         code: self.format.normalizeCode(string: self.code),
@@ -122,7 +122,7 @@ struct EditCheatView: View {
                         enabled: self.enabled
                     )
                 } else {
-                    try await persistence.library.createCheat(
+                    try await persistence.objects.createCheat(
                         name: self.label,
                         code: normalizedCode,
                         format: format,

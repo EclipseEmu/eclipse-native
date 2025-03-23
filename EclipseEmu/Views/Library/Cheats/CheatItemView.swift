@@ -49,7 +49,7 @@ struct CheatItemView: View {
             Button(role: .destructive) {
                 Task {
                     do {
-                        try await persistence.library.delete(.init(cheat))
+                        try await persistence.objects.delete(.init(cheat))
                     } catch {
                         // FIXME: Surface error
                         print(error)

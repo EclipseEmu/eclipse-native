@@ -44,7 +44,7 @@ struct SaveStateItem: View {
     func deleteSaveState() {
         Task {
             do {
-                try await persistence.library.delete(.init(saveState))
+                try await persistence.objects.delete(.init(saveState))
             } catch {
                 // FIXME: surface error
                 print(error)

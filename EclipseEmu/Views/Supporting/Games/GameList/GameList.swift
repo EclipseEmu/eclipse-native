@@ -119,7 +119,7 @@ final class GameListViewModel: ObservableObject {
     func removeFromLibrary(in persistence: Persistence) {
         Task {
             do {
-                try await persistence.library.deleteMany(selection.boxedItems())
+                try await persistence.objects.deleteMany(selection.boxedItems())
             } catch {
                 // FIXME: Handle error
                 print(error)
@@ -127,6 +127,7 @@ final class GameListViewModel: ObservableObject {
         }
     }
 
+    // FIXME: Rewrite
     func removeFromCollection(in persistence: Persistence) {
         guard case .tag(let collection) = filter else {
             return
@@ -142,6 +143,7 @@ final class GameListViewModel: ObservableObject {
         }
     }
 
+    // FIXME: Rewrite
     func addSelectionToCollection(collection: Tag, in persistence: Persistence) {
         for game in selection {
             collection.addToGames(game)
@@ -228,7 +230,7 @@ struct GameList: View {
             }
         }
         .sheet(isPresented: $viewModel.isAddToCollectionOpen) {
-            AddToCollectionView(viewModel: viewModel)
+            AddToTagView(viewModel: viewModel)
         }
         .confirmationDialog("", isPresented: $viewModel.isDeleteConfirmationOpen) {
             if case .tag = viewModel.filter {
@@ -260,11 +262,11 @@ struct GameList: View {
         games.nsSortDescriptors = viewModel.sortMethod.sortDescriptors(direction: viewModel.sortDirection)
     }
 
-    func photoFromDatabase(entry: OpenVGDB.Item, game: Game) {
-        guard let url = entry.boxart else { return }
+    func photoFromDatabase(entry: OpenVGDBItem, game: Game) {
+        guard let url = entry.cover else { return }
         Task {
             do {
-                try await persistence.library.replaceCoverArt(game: .init(game), fromRemote: url)
+                try await persistence.objects.replaceCoverArt(game: .init(game), fromRemote: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)

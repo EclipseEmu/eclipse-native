@@ -1,144 +1,6 @@
 import EclipseKit
 import SwiftUI
 
-final class GameViewModel: ObservableObject {
-    @Published var isErrored: PlayGameAction.Failure?
-}
-
-struct GameViewHeader: View {
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var persistence: Persistence
-    @ObservedObject var game: Game
-    var safeAreaTop: CGFloat
-    var onPlayError: (PlayGameAction.Failure, Game) -> Void
-
-    var body: some View {
-        ZStack {
-            VStack(alignment: .center, spacing: 16.0) {
-                BoxartView(game: self.game, cornerRadius: 8.0)
-                    .frame(minWidth: 0.0, maxWidth: 300, minHeight: 0.0, maxHeight: 300)
-                    .aspectRatio(1.0, contentMode: .fill)
-                    .padding(.top)
-
-                VStack {
-                    Text(verbatim: self.game.name, fallback: "Unknown Game")
-                        .font(.title3)
-                        .fontWeight(.medium)
-                    Text(self.game.system.string)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
-                }
-                .multilineTextAlignment(.center)
-                .padding(.vertical)
-
-                HStack(spacing: 8.0) {
-                    PlayGameButton(game: game, onError: onPlayError)
-                        .buttonStyle(.borderedProminent)
-
-                    NavigationLink {
-                        CheatsView(game: game)
-                    } label: {
-                        Label("Cheats", systemImage: "memorychip.fill")
-                    }
-                    .modify {
-                        if #available(iOS 17.0, macOS 14.0, *) {
-                            $0.tint(Color.accentColor.quaternary)
-                        } else {
-                            $0.tint(Color.accentColor.opacity(0.15))
-                        }
-                    }
-                    .foregroundStyle(Color.accentColor)
-                    .buttonStyle(.borderedProminent)
-                }
-                .padding(.bottom, 4.0)
-                .labelStyle(FullWidthLabelStyle())
-                .font(.subheadline.weight(.semibold))
-                .controlSize(.large)
-            }
-            .padding()
-            .padding(.top, self.safeAreaTop)
-        }
-        .background(Material.thin)
-        .background(ignoresSafeAreaEdges: .all)
-        .overlay(alignment: .bottom) {
-            Divider()
-        }
-    }
-}
-
-struct GameViewSaveStatesList: View {
-    @EnvironmentObject private var persistence: Persistence
-    @Environment(\.playGame) private var playGame
-    @Environment(\.dismiss) private var dismiss
-
-    @ObservedObject var game: Game
-    @Binding var renameTarget: SaveState?
-    let onPlayError: (PlayGameAction.Failure, Game) -> Void
-
-    @SectionedFetchRequest<Bool, SaveState>(sectionIdentifier: \.isAuto, sortDescriptors: [])
-    private var saveStates
-
-    init(game: Game, renameTarget: Binding<SaveState?>, onPlayError: @escaping (PlayGameAction.Failure, Game) -> Void) {
-        self.game = game
-        self._renameTarget = renameTarget
-        self.onPlayError = onPlayError
-
-        let request = SaveState.fetchRequest()
-        request.predicate = NSPredicate(format: "game == %@", game)
-        request.includesSubentities = false
-        request.fetchLimit = 10
-        request.sortDescriptors = SaveStatesListView.sortDescriptors
-        self._saveStates = SectionedFetchRequest(fetchRequest: request, sectionIdentifier: \.isAuto)
-    }
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack {
-                ForEach(self.saveStates) { section in
-                    ForEach(section) { saveState in
-                        SaveStateItem(
-                            saveState: saveState,
-                            action: self.saveStateSelected,
-                            renameDialogTarget: $renameTarget
-                        )
-                        .frame(minWidth: 140.0, idealWidth: 200.0, maxWidth: 260.0)
-                    }
-                    if section.id == saveStates.first?.id && saveStates.count > 1 {
-                        Divider()
-                    }
-                }
-            }
-            .padding([.horizontal, .bottom])
-        }
-        .emptyState(saveStates.isEmpty) {
-            EmptyMessage {
-                Text("No Save States")
-            } message: {
-                Text("You haven't made any save states for this game. Use the \"Save State\" button in the emulation menu to create some.")
-            }
-        }
-    }
-
-    func saveStateSelected(_ state: SaveState) {
-        Task {
-            do {
-                try await playGame(
-                    game: game,
-                    saveState: state,
-                    persistence: persistence
-                )
-                dismiss()
-            } catch let error as PlayGameAction.Failure {
-                onPlayError(error, game)
-            } catch {
-                onPlayError(.unknown(error), game)
-            }
-        }
-    }
-}
-
 struct GameView: View {
     @ObservedObject var game: Game
 
@@ -176,8 +38,8 @@ struct GameView: View {
                             DataPointView(title: "Last Played") {
                                 Text(game.datePlayed, format: .dateTime, fallback: "Never")
                             }
-                            DataPointView(title: "MD5 Checksum") {
-                                Text(verbatim: game.md5, fallback: "Unknown")
+                            DataPointView(title: "SHA-1 Checksum") {
+                                Text(verbatim: game.sha1, fallback: "Unknown")
                                     .font(.caption.monospaced())
                             }
                         }
@@ -210,7 +72,7 @@ struct GameView: View {
                         }
 
                         NavigationLink {
-                            GameManageCollectionsView(game: game)
+                            GameTagsView(game: game)
                         } label: {
                             Label("Manage Collections", systemImage: "square.stack.fill")
                         }
@@ -229,7 +91,7 @@ struct GameView: View {
                             Button(action: exportSave) {
                                 Label("Export Save", systemImage: "square.and.arrow.up")
                             }
-                            Button(action: deleteSave) {
+                            Button(role: .destructive, action: deleteSave) {
                                 Label("Delete Save", systemImage: "trash")
                             }
                         } label: {
@@ -255,7 +117,7 @@ struct GameView: View {
                 placeholder: "State Name"
             ) { saveState, name in
                 Task {
-                    try await persistence.library.rename(.init(saveState), to: name)
+                    try await persistence.objects.rename(.init(saveState), to: name)
                 }
             }
             .alert("Rename Game", isPresented: self.$isRenameGameOpen) {
@@ -284,7 +146,7 @@ struct GameView: View {
 
     private func rename() {
         Task {
-            try await persistence.library.rename(ObjectBox(game), to: renameGameText)
+            try await persistence.objects.rename(ObjectBox(game), to: renameGameText)
             renameGameText = ""
         }
     }
@@ -298,7 +160,7 @@ struct GameView: View {
             await MainActor.run {
                 dismiss()
             }
-            try? await persistence.library.delete(.init(self.game))
+            try? await persistence.objects.delete(.init(self.game))
         }
     }
 
@@ -308,7 +170,7 @@ struct GameView: View {
         guard case .success(let url) = entry else { return }
         Task {
             do {
-                try await persistence.library.replaceCoverArt(game: .init(game), copying: url)
+                try await persistence.objects.replaceCoverArt(game: .init(game), copying: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -316,11 +178,11 @@ struct GameView: View {
         }
     }
 
-    private func boxartFromDatabase(entry: OpenVGDB.Item) {
-        guard let url = entry.boxart else { return }
+    private func boxartFromDatabase(entry: OpenVGDBItem) {
+        guard let url = entry.cover else { return }
         Task {
             do {
-                try await persistence.library.replaceCoverArt(game: .init(game), fromRemote: url)
+                try await persistence.objects.replaceCoverArt(game: .init(game), fromRemote: url)
             } catch {
                 // FIXME: present this to the user
                 print(error)
@@ -336,7 +198,7 @@ struct GameView: View {
 
     private func deleteSave() {}
 
-    private func onPlayError(error: PlayGameAction.Failure, game: Game) {
+    private func onPlayError(error: PlayGameError, game: Game) {
         print(error, game)
     }
 }

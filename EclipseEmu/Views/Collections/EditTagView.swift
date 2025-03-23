@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct CollectionColorPickerView: View {
+private struct ColorPickerView: View {
     static let colors: [Color] = [
         .red, .orange, .yellow, .green, .mint, .teal, .cyan, .blue, .indigo, .purple, .pink, .brown
     ]
@@ -30,12 +30,11 @@ struct CollectionColorPickerView: View {
     }
 }
 
-struct EditCollectionView: View {
+struct EditTagView: View {
     @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss
     @State var name: String
-
-    @State var selectedColor: Color
+    @State var color: Color
 
     var tag: Tag?
 
@@ -43,10 +42,10 @@ struct EditCollectionView: View {
         self.tag = tag
         if let tag {
             self.name = tag.name ?? ""
-            self.selectedColor = tag.parsedColor.color
+            self.color = tag.parsedColor.color
         } else {
             self.name = ""
-            self.selectedColor = .blue
+            self.color = .blue
         }
     }
 
@@ -63,11 +62,11 @@ struct EditCollectionView: View {
                                 .frame(width: 64.0, height: 64.0)
                                 .foregroundStyle(.white)
                                 .padding()
-                                .background(self.selectedColor.gradient)
+                                .background(color)
                                 .clipShape(Circle())
                                 .padding()
 
-                            TextField("Collection Name", text: self.$name)
+                            TextField("Tag Name", text: self.$name)
                                 .padding()
                                 .multilineTextAlignment(.center)
                                 .background(.quaternary.opacity(0.45))
@@ -77,11 +76,11 @@ struct EditCollectionView: View {
                     }
 
                     Section {
-                        CollectionColorPickerView(selectedColor: self.$selectedColor)
+                        ColorPickerView(selectedColor: self.$color)
                     }
                 }
             }
-            .navigationTitle(self.tag == nil ? "New Collection" : "Edit Collection")
+            .navigationTitle(self.tag == nil ? "New Tag" : "Edit Tag")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -104,17 +103,17 @@ struct EditCollectionView: View {
     func upsert() {
         guard !self.name.isEmpty else { return }
 
-        let color = Tag.Color(color: self.selectedColor)
+        let color = TagColor(color: self.color)
         Task {
             do {
                 if let tag {
-                    try await persistence.library.update(
+                    try await persistence.objects.update(
                         tag: .init(tag),
                         name: self.name,
                         color: color
                     )
                 } else {
-                    try await persistence.library.createTag(name: self.name, color: color)
+                    try await persistence.objects.createTag(name: self.name, color: color)
                 }
 
                 self.dismiss()
@@ -128,14 +127,14 @@ struct EditCollectionView: View {
 }
 
 #Preview("Create") {
-    EditCollectionView()
+    EditTagView()
 }
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview("Edit", traits: .modifier(PreviewStorage())) {
     PreviewSingleObjectView(Tag.fetchRequest()) { tag, _ in
         NavigationStack {
-            EditCollectionView(tag: tag)
+            EditTagView(tag: tag)
         }
     }
 }
