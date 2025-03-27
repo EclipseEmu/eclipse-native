@@ -389,7 +389,6 @@ final class TouchControlsController: UIViewController {
         for touch in touches {
             if let (_, element) = self.lockedTouches[touch] {
                 self.lockedTouches.removeValue(forKey: touch)
-//                let view = self.touchControlsSubview.subviews[i]
                 self.state &= ~(
                     element.bindings.inputA |
                         element.bindings.inputB.rawValue |

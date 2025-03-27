@@ -1,6 +1,18 @@
 import SwiftUI
 
-enum TagColor: Int16, RawRepresentable, Equatable {
+let colors = [
+    Color.blue,
+    Color.indigo,
+    Color.red,
+    Color.green,
+    Color.yellow,
+    Color.orange,
+    Color.purple,
+    Color.pink
+]
+
+enum TagColor: Int16, RawRepresentable, Equatable, CaseIterable {
+    case blue
     case red
     case orange
     case yellow
@@ -8,7 +20,6 @@ enum TagColor: Int16, RawRepresentable, Equatable {
     case mint
     case teal
     case cyan
-    case blue
     case indigo
     case purple
     case pink
@@ -51,13 +62,18 @@ enum TagColor: Int16, RawRepresentable, Equatable {
 }
 
 extension Tag {
-    var parsedColor: TagColor {
-        .init(rawValue: self.color) ?? .blue
+    var color: TagColor {
+        get {
+            .init(rawValue: rawColor) ?? .blue
+        }
+        set {
+            rawColor = newValue.rawValue
+        }
     }
 
     convenience init(name: String, color: TagColor) {
         self.init(entity: Self.entity(), insertInto: nil)
         self.name = name
-        self.color = color.rawValue
+        self.rawColor = color.rawValue
     }
 }

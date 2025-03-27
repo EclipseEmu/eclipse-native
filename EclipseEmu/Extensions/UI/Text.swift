@@ -18,3 +18,16 @@ extension Text {
             }
         }
 }
+
+extension Text {
+    func sectionHeaderStyle() -> some View {
+        self
+            .font(.headline)
+            .frame(
+                minWidth: 0,
+                maxWidth: .infinity,
+                alignment: .leading
+            )
+    }
+}
+

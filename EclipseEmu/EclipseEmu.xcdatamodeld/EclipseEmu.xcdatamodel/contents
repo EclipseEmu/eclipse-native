@@ -38,8 +38,8 @@
         <relationship name="preview" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAsset" inverseName="saveState" inverseEntity="ImageAsset"/>
     </entity>
     <entity name="Tag" representedClassName="Tag" syncable="YES" codeGenerationType="class">
-        <attribute name="color" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawColor" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Game" inverseName="tags" inverseEntity="Game"/>
     </entity>
 </model>

@@ -30,6 +30,9 @@ enum GameCoreCoordinatorError: Error {
 }
 
 final actor GameCoreCoordinator {
+    private let executor: BlockingSerialExecutor
+    nonisolated let unownedExecutor: UnownedSerialExecutor
+
     let width: CGFloat
     let height: CGFloat
 
@@ -74,6 +77,10 @@ final actor GameCoreCoordinator {
     }
 
     init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderCallback) async throws {
+        let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.corecoordinator")
+        self.executor = BlockingSerialExecutor(queue: queue)
+        self.unownedExecutor = executor.asUnownedSerialExecutor()
+
         do {
             callbackContext = UnsafeMutablePointer<CallbackContext>.allocate(capacity: 1)
             callbackContext.initialize(to: CallbackContext())

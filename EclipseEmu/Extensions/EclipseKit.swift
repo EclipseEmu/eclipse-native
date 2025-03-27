@@ -5,45 +5,46 @@ import Metal
 extension GameSystem {
     var string: String {
         return switch self {
-        case .unknown:
-            "Unknown System"
-        case .gb:
-            "Game Boy"
-        case .gbc:
-            "Game Boy Color"
-        case .gba:
-            "Game Boy Advance"
-        case .nes:
-            "Nintendo Entertainment System"
-        case .snes:
-            "Super Nintendo Entertainment System"
-        @unknown default:
-            "Unknown System"
+        case .unknown: "Unknown System"
+        case .gb: "Game Boy"
+        case .gbc: "Game Boy Color"
+        case .gba: "Game Boy Advance"
+        case .nes: "Nintendo Entertainment System"
+        case .snes: "Super Nintendo Entertainment System"
+        @unknown default: "Unknown System"
         }
     }
 
     var fileType: UTType? {
         return switch self {
-        case .gb: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gb")
-        case .gbc: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gbc")
-        case .gba: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gba")
-        case .nes: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.nes")
-        case .snes: UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes")
+        case .gb: .romGB
+        case .gbc: .romGBC
+        case .gba: .romGBA
+        case .nes: .romNES
+        case .snes: .romSNES
         default: nil
         }
     }
 
     init(fileType: UTType) {
         self = switch fileType.identifier {
-        case "dev.magnetar.eclipseemu.rom.gb": Self.gb
-        case "dev.magnetar.eclipseemu.rom.gbc": Self.gbc
-        case "dev.magnetar.eclipseemu.rom.gba": Self.gba
-        case "dev.magnetar.eclipseemu.rom.nes": Self.nes
-        case "dev.magnetar.eclipseemu.rom.snes": Self.snes
+        case UTType.romGB.identifier: Self.gb
+        case UTType.romGBC.identifier: Self.gbc
+        case UTType.romGBA.identifier: Self.gba
+        case UTType.romNES.identifier: Self.nes
+        case UTType.romSNES.identifier: Self.snes
         default: Self.unknown
         }
     }
 }
+
+extension GameSystem: Codable {}
+
+extension GameSystem: @retroactive CaseIterable {
+    public static let allCases: [GameSystem] = [.unknown, .gb, .gbc, .gba, .nes, .snes]
+}
+
+// MARK: Video
 
 extension GameCoreVideoPixelFormat {
     var metal: MTLPixelFormat? {

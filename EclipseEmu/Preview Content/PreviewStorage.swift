@@ -9,7 +9,7 @@ struct PreviewStorage: PreviewModifier {
     }
 
     private static func insertGames(into persistence: Persistence) {
-        let ctx = persistence.mainContext
+        let objectContext = persistence.mainContext
 
         let tags = [
             Tag(name: "Collection 0", color: .mint),
@@ -19,7 +19,7 @@ struct PreviewStorage: PreviewModifier {
         ]
 
         for tag in tags {
-            ctx.insert(tag)
+            objectContext.insert(tag)
         }
 
         for i in 0..<32 {
@@ -31,13 +31,14 @@ struct PreviewStorage: PreviewModifier {
                 saveExtension: "sav",
                 boxart: nil
             )
-            ctx.insert(game)
+            objectContext.insert(game)
 
             let randIdx = i & 3
             tags[randIdx].addToGames(game)
             for j in (0...randIdx) {
-                let saveState = SaveState(isAuto: j == 0, stateExtension: "s8", preview: nil, game: game)
-                ctx.insert(saveState)
+                let saveState = SaveState(isAuto: j == 0, stateExtension: "s8", preview: nil, game: nil)
+                objectContext.insert(saveState)
+                saveState.game = game
             }
         }
     }

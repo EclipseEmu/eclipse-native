@@ -1,0 +1,146 @@
+import Combine
+import Foundation
+import CoreData
+import SwiftUI
+import EclipseKit
+
+enum GamePlaybackState {
+    case playing(GamePlaybackData)
+    case none
+}
+
+enum GamePlaybackMissingFile: Equatable {
+    case none
+    case rom
+    case saveState(ObjectBox<SaveState>)
+}
+
+enum GamePlaybackError: LocalizedError {
+    case unknown(any Error)
+    case badPermissions
+    case failedToHash
+    case hashMismatch(GamePlaybackMissingFile, String, URL)
+    case missingCore
+    case failedToReplaceROM
+    case missingGame
+    case missingFile(GamePlaybackMissingFile)
+
+    var errorDescription: String? {
+        switch self {
+        case .badPermissions: "Missing Permissions"
+        case .failedToHash: "Failed to Hash"
+        case .failedToReplaceROM: "Failed to replace the ROM file."
+        case .hashMismatch(let kind, _, _):
+            switch kind {
+            case .rom: "The ROM file does not match the one that was originally used for this game. This may cause issues with save data, save states, and cheats."
+            default: "E_HASH_MISMATCH"
+            }
+        case .missingCore: "Unknown Core"
+        case .missingFile(let kind):
+            switch kind {
+            case .none: "Unknown File Missing"
+            case .rom: "ROM is Missing"
+            case .saveState: "Save State is Missing"
+            }
+        case .unknown(let error):
+            if let localizedError = error as? LocalizedError {
+                localizedError.errorDescription
+            } else {
+                "An Unknown Error Occurred"
+            }
+        case .missingGame:
+            "This Save State is not associated with a game."
+        }
+    }
+}
+
+struct GamePlaybackData: Sendable {
+    let core: GameCoreInfo
+    let game: ObjectBox<Game>
+    let saveState: ObjectBox<SaveState>?
+    let romPath: FileSystemPath
+    let savePath: FileSystemPath
+    let saveStatePath: FileSystemPath?
+    let cheats: [GamePlaybackData.OwnedCheat]
+
+    struct OwnedCheat: Identifiable, Equatable, Hashable {
+        let id: ObjectIdentifier
+        let code: String?
+        let enabled: Bool
+        let label: String?
+        let priority: Int16
+        let type: String?
+
+        init(_ cheat: Cheat) {
+            self.id = cheat.id
+            self.code = cheat.code
+            self.enabled = cheat.enabled
+            self.label = cheat.label
+            self.priority = cheat.priority
+            self.type = cheat.type
+        }
+    }
+}
+
+@MainActor
+final class GamePlayback: ObservableObject {
+    private let coreRegistry: CoreRegistry
+    @Published var playbackState: GamePlaybackState = .none
+
+    init(coreRegistry: CoreRegistry) {
+        self.coreRegistry = coreRegistry
+    }
+
+    func play(game: Game, persistence: Persistence) async throws(GamePlaybackError) {
+        guard let core = coreRegistry.get(for: game) else {
+            throw .missingCore
+        }
+        guard await persistence.files.exists(path: game.romPath) else {
+            throw .missingFile(.rom)
+        }
+
+        let cheats = (game.cheats as? Set<Cheat>) ?? []
+        let data = GamePlaybackData(
+            core: core,
+            game: .init(game),
+            saveState: nil,
+            romPath: game.romPath,
+            savePath: game.savePath,
+            saveStatePath: nil,
+            cheats: cheats.map(GamePlaybackData.OwnedCheat.init)
+        )
+
+        self.playbackState = .playing(data)
+    }
+
+    func play(state: SaveState, persistence: Persistence) async throws(GamePlaybackError) {
+        guard let game = state.game else { throw .missingGame }
+        guard let core = coreRegistry.get(for: game) else {
+            throw .missingCore
+        }
+        let files = persistence.files
+        guard await files.exists(path: state.path) else {
+            throw .missingFile(.saveState(.init(state)))
+        }
+        guard await files.exists(path: game.romPath) else {
+            throw .missingFile(.rom)
+        }
+
+        let cheats = (game.cheats as? Set<Cheat>) ?? []
+        let data = GamePlaybackData(
+            core: core,
+            game: .init(game),
+            saveState: .init(state),
+            romPath: game.romPath,
+            savePath: game.savePath,
+            saveStatePath: state.path,
+            cheats: cheats.map(GamePlaybackData.OwnedCheat.init)
+        )
+
+        self.playbackState = .playing(data)
+    }
+
+    public func closeGame() {
+        self.playbackState = .none
+    }
+}

@@ -224,6 +224,7 @@ extension ObjectActor {
         do {
             let game = try box.get(in: objectContext)
             game.boxart = try await self.createImage(remote: url)
+            try objectContext.saveIfNeeded()
         } catch let error as PersistenceError {
             throw .persistence(error)
         } catch let error as FileSystemError {
@@ -269,7 +270,7 @@ extension ObjectActor {
     func update(tag: ObjectBox<Tag>, name: String, color: TagColor) throws(PersistenceError) {
         let tag = try tag.get(in: objectContext)
         tag.name = name
-        tag.color = color.rawValue
+        tag.color = color
         try objectContext.saveIfNeeded()
     }
 
@@ -331,5 +332,186 @@ extension ObjectActor {
             cheat.priority = Int16(truncatingIfNeeded: index)
         }
         try objectContext.saveIfNeeded()
+    }
+}
+
+struct GameCreationInfo: Sendable {
+    let uuid: UUID
+    let name: String
+    let system: GameSystem
+    let sha1: String
+    let cover: FileSystemPath?
+    let romExtension: String?
+
+    init(id: UUID, name: String, system: GameSystem, cover: FileSystemPath?, sha1: String, romExtension: String?) {
+        self.uuid = id
+        self.name = name
+        self.system = system
+        self.sha1 = sha1
+        self.cover = cover
+        self.romExtension = romExtension
+    }
+}
+
+enum GameCreationError: LocalizedError {
+    case notFileURL
+    case unknownSystem
+    case openvgdbError(OpenVGDBError)
+    case hashingFailed(FileSystemError)
+    case copyFileError(FileSystemError)
+    case persistenceError(PersistenceError)
+}
+
+struct GameCreationFailure {
+    let url: URL
+    let error: GameCreationError
+}
+
+typealias GameCreationResult = (URL, Result<GameCreationInfo, GameCreationError>)
+
+extension ObjectActor {
+    nonisolated func createGames(for files: [URL]) async throws(GameCreationError) -> [GameCreationFailure] {
+        let openvgdb: OpenVGDB
+        do {
+            openvgdb = try OpenVGDB()
+        } catch {
+            throw .openvgdbError(error)
+        }
+
+        let gameResults = await withTaskGroup(of: GameCreationResult.self) { group in
+            for file in files {
+                group.addTask {
+                    await self.createGame(from: file, db: openvgdb)
+                }
+            }
+
+            return await group.reduce(into: [GameCreationResult]()) { $0.append($1) }
+        }
+
+        return try await self.createGameObjects(for: gameResults)
+    }
+
+    private nonisolated func createGame(from file: URL, db: OpenVGDB?) async -> GameCreationResult {
+        guard file.isFileURL else { return (file, .failure(.notFileURL)) }
+
+        let doStopAccessing = file.startAccessingSecurityScopedResource()
+        defer {
+            if doStopAccessing {
+                file.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        let contentType = try? file.resourceValues(forKeys: [.contentTypeKey]).contentType
+        guard let system = contentType.map(GameSystem.init(fileType:)), system != .unknown else {
+            return (file, .failure(.unknownSystem))
+        }
+
+        // Hash the game
+        let sha1: String
+        do {
+            sha1 = try await fileSystem.sha1(for: file)
+        } catch {
+            return (file, .failure(.hashingFailed(error)))
+        }
+
+        let fullFileName = file.lastPathComponent
+        let (fileName, romExtension) = fullFileName.splitOnce(separator: ".")
+        let romExt = romExtension.map({ String($0) })
+
+        let id = UUID()
+        var name: String = String(fileName)
+        var coverUrl: URL? = nil
+
+        // Get the game info from OpenVGDB
+        do {
+            if let db, let entry = try await db.get(sha1: sha1, system: system) {
+                name = entry.name
+                coverUrl = entry.cover
+            } else {
+                Logger.coredata.warning("no game info found for \(sha1)")
+            }
+        } catch {
+            Logger.coredata.warning("failed to get game info for \(sha1): \(error.localizedDescription)")
+        }
+
+        // Copy the ROM file and download the boxart
+        var coverPath: FileSystemPath? = nil
+        do {
+            if let coverUrl {
+                try await copyRom(from: file, for: sha1, with: romExt)
+                coverPath = await downloadCover(for: id, cover: coverUrl)
+            } else {
+                try await copyRom(from: file, for: sha1, with: romExt)
+            }
+        } catch {
+            return (file, .failure(error))
+        }
+
+        return (file, .success(GameCreationInfo(
+            id: id,
+            name: name,
+            system: system,
+            cover: coverPath,
+            sha1: sha1,
+            romExtension: romExt
+        )))
+    }
+
+    private nonisolated func copyRom(
+        from file: URL,
+        for sha1: String,
+        with fileExtension: String?
+    ) async throws(GameCreationError) {
+        do {
+            try await fileSystem.copy(from: .other(file), to: .rom(fileName: sha1, fileExtension: fileExtension))
+        } catch .fileWriteFileExists {
+            // noop: means we don't actually need to copy (unless there's a hash collision - unlikely)
+        } catch {
+            throw .copyFileError(error)
+        }
+    }
+
+    private nonisolated func downloadCover(for id: UUID, cover: URL) async -> FileSystemPath? {
+        do {
+            let path = FileSystemPath.image(fileName: id, fileExtension: cover.fileExtension())
+            try await fileSystem.download(from: cover, to: path)
+            return path
+        } catch {
+            return nil
+        }
+    }
+
+    private func createGameObjects(for results: [GameCreationResult]) throws(GameCreationError) -> [GameCreationFailure] {
+        var failed: [GameCreationFailure] = []
+        for (file, result) in results {
+            switch result {
+            case .success(let info):
+                let game = Game(
+                    name: info.name,
+                    system: info.system,
+                    sha1: info.sha1,
+                    romExtension: info.romExtension,
+                    saveExtension: ".sav",
+                    boxart: nil
+                )
+                objectContext.insert(game)
+                if case .image(fileName: let uuid, fileExtension: let fileExtension) = info.cover {
+                    let cover = ImageAsset(id: uuid, fileExtension: fileExtension)
+                    objectContext.insert(cover)
+                    game.boxart = cover
+                }
+                break
+            case .failure(let error):
+                failed.append(.init(url: file, error: error))
+            }
+        }
+
+        do {
+            try self.objectContext.saveIfNeeded()
+        } catch {
+            throw .persistenceError(error)
+        }
+
+        return failed
     }
 }

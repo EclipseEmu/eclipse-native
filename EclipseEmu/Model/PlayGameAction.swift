@@ -1,6 +1,7 @@
 import CoreData
 import EclipseKit
 import SwiftUI
+import mGBAEclipseCore
 
 enum PlayGameMissingFile: Equatable {
     case none
@@ -44,14 +45,16 @@ enum PlayGameError: LocalizedError {
     }
 }
 
+@available(*, deprecated, renamed: "GamePlayback", message: "More semantically obvious class")
 final class PlayGameAction: ObservableObject {
     @Published var model: EmulationViewModel?
 
     @MainActor
     public func callAsFunction(game: Game, saveState: SaveState?, persistence: Persistence) async throws(PlayGameError) {
-        guard let core = EclipseEmuApp.cores.get(for: game) else {
-            throw .missingCore
-        }
+        let core = mGBACoreInfo
+        //        guard let core = EclipseEmuApp.cores.get(for: game) else {
+//            throw .missingCore
+//        }
 
         let files = persistence.files
         let cheats = (game.cheats as? Set<Cheat>) ?? []
