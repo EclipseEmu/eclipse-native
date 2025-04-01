@@ -194,11 +194,6 @@ struct GameView: View {
 
                 Divider()
 
-                Toggle(isOn: $isManageTagsOpen) {
-                    Label("Manage Tags", systemImage: "tag")
-                }
-                .toggleStyle(.button)
-
                 Button(action: manageTags) {
                     Label("Manage Tags", systemImage: "tag")
                 }

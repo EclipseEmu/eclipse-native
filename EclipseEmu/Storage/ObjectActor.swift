@@ -4,33 +4,6 @@ import CoreData
 import OSLog
 import EclipseKit
 
-struct OwnedCheat: Identifiable, Equatable, Hashable {
-    let id: ObjectIdentifier
-    let code: String?
-    let enabled: Bool
-    let label: String?
-    let priority: Int16
-    let type: String?
-
-    init(cheat: Cheat) {
-        self.id = cheat.id
-        self.code = cheat.code
-        self.enabled = cheat.enabled
-        self.label = cheat.label
-        self.priority = cheat.priority
-        self.type = cheat.type
-    }
-}
-
-@available(*, deprecated, renamed: "N.A", message: "this has been removed")
-struct EmulationData {
-    let romPath: URL
-    let savePath: URL
-    let cheats: [OwnedCheat]
-}
-
-// MARK: Games
-
 struct GameCreationInfo: Sendable {
     let uuid: UUID
     let name: String
@@ -383,11 +356,9 @@ final actor ObjectActor {
         saveState.game = game
         try objectContext.saveIfNeeded()
     }
-}
 
-// MARK: Images
+    // MARK: Images
 
-extension ObjectActor {
     private func createImage(copy sourceUrl: URL) async throws(FileSystemError) -> ImageAsset {
         let asset = ImageAsset(fileExtension: sourceUrl.fileExtension())
         try await fileSystem.overwrite(copying: .other(sourceUrl), to: asset.path)
@@ -429,11 +400,9 @@ extension ObjectActor {
             unreachable()
         }
     }
-}
 
-// MARK: Tags
+    // MARK: Tags
 
-extension ObjectActor {
     func setTags<S: Sequence>(_ tags: S, for game: ObjectBox<Game>) throws(PersistenceError)
         where S.Element == ObjectBox<Tag>
     {
@@ -468,11 +437,9 @@ extension ObjectActor {
 
         try objectContext.saveIfNeeded()
     }
-}
 
-// MARK: Cheats
+    // MARK: Cheats
 
-extension ObjectActor {
     func createCheat(
         name: String,
         code: String,
