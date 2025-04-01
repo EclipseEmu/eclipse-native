@@ -83,9 +83,11 @@ struct CoverPickerDatabaseView: View {
 
                         Button("USE") { setCoverArt(result) }
                             .controlSize(.small)
-                            .fontWeight(.medium)
+                            .fontWeight(.semibold)
                             .buttonStyle(.bordered)
+#if !os(macOS)
                             .buttonBorderShape(.capsule)
+#endif
                     }
                 }
             }
@@ -95,7 +97,9 @@ struct CoverPickerDatabaseView: View {
     var body: some View {
         content
             .navigationTitle("Cover Art")
+        #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
+        #endif
             .searchable(text: $viewModel.query)
             .toolbar {
                 ToolbarItem(placement: .navigation) {

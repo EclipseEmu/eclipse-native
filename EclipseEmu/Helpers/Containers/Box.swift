@@ -6,3 +6,15 @@ final class Box<T> {
         self.value = value
     }
 }
+
+extension Box: Equatable where T: Equatable {
+    static func == (lhs: Box<T>, rhs: Box<T>) -> Bool {
+        lhs.value == rhs.value
+    }
+}
+
+extension Box: Hashable where T: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(value)
+    }
+}

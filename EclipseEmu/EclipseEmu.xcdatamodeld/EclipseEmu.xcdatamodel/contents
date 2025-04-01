@@ -8,6 +8,20 @@
         <attribute name="type" attributeType="String"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="cheats" inverseEntity="Game"/>
     </entity>
+    <entity name="ControlsConfiguration" representedClassName="ControlsConfiguration" syncable="YES" codeGenerationType="class">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawKind" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sourceID" optional="YES" attributeType="String"/>
+        <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="controls" inverseEntity="Game"/>
+    </entity>
+    <entity name="CoreSettings" representedClassName="CoreSettings" syncable="YES" codeGenerationType="class">
+        <attribute name="coreID" optional="YES" attributeType="String"/>
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
     <entity name="Game" representedClassName="Game" syncable="YES" codeGenerationType="class">
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="datePlayed" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -17,15 +31,16 @@
         <attribute name="romExtension" optional="YES" attributeType="String"/>
         <attribute name="saveExtension" optional="YES" attributeType="String" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="sha1" attributeType="String"/>
-        <relationship name="boxart" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAsset" inverseName="game" inverseEntity="ImageAsset"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Cheat" inverseName="game" inverseEntity="Cheat"/>
+        <relationship name="controls" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControlsConfiguration" inverseName="game" inverseEntity="ControlsConfiguration"/>
+        <relationship name="cover" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAsset" inverseName="game" inverseEntity="ImageAsset"/>
         <relationship name="saveStates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SaveState" inverseName="game" inverseEntity="SaveState"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="games" inverseEntity="Tag"/>
     </entity>
     <entity name="ImageAsset" representedClassName="ImageAsset" syncable="YES" codeGenerationType="class">
         <attribute name="fileExtension" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="boxart" inverseEntity="Game"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="cover" inverseEntity="Game"/>
         <relationship name="saveState" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SaveState" inverseName="preview" inverseEntity="SaveState"/>
     </entity>
     <entity name="SaveState" representedClassName="SaveState" syncable="YES" codeGenerationType="class">

@@ -29,7 +29,7 @@ struct PreviewStorage: PreviewModifier {
                 sha1: "abcdef1234567890",
                 romExtension: "gba",
                 saveExtension: "sav",
-                boxart: nil
+                cover: nil
             )
             objectContext.insert(game)
 

@@ -1,9 +1,15 @@
 import Metal
 import SwiftUI
 
+@MainActor
 struct GameScreenView {
     var model: EmulationViewModel
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    @MainActor
     class Coordinator: NSObject {
         var parent: GameScreenView
 
@@ -12,7 +18,7 @@ struct GameScreenView {
             super.init()
         }
 
-        @MainActor @inlinable
+        @inlinable
         func surfaceCreated(surface: CAMetalLayer) {
             self.parent.model.renderingSurfaceCreated(surface: surface)
         }
@@ -31,10 +37,6 @@ extension GameScreenView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: CustomMetalView, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
 }
 
 final class CustomMetalView: NSView {
@@ -72,10 +74,6 @@ extension GameScreenView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: CustomMetalView, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
 }
 
 final class CustomMetalView: UIView {

@@ -10,6 +10,9 @@ struct KeepPlayingSection: View {
     @FetchRequest<SaveState>(sortDescriptors: [])
     var keepPlaying: FetchedResults<SaveState>
 
+    @State private var renameSaveStateTarget: SaveState?
+    @State private var deleteSaveStateTarget: SaveState?
+
     init() {
         let fetchRequest = SaveState.fetchRequest()
         fetchRequest.fetchLimit = 10
@@ -25,12 +28,15 @@ struct KeepPlayingSection: View {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 16.0) {
                             ForEach(keepPlaying) { saveState in
-                                SaveStateItem2(
+                                SaveStateItem(
                                     saveState,
                                     title: .game,
                                     formatter: self.saveStateDateFormatter,
+                                    renameTarget: $renameSaveStateTarget,
+                                    deleteTarget: $deleteSaveStateTarget,
                                     action: self.saveStateSelected
                                 )
+                                .frame(height: 226.0)
                             }
                         }
                         .padding([.horizontal, .bottom])
@@ -54,6 +60,10 @@ struct KeepPlayingSection: View {
                 Text("Keep Playing")
                     .sectionHeaderStyle()
                     .padding([.horizontal, .top])
+            }
+            .renameItem("Rename Save State", item: $renameSaveStateTarget)
+            .deleteItem("Delete Save State", item: $deleteSaveStateTarget) { saveState in
+                Text("Are you sure you want to delete \(saveState.name ?? "this save state")? This can't be undone.")
             }
         }
     }

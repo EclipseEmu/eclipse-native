@@ -66,7 +66,9 @@ struct TagDetailView: View {
             }
         }
         .navigationTitle(mode.title)
+        #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .toolbar {
             if mode == .create {
                 ToolbarItem(placement: .cancellationAction) {

@@ -28,7 +28,7 @@ extension Game {
         sha1: String,
         romExtension: String?,
         saveExtension: String?,
-        boxart: ImageAsset?
+        cover: ImageAsset?
     ) {
         self.init(entity: Self.entity(), insertInto: nil)
 
@@ -39,7 +39,7 @@ extension Game {
         self.sha1 = sha1
         self.romExtension = romExtension
         self.saveExtension = saveExtension
-        self.boxart = boxart
+        self.cover = cover
     }
 
     override public func didSave() {

@@ -39,7 +39,6 @@ final actor GameCoreCoordinator {
     private nonisolated(unsafe) let core: UnsafeMutablePointer<GameCore>
 
     let inputs: GameInputCoordinator
-    // FIXME: there should be some sort of notification to indicate changes in state
     private(set) var state: GameCoreCoordinatorState = .stopped
     let audio: GameAudio
 
@@ -76,7 +75,12 @@ final actor GameCoreCoordinator {
         }
     }
 
-    init(coreInfo: GameCoreInfo, system: GameSystem, reorderControls: @escaping GameInputCoordinator.ReorderCallback) async throws {
+    init(
+        coreInfo: CoreInfo,
+        game: ObjectBox<Game>,
+        system: GameSystem,
+        bindingsManager: ControlBindingsManager
+    ) async throws {
         let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.corecoordinator")
         self.executor = BlockingSerialExecutor(queue: queue)
         self.unownedExecutor = executor.asUnownedSerialExecutor()
@@ -151,9 +155,11 @@ final actor GameCoreCoordinator {
             }
 
             audio = try GameAudio(format: audioFormat)
-            inputs = await .init(
+            inputs = await GameInputCoordinator(
                 maxPlayers: core.pointee.getMaxPlayers(core.pointee.data),
-                reorder: reorderControls
+                game: game,
+                system: system,
+                bindingsManager: bindingsManager
             )
 
             try Task.checkCancellation()
@@ -238,6 +244,7 @@ final actor GameCoreCoordinator {
         return core.pointee.saveState(core.pointee.data, url.path)
     }
 
+    @discardableResult
     func loadState(for url: URL) -> Bool {
         return core.pointee.loadState(core.pointee.data, url.path)
     }
@@ -246,9 +253,9 @@ final actor GameCoreCoordinator {
 
     /// - Parameter cheats: A list of cheats to add
     /// - Returns: A set of the cheats that failed to set.
-    func setCheats(cheats: [EmulationData.OwnedCheat]) -> Set<EmulationData.OwnedCheat>? {
+    func setCheats(cheats: [OwnedCheat]) -> Set<OwnedCheat>? {
         core.pointee.clearCheats(core.pointee.data)
-        var response: Set<EmulationData.OwnedCheat>?
+        var response: Set<OwnedCheat>?
         for cheat in cheats {
             guard let type = cheat.type, let code = cheat.code else { continue }
             let wasSuccessful = core.pointee.setCheat(core.pointee.data, type, code, cheat.enabled)

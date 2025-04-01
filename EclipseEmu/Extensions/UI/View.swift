@@ -15,22 +15,21 @@ extension View {
         self.frame(minWidth: .zero, maxWidth: .infinity)
     }
 
+    @ViewBuilder
     func backgroundSecondary() -> some View {
-        self.modify {
 #if canImport(UIKit)
             if #available(iOS 17.0, macOS 14.0, *) {
-                $0.background(.background.secondary)
+                self.background(.background.secondary)
             } else {
-                $0.background(Color(uiColor: .secondarySystemBackground))
+                self.background(Color(uiColor: .secondarySystemBackground))
             }
 #else
             if #available(macOS 14.0, *) {
-                $0.background(Color(nsColor: .tertiarySystemFill))
+                self.background(Color(nsColor: .tertiarySystemFill))
             } else {
-                $0.background(Color(nsColor: .gridColor))
+                self.background(Color(nsColor: .gridColor))
             }
 #endif
-        }
     }
 
     @available(*, deprecated, renamed: "background", message: "")

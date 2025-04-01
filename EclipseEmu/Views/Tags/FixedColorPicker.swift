@@ -31,7 +31,7 @@ struct FixedColorPicker: View {
     }
 }
 
-@available(iOS 18.0, *)
+@available(iOS 18.0, macOS 14.0, *)
 #Preview {
     @Previewable @State var tagColor: TagColor = .blue
     FixedColorPicker(selection: $tagColor)

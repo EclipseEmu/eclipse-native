@@ -64,9 +64,6 @@ final actor GameAudio {
         //            engine.detach(sourceNode)
         //        }
         //        engine.detach(playback)
-        //        if let hardwareListener {
-        //            NotificationCenter.default.removeObserver(hardwareListener)
-        //        }
     }
 
     func start() {
@@ -81,6 +78,7 @@ final actor GameAudio {
             self.engine.detach(sourceNode)
             self.sourceNode = nil
         }
+        self.hardwareListener?.cancel()
     }
 
     func resume() {

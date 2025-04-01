@@ -22,6 +22,7 @@ struct TagsView: View {
                 ForEach(tags) { tag in
                     NavigationLink(to: .editTag(tag)) {
                         Label(tag.name ?? "Tag", systemImage: "tag")
+                            .tint(tag.color.color)
                     }
                 }
                 .onDelete(perform: delete)
@@ -33,9 +34,11 @@ struct TagsView: View {
         mainContent
             .navigationTitle("Tags")
             .toolbar {
+                #if !os(macOS)
                 ToolbarItem {
                     EditButton()
                 }
+                #endif
                 ToolbarItem {
                     Button {
                         self.isCreateDialogPresented = true

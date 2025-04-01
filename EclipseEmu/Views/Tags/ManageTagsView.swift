@@ -45,6 +45,7 @@ private struct ManyManageTagsItemView: View {
     var body: some View {
         Toggle(sources: $sources, isOn: \.isSelected) {
             Label(tag.name ?? "Tag", systemImage: "tag")
+                .tint(tag.color.color)
         }
     }
 }
@@ -72,6 +73,7 @@ private struct OneManageTagsItemView: View {
     var body: some View {
         Toggle(isOn: $isOn) {
             Label(tag.name ?? "Tag", systemImage: "tag")
+                .tint(tag.color.color)
         }
     }
 }
@@ -119,7 +121,9 @@ struct ManageTagsView: View {
             }
         }
         .navigationTitle("Manage Tags")
+        #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .sheet(isPresented: $isNewTagViewOpen) {
             NavigationStack {
                 TagDetailView(mode: .create)

@@ -7,7 +7,7 @@ struct GameInputPlayer {}
 
 private struct GamepadInfo {
     var playerIndex: Int
-    var bindings: [GamepadBinding]
+    let bindings: InputSourceControllerDescriptor.Bindings
 }
 
 @MainActor
@@ -22,19 +22,23 @@ final class GameInputCoordinator {
     nonisolated let states: [ManagedAtomic<GameInput.RawValue>]
     var players: [GameInputPlayer] = []
 
-    private var keyboardBindings: KeyboardBindings!
-    private var gamepadBindings: [ObjectIdentifier: GamepadInfo] = [:]
+    private var keyboardBindings: InputSourceKeyboardDescriptor.Bindings!
+    private var gamepadBindings: [GCController.ID: GamepadInfo] = [:]
 
-    private let reorder: ReorderCallback
+    private let game: ObjectBox<Game>
+    private let system: GameSystem
+    private let bindingsManager: ControlBindingsManager
 
     private var controllerConnectObserver: Task<Void, Never>!
     private var controllerDisconnectObserver: Task<Void, Never>!
     private var keyboardConnectObserver: Task<Void, Never>!
     private var keyboardDisconnectObserver: Task<Void, Never>!
 
-    init(maxPlayers: UInt8, reorder: @escaping ReorderCallback) {
+    init(maxPlayers: UInt8, game: ObjectBox<Game>, system: GameSystem, bindingsManager: ControlBindingsManager) {
         self.maxPlayerCount = maxPlayers
-        self.reorder = reorder
+        self.bindingsManager = bindingsManager
+        self.game = game
+        self.system = system
 
         states = .init(repeating: .init(0), count: Int(maxPlayerCount))
 
@@ -44,8 +48,14 @@ final class GameInputCoordinator {
         keyboardDisconnectObserver = Task(operation: keyboardDidDisconnect)
     }
 
-    func start() {
+    func start() async {
         self.running.store(true, ordering: .relaxed)
+        for controller in GCController.controllers() {
+            await registerController(device: controller)
+        }
+        if let keyboard = GCKeyboard.coalesced {
+            await registerKeyboard(device: keyboard)
+        }
     }
 
     func stop() {
@@ -78,9 +88,9 @@ final class GameInputCoordinator {
 
         var state: UInt32 = 0
         for binding in info.bindings {
-            switch binding.kind {
+            switch binding.input {
             case .button(let input):
-                state |= input.rawValue * UInt32(gamepad.buttons[binding.control]?.isPressed ?? false)
+                state |= input.rawValue * UInt32(gamepad.buttons[binding.key]?.isPressed ?? false)
             case .directionPad(up: let up, down: let down, left: let left, right: let right):
                 let dpad = gamepad.dpad
                 state |= (up.rawValue * UInt32(dpad.up.isPressed)) |
@@ -88,7 +98,7 @@ final class GameInputCoordinator {
                 (left.rawValue * UInt32(dpad.left.isPressed)) |
                 (right.rawValue * UInt32(dpad.right.isPressed))
             case .joystick(up: let up, down: let down, left: let left, right: let right):
-                guard let dpad = gamepad.dpads[binding.control] else { return }
+                guard let dpad = gamepad.dpads[binding.key] else { return }
                 // FIXME: make the deadzone configurable
                 state |= (up.rawValue * UInt32(dpad.yAxis.value > 0.25)) |
                 (down.rawValue * UInt32(dpad.yAxis.value < -0.25)) |
@@ -111,6 +121,35 @@ final class GameInputCoordinator {
     }
 #endif
 
+    nonisolated func registerController(device: GCController) async {
+        guard let gamepad = device.extendedGamepad else { return }
+
+        let id = device.id
+        let descriptor = device.inputSourceDescriptor
+        await MainActor.run {
+            let bindings = bindingsManager.load(for: descriptor, game: game, system: system)
+            self.gamepadBindings[id] = .init(playerIndex: 0, bindings: bindings)
+        }
+
+        gamepad.valueChangedHandler = self.handleGamepadInput
+    }
+
+    nonisolated func registerKeyboard(device: GCKeyboard) async {
+        guard let keyboard = device.keyboardInput else { return }
+
+        await MainActor.run {
+            if self.keyboardBindings == nil {
+                self.keyboardBindings = bindingsManager.load(
+                    for: GCKeyboard.inputSourceDescriptor,
+                    game: game,
+                    system: system
+                )
+            }
+        }
+
+        keyboard.keyChangedHandler = handleKeyboardInput
+    }
+
     // MARK: Connection Change Listeners
 
     nonisolated func controllerDidConnect() async {
@@ -118,17 +157,20 @@ final class GameInputCoordinator {
         for await notification in stream {
             guard
                 !Task.isCancelled,
-                let device = notification.object as? GCController,
-                let gamepad = device.extendedGamepad
+                let device = notification.object as? GCController
             else { continue }
+            await registerController(device: device)
+        }
+    }
 
-            let id = device.id
-            let bindings = await self.loadGamepadBindings(for: id)
-            await MainActor.run {
-                self.gamepadBindings[id] = .init(playerIndex: 0, bindings: bindings)
-            }
-
-            gamepad.valueChangedHandler = self.handleGamepadInput
+    nonisolated func keyboardDidConnect() async {
+        let stream = NotificationCenter.default.notifications(named: .GCKeyboardDidConnect)
+        for await notification in stream {
+            guard
+                !Task.isCancelled,
+                let device = notification.object as? GCKeyboard
+            else { continue }
+            await registerKeyboard(device: device)
         }
     }
 
@@ -145,25 +187,6 @@ final class GameInputCoordinator {
         }
     }
 
-    nonisolated func keyboardDidConnect() async {
-        let stream = NotificationCenter.default.notifications(named: .GCKeyboardDidConnect)
-        for await notification in stream {
-            guard
-                !Task.isCancelled,
-                let device = notification.object as? GCKeyboard,
-                let keyboardInput = device.keyboardInput
-            else { continue }
-
-            await Task { @MainActor in
-                if self.keyboardBindings == nil {
-                    self.keyboardBindings = await self.loadKeyboardBindings()
-                }
-            }.value
-
-            keyboardInput.keyChangedHandler = handleKeyboardInput
-        }
-    }
-
     nonisolated func keyboardDidDisconnect() async {
         let stream = NotificationCenter.default.notifications(named: .GCKeyboardDidDisconnect)
         for await notification in stream {
@@ -175,43 +198,5 @@ final class GameInputCoordinator {
 
             keyboardInput.keyChangedHandler = nil
         }
-    }
-}
-
-extension GameInputCoordinator {
-    func loadGamepadBindings(for _: GCController.ID) async -> [GamepadBinding] {
-        // FIXME: do proper binding loading
-        return [
-            .init(control: GCInputButtonA, kind: .button(.faceButtonRight)),
-            .init(control: GCInputButtonB, kind: .button(.faceButtonDown)),
-            .init(control: GCInputButtonMenu, kind: .button(.startButton)),
-            .init(control: GCInputButtonOptions, kind: .button(.selectButton)),
-            .init(control: GCInputLeftShoulder, kind: .button(.shoulderLeft)),
-            .init(control: GCInputRightShoulder, kind: .button(.shoulderRight)),
-            .init(
-                control: GCInputDirectionPad,
-                kind: .directionPad(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-            ),
-            .init(
-                control: GCInputLeftThumbstick,
-                kind: .joystick(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-            )
-        ]
-    }
-
-    func loadKeyboardBindings() async -> KeyboardBindings {
-        // FIXME: do proper binding loading
-        return [
-            .keyZ: .faceButtonDown,
-            .keyX: .faceButtonRight,
-            .keyA: .shoulderLeft,
-            .keyS: .shoulderRight,
-            .upArrow: .dpadUp,
-            .downArrow: .dpadDown,
-            .leftArrow: .dpadLeft,
-            .rightArrow: .dpadRight,
-            .returnOrEnter: .startButton,
-            .rightShift: .selectButton
-        ]
     }
 }

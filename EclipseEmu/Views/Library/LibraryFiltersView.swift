@@ -4,13 +4,19 @@ import EclipseKit
 
 final class LibraryFiltersViewModel: ObservableObject {
     @Published var isPresented: Bool = false
-    @Published var system: GameSystem = .unknown
+    @Published var systems: Set<GameSystem> = Set(GameSystem.concreteCases)
     @Published var tags: Set<Tag> = []
 
+    var areSystemsFiltered: Bool {
+        systems.count != GameSystem.concreteCases.count
+    }
+
     func insertPredicates(_ array: inout [NSPredicate]) {
-        if system != .unknown {
-            array.append(NSPredicate(format: "rawSystem = %d", system.rawValue))
-        }
+        array.append(
+            NSCompoundPredicate(orPredicateWithSubpredicates: systems.map {
+                NSPredicate(format: "rawSystem = %d", $0.rawValue)
+            })
+        )
 
         for tag in tags {
             array.append(NSPredicate(format: "tags CONTAINS %@", tag))
@@ -25,32 +31,20 @@ private extension Binding where Value == Bool {
             viewModel.tags.contains(value)
         }, set: { newValue in
             withAnimation(.easeInOut(duration: 0.15)) {
-                if newValue {
-                    viewModel.tags.insert(value)
-                } else {
-                    viewModel.tags.remove(value)
-                }
+                viewModel.tags.toggle(value, if: newValue)
             }
         })
     }
-}
 
-private struct MultiSelectToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        Button {
-            configuration.isOn.toggle()
-        } label: {
-            HStack {
-                configuration.label
-                Spacer()
-                // FIXME: Checkmark doesn't line up with the system one for the normal Picker.
-                Image(systemName: "checkmark")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.tint)
-                    .opacity(configuration.isOn ? 1.0 : 0.0)
-                    .scaleEffect(configuration.isOn ? 1.0 : 0.9)
+    @MainActor
+    init(_ value: GameSystem, in viewModel: LibraryFiltersViewModel) {
+        self = .init(get: {
+            viewModel.systems.contains(value)
+        }, set: { newValue in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                viewModel.systems.toggle(value, if: newValue)
             }
-        }
+        })
     }
 }
 
@@ -65,13 +59,13 @@ struct LibraryFiltersView: View {
     var body: some View {
         Form {
             Section {
-                Picker("System", selection: $viewModel.system) {
-                    ForEach(GameSystem.allCases, id: \.rawValue) { system in
-                        Text(system == .unknown ? "Any" : system.string).tag(system)
+                ForEach(GameSystem.concreteCases, id: \.rawValue) { system in
+                    Toggle(isOn: .init(system, in: viewModel)) {
+                        Text(system.string)
+                            .foregroundStyle(Color.primary)
                     }
+                    .toggleStyleCheckbox()
                 }
-                .pickerStyle(.inline)
-                .labelsHidden()
             } header: {
                 Text("System")
             }
@@ -86,14 +80,19 @@ struct LibraryFiltersView: View {
                             Image(systemName: "tag")
                         }
                     }
-                    .toggleStyle(MultiSelectToggleStyle())
+                    .toggleStyleCheckbox()
                 }
             } header: {
                 Text("Tags")
             }
+            .emptyState(tags.isEmpty) {
+                EmptyView()
+            }
         }
         .navigationTitle("Filters")
+#if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
+#endif
         .toolbar {
             ToolbarItem {
                 Button("Done") {

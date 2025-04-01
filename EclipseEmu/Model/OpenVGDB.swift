@@ -138,11 +138,6 @@ final actor OpenVGDB {
     }
 
     func search(query: String, system: GameSystem) async throws(OpenVGDBError) -> [OpenVGDBItem] {
-        // FIXME: The API uses FTS5, which I am pretty confident the SQLite3 library on iOS/macOS does not come with.
-        //  Ideally we'd use FTS in some form, but will probably need to figure out something like FTS3/4,
-        //  and if a device doesn't support it then just disable searching for boxart.
-        //  See: https://github.com/EclipseEmu/api/blob/main/src/endpoints/boxart.rs
-
         let queryString = query + "*"
 
         let statementInt = UInt(bitPattern: searchStatement.value)
@@ -173,8 +168,8 @@ final actor OpenVGDB {
             let regionCStr = sqlite3_column_text(statement, 2)
         else { return nil }
 
-        let coverUrl: URL? = if let boxartCStr = sqlite3_column_text(statement, 3) {
-            URL(string: String(cString: boxartCStr))
+        let coverUrl: URL? = if let cString = sqlite3_column_text(statement, 3) {
+            URL(string: String(cString: cString))
         } else {
             nil
         }

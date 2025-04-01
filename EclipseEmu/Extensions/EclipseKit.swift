@@ -2,6 +2,8 @@ import AVFoundation
 import EclipseKit
 import Metal
 
+// MARK: System
+
 extension GameSystem {
     var string: String {
         return switch self {
@@ -41,6 +43,7 @@ extension GameSystem {
 extension GameSystem: Codable {}
 
 extension GameSystem: @retroactive CaseIterable {
+    public static let concreteCases: [GameSystem] = [.gb, .gbc, .gba, .nes, .snes]
     public static let allCases: [GameSystem] = [.unknown, .gb, .gbc, .gba, .nes, .snes]
 }
 
@@ -92,29 +95,18 @@ extension GameCoreCheatCharacterSet {
     }
 }
 
-extension GameCoreCheatFormat: @retroactive Equatable, @retroactive Hashable {
-    public static func == (lhs: GameCoreCheatFormat, rhs: GameCoreCheatFormat) -> Bool {
-        return lhs.id == rhs.id
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-    }
-}
-
-extension GameCoreCheatFormat {
-    /// Normalize the code for storage or loading into the core
-    func normalizeCode(string: String) -> String {
-        let characterSet = self.characterSet.swiftCharacterSet.union(.onlyNewlineFeed)
-        return string.normalize(with: characterSet)
-    }
-
-    func makeFormatter() -> CheatFormatter {
-        let characterSet = self.characterSet.swiftCharacterSet
-        return .init(format: format, characterSet: characterSet)
-    }
-}
-
-// MARK: Conformances
+// MARK: Core
 
 extension GameCoreInfo: @retroactive @unchecked Sendable {}
+
+extension GameCoreInfo: @retroactive Equatable {
+    public static func == (lhs: GameCoreInfo, rhs: GameCoreInfo) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+extension GameCoreInfo: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}

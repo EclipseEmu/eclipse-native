@@ -52,7 +52,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		922F00A12BC0C26600B419D7 /* EclipseEmu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EclipseEmu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		922F00A12BC0C26600B419D7 /* Eclipse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eclipse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuTests.swift; sourceTree = "<group>"; };
 		922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -132,7 +132,7 @@
 		922F00A22BC0C26600B419D7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				922F00A12BC0C26600B419D7 /* EclipseEmu.app */,
+				922F00A12BC0C26600B419D7 /* Eclipse.app */,
 				922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */,
 				922F00C12BC0C26700B419D7 /* EclipseEmuUITests.xctest */,
 			);
@@ -185,7 +185,7 @@
 				92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
-			productReference = 922F00A12BC0C26600B419D7 /* EclipseEmu.app */;
+			productReference = 922F00A12BC0C26600B419D7 /* Eclipse.app */;
 			productType = "com.apple.product-type.application";
 		};
 		922F00B62BC0C26700B419D7 /* EclipseEmuTests */ = {
@@ -472,7 +472,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EclipseEmu/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
+				INFOPLIST_KEY_GCSupportsControllerUserInteraction = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -486,11 +488,11 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Eclipse;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -521,7 +523,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EclipseEmu/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Eclipse;
+				INFOPLIST_KEY_GCSupportsControllerUserInteraction = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -535,11 +539,11 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Eclipse;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = YES;

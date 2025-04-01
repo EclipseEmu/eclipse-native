@@ -23,6 +23,7 @@ struct DualLabeledImage<Content: View>: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         }
     }
 }

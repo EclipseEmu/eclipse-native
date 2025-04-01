@@ -6,4 +6,6 @@ extension UTType {
     static let romGBA = UTType(exportedAs: "dev.magnetar.eclipseemu.rom.gba")
     static let romNES = UTType(exportedAs: "dev.magnetar.eclipseemu.rom.nes")
     static let romSNES = UTType(exportedAs: "dev.magnetar.eclipseemu.rom.snes")
+
+    static let allRomFileTypes: [UTType] = [.romGB, .romGBC, .romGBA, .romNES, .romSNES]
 }
