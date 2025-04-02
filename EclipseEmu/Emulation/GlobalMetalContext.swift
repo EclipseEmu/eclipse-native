@@ -1,6 +1,6 @@
 import MetalKit
 
-enum GlobalGraphicsContextError: Error {
+enum GlobalMetalContextError: Error {
     case getDevice
     case makeCommandQueue
     case noShaderSource
@@ -11,7 +11,7 @@ struct GlobalMetalContext {
     let device: any MTLDevice
     nonisolated let commandQueue: UnsafeSendable<any MTLCommandQueue>
 
-    init() throws(GlobalGraphicsContextError) {
+    init() throws(GlobalMetalContextError) {
         guard let device = MTLCreateSystemDefaultDevice() else {
             throw .getDevice
         }

@@ -1,6 +1,8 @@
 import SwiftUI
 import EclipseKit
 
+private typealias OptionalCoreInfo = Optional<CoreInfo>
+
 struct SystemSettingsView: View {
     @EnvironmentObject private var coreRegistry: CoreRegistry
 
@@ -24,6 +26,8 @@ struct SystemSettingsView: View {
                     ForEach(cores, id: \.id) { core in
                         Text(core.name).tag(core)
                     }
+                    Divider()
+                    Text("None").tag(OptionalCoreInfo.none)
                 }
 
                 if let selectedCore {

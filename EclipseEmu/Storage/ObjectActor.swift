@@ -221,50 +221,6 @@ final actor ObjectActor {
         return failed
     }
 
-    func createGame(name: String, system: GameSystem, romPath: URL, romExtension: String?) async throws(GameError) {
-        guard romPath.startAccessingSecurityScopedResource() else {
-            throw GameError.failedToAccessSecurityScopedResource
-        }
-
-        defer { romPath.stopAccessingSecurityScopedResource() }
-
-        let sha1: String
-        do {
-            sha1 = try await FileSystem.shared.sha1(for: romPath)
-        } catch {
-            throw .files(error)
-        }
-        let info: OpenVGDBItem? = if let openvgdb = try? OpenVGDB() {
-            (try? await openvgdb.get(sha1: sha1, system: system))
-        } else {
-            nil
-        }
-
-        let game = Game(
-            uuid: UUID(),
-            name: info?.name ?? name,
-            system: system,
-            sha1: sha1,
-            romExtension: romExtension,
-            saveExtension: nil,
-            cover: nil
-        )
-
-        objectContext.insert(game)
-
-        if let coverUrl = info?.cover {
-            game.cover = try? await self.createImage(remote: coverUrl)
-        }
-
-        try? await FileSystem.shared.copy(from: .other(romPath), to: game.romPath)
-
-        do {
-            try objectContext.saveIfNeeded()
-        } catch {
-            throw .persistence(error)
-        }
-    }
-
     func canDeleteRom(sha1: String) -> Bool {
         let request = Game.fetchRequest()
         request.fetchLimit = 2

@@ -1,6 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+@MainActor
 struct FileImportType: Sendable {
     let types: [UTType]
     let allowsMultipleSelection: Bool
@@ -16,11 +17,11 @@ struct FileImportType: Sendable {
         multiple: Bool = false,
         completion: @Sendable @escaping (Result<[URL], any Error>) -> Void
     ) -> Self {
-        .init(
-            types: UTType.allRomFileTypes,
-            allowsMultipleSelection: multiple,
-            completion: completion
-        )
+        .init(types: UTType.allRomFileTypes, allowsMultipleSelection: multiple, completion: completion)
+    }
+
+    static func saves(completion: @Sendable @escaping (Result<[URL], any Error>) -> Void) -> Self {
+        .init(types: [.save], allowsMultipleSelection: false, completion: completion)
     }
 }
 

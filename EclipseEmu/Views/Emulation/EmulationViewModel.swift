@@ -58,7 +58,7 @@ final class EmulationViewModel: ObservableObject {
         savePath: FileSystemPath,
         cheats: [OwnedCheat],
         persistence: Persistence
-    ) async throws {
+    ) async throws(GameCoreCoordinatorError) {
         self.game = game
         self.persistence = persistence
         self.core = try await GameCoreCoordinator(

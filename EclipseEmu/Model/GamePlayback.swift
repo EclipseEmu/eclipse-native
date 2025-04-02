@@ -5,8 +5,8 @@ import SwiftUI
 import EclipseKit
 
 enum GamePlaybackState {
-    case playing(EmulationViewModel)
     case none
+    case playing(EmulationViewModel)
 }
 
 enum GamePlaybackMissingFile: Equatable {
@@ -25,6 +25,8 @@ enum GamePlaybackError: LocalizedError {
     case missingGame
     case missingFile(GamePlaybackMissingFile)
 
+    case core(GameCoreCoordinatorError)
+
     var errorDescription: String? {
         switch self {
         case .badPermissions: "Missing Permissions"
@@ -42,6 +44,7 @@ enum GamePlaybackError: LocalizedError {
             case .rom: "ROM is Missing"
             case .saveState: "Save State is Missing"
             }
+        case .core(let error): error.errorDescription
         case .unknown(let error):
             if let localizedError = error as? LocalizedError {
                 localizedError.errorDescription
@@ -91,7 +94,7 @@ final class GamePlayback: ObservableObject {
         self.coreRegistry = coreRegistry
     }
 
-    func play(game: Game, persistence: Persistence) async throws {
+    func play(game: Game, persistence: Persistence) async throws(GamePlaybackError) {
         guard let core = coreRegistry.get(for: game) else {
             throw GamePlaybackError.missingCore
         }
@@ -100,20 +103,23 @@ final class GamePlayback: ObservableObject {
         }
 
         let cheats = (game.cheats as? Set<Cheat>) ?? []
-        let viewModel: EmulationViewModel = try await EmulationViewModel(
-            coreInfo: core,
-            game: game,
-            saveState: nil,
-            romPath: game.romPath,
-            savePath: game.savePath,
-            cheats: cheats.map(OwnedCheat.init),
-            persistence: persistence
-        )
-
-        self.playbackState = .playing(viewModel)
+        do {
+            let viewModel: EmulationViewModel = try await EmulationViewModel(
+                coreInfo: core,
+                game: game,
+                saveState: nil,
+                romPath: game.romPath,
+                savePath: game.savePath,
+                cheats: cheats.map(OwnedCheat.init),
+                persistence: persistence
+            )
+            self.playbackState = .playing(viewModel)
+        } catch {
+            throw .core(error)
+        }
     }
 
-    func play(state: SaveState, persistence: Persistence) async throws {
+    func play(state: SaveState, persistence: Persistence) async throws(GamePlaybackError) {
         guard let game = state.game else { throw GamePlaybackError.missingGame }
         guard let core = coreRegistry.get(for: game) else {
             throw GamePlaybackError.missingCore
@@ -127,17 +133,20 @@ final class GamePlayback: ObservableObject {
         }
 
         let cheats = (game.cheats as? Set<Cheat>) ?? []
-        let viewModel: EmulationViewModel = try await EmulationViewModel(
-            coreInfo: core,
-            game: game,
-            saveState: state,
-            romPath: game.romPath,
-            savePath: game.savePath,
-            cheats: cheats.map(OwnedCheat.init),
-            persistence: persistence
-        )
-
-        self.playbackState = .playing(viewModel)
+        do {
+            let viewModel: EmulationViewModel = try await EmulationViewModel(
+                coreInfo: core,
+                game: game,
+                saveState: state,
+                romPath: game.romPath,
+                savePath: game.savePath,
+                cheats: cheats.map(OwnedCheat.init),
+                persistence: persistence
+            )
+            self.playbackState = .playing(viewModel)
+        } catch {
+            throw .core(error)
+        }
     }
 
     public func closeGame() {

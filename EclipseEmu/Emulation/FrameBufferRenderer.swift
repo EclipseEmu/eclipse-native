@@ -29,7 +29,7 @@ final actor FrameBufferRenderer {
     nonisolated let bytesPerRow: Int
     nonisolated let bufferSize: Int
 
-    private nonisolated(unsafe) let buffer: UnsafeMutableRawPointer
+    private nonisolated(unsafe) let buffer: UnsafeMutablePointer<UInt8>
     private let isBufferOwned: Bool
 
     private let textureBuffer: any MTLBuffer
@@ -108,9 +108,9 @@ final actor FrameBufferRenderer {
 
         self.isBufferOwned = pointer == nil
         self.buffer = if let pointer {
-            UnsafeMutableRawPointer(mutating: pointer.value)
+            UnsafeMutableRawPointer(mutating: pointer.value).assumingMemoryBound(to: UInt8.self)
         } else {
-            UnsafeMutableRawPointer.allocate(byteCount: bufferSize, alignment: 1)
+            UnsafeMutableRawPointer.allocate(byteCount: bufferSize, alignment: 1).assumingMemoryBound(to: UInt8.self)
         }
     }
 
@@ -121,7 +121,7 @@ final actor FrameBufferRenderer {
     }
 
     @inlinable
-    func getBufferPointer() -> UnsafeSendable<UnsafeMutableRawPointer> {
+    func getBufferPointer() -> UnsafeSendable<UnsafeMutablePointer<UInt8>> {
         .init(buffer)
     }
 

@@ -303,7 +303,7 @@ struct LibraryView: View {
                 // FIXME: Present failed games
                 print(failedGames)
             } catch {
-                // FIXME: Handle errors
+                // FIXME: Surface error
                 print(error)
             }
         }

@@ -63,7 +63,7 @@ struct EclipseEmuApp: App {
             }
         }
 
-        #if os(macOS)
+#if os(macOS)
         SwiftUI.Settings {
             NavigationStack {
                 SettingsView()
@@ -76,12 +76,6 @@ struct EclipseEmuApp: App {
             .environmentObject(playback)
         }
 #endif
-    }
-
-    private func playSaveState(_ saveState: SaveState) {
-        Task {
-            try await playback.play(state: saveState, persistence: persistence)
-        }
     }
 
     @ViewBuilder
@@ -104,8 +98,7 @@ struct EclipseEmuApp: App {
         case .game(let game):
             GameView(game: game)
         case .saveStates(let game):
-            SaveStatesView(game: game, action: playSaveState)
-                .navigationTitle("Save States") // NOTE:
+            GameSaveStatesView(game: game)
         case .cheats(let game):
             CheatsView(game: game, coreRegistry: coreRegistry)
         }

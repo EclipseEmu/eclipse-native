@@ -24,7 +24,7 @@ struct RenameItemViewModifier<T: RenameableObject>: ViewModifier {
             do {
                 try await persistence.objects.rename(.init(item), to: newName)
             } catch {
-                // FIXME: handle error
+                // FIXME: Surface error
                 print(error)
             }
         }

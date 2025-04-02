@@ -121,7 +121,7 @@ struct CoverPickerDatabaseView: View {
                 try await persistence.objects.replaceCoverArt(game: box, fromRemote: cover)
                 dismiss()
             } catch {
-                // FIXME: error message
+                // FIXME: Surface error
                 print(error)
             }
         }
@@ -143,7 +143,6 @@ struct CoverPickerDatabaseView: View {
                 }
 
                 let results = try await self.db!.search(query: query, system: system)
-                print(query, results)
                 self.state = .results(results)
             } catch {
                 self.state = .failure(error as! OpenVGDBError)

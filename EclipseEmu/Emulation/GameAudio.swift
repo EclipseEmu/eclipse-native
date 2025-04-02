@@ -2,12 +2,6 @@ import AVFoundation
 import Foundation
 import OSLog
 
-enum GameAudioFailure: Error {
-    case getAudioFormat
-    case unknownSampleFormat
-    case initializeRingBuffer
-}
-
 extension AVAudioFormat: @unchecked @retroactive Sendable {}
 
 final actor GameAudio {
@@ -31,17 +25,11 @@ final actor GameAudio {
     private var isUsingDefaultOutput = true
     #endif
 
-    func setVolume(to newValue: Float) {
-        self.engine.mainMixerNode.outputVolume = newValue
-    }
-
-    init(format: AVAudioFormat) throws(GameAudioFailure) {
+    init(format: AVAudioFormat) throws(GameCoreCoordinatorError) {
         let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.audio")
         self.executor = BlockingSerialExecutor(queue: queue)
         self.unownedExecutor = executor.asUnownedSerialExecutor()
 
-        let bytesPerSample = format.commonFormat.bytesPerSample
-        guard bytesPerSample != -1 else { throw .unknownSampleFormat }
         self.inputFormat = format
         self.ringBuffer = RingBuffer(capacity: Int(format.sampleRate * Double(format.channelCount * 2)))
 
@@ -93,6 +81,10 @@ final actor GameAudio {
     func pause() {
         self.engine.pause()
         self.running = false
+    }
+
+    func setVolume(to newValue: Float) {
+        self.engine.mainMixerNode.outputVolume = newValue
     }
 
     func setRate(rate: Float) {

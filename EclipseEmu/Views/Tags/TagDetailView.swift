@@ -95,7 +95,7 @@ struct TagDetailView: View {
                     try await persistence.objects.update(tag: box, name: newName, color: newColor)
                     dismissAction()
                 } catch {
-                    // FIXME: handle error
+                    // FIXME: Surface error
                     print(error)
                 }
             }
@@ -105,7 +105,7 @@ struct TagDetailView: View {
                     try await persistence.objects.createTag(name: newName, color: newColor)
                     dismissAction()
                 } catch {
-                    // FIXME: handle error
+                    // FIXME: Surface error
                     print(error)
                 }
             }

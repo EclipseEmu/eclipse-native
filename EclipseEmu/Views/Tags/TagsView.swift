@@ -61,7 +61,7 @@ struct TagsView: View {
             do {
                 try await persistence.objects.deleteMany(items)
             } catch {
-                // FIXME: handle error
+                // FIXME: Surface error
             }
         }
     }

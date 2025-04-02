@@ -1,4 +1,29 @@
 import SwiftUI
+import UniformTypeIdentifiers
+import OSLog
+
+private struct EmptyError: Error {}
+
+private struct SaveFileDocument: FileDocument {
+    static let readableContentTypes = [UTType.save]
+    let data: URL
+    let fileName: String?
+
+    init(url: URL, fileName: String) {
+        self.data = url
+        self.fileName = fileName
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        throw EmptyError()
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        let wrapper = try FileWrapper(url: data)
+        wrapper.preferredFilename = self.fileName
+        return wrapper
+    }
+}
 
 private struct HeaderBackground: View {
     private let coordinateSpace: CoordinateSpace
@@ -46,6 +71,11 @@ struct GameView: View {
     @State private var deleteSaveStateTarget: SaveState?
     @State private var coverPickerMethod: CoverPickerMethod?
     @State private var isManageTagsOpen: Bool = false
+    @State private var fileImportRequest: FileImportType?
+
+    @State private var exportedSaveFile: SaveFileDocument?
+    @State private var isDeleteSavePresented: Bool = false
+
 
     init(game: Game, coverColor: Color = .clear) {
         self.game = game
@@ -113,7 +143,7 @@ struct GameView: View {
                         formatter: dateFormatter,
                         renameTarget: $renameSaveStateTarget,
                         deleteTarget: $deleteSaveStateTarget,
-                        action: self.saveStateSelected(saveState:)
+                        action: saveStateSelected
                     )
                     .frame(height: 226.0)
                 }
@@ -215,7 +245,7 @@ struct GameView: View {
                         Label("Export Save", systemImage: "square.and.arrow.up")
                     }
                     Divider()
-                    Button(role: .destructive, action: deleteSave) {
+                    ToggleButton(role: .destructive, value: $isDeleteSavePresented) {
                         Label("Delete Save", systemImage: "trash")
                     }
                 } label: {
@@ -245,7 +275,22 @@ struct GameView: View {
         .deleteItem("Delete Save State", item: $deleteSaveStateTarget) { saveState in
             Text("Are you sure you want to delete \(saveState.name ?? "this save state")? This can't be undone.")
         }
+        .deleteItem(
+            "Delete Save",
+            isPresented: $isDeleteSavePresented,
+            perform: deleteSave
+        ) {
+            Text("Are you sure you want to delete this game's save file? This can't be undone.")
+        }
         .coverPicker(presenting: $coverPickerMethod)
+        .multiFileImporter($fileImportRequest)
+        .fileExporter(
+            isPresented: .isNotNullish($exportedSaveFile),
+            document: exportedSaveFile,
+            contentType: .save,
+            defaultFilename: exportedSaveFile?.fileName,
+            onCompletion: saveFileExported
+        )
     }
 
     private func delete() {
@@ -260,28 +305,12 @@ struct GameView: View {
         self.isManageTagsOpen = true
     }
 
-    private func importSave() {
-        // FIXME: todo
-    }
-
-    private func exportSave() {
-        // FIXME: todo
-    }
-
-    private func deleteSave() {
-        // FIXME: todo
-    }
-
-    private func replaceROM() {
-        // FIXME: todo
-    }
-
     private func play() {
         Task {
             do {
                 try await playback.play(game: game, persistence: persistence)
             } catch {
-                // FIXME: Handle error
+                // FIXME: Surface error
                 print(error)
             }
         }
@@ -292,9 +321,87 @@ struct GameView: View {
             do {
                 try await playback.play(state: saveState, persistence: persistence)
             } catch {
-                // FIXME: Handle error
+                // FIXME: Surface error
                 print(error)
             }
+        }
+    }
+}
+
+// MARK: ROM Management
+
+extension GameView {
+    // FIXME: confirm
+    private func replaceROM() {
+        self.fileImportRequest = .roms(multiple: false, completion: saveFileImported)
+    }
+
+    private func romFileImported(_ result: Result<[URL], any Error>) {
+        do {
+            guard let sourceURL = try result.get().first else { return }
+            print(sourceURL)
+            // FIXME: todo; handle hash mismatch
+        } catch {
+            // FIXME: Surface error
+            print(error)
+        }
+    }
+}
+
+// MARK: Save Management
+
+extension GameView {
+    // FIXME: confirm
+    private func importSave() {
+        self.fileImportRequest = .saves(completion: saveFileImported)
+    }
+
+    private func exportSave() {
+        Task {
+            let url = persistence.files.url(for: game.savePath)
+            self.exportedSaveFile = SaveFileDocument(url: url, fileName: "\(game.name ?? "Game") \(Date())")
+        }
+    }
+
+    private func deleteSave() async {
+        do {
+            try await persistence.files.delete(at: game.savePath)
+        } catch {
+            // FIXME: Surface error
+            print(error)
+        }
+    }
+
+    private nonisolated func saveFileImported(_ result: Result<[URL], any Error>) {
+        Task {
+            do {
+                guard let sourceURL = try result.get().first else { return }
+                let destinationPath = await MainActor.run { game.savePath }
+                let doStopAccessing = sourceURL.startAccessingSecurityScopedResource()
+                defer {
+                    if doStopAccessing {
+                        sourceURL.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                try await persistence.files.overwrite(copying: .other(sourceURL), to: destinationPath)
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
+        }
+    }
+
+    private nonisolated func saveFileExported(_ result: Result<URL, any Error>) {
+        do {
+            let url = try result.get()
+            Logger.fs.info("exported save file to \(url)")
+        } catch let error as CocoaError where error.code == .fileNoSuchFile {
+            // FIXME: Surface error
+            print("no save")
+        } catch {
+            // FIXME: Surface error
+            print(error)
         }
     }
 }

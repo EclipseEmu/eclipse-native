@@ -86,7 +86,7 @@ struct CheatsView: View {
             do {
                 try await persistence.objects.reorderCheatPriority(cheats: cheats)
             } catch {
-                // FIXME: Surface errors
+                // FIXME: Surface error
                 print(error)
             }
         }

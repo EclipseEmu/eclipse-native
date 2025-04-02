@@ -48,7 +48,7 @@ struct CoverPickerViewModifier: ViewModifier {
             do {
                 try await persistence.objects.replaceCoverArt(game: .init(game), copying: url)
             } catch {
-                // FIXME: present this to the user
+                // FIXME: Surface error
                 print(error)
             }
         }
