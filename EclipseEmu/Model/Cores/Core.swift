@@ -34,6 +34,7 @@ struct Core: ~Copyable {
 
     private let ctx: Context
     private let callbacks: CoreCallbacks
+    private let rawPointer: UnsafePointer<GameCore>
 
     private let rawDeallocate: @convention(c) (_ ctx: Context) -> Void
 
@@ -83,6 +84,7 @@ struct Core: ~Copyable {
         self.ctx = raw.pointee.data
         self.callbacks = callbacks
 
+        self.rawPointer = raw
         self.rawDeallocate = raw.pointee.deallocate
         self.rawGetAudioFormat = raw.pointee.getAudioFormat
         self.rawGetVideoFormat = raw.pointee.getVideoFormat
@@ -110,6 +112,7 @@ struct Core: ~Copyable {
         self.stop()
         self.clearCheats()
         self.rawDeallocate(ctx)
+        self.rawPointer.deallocate()
     }
 
     @inlinable

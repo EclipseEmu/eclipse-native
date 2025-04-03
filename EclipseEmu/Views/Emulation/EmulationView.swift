@@ -263,11 +263,9 @@ struct EmulationView: View {
         }
     }
 
-    private func saveStateSelected(_ saveState: SaveState) {
+    private func saveStateSelected(_ saveState: SaveState) async -> Bool {
         let url = persistence.files.url(for: saveState.path)
-        Task {
-            await viewModel.core.loadState(for: url)
-        }
+        return await viewModel.core.loadState(for: url)
     }
 
     // MARK: macOS Playback Bar helpers
