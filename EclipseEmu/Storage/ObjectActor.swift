@@ -73,9 +73,11 @@ final actor ObjectActor {
         }
         try objectContext.saveIfNeeded()
     }
+}
 
-    // MARK: Games
+// MARK: - Games
 
+extension ObjectActor {
     nonisolated func createGames(for files: [URL]) async throws(GameCreationError) -> [GameCreationFailure] {
         let openvgdb: OpenVGDB
         do {
@@ -240,9 +242,11 @@ final actor ObjectActor {
             throw .persistence(error)
         }
     }
+}
 
-    // MARK: Save States
+// MARK: - Save States
 
+extension ObjectActor {
     nonisolated func createSaveState(
         isAuto: Bool,
         for game: ObjectBox<Game>,
@@ -312,9 +316,11 @@ final actor ObjectActor {
         saveState.game = game
         try objectContext.saveIfNeeded()
     }
+}
 
-    // MARK: Images
+// MARK: - Images
 
+extension ObjectActor {
     private func createImage(copy sourceUrl: URL) async throws(FileSystemError) -> ImageAsset {
         let asset = ImageAsset(fileExtension: sourceUrl.fileExtension())
         try await fileSystem.overwrite(copying: .other(sourceUrl), to: asset.path)
@@ -356,11 +362,13 @@ final actor ObjectActor {
             unreachable()
         }
     }
+}
 
-    // MARK: Tags
+// MARK: - Tags
 
+extension ObjectActor {
     func setTags<S: Sequence>(_ tags: S, for game: ObjectBox<Game>) throws(PersistenceError)
-        where S.Element == ObjectBox<Tag>
+    where S.Element == ObjectBox<Tag>
     {
         let game = try game.get(in: objectContext)
         let set = tags.compactMap { $0.tryGet(in: objectContext) }
@@ -371,6 +379,22 @@ final actor ObjectActor {
     func createTag(name: String, color: TagColor) throws(PersistenceError) {
         let tag = Tag(name: name, color: color)
         objectContext.insert(tag)
+        try objectContext.saveIfNeeded()
+    }
+
+    func toggle(for tag: ObjectBox<Tag>, state: Bool, games: [ObjectBox<Game>]) throws(PersistenceError) {
+        let tag = try tag.get(in: objectContext)
+        if state {
+            for game in games {
+                let game = try game.get(in: objectContext)
+                tag.addToGames(game)
+            }
+        } else {
+            for game in games {
+                let game = try game.get(in: objectContext)
+                tag.removeFromGames(game)
+            }
+        }
         try objectContext.saveIfNeeded()
     }
 
@@ -393,9 +417,11 @@ final actor ObjectActor {
 
         try objectContext.saveIfNeeded()
     }
+}
 
-    // MARK: Cheats
+// MARK: - Cheats
 
+extension ObjectActor {
     func createCheat(
         name: String,
         code: String,
@@ -444,6 +470,4 @@ final actor ObjectActor {
         }
         try objectContext.saveIfNeeded()
     }
-
-    // MARK: Controls
 }
