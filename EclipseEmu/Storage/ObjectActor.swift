@@ -195,6 +195,7 @@ extension ObjectActor {
             switch result {
             case .success(let info):
                 let game = Game(
+                    insertInto: objectContext,
                     name: info.name,
                     system: info.system,
                     sha1: info.sha1,
@@ -202,10 +203,8 @@ extension ObjectActor {
                     saveExtension: ".sav",
                     cover: nil
                 )
-                objectContext.insert(game)
                 if case .image(fileName: let uuid, fileExtension: let fileExtension) = info.cover {
-                    let cover = ImageAsset(id: uuid, fileExtension: fileExtension)
-                    objectContext.insert(cover)
+                    let cover = ImageAsset(insertInto: objectContext, id: uuid, fileExtension: fileExtension)
                     game.cover = cover
                 }
                 break
@@ -241,6 +240,12 @@ extension ObjectActor {
         } catch {
             throw .persistence(error)
         }
+    }
+
+    func updateHash(_ newHash: String, for game: ObjectBox<Game>) throws(PersistenceError) {
+        let game = try game.get(in: objectContext)
+        game.sha1 = newHash
+        try objectContext.saveIfNeeded()
     }
 }
 
@@ -299,6 +304,7 @@ extension ObjectActor {
         }
 
         let saveState = SaveState(
+            insertInto: objectContext,
             id: id,
             isAuto: isAuto,
             stateExtension: nil,
@@ -306,11 +312,8 @@ extension ObjectActor {
             game: nil
         )
 
-        objectContext.insert(saveState)
         if wroteImage {
-            let asset = ImageAsset(id: previewID, fileExtension: "jpeg")
-            objectContext.insert(asset)
-            saveState.preview = asset
+            saveState.preview = ImageAsset(insertInto: objectContext, id: previewID, fileExtension: "jpeg")
         }
 
         saveState.game = game
@@ -322,16 +325,14 @@ extension ObjectActor {
 
 extension ObjectActor {
     private func createImage(copy sourceUrl: URL) async throws(FileSystemError) -> ImageAsset {
-        let asset = ImageAsset(fileExtension: sourceUrl.fileExtension())
+        let asset = ImageAsset(insertInto: objectContext, fileExtension: sourceUrl.fileExtension())
         try await fileSystem.overwrite(copying: .other(sourceUrl), to: asset.path)
-        objectContext.insert(asset)
         return asset
     }
 
     private func createImage(remote: URL) async throws(FileSystemError) -> ImageAsset {
-        let asset = ImageAsset(fileExtension: remote.fileExtension())
+        let asset = ImageAsset(insertInto: objectContext, fileExtension: remote.fileExtension())
         try await fileSystem.download(from: remote, overwriting: asset.path)
-        objectContext.insert(asset)
         return asset
     }
 
@@ -377,8 +378,7 @@ extension ObjectActor {
     }
 
     func createTag(name: String, color: TagColor) throws(PersistenceError) {
-        let tag = Tag(name: name, color: color)
-        objectContext.insert(tag)
+        Tag(insertInto: objectContext, name: name, color: color)
         try objectContext.saveIfNeeded()
     }
 
@@ -430,15 +430,7 @@ extension ObjectActor {
         for game: ObjectBox<Game>
     ) throws(PersistenceError) {
         let game = try game.get(in: objectContext)
-        let cheat = Cheat(
-            name: name,
-            code: code,
-            format: format,
-            isEnabled: isEnabled,
-            for: nil
-        )
-        objectContext.insert(cheat)
-        cheat.game = game
+        Cheat(insertInto: objectContext, name: name, code: code, format: format, isEnabled: isEnabled, game: game)
         try objectContext.saveIfNeeded()
     }
 

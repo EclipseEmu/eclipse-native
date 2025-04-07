@@ -1,14 +1,16 @@
 import CoreData
 
 extension Cheat {
+    @discardableResult
     convenience init(
+        insertInto context: NSManagedObjectContext,
         name: String,
         code: String,
         format: String,
         isEnabled: Bool,
-        for game: Game?
+        game: Game? = nil
     ) {
-        self.init(entity: Cheat.entity(), insertInto: nil)
+        self.init(context: context)
         self.label = name
         self.type = format
         self.code = code

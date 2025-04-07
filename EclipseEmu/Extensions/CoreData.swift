@@ -10,7 +10,7 @@ extension NSManagedObjectContext {
             try save()
         } catch {
             Logger.coredata.error("failed to save managed object context: \(error.localizedDescription)")
-            throw .saveError(error)
+            throw .save(error)
         }
     }
 }

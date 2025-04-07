@@ -33,7 +33,7 @@ private struct DeleteItemViewModifier<T>: ViewModifier {
         content
             .confirmationDialog(
                 titleKey,
-                isPresented: .isNotNullish($item),
+                isPresented: .isSome($item),
                 presenting: item
             ) { _ in
                 Button("Delete", role: .destructive, action: action)

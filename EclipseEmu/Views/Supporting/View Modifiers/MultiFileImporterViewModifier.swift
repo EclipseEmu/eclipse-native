@@ -32,7 +32,7 @@ struct MultiFileImporterViewModifier: ViewModifier {
         let type = self.type ?? .default
         content
             .fileImporter(
-                isPresented: .isNotNullish($type),
+                isPresented: .isSome($type),
                 allowedContentTypes: type.types,
                 allowsMultipleSelection: type.allowsMultipleSelection,
                 onCompletion: type.completion

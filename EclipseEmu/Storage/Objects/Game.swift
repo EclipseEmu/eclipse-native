@@ -21,16 +21,18 @@ extension Game {
         }
     }
 
+    @discardableResult
     convenience init(
+        insertInto context: NSManagedObjectContext,
         uuid: UUID = UUID(),
         name: String,
         system: GameSystem,
         sha1: String,
         romExtension: String?,
         saveExtension: String?,
-        cover: ImageAsset?
+        cover: ImageAsset? = nil
     ) {
-        self.init(entity: Self.entity(), insertInto: nil)
+        self.init(context: context)
 
         self.id = uuid
         self.name = name
@@ -52,7 +54,7 @@ extension Game {
         Task {
             do {
                 try await FileSystem.shared.delete(at: savePath)
-            } catch {
+            } catch FileSystemError.fileNoSuchFile {} catch {
                 Logger.coredata.warning("failed to delete save: \(error.localizedDescription)")
             }
         }
@@ -61,7 +63,7 @@ extension Game {
             guard await Persistence.shared.objects.canDeleteRom(sha1: sha1) else { return }
             do {
                 try await FileSystem.shared.delete(at: romPath)
-            } catch {
+            } catch FileSystemError.fileNoSuchFile {} catch {
                 Logger.coredata.warning("failed to delete rom: \(error.localizedDescription)")
             }
         }

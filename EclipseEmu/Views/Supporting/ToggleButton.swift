@@ -9,6 +9,12 @@ struct ToggleButton<Label: View>: View {
     @Binding var value: Bool
     let label: () -> Label
 
+    init(role: ButtonRole? = nil, value: Binding<Bool>, label: @escaping () -> Label) {
+        self.role = role
+        self._value = value
+        self.label = label
+    }
+
     var body: Button<Label> {
         Button(role: role, action: action, label: label)
     }

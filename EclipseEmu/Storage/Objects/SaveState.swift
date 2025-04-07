@@ -3,15 +3,16 @@ import Foundation
 import OSLog
 
 extension SaveState {
+    @discardableResult
     convenience init(
+        insertInto context: NSManagedObjectContext,
         id: UUID = UUID(),
         isAuto: Bool,
         stateExtension: String?,
-        preview: ImageAsset?,
-        game: Game?
+        preview: ImageAsset? = nil,
+        game: Game? = nil
     ) {
-        self.init(entity: Self.entity(), insertInto: nil)
-
+        self.init(context: context)
         self.id = id
         self.isAuto = isAuto
         self.date = Date()

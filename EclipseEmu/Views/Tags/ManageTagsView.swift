@@ -128,7 +128,7 @@ struct ManageTagsView: View {
                 Button("Done", action: dismiss.callAsFunction)
             }
         }
-        .alert(isPresented: .isNotNullish($error), error: error) {
+        .alert(isPresented: .isSome($error), error: error) {
             Button("OK", role:  .cancel) {}
         }
         .navigationTitle("Manage Tags")

@@ -3,8 +3,8 @@ import Foundation
 import OSLog
 
 extension ImageAsset {
-    convenience init(id: UUID = UUID(), fileExtension: String?) {
-        self.init(entity: Self.entity(), insertInto: nil)
+    convenience init(insertInto context: NSManagedObjectContext, id: UUID = UUID(), fileExtension: String?) {
+        self.init(context: context)
         self.id = id
         self.fileExtension = fileExtension
     }

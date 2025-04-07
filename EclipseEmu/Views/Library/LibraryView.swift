@@ -10,7 +10,10 @@ struct LibraryView: View {
     @EnvironmentObject private var persistence: Persistence
     @EnvironmentObject private var navigation: NavigationManager
 
-    @FetchRequest<Game>(sortDescriptors: [])
+    @FetchRequest<Game>(
+        sortDescriptors: Self.getSortDescriptors(for: Settings.getSortDirection(), method: Settings.getSortMethod()),
+        animation: .default
+    )
     private var games: FetchedResults<Game>
 
     @State private var query: String = ""
@@ -24,14 +27,6 @@ struct LibraryView: View {
     @State private var coverPickerMethod: CoverPickerMethod?
 
     @StateObject private var filtersModel = LibraryFiltersViewModel()
-
-    init() {
-        let descriptors = Self.getSortDescriptors(
-            for: Settings.getSortDirection(),
-            method: Settings.getSortMethod()
-        )
-        _games = FetchRequest(sortDescriptors: descriptors, animation: .default)
-    }
 
     @ViewBuilder
     var content: some View {
@@ -131,61 +126,64 @@ struct LibraryView: View {
             spacing: spacing
         ) {
             ForEach(games) { game in
-                let isSelected = self.selection.contains(game)
-                Button {
-                    gameSelected(game)
-                } label: {
-                    DualLabeledImage(title: Text(game.name ?? "Game"), subtitle: Text(game.system.string)) {
-                        LocalImage(game.cover) { image in
-                            image
-                                .resizable()
-                                .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                        } placeholder: {
-                            RoundedRectangle(cornerRadius: 8.0)
-                                .foregroundStyle(.secondary)
+                let _ = Self._printChanges()
+                if !game.isDeleted && !game.isFault {
+                    let isSelected = self.selection.contains(game)
+                    Button {
+                        gameSelected(game)
+                    } label: {
+                        DualLabeledImage(title: Text(game.name ?? "Game"), subtitle: Text(game.system.string)) {
+                            LocalImage(game.cover) { image in
+                                image
+                                    .resizable()
+                                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                            } placeholder: {
+                                RoundedRectangle(cornerRadius: 8.0)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .overlay(alignment: .bottomTrailing) {
+                                GameItemCheckbox(isSelected: isSelected)
+                                    .opacity(Double(isSelecting))
+                                    .padding(8.0)
+                            }
                         }
-                        .aspectRatio(1.0, contentMode: .fit)
-                        .overlay(alignment: .bottomTrailing) {
-                            GameItemCheckbox(isSelected: isSelected)
-                                .opacity(Double(isSelecting))
-                                .padding(8.0)
+                        .contentShape(Rectangle())
+                        .opacity(isSelecting && !isSelected ? 0.5 : 1.0)
+                    }
+                    .contextMenu {
+                        Button {
+                            self.manageTagsTarget = .one(game)
+                        } label: {
+                            Label("Manage Tags", systemImage: "tag")
+                        }
+
+                        Button {
+                            navigation.path.append(Destination.cheats(game))
+                        } label: {
+                            Label("Manage Cheats", systemImage: "memorychip")
+                        }
+
+                        Divider()
+
+                        Button {
+                            self.renameTarget = game
+                        } label: {
+                            Label("Rename...", systemImage: "text.cursor")
+                        }
+
+                        CoverPickerMenu(game: game, coverPickerMethod: $coverPickerMethod)
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            self.deleteTarget = game
+                        } label: {
+                            Label("Remove...", systemImage: "trash")
                         }
                     }
-                    .contentShape(Rectangle())
-                    .opacity(isSelecting && !isSelected ? 0.5 : 1.0)
+                    .buttonStyle(.plain)
                 }
-                .contextMenu {
-                    Button {
-                        self.manageTagsTarget = .one(game)
-                    } label: {
-                        Label("Manage Tags", systemImage: "tag")
-                    }
-
-                    Button {
-                        navigation.path.append(Destination.cheats(game))
-                    } label: {
-                        Label("Manage Cheats", systemImage: "memorychip")
-                    }
-
-                    Divider()
-
-                    Button {
-                        self.renameTarget = game
-                    } label: {
-                        Label("Rename...", systemImage: "text.cursor")
-                    }
-
-                    CoverPickerMenu(game: game, coverPickerMethod: $coverPickerMethod)
-
-                    Divider()
-
-                    Button(role: .destructive) {
-                        self.deleteTarget = game
-                    } label: {
-                        Label("Remove...", systemImage: "trash")
-                    }
-                }
-                .buttonStyle(.plain)
             }
         }
         .padding([.horizontal, .bottom])

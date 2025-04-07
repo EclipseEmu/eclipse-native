@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 let colors = [
     Color.blue,
@@ -71,8 +72,9 @@ extension Tag {
         }
     }
 
-    convenience init(name: String, color: TagColor) {
-        self.init(entity: Self.entity(), insertInto: nil)
+    @discardableResult
+    convenience init(insertInto context: NSManagedObjectContext,  name: String, color: TagColor) {
+        self.init(context: context)
         self.name = name
         self.rawColor = color.rawValue
     }

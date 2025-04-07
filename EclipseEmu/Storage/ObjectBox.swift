@@ -17,7 +17,7 @@ struct ObjectBox<T: NSManagedObject>: Equatable, Hashable, Sendable {
         do {
             object = try context.existingObject(with: self.id)
         } catch {
-            throw .coreDataError(error)
+            throw .obtain(error)
         }
         guard let object = object as? T else {
             throw .typeMismatch

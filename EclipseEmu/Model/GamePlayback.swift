@@ -11,7 +11,7 @@ enum GamePlaybackState {
 
 enum GamePlaybackMissingFile: Equatable {
     case none
-    case rom
+    case rom(ObjectBox<Game>)
     case saveState(ObjectBox<SaveState>)
 }
 
@@ -99,7 +99,7 @@ final class GamePlayback: ObservableObject {
             throw GamePlaybackError.missingCore
         }
         guard await persistence.files.exists(path: game.romPath) else {
-            throw GamePlaybackError.missingFile(.rom)
+            throw GamePlaybackError.missingFile(.rom(.init(game)))
         }
 
         let cheats = (game.cheats as? Set<Cheat>) ?? []
@@ -129,7 +129,7 @@ final class GamePlayback: ObservableObject {
             throw GamePlaybackError.missingFile(.saveState(.init(state)))
         }
         guard await files.exists(path: game.romPath) else {
-            throw GamePlaybackError.missingFile(.rom)
+            throw GamePlaybackError.missingFile(.rom(.init(game)))
         }
 
         let cheats = (game.cheats as? Set<Cheat>) ?? []

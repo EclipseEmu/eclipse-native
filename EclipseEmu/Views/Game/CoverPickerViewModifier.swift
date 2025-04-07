@@ -32,7 +32,7 @@ struct CoverPickerViewModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .photosImporter(isPresented: .isNotNullish($photosSheet), onSelection: handleImageSelected)
+            .photosImporter(isPresented: .isSome($photosSheet), onSelection: handleImageSelected)
             .sheet(item: $method) { mode in
                 NavigationStack {
                     CoverPickerDatabaseView(game: mode.game)

@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import OSLog
 
 final class Persistence: Sendable, ObservableObject {
     @MainActor
@@ -48,8 +49,9 @@ final class Persistence: Sendable, ObservableObject {
         mainContext.automaticallyMergesChangesFromParent = true
         mainContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 
-        let gamesObjectContext = container.newBackgroundContext()
-        gamesObjectContext.automaticallyMergesChangesFromParent = true
-        objects = ObjectActor(objectContext: gamesObjectContext, fileSystem: files)
+        let objectsContext = container.newBackgroundContext()
+        objectsContext.automaticallyMergesChangesFromParent = true
+        objectsContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+        objects = ObjectActor(objectContext: objectsContext, fileSystem: files)
     }
 }
