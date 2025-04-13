@@ -22,8 +22,8 @@ extension Game {
     }
 
     @discardableResult
-    convenience init(
-        insertInto context: NSManagedObjectContext,
+    static func create(
+        in context: NSManagedObjectContext,
         uuid: UUID = UUID(),
         name: String,
         system: GameSystem,
@@ -31,17 +31,17 @@ extension Game {
         romExtension: String?,
         saveExtension: String?,
         cover: ImageAsset? = nil
-    ) {
-        self.init(context: context)
-
-        self.id = uuid
-        self.name = name
-        self.system = system
-        self.dateAdded = Date()
-        self.sha1 = sha1
-        self.romExtension = romExtension
-        self.saveExtension = saveExtension
-        self.cover = cover
+    ) -> Self {
+        let model: Self = context.create()
+        model.id = uuid
+        model.name = name
+        model.system = system
+        model.dateAdded = Date()
+        model.sha1 = sha1
+        model.romExtension = romExtension
+        model.saveExtension = saveExtension
+        model.cover = cover
+        return model
     }
 
     override public func didSave() {

@@ -3,15 +3,16 @@ import CoreData
 import OSLog
 import EclipseKit
 
-// FIXME: Navigating away from the view will cause the filters to be ignored.
-
 struct LibraryView: View {
     @EnvironmentObject private var settings: Settings
     @EnvironmentObject private var persistence: Persistence
     @EnvironmentObject private var navigation: NavigationManager
 
     @FetchRequest<Game>(
-        sortDescriptors: Self.getSortDescriptors(for: Settings.getSortDirection(), method: Settings.getSortMethod()),
+        sortDescriptors: Self.getSortDescriptors(
+            for: Settings.getSortDirection(),
+            method: Settings.getSortMethod()
+        ),
         animation: .default
     )
     private var games: FetchedResults<Game>
@@ -26,7 +27,11 @@ struct LibraryView: View {
     @State private var manageTagsTarget: ManageTagsTarget?
     @State private var coverPickerMethod: CoverPickerMethod?
 
-    @StateObject private var filtersModel = LibraryFiltersViewModel()
+    @State var isFiltersViewPresented: Bool = false
+    @State var filteredSystems: Set<GameSystem> = Set(GameSystem.concreteCases)
+    @State var filteredTags: Set<Tag> = []
+
+    var areSystemsFiltered: Bool { filteredSystems.count != GameSystem.concreteCases.count }
 
     @ViewBuilder
     var content: some View {
@@ -55,7 +60,7 @@ struct LibraryView: View {
             } description: {
                 Text("No results for \"\(query)\"")
             }
-        } else if games.isEmpty && (filtersModel.areSystemsFiltered || !filtersModel.tags.isEmpty) {
+        } else if games.isEmpty && (areSystemsFiltered || !filteredTags.isEmpty) {
             ContentUnavailableMessage {
                 Label("No Results", systemImage: "line.3.horizontal.decrease.circle")
             } description: {
@@ -86,10 +91,10 @@ struct LibraryView: View {
             .onChange(of: query) { newQuery in
                 games.nsPredicate = self.predicate(for: newQuery)
             }
-            .onChange(of: filtersModel.tags) { _ in
+            .onChange(of: filteredTags) { _ in
                 games.nsPredicate = self.predicate(for: query)
             }
-            .onChange(of: filtersModel.systems) { _ in
+            .onChange(of: filteredSystems) { _ in
                 games.nsPredicate = self.predicate(for: query)
             }
             .onAppear {
@@ -101,14 +106,12 @@ struct LibraryView: View {
             .deleteItem("Remove Game", item: $deleteTarget) { game in
                 Text("Are you sure you want to remove \"\(game.name ?? "this game")\"? Your save, save states, and cheats will be deleted as well.")
             }
-            .sheet(isPresented: $filtersModel.isPresented) {
+            .sheet(isPresented: $isFiltersViewPresented) {
                 NavigationStack {
-                    LibraryFiltersView(viewModel: filtersModel)
+                    LibraryFiltersView(systems: $filteredSystems, tags: $filteredTags)
                 }.presentationDetents([.medium, .large])
             }
-            .sheet(item: $manageTagsTarget) {
-                try? persistence.mainContext.saveIfNeeded()
-            } content: { target in
+            .sheet(item: $manageTagsTarget) { target in
                 NavigationStack {
                     ManageTagsView(target: target)
                 }
@@ -126,7 +129,6 @@ struct LibraryView: View {
             spacing: spacing
         ) {
             ForEach(games) { game in
-                let _ = Self._printChanges()
                 if !game.isDeleted && !game.isFault {
                     let isSelected = self.selection.contains(game)
                     Button {
@@ -204,18 +206,13 @@ struct LibraryView: View {
         ToolbarItem {
             Menu {
                 if !self.isSelecting {
-                    Button {
-                        withAnimation {
-                            self.isSelecting = true
-                        }
-                    } label: {
+                    ToggleButton(value: $isSelecting) {
                         Label("Select", systemImage: "checkmark.circle")
                     }
                 }
 
-                Button {
-                    filtersModel.isPresented = true
-                } label: {
+
+                ToggleButton(value: $isFiltersViewPresented) {
                     Label("Filter", systemImage: "line.3.horizontal.decrease")
                 }
 
@@ -332,7 +329,15 @@ struct LibraryView: View {
             predicates.append(NSPredicate(format: "name CONTAINS[d] %@", query))
         }
 
-        filtersModel.insertPredicates(&predicates)
+        predicates.append(
+            NSCompoundPredicate(orPredicateWithSubpredicates: filteredSystems.map {
+                NSPredicate(format: "rawSystem = %d", $0.rawValue)
+            })
+        )
+
+        for tag in filteredTags {
+            predicates.append(NSPredicate(format: "tags CONTAINS %@", tag))
+        }
 
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }

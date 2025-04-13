@@ -73,9 +73,10 @@ extension Tag {
     }
 
     @discardableResult
-    convenience init(insertInto context: NSManagedObjectContext,  name: String, color: TagColor) {
-        self.init(context: context)
-        self.name = name
-        self.rawColor = color.rawValue
+    static func create(in context: NSManagedObjectContext, name: String, color: TagColor) -> Self {
+        let model: Self = context.create()
+        model.name = name
+        model.color = color
+        return model
     }
 }

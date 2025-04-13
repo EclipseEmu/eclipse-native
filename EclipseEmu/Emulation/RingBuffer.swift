@@ -21,22 +21,22 @@ struct RingBuffer: Sendable, ~Copyable {
     }
 
     @inlinable
-    func availableRead(head: Int, tail: Int) -> Int {
+    borrowing func availableRead(head: Int, tail: Int) -> Int {
         return tail >= head ? tail &- head : tail &+ self.capacity &- head
     }
 
     @inlinable
-    func availableWrite(head: Int, tail: Int) -> Int {
+    borrowing func availableWrite(head: Int, tail: Int) -> Int {
         return tail >= head ? self.capacity &- tail &+ head : head &- tail
     }
 
-    func availableRead() -> Int {
+    borrowing func availableRead() -> Int {
         let head = self.head.load(ordering: .relaxed)
         let tail = self.tail.load(ordering: .relaxed)
         return self.availableRead(head: head, tail: tail)
     }
 
-    func availableWrite() -> Int {
+    borrowing func availableWrite() -> Int {
         let head = self.head.load(ordering: .relaxed)
         let tail = self.tail.load(ordering: .relaxed)
         return self.availableWrite(head: head, tail: tail)
@@ -84,7 +84,7 @@ struct RingBuffer: Sendable, ~Copyable {
         return length
     }
 
-    func clear() {
+    mutating func clear() {
         self.head.store(0, ordering: .relaxed)
         self.tail.store(0, ordering: .relaxed)
     }

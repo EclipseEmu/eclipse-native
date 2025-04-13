@@ -3,14 +3,16 @@ import Foundation
 import OSLog
 
 extension ImageAsset {
-    convenience init(insertInto context: NSManagedObjectContext, id: UUID = UUID(), fileExtension: String?) {
-        self.init(context: context)
-        self.id = id
-        self.fileExtension = fileExtension
-    }
-
     var path: FileSystemPath {
         .image(fileName: id!, fileExtension: fileExtension)
+    }
+
+    @discardableResult
+    static func create(in context: NSManagedObjectContext, id: UUID = UUID(), fileExtension: String?) -> Self {
+        let model: Self = context.create()
+        model.id = id
+        model.fileExtension = fileExtension
+        return model
     }
 
     override public func didSave() {

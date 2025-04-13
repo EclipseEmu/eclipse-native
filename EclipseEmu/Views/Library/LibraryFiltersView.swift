@@ -2,77 +2,43 @@ import OSLog
 import SwiftUI
 import EclipseKit
 
-final class LibraryFiltersViewModel: ObservableObject {
-    @Published var isPresented: Bool = false
-    @Published var systems: Set<GameSystem> = Set(GameSystem.concreteCases)
-    @Published var tags: Set<Tag> = []
-
-    var areSystemsFiltered: Bool {
-        systems.count != GameSystem.concreteCases.count
-    }
-
-    func insertPredicates(_ array: inout [NSPredicate]) {
-        array.append(
-            NSCompoundPredicate(orPredicateWithSubpredicates: systems.map {
-                NSPredicate(format: "rawSystem = %d", $0.rawValue)
-            })
-        )
-
-        for tag in tags {
-            array.append(NSPredicate(format: "tags CONTAINS %@", tag))
-        }
-    }
-}
-
-private extension Binding where Value == Bool {
-    @MainActor
-    init(_ value: Tag, in viewModel: LibraryFiltersViewModel) {
-        self = .init(get: {
-            viewModel.tags.contains(value)
-        }, set: { newValue in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                viewModel.tags.toggle(value, if: newValue)
-            }
-        })
-    }
-
-    @MainActor
-    init(_ value: GameSystem, in viewModel: LibraryFiltersViewModel) {
-        self = .init(get: {
-            viewModel.systems.contains(value)
-        }, set: { newValue in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                viewModel.systems.toggle(value, if: newValue)
-            }
-        })
-    }
-}
-
 struct LibraryFiltersView: View {
-    @Environment(\.dismiss) var dismiss: DismissAction
-
-    @ObservedObject var viewModel: LibraryFiltersViewModel
+    @Environment(\.dismiss) private var dismiss: DismissAction
 
     @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
-    private var tags: FetchedResults<Tag>
+    private var allTags: FetchedResults<Tag>
+
+    @Binding var systems: Set<GameSystem>
+    @Binding var tags: Set<Tag>
 
     var body: some View {
         Form {
             Section {
                 ForEach(GameSystem.concreteCases, id: \.rawValue) { system in
-                    Toggle(isOn: .init(system, in: viewModel)) {
+                    Toggle(isOn: .init(get: {
+                        systems.contains(system)
+                    }, set: { newValue in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            systems.toggle(system, if: newValue)
+                        }
+                    })) {
                         Text(system.string)
                             .foregroundStyle(Color.primary)
                     }
-                    .toggleStyleCheckbox()
                 }
             } header: {
                 Text("System")
             }
 
             Section {
-                ForEach(tags) { tag in
-                    Toggle(isOn: .init(tag, in: viewModel)) {
+                ForEach(allTags) { tag in
+                    Toggle(isOn: .init(get: {
+                        tags.contains(tag)
+                    }, set: { newValue in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            tags.toggle(tag, if: newValue)
+                        }
+                    })) {
                         Label {
                             Text(tag.name ?? "Tag")
                                 .foregroundStyle(Color.primary)
@@ -80,24 +46,23 @@ struct LibraryFiltersView: View {
                             Image(systemName: "tag")
                         }
                     }
-                    .toggleStyleCheckbox()
+                    .listItemTint(tag.color.color)
                 }
             } header: {
                 Text("Tags")
             }
-            .emptyState(tags.isEmpty) {
+            .emptyState(allTags.isEmpty) {
                 EmptyView()
             }
         }
+        .toggleStyleCheckbox()
         .navigationTitle("Filters")
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
 #endif
         .toolbar {
-            ToolbarItem {
-                Button("Done") {
-                    dismiss()
-                }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: dismiss.callAsFunction)
             }
         }
     }
@@ -105,10 +70,11 @@ struct LibraryFiltersView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    @Previewable @StateObject var viewModel = LibraryFiltersViewModel()
+    @Previewable @State var systems: Set<GameSystem> = []
+    @Previewable @State var tags: Set<Tag> = []
 
     NavigationStack {
-        LibraryFiltersView(viewModel: viewModel)
+        LibraryFiltersView(systems: $systems, tags: $tags)
     }
 }
 

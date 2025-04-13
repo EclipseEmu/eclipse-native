@@ -23,9 +23,15 @@ extension NavigationLink where Label: View, Destination == Never {
     }
 }
 
+private struct LibraryViewWrapper: View {
+    var body: some View {
+        LibraryView()
+    }
+}
+
 @main
 struct EclipseEmuApp: App {
-    @StateObject private var persistence = Persistence(inMemory: true)
+    @StateObject private var persistence = Persistence.shared
     @StateObject private var settings: Settings
     @StateObject private var playback: GamePlayback
     @StateObject private var navigationManager = NavigationManager()
@@ -53,7 +59,8 @@ struct EclipseEmuApp: App {
                     .environmentObject(playback)
             case .none:
                 NavigationStack(path: $navigationManager.path) {
-                    LibraryView().navigationDestination(for: Destination.self, destination: navigationDestination)
+                    LibraryViewWrapper()
+                        .navigationDestination(for: Destination.self, destination: navigationDestination)
                 }
                 .persistence(persistence)
                 .environmentObject(coreRegistry)

@@ -33,7 +33,7 @@ struct TagDetailView: View {
         self.mode = mode
         if case .edit(let tag) = mode {
             newName = tag.name ?? ""
-            newColor = .blue
+            newColor = tag.color
         } else {
             newName = ""
             newColor = .blue
@@ -72,9 +72,7 @@ struct TagDetailView: View {
         .toolbar {
             if mode == .create {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismissAction()
-                    }
+                    Button("Cancel", action: dismissAction.callAsFunction)
                 }
             }
 

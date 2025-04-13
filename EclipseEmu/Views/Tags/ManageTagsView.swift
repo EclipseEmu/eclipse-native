@@ -36,9 +36,9 @@ private struct ManyManageTagsItemView: View {
     var body: some View {
         Toggle(sources: $sources, isOn: \.isSelected) {
             Label(tag.name ?? "Tag", systemImage: "tag")
-                .tint(tag.color.color)
         }
         .onChange(of: sources.first?.isSelected ?? false, perform: update)
+        .listItemTint(tag.color.color)
     }
 
     private func update(_ isEnabled: Bool) {
@@ -70,9 +70,9 @@ private struct OneManageTagsItemView: View {
     var body: some View {
         Toggle(isOn: $isOn) {
             Label(tag.name ?? "Tag", systemImage: "tag")
-                .tint(tag.color.color)
         }
         .onChange(of: isOn, perform: update)
+        .listItemTint(tag.color.color)
     }
 
     private func update(_ newValue: Bool) {

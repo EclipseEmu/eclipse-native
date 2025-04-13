@@ -2,7 +2,15 @@ import CoreData
 import OSLog
 import SwiftUI
 
+@available(*, unavailable)
+extension NSManagedObject: @retroactive Sendable {}
+
 extension NSManagedObjectContext {
+    func create<T: NSManagedObject>() -> T {
+        let name = String(describing: T.self)
+        return NSEntityDescription.insertNewObject(forEntityName: name, into: self) as! T
+    }
+
     func saveIfNeeded() throws(PersistenceError) {
         guard hasChanges else { return }
         do {

@@ -194,8 +194,8 @@ extension ObjectActor {
         for (file, result) in results {
             switch result {
             case .success(let info):
-                let game = Game(
-                    insertInto: objectContext,
+                let game = Game.create(
+                    in: objectContext,
                     name: info.name,
                     system: info.system,
                     sha1: info.sha1,
@@ -204,7 +204,7 @@ extension ObjectActor {
                     cover: nil
                 )
                 if case .image(fileName: let uuid, fileExtension: let fileExtension) = info.cover {
-                    let cover = ImageAsset(insertInto: objectContext, id: uuid, fileExtension: fileExtension)
+                    let cover = ImageAsset.create(in: objectContext, id: uuid, fileExtension: fileExtension)
                     game.cover = cover
                 }
                 break
@@ -258,7 +258,7 @@ extension ObjectActor {
         with core: GameCoreCoordinator
     ) async throws(SaveStateError) {
         let id = UUID()
-        let saveStatePath = self.fileSystem.url(for: .saveState(fileName: id, fileExtension: nil))
+        let saveStatePath = self.fileSystem.url(for: .saveState(fileName: id, fileExtension: "s8"))
 
         guard await core.saveState(to: saveStatePath) else {
             throw SaveStateError.failedToCreateSaveState
@@ -279,7 +279,8 @@ extension ObjectActor {
                 isAuto: isAuto,
                 game: game,
                 previewID: imageID,
-                wroteImage: wroteImage
+                wroteImage: wroteImage,
+                fileExtension: saveStatePath.fileExtension()
             )
         } catch {
             throw .persistence(error)
@@ -291,7 +292,8 @@ extension ObjectActor {
         isAuto: Bool,
         game: ObjectBox<Game>,
         previewID: UUID,
-        wroteImage: Bool
+        wroteImage: Bool,
+        fileExtension: String?
     ) async throws(PersistenceError) {
         let game = try game.get(in: objectContext)
 
@@ -303,20 +305,15 @@ extension ObjectActor {
             objectContext.delete(item)
         }
 
-        let saveState = SaveState(
-            insertInto: objectContext,
+        SaveState.create(
+            in: objectContext,
             id: id,
             isAuto: isAuto,
-            stateExtension: nil,
-            preview: nil,
-            game: nil
+            stateExtension: fileExtension,
+            preview: wroteImage ? ImageAsset.create(in: objectContext, id: previewID, fileExtension: "jpeg") : nil,
+            game: game
         )
 
-        if wroteImage {
-            saveState.preview = ImageAsset(insertInto: objectContext, id: previewID, fileExtension: "jpeg")
-        }
-
-        saveState.game = game
         try objectContext.saveIfNeeded()
     }
 }
@@ -325,13 +322,13 @@ extension ObjectActor {
 
 extension ObjectActor {
     private func createImage(copy sourceUrl: URL) async throws(FileSystemError) -> ImageAsset {
-        let asset = ImageAsset(insertInto: objectContext, fileExtension: sourceUrl.fileExtension())
+        let asset = ImageAsset.create(in: objectContext, fileExtension: sourceUrl.fileExtension())
         try await fileSystem.overwrite(copying: .other(sourceUrl), to: asset.path)
         return asset
     }
 
     private func createImage(remote: URL) async throws(FileSystemError) -> ImageAsset {
-        let asset = ImageAsset(insertInto: objectContext, fileExtension: remote.fileExtension())
+        let asset = ImageAsset.create(in: objectContext, fileExtension: remote.fileExtension())
         try await fileSystem.download(from: remote, overwriting: asset.path)
         return asset
     }
@@ -378,7 +375,7 @@ extension ObjectActor {
     }
 
     func createTag(name: String, color: TagColor) throws(PersistenceError) {
-        Tag(insertInto: objectContext, name: name, color: color)
+        Tag.create(in: objectContext, name: name, color: color)
         try objectContext.saveIfNeeded()
     }
 
@@ -430,7 +427,7 @@ extension ObjectActor {
         for game: ObjectBox<Game>
     ) throws(PersistenceError) {
         let game = try game.get(in: objectContext)
-        Cheat(insertInto: objectContext, name: name, code: code, format: format, isEnabled: isEnabled, game: game)
+        Cheat.create(in: objectContext, name: name, code: code, format: format, isEnabled: isEnabled, game: game)
         try objectContext.saveIfNeeded()
     }
 

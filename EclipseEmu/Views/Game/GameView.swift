@@ -2,8 +2,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 import OSLog
 
-private struct EmptyError: Error {}
-
 private enum GameViewError: LocalizedError {
     case saveFileDoesNotExist
     case playbackError(GamePlaybackError)
@@ -37,6 +35,8 @@ private struct SaveFileDocument: FileDocument {
     static let readableContentTypes = [UTType.save]
     let data: URL
     let fileName: String?
+
+    private struct EmptyError: Error {}
 
     init(url: URL, fileName: String) {
         self.data = url

@@ -22,8 +22,8 @@ struct TagsView: View {
                 ForEach(tags) { tag in
                     NavigationLink(to: .editTag(tag)) {
                         Label(tag.name ?? "Tag", systemImage: "tag")
-                            .tint(tag.color.color)
                     }
+                    .listItemTint(tag.color.color)
                 }
                 .onDelete(perform: delete)
             }
@@ -40,9 +40,7 @@ struct TagsView: View {
                 }
                 #endif
                 ToolbarItem {
-                    Button {
-                        self.isCreateDialogPresented = true
-                    } label: {
+                    ToggleButton(value: $isCreateDialogPresented) {
                         Label("Create Tag", systemImage: "plus")
                     }
                 }

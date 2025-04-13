@@ -3,26 +3,27 @@ import Foundation
 import OSLog
 
 extension SaveState {
-    @discardableResult
-    convenience init(
-        insertInto context: NSManagedObjectContext,
-        id: UUID = UUID(),
-        isAuto: Bool,
-        stateExtension: String?,
-        preview: ImageAsset? = nil,
-        game: Game? = nil
-    ) {
-        self.init(context: context)
-        self.id = id
-        self.isAuto = isAuto
-        self.date = Date()
-        self.preview = preview
-        self.fileExtension = stateExtension
-        self.game = game
-    }
-
     var path: FileSystemPath {
         .saveState(fileName: id!, fileExtension: fileExtension)
+    }
+
+    @discardableResult
+    static func create(
+        in context: NSManagedObjectContext,
+        id: UUID = UUID(),
+        isAuto: Bool,
+        stateExtension: String? = "s8",
+        preview: ImageAsset? = nil,
+        game: Game? = nil
+    ) -> Self {
+        let model: Self = context.create()
+        model.id = id
+        model.isAuto = isAuto
+        model.date = Date()
+        model.preview = preview
+        model.fileExtension = stateExtension
+        model.game = game
+        return model
     }
 
     override public func didSave() {

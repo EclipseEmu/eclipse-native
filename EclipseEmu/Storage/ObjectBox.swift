@@ -4,25 +4,19 @@ import CoreData
 struct ObjectBox<T: NSManagedObject>: Equatable, Hashable, Sendable {
     let id: NSManagedObjectID
 
-    init(id: NSManagedObjectID) {
-        self.id = id
-    }
-
     init(_ object: T) {
         self.id = object.objectID
     }
 
     func get(in context: NSManagedObjectContext) throws(PersistenceError) -> T {
-        let object: NSManagedObject
         do {
-            object = try context.existingObject(with: self.id)
+            guard let object = try context.existingObject(with: self.id) as? T else {
+                unreachable("object is not castable to \(String(describing: T.self)). this is a fatal error")
+            }
+            return object
         } catch {
             throw .obtain(error)
         }
-        guard let object = object as? T else {
-            throw .typeMismatch
-        }
-        return object
     }
 
     func tryGet(in context: NSManagedObjectContext) -> T? {
