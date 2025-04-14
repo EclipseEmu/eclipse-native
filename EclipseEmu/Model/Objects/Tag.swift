@@ -62,7 +62,7 @@ enum TagColor: Int16, RawRepresentable, Equatable, CaseIterable {
     }
 }
 
-extension Tag {
+extension TagObject {
     var color: TagColor {
         get {
             .init(rawValue: rawColor) ?? .blue

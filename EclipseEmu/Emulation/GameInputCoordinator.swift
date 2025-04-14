@@ -25,7 +25,7 @@ final class GameInputCoordinator {
     private var keyboardBindings: InputSourceKeyboardDescriptor.Bindings!
     private var gamepadBindings: [GCController.ID: GamepadInfo] = [:]
 
-    private let game: ObjectBox<Game>
+    private let game: ObjectBox<GameObject>
     private let system: GameSystem
     private let bindingsManager: ControlBindingsManager
 
@@ -34,7 +34,7 @@ final class GameInputCoordinator {
     private var keyboardConnectObserver: Task<Void, Never>!
     private var keyboardDisconnectObserver: Task<Void, Never>!
 
-    init(maxPlayers: UInt8, game: ObjectBox<Game>, system: GameSystem, bindingsManager: ControlBindingsManager) {
+    init(maxPlayers: UInt8, game: ObjectBox<GameObject>, system: GameSystem, bindingsManager: ControlBindingsManager) {
         self.maxPlayerCount = maxPlayers
         self.bindingsManager = bindingsManager
         self.game = game

@@ -26,10 +26,10 @@ struct CoverPickerDatabaseView: View {
     @State private var searchTask: Task<Void, Never>?
     @State private var db: OpenVGDB?
 
-    @ObservedObject private var game: Game
+    @ObservedObject private var game: GameObject
     let system: GameSystem
 
-    init(game: Game) {
+    init(game: GameObject) {
         self.game = game
         self.system = game.system
         let query = game.name?.normalize(with: .alphanumerics.union(.whitespaces)) ?? ""
@@ -153,7 +153,7 @@ struct CoverPickerDatabaseView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+    PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             CoverPickerDatabaseView(game: game)
         }

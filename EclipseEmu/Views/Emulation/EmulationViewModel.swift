@@ -25,7 +25,7 @@ enum EmulationViewError: LocalizedError {
 
 @MainActor
 final class EmulationViewModel: ObservableObject {
-    @Published var game: Game
+    @Published var game: GameObject
     let persistence: Persistence
     let core: GameCoreCoordinator
 
@@ -52,8 +52,8 @@ final class EmulationViewModel: ObservableObject {
 
     init(
         coreInfo: CoreInfo,
-        game: Game,
-        saveState: SaveState?,
+        game: GameObject,
+        saveState: SaveStateObject?,
         romPath: FileSystemPath,
         savePath: FileSystemPath,
         cheats: [OwnedCheat],

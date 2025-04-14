@@ -5,8 +5,8 @@ struct CoverPickerViewModifier: ViewModifier {
     @EnvironmentObject private var persistence: Persistence
 
     @Binding var method: CoverPickerMethod?
-    @Binding private var photosSheet: Game?
-    @Binding private var databaseSheet: Game?
+    @Binding private var photosSheet: GameObject?
+    @Binding private var databaseSheet: GameObject?
 
     init(presenting method: Binding<CoverPickerMethod?>) {
         self._method = method

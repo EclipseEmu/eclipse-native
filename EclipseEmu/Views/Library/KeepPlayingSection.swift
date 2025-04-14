@@ -7,16 +7,16 @@ struct KeepPlayingSection: View {
     @EnvironmentObject var gamePlayback: GamePlayback
     @EnvironmentObject var persistence: Persistence
 
-    @FetchRequest<SaveState>(sortDescriptors: [])
-    var keepPlaying: FetchedResults<SaveState>
+    @FetchRequest<SaveStateObject>(sortDescriptors: [])
+    var keepPlaying: FetchedResults<SaveStateObject>
 
-    @State private var renameSaveStateTarget: SaveState?
-    @State private var deleteSaveStateTarget: SaveState?
+    @State private var renameSaveStateTarget: SaveStateObject?
+    @State private var deleteSaveStateTarget: SaveStateObject?
 
     init() {
-        let fetchRequest = SaveState.fetchRequest()
+        let fetchRequest = SaveStateObject.fetchRequest()
         fetchRequest.fetchLimit = 10
-        fetchRequest.sortDescriptors = [.init(keyPath: \SaveState.date, ascending: false)]
+        fetchRequest.sortDescriptors = [.init(keyPath: \SaveStateObject.date, ascending: false)]
         fetchRequest.predicate = NSPredicate(format: "isAuto == true")
         _keepPlaying = FetchRequest(fetchRequest: fetchRequest)
     }
@@ -68,7 +68,7 @@ struct KeepPlayingSection: View {
         }
     }
 
-    func saveStateSelected(_ saveState: SaveState) {
+    func saveStateSelected(_ saveState: SaveStateObject) {
         Task { @MainActor in
             do {
                 try await gamePlayback.play(state: saveState, persistence: persistence)

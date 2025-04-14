@@ -4,21 +4,21 @@ protocol RenameableObject: NSManagedObject {
     func rename(to newName: String) -> Void
 }
 
-extension Game: RenameableObject {
+extension GameObject: RenameableObject {
     @inlinable
     func rename(to newName: String) {
         self.name = newName
     }
 }
 
-extension Tag: RenameableObject {
+extension TagObject: RenameableObject {
     @inlinable
     func rename(to newName: String) {
         self.name = newName
     }
 }
 
-extension SaveState: RenameableObject {
+extension SaveStateObject: RenameableObject {
     @inlinable
     func rename(to newName: String) {
         self.name = newName

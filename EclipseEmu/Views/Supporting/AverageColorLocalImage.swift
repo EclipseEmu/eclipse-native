@@ -5,7 +5,7 @@ struct AverageColorLocalImage<I: View, P: View>: View {
     @State private var task: Task<Void, Never>?
 
     @EnvironmentObject var persistence: Persistence
-    private var handle: ImageAsset?
+    private var handle: ImageAssetObject?
     private let image: (Image) -> I
     private let placeholder: () -> P
 
@@ -13,7 +13,7 @@ struct AverageColorLocalImage<I: View, P: View>: View {
     @State private var state: AsyncImagePhase = .empty
 
     init(
-        _ object: ImageAsset?,
+        _ object: ImageAssetObject?,
         color: Binding<Color?>,
         @ViewBuilder image: @escaping (Image) -> I,
         @ViewBuilder placeholder: @escaping () -> P

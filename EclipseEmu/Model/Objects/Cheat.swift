@@ -1,6 +1,6 @@
 import CoreData
 
-extension Cheat {
+extension CheatObject {
     @discardableResult
     static func create(
         in context: NSManagedObjectContext,
@@ -8,7 +8,7 @@ extension Cheat {
         code: String,
         format: String,
         isEnabled: Bool,
-        game: Game? = nil
+        game: GameObject? = nil
     ) -> Self {
         let model: Self = context.create()
         model.label = name

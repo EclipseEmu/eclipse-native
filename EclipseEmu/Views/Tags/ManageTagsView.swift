@@ -3,15 +3,15 @@ import SwiftUI
 enum ManageTagsTarget: Identifiable, Hashable {
     var id: Int { self.hashValue }
 
-    case one(Game)
-    case many(Set<Game>)
+    case one(GameObject)
+    case many(Set<GameObject>)
 }
 
 private struct TagsSelection {
-    let game: Game
+    let game: GameObject
     var isSelected: Bool
 
-    init(game: Game, tag: Tag) {
+    init(game: GameObject, tag: TagObject) {
         self.game = game
         isSelected = game.tags?.contains(tag) ?? false
     }
@@ -21,12 +21,12 @@ private struct TagsSelection {
 
 private struct ManyManageTagsItemView: View {
     @EnvironmentObject private var persistence: Persistence
-    @ObservedObject private var tag: Tag
-    let games: [ObjectBox<Game>]
+    @ObservedObject private var tag: TagObject
+    let games: [ObjectBox<GameObject>]
     @State private var sources: [TagsSelection]
     @Binding private var error: PersistenceError?
 
-    init(tag: Tag, target: Set<Game>, error: Binding<PersistenceError?>) {
+    init(tag: TagObject, target: Set<GameObject>, error: Binding<PersistenceError?>) {
         self.tag = tag
         self.games = target.boxedItems()
         self._error = error
@@ -55,12 +55,12 @@ private struct ManyManageTagsItemView: View {
 
 private struct OneManageTagsItemView: View {
     @EnvironmentObject private var persistence: Persistence
-    @ObservedObject private var tag: Tag
-    @ObservedObject private var game: Game
+    @ObservedObject private var tag: TagObject
+    @ObservedObject private var game: GameObject
     @State private var isOn: Bool
     @Binding private var error: PersistenceError?
 
-    init(tag: Tag, game: Game, error: Binding<PersistenceError?>) {
+    init(tag: TagObject, game: GameObject, error: Binding<PersistenceError?>) {
         self.tag = tag
         self.game = game
         self.isOn = game.tags?.contains(tag) ?? false
@@ -97,8 +97,8 @@ struct ManageTagsView: View {
     @State private var isNewTagViewOpen: Bool = false
     @State private var error: PersistenceError?
 
-    @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
-    private var tags: FetchedResults<Tag>
+    @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
+    private var tags: FetchedResults<TagObject>
 
     init(target: ManageTagsTarget) {
         self.target = target

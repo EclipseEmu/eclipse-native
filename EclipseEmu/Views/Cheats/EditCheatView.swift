@@ -2,9 +2,9 @@ import EclipseKit
 import SwiftUI
 
 struct EditCheatView: View {
-    private let game: Game
+    private let game: GameObject
     private let cheatFormats: [CheatFormat]
-    private let cheat: Cheat?
+    private let cheat: CheatObject?
     private let isCreatingCheat: Bool
 
     @Environment(\.dismiss) var dismiss
@@ -16,7 +16,7 @@ struct EditCheatView: View {
     @State var enabled: Bool = true
     @State var isCodeValid: Bool = false
 
-    init(cheat: Cheat?, game: Game, cheatFormats: [CheatFormat]) {
+    init(cheat: CheatObject?, game: GameObject, cheatFormats: [CheatFormat]) {
         self.cheat = cheat
         self.game = game
         self.cheatFormats = cheatFormats
@@ -140,7 +140,7 @@ struct EditCheatView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+    PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             EditCheatView(cheat: nil, game: game, cheatFormats: [])
         }

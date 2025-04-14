@@ -8,20 +8,20 @@ enum SaveStateItemTitle: Equatable {
 struct SaveStateItem: View {
     @EnvironmentObject private var persistence: Persistence
 
-    @ObservedObject private var saveState: SaveState
-    @Binding private var renameTarget: SaveState?
-    @Binding private var deleteTarget: SaveState?
+    @ObservedObject private var saveState: SaveStateObject
+    @Binding private var renameTarget: SaveStateObject?
+    @Binding private var deleteTarget: SaveStateObject?
     private let formatter: RelativeDateTimeFormatter
     private let titleValue: SaveStateItemTitle
-    private let action: (SaveState) -> Void
+    private let action: (SaveStateObject) -> Void
 
     init(
-        _ saveState: SaveState,
+        _ saveState: SaveStateObject,
         title: SaveStateItemTitle,
         formatter: RelativeDateTimeFormatter,
-        renameTarget: Binding<SaveState?>,
-        deleteTarget: Binding<SaveState?>,
-        action: @escaping (SaveState) -> Void
+        renameTarget: Binding<SaveStateObject?>,
+        deleteTarget: Binding<SaveStateObject?>,
+        action: @escaping (SaveStateObject) -> Void
     ) {
         self.saveState = saveState
         self.formatter = formatter
@@ -104,10 +104,10 @@ struct SaveStateItem: View {
 
 @available(iOS 18, macOS 15, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    @Previewable @State var renameTarget: SaveState?
-    @Previewable @State var deleteTarget: SaveState?
+    @Previewable @State var renameTarget: SaveStateObject?
+    @Previewable @State var deleteTarget: SaveStateObject?
 
-    PreviewSingleObjectView(SaveState.fetchRequest()) { item, _ in
+    PreviewSingleObjectView(SaveStateObject.fetchRequest()) { item, _ in
         SaveStateItem(
             item,
             title: .name,

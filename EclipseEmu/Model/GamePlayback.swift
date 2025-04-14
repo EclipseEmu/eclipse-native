@@ -11,8 +11,8 @@ enum GamePlaybackState {
 
 enum GamePlaybackMissingFile: Equatable {
     case none
-    case rom(ObjectBox<Game>)
-    case saveState(ObjectBox<SaveState>)
+    case rom(ObjectBox<GameObject>)
+    case saveState(ObjectBox<SaveStateObject>)
 }
 
 enum GamePlaybackError: LocalizedError {
@@ -59,8 +59,8 @@ enum GamePlaybackError: LocalizedError {
 
 struct GamePlaybackData: Sendable {
     let core: CoreInfo
-    let game: ObjectBox<Game>
-    let saveState: ObjectBox<SaveState>?
+    let game: ObjectBox<GameObject>
+    let saveState: ObjectBox<SaveStateObject>?
     let romPath: FileSystemPath
     let savePath: FileSystemPath
     let saveStatePath: FileSystemPath?
@@ -74,7 +74,7 @@ struct GamePlaybackData: Sendable {
         let priority: Int16
         let type: String?
 
-        init(_ cheat: Cheat) {
+        init(_ cheat: CheatObject) {
             self.id = cheat.id
             self.code = cheat.code
             self.enabled = cheat.enabled
@@ -94,7 +94,7 @@ final class GamePlayback: ObservableObject {
         self.coreRegistry = coreRegistry
     }
 
-    func play(game: Game, persistence: Persistence) async throws(GamePlaybackError) {
+    func play(game: GameObject, persistence: Persistence) async throws(GamePlaybackError) {
         guard let core = coreRegistry.get(for: game) else {
             throw GamePlaybackError.missingCore
         }
@@ -102,7 +102,7 @@ final class GamePlayback: ObservableObject {
             throw GamePlaybackError.missingFile(.rom(.init(game)))
         }
 
-        let cheats = (game.cheats as? Set<Cheat>) ?? []
+        let cheats = (game.cheats as? Set<CheatObject>) ?? []
         do {
             let viewModel: EmulationViewModel = try await EmulationViewModel(
                 coreInfo: core,
@@ -119,7 +119,7 @@ final class GamePlayback: ObservableObject {
         }
     }
 
-    func play(state: SaveState, persistence: Persistence) async throws(GamePlaybackError) {
+    func play(state: SaveStateObject, persistence: Persistence) async throws(GamePlaybackError) {
         guard let game = state.game else { throw GamePlaybackError.missingGame }
         guard let core = coreRegistry.get(for: game) else {
             throw GamePlaybackError.missingCore
@@ -132,7 +132,7 @@ final class GamePlayback: ObservableObject {
             throw GamePlaybackError.missingFile(.rom(.init(game)))
         }
 
-        let cheats = (game.cheats as? Set<Cheat>) ?? []
+        let cheats = (game.cheats as? Set<CheatObject>) ?? []
         do {
             let viewModel: EmulationViewModel = try await EmulationViewModel(
                 coreInfo: core,

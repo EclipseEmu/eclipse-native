@@ -82,7 +82,7 @@ final actor GameCoreCoordinator {
 
     init(
         coreInfo: CoreInfo,
-        game: ObjectBox<Game>,
+        game: ObjectBox<GameObject>,
         system: GameSystem,
         bindingsManager: ControlBindingsManager
     ) async throws(GameCoreCoordinatorError) {

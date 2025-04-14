@@ -12,14 +12,14 @@ struct PreviewStorage: PreviewModifier {
         let objectContext = persistence.mainContext
 
         let tags = [
-            Tag.create(in: objectContext, name: "Collection 0", color: .mint),
-            Tag.create(in: objectContext, name: "Collection 1", color: .cyan),
-            Tag.create(in: objectContext, name: "Collection 2", color: .green),
-            Tag.create(in: objectContext, name: "Collection 3", color: .blue),
+            TagObject.create(in: objectContext, name: "Collection 0", color: .mint),
+            TagObject.create(in: objectContext, name: "Collection 1", color: .cyan),
+            TagObject.create(in: objectContext, name: "Collection 2", color: .green),
+            TagObject.create(in: objectContext, name: "Collection 3", color: .blue),
         ]
 
         for i in 0..<32 {
-            let game = Game.create(
+            let game = GameObject.create(
                 in: objectContext,
                 name: "Game \(i)",
                 system: .gba,
@@ -31,7 +31,7 @@ struct PreviewStorage: PreviewModifier {
             let randIdx = i & 3
             tags[randIdx].addToGames(game)
             for j in (0...randIdx) {
-                let saveState = SaveState.create(in: objectContext, isAuto: j == 0, stateExtension: "s8")
+                let saveState = SaveStateObject.create(in: objectContext, isAuto: j == 0, stateExtension: "s8")
                 saveState.game = game
             }
         }

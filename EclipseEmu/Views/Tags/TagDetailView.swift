@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum TagDetailViewMode: Hashable, Equatable {
-    case edit(Tag)
+    case edit(TagObject)
     case create
 
     var title: LocalizedStringKey {
@@ -27,7 +27,7 @@ struct TagDetailView: View {
 
     @State private var newName: String
     @State private var newColor: TagColor
-    @State private var deleteTag: Tag?
+    @State private var deleteTag: TagObject?
 
     init(mode: TagDetailViewMode) {
         self.mode = mode

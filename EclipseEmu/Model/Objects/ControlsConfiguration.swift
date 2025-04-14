@@ -1,6 +1,6 @@
 import EclipseKit
 
-extension ControlsConfiguration {
+extension ControlsConfigurationObject {
     var system: GameSystem {
         get {
             GameSystem(rawValue: UInt32(self.rawSystem)) ?? .unknown

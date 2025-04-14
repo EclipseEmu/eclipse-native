@@ -3,7 +3,7 @@ import Foundation
 import EclipseKit
 import OSLog
 
-extension Game {
+extension GameObject {
     var romPath: FileSystemPath {
         .rom(fileName: sha1!, fileExtension: romExtension)
     }
@@ -30,7 +30,7 @@ extension Game {
         sha1: String,
         romExtension: String?,
         saveExtension: String?,
-        cover: ImageAsset? = nil
+        cover: ImageAssetObject? = nil
     ) -> Self {
         let model: Self = context.create()
         model.id = uuid

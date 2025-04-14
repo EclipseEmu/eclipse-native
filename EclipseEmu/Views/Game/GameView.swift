@@ -89,15 +89,15 @@ struct GameView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-    @ObservedObject var game: Game
-    @FetchRequest<SaveState>(fetchRequest: SaveState.fetchRequest())
-    private var saveStates: FetchedResults<SaveState>
+    @ObservedObject var game: GameObject
+    @FetchRequest<SaveStateObject>(fetchRequest: SaveStateObject.fetchRequest())
+    private var saveStates: FetchedResults<SaveStateObject>
     @State private var coverColor: Color?
 
-    @State private var renameTarget: Game?
-    @State private var deleteTarget: Game?
-    @State private var renameSaveStateTarget: SaveState?
-    @State private var deleteSaveStateTarget: SaveState?
+    @State private var renameTarget: GameObject?
+    @State private var deleteTarget: GameObject?
+    @State private var renameSaveStateTarget: SaveStateObject?
+    @State private var deleteSaveStateTarget: SaveStateObject?
     @State private var coverPickerMethod: CoverPickerMethod?
     @State private var isManageTagsOpen: Bool = false
     @State private var fileImportRequest: FileImportType?
@@ -109,14 +109,14 @@ struct GameView: View {
 
     @State private var error: GameViewError?
 
-    init(game: Game, coverColor: Color = .clear) {
+    init(game: GameObject, coverColor: Color = .clear) {
         self.game = game
 
-        let request = SaveState.fetchRequest()
+        let request = SaveStateObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
         request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \SaveState.isAuto, ascending: false),
-            NSSortDescriptor(keyPath: \SaveState.date, ascending: false)
+            NSSortDescriptor(keyPath: \SaveStateObject.isAuto, ascending: false),
+            NSSortDescriptor(keyPath: \SaveStateObject.date, ascending: false)
         ]
         request.fetchLimit = 10
 
@@ -397,7 +397,7 @@ struct GameView: View {
         }
     }
 
-    private func saveStateSelected(saveState: SaveState) {
+    private func saveStateSelected(saveState: SaveStateObject) {
         Task {
             do {
                 try await playback.play(state: saveState, persistence: persistence)
@@ -537,7 +537,7 @@ extension GameView {
 
 @available(iOS 18, macOS 15, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+    PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             GameView(game: game, coverColor: Color.red)
         }

@@ -6,8 +6,8 @@ struct CheatItemView: View {
     @Environment(\.editMode) var editMode
     #endif
 
-    @ObservedObject var cheat: Cheat
-    @Binding var editingCheat: Cheat?
+    @ObservedObject var cheat: CheatObject
+    @Binding var editingCheat: CheatObject?
 
     var body: some View {
         HStack {

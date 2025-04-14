@@ -10,11 +10,11 @@ enum Destination: Hashable, Equatable {
     case licenses
 
     case manageTags
-    case editTag(Tag)
+    case editTag(TagObject)
 
-    case game(Game)
-    case saveStates(Game)
-    case cheats(Game)
+    case game(GameObject)
+    case saveStates(GameObject)
+    case cheats(GameObject)
 }
 
 extension NavigationLink where Label: View, Destination == Never {

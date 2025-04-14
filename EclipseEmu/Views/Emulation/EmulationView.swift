@@ -263,7 +263,7 @@ struct EmulationView: View {
         }
     }
 
-    private func saveStateSelected(_ saveState: SaveState) async -> Bool {
+    private func saveStateSelected(_ saveState: SaveStateObject) async -> Bool {
         let url = persistence.files.url(for: saveState.path)
         return await viewModel.core.loadState(for: url)
     }

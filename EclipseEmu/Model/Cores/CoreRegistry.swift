@@ -35,7 +35,7 @@ final class CoreRegistry: ObservableObject {
     }
 
     @inlinable
-    func get(for game: Game) -> CoreInfo? {
+    func get(for game: GameObject) -> CoreInfo? {
         self.get(for: game.system)
     }
 

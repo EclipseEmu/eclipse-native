@@ -2,12 +2,12 @@ import SwiftUI
 
 struct LocalImage<I: View, P: View>: View {
     @EnvironmentObject var persistence: Persistence
-    private var handle: ImageAsset?
+    private var handle: ImageAssetObject?
     private let image: (Image) -> I
     private let placeholder: () -> P
 
     init(
-        _ object: ImageAsset?,
+        _ object: ImageAssetObject?,
         @ViewBuilder image: @escaping (Image) -> I,
         @ViewBuilder placeholder: @escaping () -> P
     ) {

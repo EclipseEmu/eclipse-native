@@ -44,12 +44,12 @@ final class ControlBindingsManager {
 
     func load<S: InputSourceDescriptorProtocol>(
         for source: S,
-        game: ObjectBox<Game>?,
+        game: ObjectBox<GameObject>?,
         system: GameSystem
     ) -> S.Bindings {
         guard
             let game = game?.tryGet(in: persistence.mainContext),
-            let controls = game.controls as? Set<ControlsConfiguration>,
+            let controls = game.controls as? Set<ControlsConfigurationObject>,
             let config = controls.first(where: { config in
                 config.system == system && config.kind == source.kind && config.sourceID == source.id
             }),
@@ -62,7 +62,7 @@ final class ControlBindingsManager {
     }
 
     func load<S: InputSourceDescriptorProtocol>(for source: S, system: GameSystem) -> S.Bindings {
-        let request = ControlsConfiguration.fetchRequest()
+        let request = ControlsConfigurationObject.fetchRequest()
         request.fetchLimit = 1
         request.includesSubentities = false
         request.predicate = if let sourceID = source.id {

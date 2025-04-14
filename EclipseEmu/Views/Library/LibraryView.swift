@@ -8,28 +8,28 @@ struct LibraryView: View {
     @EnvironmentObject private var persistence: Persistence
     @EnvironmentObject private var navigation: NavigationManager
 
-    @FetchRequest<Game>(
+    @FetchRequest<GameObject>(
         sortDescriptors: Self.getSortDescriptors(
             for: Settings.getSortDirection(),
             method: Settings.getSortMethod()
         ),
         animation: .default
     )
-    private var games: FetchedResults<Game>
+    private var games: FetchedResults<GameObject>
 
     @State private var query: String = ""
 
     @State private var isSelecting = false
-    @State private var selection: Set<Game> = []
-    @State private var renameTarget: Game?
-    @State private var deleteTarget: Game?
+    @State private var selection: Set<GameObject> = []
+    @State private var renameTarget: GameObject?
+    @State private var deleteTarget: GameObject?
     @State private var fileImportType: FileImportType?
     @State private var manageTagsTarget: ManageTagsTarget?
     @State private var coverPickerMethod: CoverPickerMethod?
 
     @State var isFiltersViewPresented: Bool = false
     @State var filteredSystems: Set<GameSystem> = Set(GameSystem.concreteCases)
-    @State var filteredTags: Set<Tag> = []
+    @State var filteredTags: Set<TagObject> = []
 
     var areSystemsFiltered: Bool { filteredSystems.count != GameSystem.concreteCases.count }
 
@@ -304,7 +304,7 @@ struct LibraryView: View {
         }
     }
 
-    private func gameSelected(_ game: Game) {
+    private func gameSelected(_ game: GameObject) {
         if !isSelecting {
             navigation.path.append(Destination.game(game))
         } else if selection.contains(game) {
@@ -349,8 +349,8 @@ struct LibraryView: View {
     private static func getSortDescriptors(for direction: GameListSortingDirection, method: GameListSortingMethod) -> [NSSortDescriptor] {
         let isAscending = direction == .ascending
         return switch method {
-        case .name: [NSSortDescriptor(keyPath: \Game.name, ascending: isAscending)]
-        case .dateAdded: [NSSortDescriptor(keyPath: \Game.dateAdded, ascending: isAscending)]
+        case .name: [NSSortDescriptor(keyPath: \GameObject.name, ascending: isAscending)]
+        case .dateAdded: [NSSortDescriptor(keyPath: \GameObject.dateAdded, ascending: isAscending)]
         }
     }
 }

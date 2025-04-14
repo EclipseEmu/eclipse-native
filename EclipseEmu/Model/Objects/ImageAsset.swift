@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 import OSLog
 
-extension ImageAsset {
+extension ImageAssetObject {
     var path: FileSystemPath {
         .image(fileName: id!, fileExtension: fileExtension)
     }

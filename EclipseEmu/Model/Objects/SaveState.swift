@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 import OSLog
 
-extension SaveState {
+extension SaveStateObject {
     var path: FileSystemPath {
         .saveState(fileName: id!, fileExtension: fileExtension)
     }
@@ -13,8 +13,8 @@ extension SaveState {
         id: UUID = UUID(),
         isAuto: Bool,
         stateExtension: String? = "s8",
-        preview: ImageAsset? = nil,
-        game: Game? = nil
+        preview: ImageAssetObject? = nil,
+        game: GameObject? = nil
     ) -> Self {
         let model: Self = context.create()
         model.id = id

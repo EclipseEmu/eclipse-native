@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CoverPickerMenu: View {
-    @ObservedObject var game: Game
+    @ObservedObject var game: GameObject
     @Binding var coverPickerMethod: CoverPickerMethod?
 
     var body: some View {

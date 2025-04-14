@@ -5,11 +5,11 @@ import EclipseKit
 struct LibraryFiltersView: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
 
-    @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
-    private var allTags: FetchedResults<Tag>
+    @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
+    private var allTags: FetchedResults<TagObject>
 
     @Binding var systems: Set<GameSystem>
-    @Binding var tags: Set<Tag>
+    @Binding var tags: Set<TagObject>
 
     var body: some View {
         Form {
@@ -71,7 +71,7 @@ struct LibraryFiltersView: View {
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
     @Previewable @State var systems: Set<GameSystem> = []
-    @Previewable @State var tags: Set<Tag> = []
+    @Previewable @State var tags: Set<TagObject> = []
 
     NavigationStack {
         LibraryFiltersView(systems: $systems, tags: $tags)

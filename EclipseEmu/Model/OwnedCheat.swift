@@ -6,7 +6,7 @@ struct OwnedCheat: Identifiable, Equatable, Hashable {
     let priority: Int16
     let type: String?
 
-    init(cheat: Cheat) {
+    init(cheat: CheatObject) {
         self.id = cheat.id
         self.code = cheat.code
         self.enabled = cheat.enabled

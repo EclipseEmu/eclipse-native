@@ -5,20 +5,20 @@ struct SaveStatesView: View {
 
     @EnvironmentObject private var persistence: Persistence
 
-    @FetchRequest<SaveState>(fetchRequest: SaveState.fetchRequest())
-    private var saveStates: FetchedResults<SaveState>
-    @ObservedObject private var game: Game
-    private let action: (SaveState) -> Void
+    @FetchRequest<SaveStateObject>(fetchRequest: SaveStateObject.fetchRequest())
+    private var saveStates: FetchedResults<SaveStateObject>
+    @ObservedObject private var game: GameObject
+    private let action: (SaveStateObject) -> Void
 
-    @State private var renameTarget: SaveState?
-    @State private var deleteTarget: SaveState?
+    @State private var renameTarget: SaveStateObject?
+    @State private var deleteTarget: SaveStateObject?
 
-    init(game: Game, action: @escaping (SaveState) -> Void) {
-        let request = SaveState.fetchRequest()
+    init(game: GameObject, action: @escaping (SaveStateObject) -> Void) {
+        let request = SaveStateObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
         request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \SaveState.isAuto, ascending: false),
-            NSSortDescriptor(keyPath: \SaveState.date, ascending: false)
+            NSSortDescriptor(keyPath: \SaveStateObject.isAuto, ascending: false),
+            NSSortDescriptor(keyPath: \SaveStateObject.date, ascending: false)
         ]
         self._saveStates = .init(fetchRequest: request)
 
@@ -61,7 +61,7 @@ struct SaveStatesView: View {
 
 @available(iOS 18, macOS 15, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+    PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         SaveStatesView(game: game) { _ in }
     }
 }

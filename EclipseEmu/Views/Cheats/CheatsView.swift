@@ -4,22 +4,22 @@ import Foundation
 import SwiftUI
 
 struct CheatsView: View {
-    static let sortCheatsBy = [NSSortDescriptor(keyPath: \Cheat.priority, ascending: true)]
+    static let sortCheatsBy = [NSSortDescriptor(keyPath: \CheatObject.priority, ascending: true)]
 
-    @ObservedObject var game: Game
+    @ObservedObject var game: GameObject
     let cheatFormats: [CheatFormat]
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var persistence: Persistence
-    @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<Cheat>
+    @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<CheatObject>
     @State var isAddViewOpen = false
-    @State var editingCheat: Cheat?
+    @State var editingCheat: CheatObject?
 
-    init(game: Game, coreRegistry: CoreRegistry) {
+    init(game: GameObject, coreRegistry: CoreRegistry) {
         self.game = game
 
         self.cheatFormats = coreRegistry.get(for: game)?.cheatFormats ?? []
 
-        let request = Cheat.fetchRequest()
+        let request = CheatObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
         request.includesSubentities = false
         request.sortDescriptors = Self.sortCheatsBy
@@ -107,7 +107,7 @@ struct CheatsView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    PreviewSingleObjectView(Game.fetchRequest()) { game, _ in
+    PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             CheatsView(game: game, coreRegistry: .init(cores: [], settings: Settings()))
         }

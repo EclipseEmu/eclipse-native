@@ -4,10 +4,10 @@ struct TagsView: View {
     @EnvironmentObject var persistence: Persistence
     @EnvironmentObject var navigationManager: NavigationManager
     @State var isCreateDialogPresented: Bool = false
-    @State var renameItem: Tag?
+    @State var renameItem: TagObject?
 
-    @FetchRequest<Tag>(sortDescriptors: [NSSortDescriptor(keyPath: \Tag.name, ascending: true)])
-    var tags: FetchedResults<Tag>
+    @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
+    var tags: FetchedResults<TagObject>
 
     @ViewBuilder
     var mainContent: some View {
