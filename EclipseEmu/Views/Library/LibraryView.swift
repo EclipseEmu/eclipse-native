@@ -100,7 +100,7 @@ struct LibraryView: View {
             .coverPicker(presenting: $coverPickerMethod)
             .renameItem("RENAME_GAME", item: $renameTarget)
             .deleteItem("DELETE_GAME", item: $deleteTarget) { game in
-                Text("DELETE_GAME_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
+                Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
             }
             .sheet(isPresented: $isFiltersViewPresented) {
                 NavigationStack {

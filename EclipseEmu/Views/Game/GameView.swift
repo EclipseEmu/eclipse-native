@@ -257,11 +257,11 @@ struct GameView: View {
         }
         .renameItem("RENAME_GAME", item: $renameTarget)
         .deleteItem("DELETE_GAME", item: $deleteTarget, dismiss: true) { game in
-            Text("DELETE_GAME_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
+            Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
         }
         .renameItem("RENAME_SAVE_STATE", item: $renameSaveStateTarget)
         .deleteItem("DELETE_SAVE_STATE", item: $deleteSaveStateTarget) { saveState in
-            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? NSLocalizedString("SAVE_STATE_UNNAMED", comment: ""))")
+            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? String(localized: "SAVE_STATE_UNNAMED"))")
         }
         .confirmationDialog("REPLACE_ROM", isPresented: $isReplaceRomConfirmationOpen) {
             Button("CANCEL", role: .cancel) {}

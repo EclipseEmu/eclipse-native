@@ -54,7 +54,7 @@ struct SaveStatesView: View {
         }
         .renameItem("RENAME_SAVE_STATE", item: $renameTarget)
         .deleteItem("DELETE_SAVE_STATE", item: $deleteTarget) { saveState in
-            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? NSLocalizedString("SAVE_STATE_UNNAMED", comment: ""))")
+            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? String(localized: "SAVE_STATE_UNNAMED"))")
         }
     }
 }

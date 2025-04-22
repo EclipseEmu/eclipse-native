@@ -38,7 +38,7 @@ struct CheatsView: View {
             ContentUnavailableMessage {
                 Label("NO_CHEATS_TITLE", systemImage: "memorychip.fill")
             } description: {
-                Text("NO_CHEATS_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
+                Text("NO_CHEATS_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
             }
         }
         .emptyState(cheatFormats.isEmpty) {

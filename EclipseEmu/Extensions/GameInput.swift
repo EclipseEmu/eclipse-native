@@ -51,7 +51,7 @@ extension GameInput {
         case .gyroX: "Gryo X"
         case .gyroY: "Gryo Y"
         case .gyroZ: "Gryo Z"
-        default: NSLocalizedString("UNKNOWN", comment: "")
+        default: "Unknown"
         }
     }
 

@@ -6,15 +6,15 @@ import Metal
 // MARK: System
 
 extension GameSystem {
-    var string: LocalizedStringKey {
+    var string: String {
         return switch self {
-        case .unknown: "SYSTEM_UNKNOWN"
-        case .gb: "SYSTEM_GB"
-        case .gbc: "SYSTEM_GBC"
-        case .gba: "SYSTEM_GBA"
-        case .nes: "SYSTEM_NES"
-        case .snes: "SYSTEM_SNES"
-        @unknown default: "SYSTEM_UNKNOWN"
+        case .unknown: String(localized: "SYSTEM_UNKNOWN")
+        case .gb: String(localized: "SYSTEM_GB")
+        case .gbc: String(localized: "SYSTEM_GBC")
+        case .gba: String(localized: "SYSTEM_GBA")
+        case .nes: String(localized: "SYSTEM_NES")
+        case .snes: String(localized: "SYSTEM_SNES")
+        @unknown default: String(localized: "SYSTEM_UNKNOWN")
         }
     }
 
