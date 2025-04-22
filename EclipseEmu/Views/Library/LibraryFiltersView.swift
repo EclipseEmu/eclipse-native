@@ -27,7 +27,7 @@ struct LibraryFiltersView: View {
                     }
                 }
             } header: {
-                Text("System")
+                Text("SYSTEM")
             }
 
             Section {
@@ -40,7 +40,7 @@ struct LibraryFiltersView: View {
                         }
                     })) {
                         Label {
-                            Text(tag.name ?? "Tag")
+                            Text(verbatim: tag.name, fallback: "TAG")
                                 .foregroundStyle(Color.primary)
                         } icon: {
                             Image(systemName: "tag")
@@ -49,20 +49,20 @@ struct LibraryFiltersView: View {
                     .listItemTint(tag.color.color)
                 }
             } header: {
-                Text("Tags")
+                Text("TAGS")
             }
             .emptyState(allTags.isEmpty) {
                 EmptyView()
             }
         }
         .toggleStyleCheckbox()
-        .navigationTitle("Filters")
+        .navigationTitle("FILTERS")
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
 #endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done", action: dismiss.callAsFunction)
+                Button("DONE", action: dismiss.callAsFunction)
             }
         }
     }

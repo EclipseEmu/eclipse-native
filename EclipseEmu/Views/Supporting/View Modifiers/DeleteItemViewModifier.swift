@@ -10,7 +10,7 @@ private struct DeleteConfirmationViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .confirmationDialog(titleKey, isPresented: $isPresented) {
-                Button("Delete", role: .destructive, action: action)
+                Button("DELETE", role: .destructive, action: action)
             } message: {
                 message()
             }
@@ -36,7 +36,7 @@ private struct DeleteItemViewModifier<T>: ViewModifier {
                 isPresented: .isSome($item),
                 presenting: item
             ) { _ in
-                Button("Delete", role: .destructive, action: action)
+                Button("DELETE", role: .destructive, action: action)
             } message: { value in
                 message(value)
             }

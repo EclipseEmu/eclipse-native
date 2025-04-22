@@ -57,13 +57,13 @@ struct KeepPlayingSection: View {
                     }
                 }
             } header: {
-                Text("Keep Playing")
+                Text("KEEP_PLAYING")
                     .sectionHeaderStyle()
                     .padding([.horizontal, .top])
             }
-            .renameItem("Rename Save State", item: $renameSaveStateTarget)
-            .deleteItem("Delete Save State", item: $deleteSaveStateTarget) { saveState in
-                Text("Are you sure you want to delete \(saveState.name ?? "this save state")? This can't be undone.")
+            .renameItem("RENAME_SAVE_STATE", item: $renameSaveStateTarget)
+            .deleteItem("DELETE_SAVE_STATE", item: $deleteSaveStateTarget) { saveState in
+                Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? NSLocalizedString("SAVE_STATE_UNNAMED", comment: ""))")
             }
         }
     }

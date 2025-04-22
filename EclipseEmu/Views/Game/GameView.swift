@@ -136,7 +136,7 @@ struct GameView: View {
             .aspectRatio(1.0, contentMode: .fit)
             .frame(maxWidth: 256.0)
 
-            Text(game.name ?? "Game")
+            Text(verbatim: game.name, fallback: "GAME_UNNAMED")
                 .padding(.top)
                 .font(.headline)
                 .foregroundStyle(.primary)
@@ -146,7 +146,7 @@ struct GameView: View {
                 .foregroundStyle(.secondary)
 
             Button(action: play) {
-                Label("Play Game", systemImage: "play.fill").fontWeight(.semibold)
+                Label("PLAY_GAME", systemImage: "play.fill").fontWeight(.semibold)
             }
             .tint(.white)
             .foregroundStyle(.black)
@@ -186,21 +186,21 @@ struct GameView: View {
             .buttonStyle(.plain)
             .emptyState(saveStates.isEmpty) {
                 EmptyMessage {
-                    Text("No Save States")
+                    Text("NO_SAVE_STATES_TITLE")
                 } message: {
-                    Text("You haven't made any save states for this game yet.")
+                    Text("NO_SAVE_STATES_MESSAGE")
                 }
                 .padding(.bottom)
             }
         } header: {
             HStack {
-                Text("Save States")
+                Text("SAVE_STATES")
                     .sectionHeaderStyle()
 
                 Spacer()
 
                 NavigationLink(to: .saveStates(game)) {
-                    Text("View All")
+                    Text("VIEW_ALL")
                         .font(.body)
                 }
             }
@@ -211,20 +211,20 @@ struct GameView: View {
     var informationSection: some View {
         Section {
             VStack(alignment: .leading, spacing: 12.0) {
-                DataPointView(title: "Date Added") {
-                    Text(game.dateAdded, format: .dateTime, fallback: "Unknown")
+                DataPointView(title: "GAME_DATE_ADDED") {
+                    Text(game.dateAdded, format: .dateTime, fallback: "UNKNOWN")
                 }
-                DataPointView(title: "Last Played") {
-                    Text(game.datePlayed, format: .dateTime, fallback: "Never")
+                DataPointView(title: "GAME_LAST_PLAYED") {
+                    Text(game.datePlayed, format: .dateTime, fallback: "NEVER")
                 }
-                DataPointView(title: "SHA-1 Checksum") {
-                    Text(verbatim: game.sha1, fallback: "Unknown")
+                DataPointView(title: "GAME_SHA1_CHECKSUM") {
+                    Text(verbatim: game.sha1, fallback: "UNKNOWN")
                         .font(.caption.monospaced())
                 }
             }
             .padding([.horizontal, .bottom])
         } header: {
-            Text("Information")
+            Text("INFORMATION")
                 .sectionHeaderStyle()
                 .padding(.horizontal)
                 .padding(.bottom, 4.0)
@@ -255,32 +255,32 @@ struct GameView: View {
                 ManageTagsView(target: .one(game))
             }
         }
-        .renameItem("Rename Game", item: $renameTarget)
-        .deleteItem("Delete Game", item: $deleteTarget, dismiss: true) { game in
-            Text("Are you sure you want to delete \(game.name ?? "this game")? Its saves, save states, and cover art will all be deleted. This can't be undone.")
+        .renameItem("RENAME_GAME", item: $renameTarget)
+        .deleteItem("DELETE_GAME", item: $deleteTarget, dismiss: true) { game in
+            Text("DELETE_GAME_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
         }
-        .renameItem("Rename Save State", item: $renameSaveStateTarget)
-        .deleteItem("Delete Save State", item: $deleteSaveStateTarget) { saveState in
-            Text("Are you sure you want to delete \(saveState.name ?? "this save state")? This can't be undone.")
+        .renameItem("RENAME_SAVE_STATE", item: $renameSaveStateTarget)
+        .deleteItem("DELETE_SAVE_STATE", item: $deleteSaveStateTarget) { saveState in
+            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? NSLocalizedString("SAVE_STATE_UNNAMED", comment: ""))")
         }
-        .confirmationDialog("Replace ROM", isPresented: $isReplaceRomConfirmationOpen) {
-            Button("Cancel", role: .cancel) {}
+        .confirmationDialog("REPLACE_ROM", isPresented: $isReplaceRomConfirmationOpen) {
+            Button("CANCEL", role: .cancel) {}
             Button("OK", action: self.replaceROM)
         } message: {
-            Text("By replacing the ROM, you will overwrite the existing ROM for this game. This may cause issues with save and save state compatibility and cannot be undone.")
+            Text("REPLACE_ROM_MESSAGE")
         }
-        .confirmationDialog("Import Save", isPresented: $isImportSaveConfirmationOpen) {
-            Button("Cancel", role: .cancel) {}
+        .confirmationDialog("IMPORT_SAVE", isPresented: $isImportSaveConfirmationOpen) {
+            Button("CANCEL", role: .cancel) {}
             Button("OK", action: self.importSave)
         } message: {
-            Text("By importing a save, you will overwrite any existing save for this game. This cannot be undone.")
+            Text("IMPORT_SAVE_MESSAGE")
         }
         .deleteItem(
-            "Delete Save",
+            "DELETE_SAVE",
             isPresented: $isDeleteSavePresented,
             perform: deleteSave
         ) {
-            Text("Are you sure you want to delete this game's save file? This can't be undone.")
+            Text("DELETE_SAVE_MESSAGE")
         }
         .coverPicker(presenting: $coverPickerMethod)
         .multiFileImporter($fileImportRequest)
@@ -299,7 +299,7 @@ struct GameView: View {
     var toolbarContent: some View {
         Menu {
             Button(action: rename) {
-                Label("Rename", systemImage: "text.cursor")
+                Label("RENAME", systemImage: "text.cursor")
             }
 
             CoverPickerMenu(game: game, coverPickerMethod: $coverPickerMethod)
@@ -307,41 +307,41 @@ struct GameView: View {
             Divider()
 
             Button(action: manageTags) {
-                Label("Manage Tags", systemImage: "tag")
+                Label("MANAGE_TAGS", systemImage: "tag")
             }
 
             NavigationLink(to: .cheats(game)) {
-                Label("Manage Cheats", systemImage: "memorychip")
+                Label("MANAGE_CHEATS", systemImage: "memorychip")
             }
 
             Divider()
 
             ToggleButton(value: $isReplaceRomConfirmationOpen) {
-                Label("Replace ROM", systemImage: "rectangle.2.swap")
+                Label("REPLACE_ROM", systemImage: "rectangle.2.swap")
             }
             Menu {
                 ToggleButton(value: $isImportSaveConfirmationOpen) {
-                    Label("Import Save", systemImage: "square.and.arrow.down")
+                    Label("IMPORT_SAVE", systemImage: "square.and.arrow.down")
                 }
                 Button(action: exportSave) {
-                    Label("Export Save", systemImage: "square.and.arrow.up")
+                    Label("EXPORT_SAVE", systemImage: "square.and.arrow.up")
                 }
                 Divider()
                 ToggleButton(role: .destructive, value: $isDeleteSavePresented) {
-                    Label("Delete Save", systemImage: "trash")
+                    Label("DELETE_SAVE", systemImage: "trash")
                 }
             } label: {
-                Label("Manage Save", systemImage: "doc")
+                Label("MANAGE_SAVE", systemImage: "doc")
                     .labelStyle(.iconOnly)
             }
 
             Divider()
 
             Button(role: .destructive, action: delete) {
-                Label("Remove", systemImage: "trash")
+                Label("DELETE", systemImage: "trash")
             }
         } label: {
-            Label("Options", systemImage: "ellipsis.circle")
+            Label("OPTIONS", systemImage: "ellipsis.circle")
         }
     }
 
@@ -351,10 +351,10 @@ struct GameView: View {
         case .playbackError(let playbackError):
             switch playbackError {
             case .hashMismatch(let file, let hash, let url):
-                Button("Cancel", role: .cancel) {}
+                Button("CANCEL", role: .cancel) {}
                 switch file {
                 case .rom:
-                    Button("Replace Anyways", role: .destructive) {
+                    Button("REPLACE_ANYWAYS", role: .destructive) {
                         self.resolveHashMismatch(newHash: hash, sourceURL: url)
                     }
                 default: EmptyView()
@@ -362,8 +362,8 @@ struct GameView: View {
             case .missingFile(let file):
                 switch file {
                 case .rom, .saveState:
-                    Button("Cancel", role: .cancel) {}
-                    Button("Select File", action: replaceROM)
+                    Button("CANCEL", role: .cancel) {}
+                    Button("SELECT_FILE", action: replaceROM)
                 default:
                     Button("OK") {}
                 }

@@ -12,9 +12,9 @@ struct CheatItemView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(cheat.label ?? "Unnamed Cheat")
+                Text(verbatim: cheat.label, fallback: "CHEAT_UNNAMED")
                     .lineLimit(1)
-                Text(cheat.code ?? "")
+                Text(verbatim: cheat.code ?? "")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -23,24 +23,24 @@ struct CheatItemView: View {
             #if !os(macOS)
             if editMode?.wrappedValue == .active {
                 Button(action: edit) {
-                    Label("Edit", systemImage: "pencil.circle")
+                    Label("EDIT", systemImage: "pencil.circle")
                         .labelStyle(.iconOnly)
                 }
             } else {
-                Toggle("Enabled", isOn: $cheat.enabled)
+                Toggle("CHEAT_ENABLED", isOn: $cheat.enabled)
                     .labelsHidden()
             }
             #else
-            Toggle("Enabled", isOn: $cheat.enabled)
+            Toggle("CHEAT_ENABLED", isOn: $cheat.enabled)
                 .labelsHidden()
             #endif
         }
         .contextMenu(ContextMenu(menuItems: {
             Button(action: edit) {
-                Label("Edit", systemImage: "pencil")
+                Label("EDIT", systemImage: "pencil")
             }
             Button(role: .destructive, action: delete) {
-                Label("Delete", systemImage: "trash")
+                Label("DELETE", systemImage: "trash")
             }
         }))
         .onChange(of: cheat.enabled, perform: toggleCheat)

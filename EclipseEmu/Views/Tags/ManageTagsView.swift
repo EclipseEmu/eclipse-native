@@ -35,7 +35,7 @@ private struct ManyManageTagsItemView: View {
 
     var body: some View {
         Toggle(sources: $sources, isOn: \.isSelected) {
-            Label(tag.name ?? "Tag", systemImage: "tag")
+            Label(tag.name ?? "TAG", systemImage: "tag")
         }
         .onChange(of: sources.first?.isSelected ?? false, perform: update)
         .listItemTint(tag.color.color)
@@ -69,7 +69,7 @@ private struct OneManageTagsItemView: View {
 
     var body: some View {
         Toggle(isOn: $isOn) {
-            Label(tag.name ?? "Tag", systemImage: "tag")
+            Label(tag.name ?? "TAG", systemImage: "tag")
         }
         .onChange(of: isOn, perform: update)
         .listItemTint(tag.color.color)
@@ -120,18 +120,18 @@ struct ManageTagsView: View {
             }
 
             Section {
-                Button("New Tag", action: newTag)
+                Button("NEW_TAG", action: newTag)
             }
         }
         .toolbar {
             ToolbarItem {
-                Button("Done", action: dismiss.callAsFunction)
+                Button("DONE", action: dismiss.callAsFunction)
             }
         }
         .alert(isPresented: .isSome($error), error: error) {
             Button("OK", role:  .cancel) {}
         }
-        .navigationTitle("Manage Tags")
+        .navigationTitle("MANAGE_TAGS")
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -157,4 +157,5 @@ struct ManageTagsView: View {
         LibraryView()
     }
     .environmentObject(navigationManager)
+    .environmentObject(Settings())
 }

@@ -40,13 +40,10 @@ final class CoreRegistry: ObservableObject {
     }
 
     func get(for system: GameSystem) -> CoreInfo? {
-        let registered: CoreInfo? = if let coreID = settings.registeredCores[system] {
-            self.coresByID[coreID]
+        return if let coreID = settings.registeredCores[system], let core = self.coresByID[coreID] {
+            core
         } else {
-            nil
+            self.coresBySystem[system]?.first
         }
-
-        let box = registered ?? self.coresBySystem[system]?.first
-        return box
     }
 }

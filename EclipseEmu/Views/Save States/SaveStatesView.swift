@@ -47,14 +47,14 @@ struct SaveStatesView: View {
         }
         .emptyState(saveStates.isEmpty) {
             ContentUnavailableMessage {
-                Label("No Save States", systemImage: "rectangle.grid.2x2")
+                Label("NO_SAVE_STATES_TITLE", systemImage: "rectangle.grid.2x2")
             } description: {
-                Text("You haven't made any save states for this game yet.")
+                Text("NO_SAVE_STATES_MESSAGE")
             }
         }
-        .renameItem("Rename State", item: $renameTarget)
-        .deleteItem("Delete State", item: $deleteTarget) { saveState in
-            Text("Are you sure you want to delete \(saveState.name ?? "this save state")?")
+        .renameItem("RENAME_SAVE_STATE", item: $renameTarget)
+        .deleteItem("DELETE_SAVE_STATE", item: $deleteTarget) { saveState in
+            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? NSLocalizedString("SAVE_STATE_UNNAMED", comment: ""))")
         }
     }
 }

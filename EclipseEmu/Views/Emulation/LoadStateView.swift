@@ -11,10 +11,10 @@ struct LoadStateView: View {
 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
 #endif
-                .navigationTitle("Load State")
+                .navigationTitle("LOAD_SAVE_STATE")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel", role: .cancel, action: dismiss.callAsFunction)
+                        Button("CANCEL", role: .cancel, action: dismiss.callAsFunction)
                     }
                 }
         }

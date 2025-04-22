@@ -9,15 +9,15 @@ struct CoverPickerMenu: View {
             Button {
                 self.coverPickerMethod = .database(game)
             } label: {
-                Label("From Database", systemImage: "cylinder.split.1x2")
+                Label("REPLACE_COVER_ART_FROM_DATABASE", systemImage: "cylinder.split.1x2")
             }
             Button {
                 self.coverPickerMethod = .photos(game)
             } label: {
-                Label("From Photos", systemImage: "photo.stack")
+                Label("REPLACE_COVER_ART_FROM_PHOTOS", systemImage: "photo.stack")
             }
         } label: {
-            Label("Replace Cover Art", systemImage: "photo")
+            Label("REPLACE_COVER_ART", systemImage: "photo")
         }
     }
 }

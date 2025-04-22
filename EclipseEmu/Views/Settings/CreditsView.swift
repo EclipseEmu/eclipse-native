@@ -10,9 +10,9 @@ struct CreditsView: View {
                 Link(destination: URL(string: "https://magnetar.dev")!) {
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Magnetar")
+                            Text(verbatim: "Magnetar")
                                 .foregroundStyle(Color.primary)
-                            Text("Lead Developer & Designer")
+                            Text("DEVELOPER_MAGNETAR_ROLE")
                                 .font(.caption)
                                 .foregroundStyle(Color.secondary)
                         }
@@ -22,7 +22,7 @@ struct CreditsView: View {
                     }
                 }
             } header: {
-                Text("Developers")
+                Text("DEVELOPERS")
             }
 
             Section {
@@ -52,18 +52,18 @@ struct CreditsView: View {
                     }
                 }
             } header: {
-                Text("Cores")
+                Text("CORES")
             } footer: {
-                Text("Eclipse wouldn't be possible without the core developers' hard work. Please support them however you can.")
+                Text("ECLIPSE_CORE_DEVELOPERS_MESSAGE")
             }
 
             Section {
                 NavigationLink(to: .licenses) {
-                    Text("Open Source Licenses")
+                    Text("OPEN_SOURCE_LICENSES")
                 }
             }
         }
-        .navigationTitle("Credits")
+        .navigationTitle("CREDITS")
         .formStyle(.grouped)
     }
 }

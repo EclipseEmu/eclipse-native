@@ -14,34 +14,28 @@ struct SystemSettingsView: View {
     init(coreRegistry: CoreRegistry, system: GameSystem) {
         self.system = system
         self.cores = coreRegistry.cores(for: system)
-        if let selectedCore = coreRegistry.get(for: system) {
-            self.selectedCore = selectedCore
-        }
+        // NOTE: setting self.selectedCore directly was not actually setting it.
+        self._selectedCore = State(initialValue: coreRegistry.get(for: system))
     }
 
     var body: some View {
         Form {
             Section {
-                Picker("Core", selection: $selectedCore) {
+                Picker("CORE", selection: $selectedCore) {
+                    Text("NONE").tag(OptionalCoreInfo.none)
+                    Divider().hidden(if: cores.isEmpty)
                     ForEach(cores, id: \.id) { core in
-                        Text(core.name).tag(core)
+                        Text(core.name).tag(OptionalCoreInfo.some(core))
                     }
-                    Divider()
-                    Text("None").tag(OptionalCoreInfo.none)
                 }
 
                 if let selectedCore {
                     NavigationLink(to: .coreSettings(selectedCore)) {
-                        Label("Core Settings", systemImage: "gear")
+                        Label("CORE_SETTINGS", systemImage: "gear")
                     }
-                } else {
-                    NavigationLink(to: .settings) {
-                        Label("Core Settings", systemImage: "gear")
-                    }
-                    .disabled(true)
                 }
             } header: {
-                Text("Core")
+                Text("CORE")
             }
         }
         .navigationTitle(system.string)

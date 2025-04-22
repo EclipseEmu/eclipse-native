@@ -13,15 +13,15 @@ struct TagsView: View {
     var mainContent: some View {
         if tags.isEmpty {
             ContentUnavailableMessage {
-                Label("No Tags", systemImage: "tag")
+                Label("NO_TAGS", systemImage: "tag")
             } description: {
-                Text("You haven't created any tags to organize your games yet.")
+                Text("NO_TAGS_MESSAGE")
             }
         } else {
             List {
                 ForEach(tags) { tag in
                     NavigationLink(to: .editTag(tag)) {
-                        Label(tag.name ?? "Tag", systemImage: "tag")
+                        Label(tag.name ?? "TAG", systemImage: "tag")
                     }
                     .listItemTint(tag.color.color)
                 }
@@ -32,7 +32,7 @@ struct TagsView: View {
 
     var body: some View {
         mainContent
-            .navigationTitle("Tags")
+            .navigationTitle("TAGS")
             .toolbar {
                 #if !os(macOS)
                 ToolbarItem {
@@ -41,11 +41,11 @@ struct TagsView: View {
                 #endif
                 ToolbarItem {
                     ToggleButton(value: $isCreateDialogPresented) {
-                        Label("Create Tag", systemImage: "plus")
+                        Label("CREATE_TAG", systemImage: "plus")
                     }
                 }
             }
-            .renameItem("Rename Tag", item: $renameItem)
+            .renameItem("RENAME_TAG", item: $renameItem)
             .sheet(isPresented: $isCreateDialogPresented) {
                 NavigationStack {
                     TagDetailView(mode: .create)

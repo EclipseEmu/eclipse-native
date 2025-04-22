@@ -45,6 +45,6 @@ final class CoreInfo: Identifiable, Equatable, Hashable, Sendable {
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        id.hash(into: &hasher)
     }
 }

@@ -8,30 +8,30 @@ struct CoreSettingsView: View {
         Form {
             Section {
                 HStack {
-                    Text("Name")
+                    Text("CORE_NAME")
                     Spacer()
                     Text(core.name)
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("Developer")
+                    Text("CORE_DEVELOPER")
                     Spacer()
                     Text(core.developer)
                         .foregroundStyle(.secondary)
                 }
                 HStack {
-                    Text("Version")
+                    Text("CORE_VERSION")
                     Spacer()
                     Text(core.version)
                         .foregroundStyle(.secondary)
                 }
                 if let sourceCodeUrl = core.sourceCodeUrl {
                     Link(destination: sourceCodeUrl) {
-                        Label("Source Code", systemImage: "folder")
+                        Label("SOURCE_CODE", systemImage: "folder")
                     }
                 }
             } header: {
-                Text("Info")
+                Text("INFORMATION")
             }
 
             Section {
@@ -51,7 +51,7 @@ struct CoreSettingsView: View {
                             Button {
                                 print(file.sha1)
                             } label: {
-                                Text("Select File")
+                                Text("SELECT_FILE")
                             }
                         }
                     case .unknown:
@@ -59,7 +59,7 @@ struct CoreSettingsView: View {
                     }
                 }
             } header: {
-                Text("Settings")
+                Text("SETTINGS")
             }
             .emptyState(core.settings.items.isEmpty) { EmptyView() }
         }

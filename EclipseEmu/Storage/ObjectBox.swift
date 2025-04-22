@@ -8,6 +8,10 @@ struct ObjectBox<T: NSManagedObject>: Equatable, Hashable, Sendable {
         self.id = object.objectID
     }
 
+    init(unsafeID: NSManagedObjectID) {
+        self.id = unsafeID
+    }
+
     func get(in context: NSManagedObjectContext) throws(PersistenceError) -> T {
         do {
             guard let object = try context.existingObject(with: self.id) as? T else {

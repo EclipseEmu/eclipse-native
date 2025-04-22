@@ -1,3 +1,4 @@
+import SwiftUI
 import AVFoundation
 import EclipseKit
 import Metal
@@ -5,15 +6,15 @@ import Metal
 // MARK: System
 
 extension GameSystem {
-    var string: String {
+    var string: LocalizedStringKey {
         return switch self {
-        case .unknown: "Unknown System"
-        case .gb: "Game Boy"
-        case .gbc: "Game Boy Color"
-        case .gba: "Game Boy Advance"
-        case .nes: "Nintendo Entertainment System"
-        case .snes: "Super Nintendo Entertainment System"
-        @unknown default: "Unknown System"
+        case .unknown: "SYSTEM_UNKNOWN"
+        case .gb: "SYSTEM_GB"
+        case .gbc: "SYSTEM_GBC"
+        case .gba: "SYSTEM_GBA"
+        case .nes: "SYSTEM_NES"
+        case .snes: "SYSTEM_SNES"
+        @unknown default: "SYSTEM_UNKNOWN"
         }
     }
 
@@ -36,6 +37,29 @@ extension GameSystem {
         case UTType.romNES.identifier: Self.nes
         case UTType.romSNES.identifier: Self.snes
         default: Self.unknown
+        }
+    }
+
+    var inputs: GameInput {
+        switch self {
+        case .unknown: GameInput.allOn
+        case .gb, .gbc, .nes:
+            [.dpadDown, .dpadUp, .dpadLeft, .dpadRight, .faceButtonRight, .faceButtonDown, .startButton, .selectButton]
+        case .gba:
+            [
+                .dpadDown, .dpadUp, .dpadLeft, .dpadRight,
+                .faceButtonRight, .faceButtonDown,
+                .startButton, .selectButton,
+                .shoulderLeft, .shoulderRight
+            ]
+        case .snes:
+            [
+                .dpadDown, .dpadUp, .dpadLeft, .dpadRight,
+                .faceButtonRight, .faceButtonDown, .faceButtonLeft, .faceButtonUp,
+                .startButton, .selectButton, .shoulderLeft, .shoulderRight
+            ]
+        @unknown default:
+            []
         }
     }
 }

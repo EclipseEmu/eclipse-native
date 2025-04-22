@@ -51,7 +51,7 @@ struct EmulationView: View {
                 .padding(.bottom, self.verticalSizeClass == .compact ? 0 : 240)
                 .ignoresSafeArea(.all)
 #endif
-                .navigationTitle(viewModel.game.name ?? "Game")
+                .navigationTitle(viewModel.game.name ?? "GAME_UNNAMED")
 #if os(iOS)
             TouchControlsView(viewModel.core.inputs.handleTouchInput)
                 .opacity(settings.touchControlsOpacity)
@@ -80,10 +80,10 @@ struct EmulationView: View {
             LoadStateView(game: viewModel.game, action: saveStateSelected)
                 .presentationDetents([.medium, .large])
         }
-        .confirmationDialog("Quit Game", isPresented: $viewModel.isQuitConfirmationShown) {
-            Button("Quit", role: .destructive, action: quit)
+        .confirmationDialog("QUIT_GAME_TITLE", isPresented: $viewModel.isQuitConfirmationShown) {
+            Button("QUIT", role: .destructive, action: quit)
         } message: {
-            Text("Any unsaved progress will be lost.")
+            Text("QUIT_GAME_MESSAGE")
         }
     }
 
@@ -103,7 +103,7 @@ struct EmulationView: View {
             Menu {
                 menuContent
             } label: {
-                Label("Menu", systemImage: "line.horizontal.3")
+                Label("MENU", systemImage: "line.horizontal.3")
                     .frame(width: menuButtonLayout.width, height: menuButtonLayout.height)
                     .labelStyle(.iconOnly)
                     .background(Circle().strokeBorder(.white, lineWidth: 2).background(Circle().fill(Color.black)))
@@ -138,7 +138,7 @@ struct EmulationView: View {
     @ViewBuilder
     var menuContent: some View {
         Button(action: togglePlayPause) {
-            Label("Play/Pause", systemImage: "playpause.fill")
+            Label("TOGGLE_PLAY_PAUSE", systemImage: "playpause.fill")
         }
 #if os(macOS)
         .buttonStyle(EmulationMenuButtonStyle())
@@ -146,13 +146,13 @@ struct EmulationView: View {
 
 #if os(macOS)
         Button(action: toggleFastForward) {
-            Label("Fast Forward", systemImage: "forward.fill")
+            Label("FAST_FORWARD", systemImage: "forward.fill")
         }
         .buttonStyle(EmulationMenuButtonStyle())
         .foregroundStyle(viewModel.isFastForwarding ? .primary : .secondary)
 #else
         Toggle(isOn: $viewModel.isFastForwarding) {
-            Label("Fast Forward", systemImage: "forward.fill")
+            Label("FAST_FORWARD", systemImage: "forward.fill")
         }
 #endif
 
@@ -163,14 +163,14 @@ struct EmulationView: View {
 #endif
 
         Button(action: viewModel.saveState) {
-            Label("Save State", systemImage: "square.and.arrow.up.on.square")
+            Label("SAVE_STATE", systemImage: "square.and.arrow.up.on.square")
         }
 #if os(macOS)
         .buttonStyle(EmulationMenuButtonStyle())
 #endif
 
         Button(action: showSaveStates) {
-            Label("Load State", systemImage: "square.and.arrow.down.on.square")
+            Label("LOAD_SAVE_STATE", systemImage: "square.and.arrow.down.on.square")
         }
 #if os(macOS)
         .buttonStyle(EmulationMenuButtonStyle())
@@ -182,9 +182,9 @@ struct EmulationView: View {
 #endif
 
         Slider(value: $viewModel.volume, in: 0 ... 1) {} minimumValueLabel: {
-            Label("Lower Volume", systemImage: "speaker.fill")
+            Label("VOLUME_DOWN", systemImage: "speaker.fill")
         } maximumValueLabel: {
-            Label("Raise Volume", systemImage: "speaker.wave.3.fill")
+            Label("VOLUME_UP", systemImage: "speaker.wave.3.fill")
         }
 #if os(macOS)
         .labelStyle(.iconOnly)
@@ -193,7 +193,7 @@ struct EmulationView: View {
 #endif
 
         Button(role: .destructive, action: confirmQuit) {
-            Label("Quit", systemImage: "power")
+            Label("QUIT", systemImage: "power")
         }
 #if os(macOS)
         .labelStyle(.iconOnly)

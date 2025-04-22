@@ -18,21 +18,6 @@ struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: 
     private let description: () -> Description
     private let actions: () -> Action
 
-    @ViewBuilder
-    static func search(text: String) -> some View {
-        if #available(iOS 17.0, macOS 14.0, *) {
-            ContentUnavailableView.search(text: text)
-        } else {
-            ContentUnavailableMessage<SwiftUI.Label, Text, EmptyView> {
-                SwiftUI.Label("No Results for \"\(text)\"", systemImage: "magnifyingglass")
-            } description: {
-                Text("Check the spelling or try a new search.")
-            } actions: {
-                EmptyView()
-            }
-        }
-    }
-
     init(
         @ViewBuilder label: @escaping () -> Label,
         @ViewBuilder description: @escaping () -> Description = { EmptyView() },
@@ -64,6 +49,37 @@ struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: 
         }
     }
 }
+
+extension ContentUnavailableMessage
+where
+    Label == SwiftUI.Label<Text, Image>,
+    Description == Text,
+    Action == EmptyView
+{
+    @ViewBuilder
+    static func search(text: String) -> some View {
+        if #available(iOS 17.0, macOS 14.0, *) {
+            ContentUnavailableView.search(text: text)
+        } else {
+            ContentUnavailableMessage<SwiftUI.Label, Text, EmptyView> {
+                SwiftUI.Label("NO_RESULTS_TITLE \"\(text)\"", systemImage: "magnifyingglass")
+            } description: {
+                Text("NO_RESULTS_MESSAGE")
+            } actions: {
+                EmptyView()
+            }
+        }
+    }
+
+    static func error(error: some LocalizedError) -> ContentUnavailableMessage {
+        ContentUnavailableMessage {
+            Label("GENERIC_ERROR_MESSAGE_TITLE", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(verbatim: error.errorDescription, fallback: "GENERIC_ERROR_MESSAGE_UNKNOWN_ERROR")
+        }
+    }
+}
+
 
 #Preview {
     ContentUnavailableMessage {

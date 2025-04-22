@@ -42,20 +42,14 @@ struct CoverPickerDatabaseView: View {
         case .loading:
             ProgressView()
         case .failure(let failure):
-            ContentUnavailableMessage {
-                Label("Something went wrong", systemImage: "exclamationmark.triangle")
-            } description: {
-                Text(failure.localizedDescription)
-            }
+            ContentUnavailableMessage.error(error: failure)
         case .noQuery:
             ContentUnavailableMessage {
-                Label("Search for a Game", systemImage: "magnifyingglass")
+                Label("COVER_ART_SEARCH_FOR_GAMES", systemImage: "magnifyingglass")
             }
         case .results(let results):
             if results.isEmpty {
-                ContentUnavailableMessage {
-                    Label("No Results", systemImage: "magnifyingglass")
-                }
+                ContentUnavailableMessage.search(text: viewModel.query)
             } else {
                 List(results) { result in
                     HStack(alignment: .center, spacing: 12.0) {
@@ -82,6 +76,7 @@ struct CoverPickerDatabaseView: View {
                         Spacer()
 
                         Button("USE") { setCoverArt(result) }
+                            .textCase(.uppercase)
                             .controlSize(.small)
                             .fontWeight(.semibold)
                             .buttonStyle(.bordered)
@@ -96,16 +91,14 @@ struct CoverPickerDatabaseView: View {
 
     var body: some View {
         content
-            .navigationTitle("Cover Art")
+            .navigationTitle("COVER_ART")
         #if !os(macOS)
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .searchable(text: $viewModel.query)
             .toolbar {
                 ToolbarItem(placement: .navigation) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("CANCEL", action: dismiss)
                 }
             }
             .onReceive(viewModel.$query.debounce(for: .milliseconds(250), scheduler: RunLoop.main)) { query in

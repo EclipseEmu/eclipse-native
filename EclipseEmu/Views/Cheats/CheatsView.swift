@@ -36,16 +36,16 @@ struct CheatsView: View {
         }
         .emptyState(cheats.isEmpty) {
             ContentUnavailableMessage {
-                Label("No Cheats", systemImage: "memorychip.fill")
+                Label("NO_CHEATS_TITLE", systemImage: "memorychip.fill")
             } description: {
-                Text("You haven't added any cheats for \(game.name ?? "this game"). Use the \(Image(systemName: "plus")) button to add cheats.")
+                Text("NO_CHEATS_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
             }
         }
         .emptyState(cheatFormats.isEmpty) {
             ContentUnavailableMessage {
-                Label("No Supported Cheats", systemImage: "nosign")
+                Label("NO_SUPPORTED_CHEATS_TITLE", systemImage: "nosign")
             } description: {
-                Text("You can't add cheats for this game. The core it uses doesn't support any cheat formats.")
+                Text("NO_SUPPORTED_CHEATS_MESSAGE")
             }
         }
         .toolbar {
@@ -55,15 +55,13 @@ struct CheatsView: View {
             }
 #endif
             ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    self.isAddViewOpen = true
-                } label: {
-                    Label("Add Cheat", systemImage: "plus")
+                ToggleButton(value: $isAddViewOpen) {
+                    Label("ADD_CHEAT", systemImage: "plus")
                 }
                 .disabled(self.cheatFormats.isEmpty)
             }
         }
-        .navigationTitle("Cheats")
+        .navigationTitle("CHEATS")
         .sheet(item: $editingCheat) { cheat in
             EditCheatView(
                 cheat: cheat,

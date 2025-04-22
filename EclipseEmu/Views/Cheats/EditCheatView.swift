@@ -43,23 +43,23 @@ struct EditCheatView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: self.$label)
-                    Toggle("Enabled", isOn: self.$enabled)
+                    TextField("CHEAT_NAME", text: self.$label)
+                    Toggle("CHEAT_ENABLED", isOn: self.$enabled)
                 } header: {
 #if !os(macOS)
-                    Text("Name & State")
+                    Text("CHEAT_NAME_AND_STATE")
 #endif
                 }
 
                 Section {
-                    Picker("Format", selection: self.$format) {
+                    Picker("CHEAT_FORMAT", selection: self.$format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
                             Text(format.displayName).tag(format)
                         }
                     }
 
 #if os(macOS)
-                    LabeledContent("Code") {
+                    LabeledContent("CHEAT_CODE") {
                         CheatCodeField(value: self.$code, formatter: self.$formatter)
                     }
 #else
@@ -67,15 +67,15 @@ struct EditCheatView: View {
 #endif
                 } header: {
 #if !os(macOS)
-                    Text("Code")
+                    Text("CHEAT_CODE")
 #endif
                 } footer: {
-                    Text("The code will automatically be formatted as \"\(self.format.format.uppercased())\"")
+                    Text("CHEAT_CORE_FORMAT_MESSAGE \"\(self.format.format.uppercased())\"")
                 }
             }
             .onChange(of: self.format, perform: self.formatChanged)
             .onChange(of: self.code, perform: self.codeChanged)
-            .navigationTitle(self.isCreatingCheat ? "Add Cheat" : "Edit Cheat")
+            .navigationTitle(self.isCreatingCheat ? "ADD_CHEAT" : "EDIT_CHEAT")
 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
 #else
@@ -83,12 +83,12 @@ struct EditCheatView: View {
 #endif
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel", role: .cancel) {
+                        Button("CANCEL", role: .cancel) {
                             self.dismiss()
                         }
                     }
                     ToolbarItem(placement: .primaryAction) {
-                        Button("Done", action: self.save)
+                        Button("DONE", action: self.save)
                             .disabled(self.label.isEmpty || !self.isCodeValid)
                     }
                 }

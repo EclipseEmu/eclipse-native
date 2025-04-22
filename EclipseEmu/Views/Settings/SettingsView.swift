@@ -10,30 +10,43 @@ struct SettingsView: View {
         Form {
             Section {
                 NavigationLink(to: .manageTags) {
-                    Text("Tags")
-//                    Label("Tags", systemImage: "tag")
+                    Text("TAGS")
                 }
             } header: {
-                Text("Library")
+                Text("LIBRARY")
+            }
+
+            Section {
+                NavigationLink(to: .touchProfiles) {
+                    Text("TOUCH")
+                }
+                NavigationLink(to: .keyboardProfiles) {
+                    Text("KEYBOARD")
+                }
+                NavigationLink(to: .controllerProfiles) {
+                    Text("CONTROLLERS")
+                }
+            } header: {
+                Text("CONTROLS")
             }
 
             Section {
                 Slider(value: settings.$volume, in: 0 ... 1) {
-                    Text("Volume")
+                    Text("VOLUME")
                 } minimumValueLabel: {
-                    Label("Lower Volume", systemImage: "speaker.fill")
+                    Label("VOLUME_DOWN", systemImage: "speaker.fill")
                         .foregroundStyle(.secondary)
                 } maximumValueLabel: {
-                    Label("Raise Volume", systemImage: "speaker.wave.3.fill")
+                    Label("VOLUME_UP", systemImage: "speaker.wave.3.fill")
                         .foregroundStyle(.secondary)
                 }
                 .labelStyle(.iconOnly)
 
-                Toggle("Ignore Silent Mode", isOn: settings.$ignoreSilentMode)
+                Toggle("IGNORE_SILENT_MODE", isOn: settings.$ignoreSilentMode)
             } header: {
-                Text("Audio")
+                Text("AUDIO")
             } footer: {
-                Text("When enabled, Ignore Silent Mode will allow game audio to keep playing when your device's Silent Mode is on.")
+                Text("IGNORE_SILENT_MODE_DESCRIPTION")
             }
 
             Section {
@@ -43,9 +56,7 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Systems")
-            } footer: {
-                Text("Controls and other core-related settings are on a per-system basis.")
+                Text("SYSTEMS")
             }
 
             Section {
@@ -55,23 +66,22 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Cores")
+                Text("CORES")
             }
 
             aboutSection
             socialSection
 
             Section {
-                Button("Clear Library", role: .destructive, action: resetLibrary)
-                Button("Use Default Settings", role: .destructive, action: resetSettings)
-                Button("Reset All Content & Settings", role: .destructive, action: resetEverything)
+                Button("RESET_SETTINGS", role: .destructive, action: resetSettings)
+                Button("RESET_EVERYTHING", role: .destructive, action: resetEverything)
             } header: {
-                Text("Reset")
+                Text("RESET")
             }
 
             versionInfoSection
         }
-        .navigationTitle("Settings")
+        .navigationTitle("SETTINGS")
         .formStyle(.grouped)
     }
 
@@ -91,7 +101,7 @@ struct SettingsView: View {
         Section {
             Link(destination: URL(string: "https://eclipseemu.me/")!) {
                 HStack {
-                    Label("Help & Guides", systemImage: "questionmark")
+                    Label("HELP_AND_GUIDES", systemImage: "questionmark")
                         .labelStyle(.titleOnly)
                     Spacer()
                     Image(systemName: "arrow.up.right.square")
@@ -100,7 +110,7 @@ struct SettingsView: View {
             }
             Link(destination: URL(string: "https://eclipseemu.me/")!) {
                 HStack {
-                    Label("What's New", systemImage: "doc.badge.clock")
+                    Label("WHATS_NEW", systemImage: "doc.badge.clock")
                         .labelStyle(.titleOnly)
                     Spacer()
                     Image(systemName: "arrow.up.right.square")
@@ -108,11 +118,11 @@ struct SettingsView: View {
                 }
             }
             NavigationLink(to: .credits) {
-                Label("Credits", systemImage: "person")
+                Label("CREDITS", systemImage: "person")
                     .labelStyle(.titleOnly)
             }
         } header: {
-            Text("About")
+            Text("ABOUT")
         }
         .buttonStyle(.plain)
     }
@@ -121,7 +131,7 @@ struct SettingsView: View {
         Section {
             Link(destination: URL(string: "https://discord.gg/Mx2W9nec4Z")!) {
                 HStack {
-                    Label("Discord", systemImage: "app.dashed")
+                    Label("DISCORD", systemImage: "app.dashed")
                         .labelStyle(.titleOnly)
                         .foregroundStyle(Color.primary)
                     Spacer()
@@ -131,7 +141,7 @@ struct SettingsView: View {
             }
             Link(destination: URL(string: "https://github.com/EclipseEmu")!) {
                 HStack {
-                    Label("GitHub", systemImage: "app.dashed")
+                    Label("GITHUB", systemImage: "app.dashed")
                         .labelStyle(.titleOnly)
                         .foregroundStyle(Color.primary)
                     Spacer()
@@ -140,13 +150,12 @@ struct SettingsView: View {
                 }
             }
         } header: {
-            Text("Social")
+            Text("SOCIAL")
         }
     }
 
     // FIXME: todo, make these show confirmation dialogs
 
-    func resetLibrary() {}
     func resetSettings() {}
     func resetEverything() {}
 }

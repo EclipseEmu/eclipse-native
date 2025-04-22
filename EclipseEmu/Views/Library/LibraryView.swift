@@ -47,7 +47,7 @@ struct LibraryView: View {
                     gameList
                 } header: {
                     if showExtraContent {
-                        Text("All Games")
+                        Text("ALL_GAMES")
                             .sectionHeaderStyle()
                             .padding([.horizontal, .top])
                     }
@@ -55,34 +55,30 @@ struct LibraryView: View {
             }
             .headerProminence(.increased)
         } else if games.isEmpty && !query.isEmpty {
-            ContentUnavailableMessage {
-                Label("No Results", systemImage: "magnifyingglass")
-            } description: {
-                Text("No results for \"\(query)\"")
-            }
+            ContentUnavailableMessage.search(text: query)
         } else if games.isEmpty && (areSystemsFiltered || !filteredTags.isEmpty) {
             ContentUnavailableMessage {
-                Label("No Results", systemImage: "line.3.horizontal.decrease.circle")
+                Label("NO_RESULTS_FILTERED_TITLE", systemImage: "line.3.horizontal.decrease.circle")
             } description: {
-                Text("All games are filtered out.")
+                Text("NO_RESULTS_FILTERED_MESSAGE")
             }
         } else {
             ContentUnavailableMessage {
-                Label("No Games", systemImage: "books.vertical")
+                Label("EMPTY_LIBRARY_TITLE", systemImage: "books.vertical")
             } description: {
-                Text("You don't have any games in your library.")
+                Text("EMPTY_LIBRARY_MESSAGE")
             }
         }
     }
 
     var body: some View {
         content
-            .navigationTitle("Library")
+            .navigationTitle("LIBRARY")
             .multiFileImporter($fileImportType)
             .toolbar {
                 toolbarContent
             }
-            .searchable(text: $query, prompt: "Search Games")
+            .searchable(text: $query, prompt: "SEARCH_GAMES")
             .onChange(of: settings.listSortMethod, perform: updateSortDescriptor)
             .onChange(of: settings.listSortDirection, perform: updateSortDescriptor)
             .onSubmit(of: .search) {
@@ -102,9 +98,9 @@ struct LibraryView: View {
                 games.nsPredicate = self.predicate(for: query)
             }
             .coverPicker(presenting: $coverPickerMethod)
-            .renameItem("Rename Game", item: $renameTarget)
-            .deleteItem("Remove Game", item: $deleteTarget) { game in
-                Text("Are you sure you want to remove \"\(game.name ?? "this game")\"? Your save, save states, and cheats will be deleted as well.")
+            .renameItem("RENAME_GAME", item: $renameTarget)
+            .deleteItem("DELETE_GAME", item: $deleteTarget) { game in
+                Text("DELETE_GAME_MESSAGE \(game.name ?? NSLocalizedString("GAME_UNNAMED", comment: ""))")
             }
             .sheet(isPresented: $isFiltersViewPresented) {
                 NavigationStack {
@@ -134,7 +130,10 @@ struct LibraryView: View {
                     Button {
                         gameSelected(game)
                     } label: {
-                        DualLabeledImage(title: Text(game.name ?? "Game"), subtitle: Text(game.system.string)) {
+                        DualLabeledImage(
+                            title: Text(verbatim: game.name, fallback: "GAME_UNNAMED"),
+                            subtitle: Text(game.system.string)
+                        ) {
                             LocalImage(game.cover) { image in
                                 image
                                     .resizable()
@@ -157,13 +156,11 @@ struct LibraryView: View {
                         Button {
                             self.manageTagsTarget = .one(game)
                         } label: {
-                            Label("Manage Tags", systemImage: "tag")
+                            Label("MANAGE_TAGS", systemImage: "tag")
                         }
 
-                        Button {
-                            navigation.path.append(Destination.cheats(game))
-                        } label: {
-                            Label("Manage Cheats", systemImage: "memorychip")
+                        NavigationLink(to: .cheats(game)) {
+                            Label("MANAGE_CHEATS", systemImage: "memorychip")
                         }
 
                         Divider()
@@ -171,7 +168,7 @@ struct LibraryView: View {
                         Button {
                             self.renameTarget = game
                         } label: {
-                            Label("Rename...", systemImage: "text.cursor")
+                            Label("RENAME", systemImage: "text.cursor")
                         }
 
                         CoverPickerMenu(game: game, coverPickerMethod: $coverPickerMethod)
@@ -181,7 +178,7 @@ struct LibraryView: View {
                         Button(role: .destructive) {
                             self.deleteTarget = game
                         } label: {
-                            Label("Remove...", systemImage: "trash")
+                            Label("DELETE", systemImage: "trash")
                         }
                     }
                     .buttonStyle(.plain)
@@ -198,7 +195,7 @@ struct LibraryView: View {
         #if !os(macOS)
         ToolbarItem(placement: .topBarLeading) {
             NavigationLink(to: .settings) {
-                Label("Settings", systemImage: "gear")
+                Label("SETTINGS", systemImage: "gear")
             }
         }
         #endif
@@ -207,37 +204,37 @@ struct LibraryView: View {
             Menu {
                 if !self.isSelecting {
                     ToggleButton(value: $isSelecting) {
-                        Label("Select", systemImage: "checkmark.circle")
+                        Label("SELECT", systemImage: "checkmark.circle")
                     }
                 }
 
 
                 ToggleButton(value: $isFiltersViewPresented) {
-                    Label("Filter", systemImage: "line.3.horizontal.decrease")
+                    Label("FILTER", systemImage: "line.3.horizontal.decrease")
                 }
 
                 Picker(selection: $settings.listSortMethod) {
-                    Text("Name").tag(GameListSortingMethod.name)
-                    Text("Date Added").tag(GameListSortingMethod.dateAdded)
+                    Text("NAME").tag(GameListSortingMethod.name)
+                    Text("DATE_ADDED").tag(GameListSortingMethod.dateAdded)
                 } label: {
-                    Label("Sort By", systemImage: "arrow.up.arrow.down")
+                    Label("SORT_BY", systemImage: "arrow.up.arrow.down")
                 }
 
                 Picker(selection: $settings.listSortDirection) {
-                    Text("Ascending").tag(GameListSortingDirection.ascending)
-                    Text("Descending").tag(GameListSortingDirection.descending)
+                    Text("ASCENDING").tag(GameListSortingDirection.ascending)
+                    Text("DESCENDING").tag(GameListSortingDirection.descending)
                 } label: {
-                    Label("Order By", systemImage: "arrow.up.arrow.down")
+                    Label("ORDER_BY", systemImage: "arrow.up.arrow.down")
                 }
             } label: {
-                Label("Options", systemImage: "ellipsis.circle")
+                Label("OPTIONS", systemImage: "ellipsis.circle")
             }
         }
 
         if !isSelecting {
             ToolbarItem {
                 Button(action: self.addGames) {
-                    Label("Add Games", systemImage: "plus")
+                    Label("ADD GAMES", systemImage: "plus")
                 }
             }
         }
@@ -253,7 +250,7 @@ struct LibraryView: View {
                         }
                     }
                 } label: {
-                    Label("Remove...", systemImage: "trash")
+                    Label("DELETE", systemImage: "trash")
                 }
                 .disabled(selection.isEmpty)
 
@@ -266,13 +263,13 @@ struct LibraryView: View {
                         self.manageTagsTarget = .many(selection)
                     }
                 } label: {
-                    Label("Manage Tags", systemImage: "tag")
+                    Label("MANAGE_TAGS", systemImage: "tag")
                 }
                 .disabled(selection.isEmpty)
             }
 
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done", role: .cancel) {
+                Button("DONE", role: .cancel) {
                     withAnimation {
                         self.isSelecting = false
                         self.selection.removeAll()

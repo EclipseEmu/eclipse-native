@@ -28,7 +28,7 @@ struct LicensesView: View {
             }
         }
         .listStyle(.plain)
-        .navigationTitle("Licenses")
+        .navigationTitle("LICENSES")
     }
 }
 

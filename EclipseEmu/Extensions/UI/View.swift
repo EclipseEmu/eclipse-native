@@ -11,6 +11,13 @@ extension View {
         return modifier(self)
     }
 
+    @ViewBuilder
+    func hidden(if isHidden: Bool) -> some View {
+        if !isHidden {
+            self
+        }
+    }
+
     func fullWidthFrame() -> some View {
         self.frame(minWidth: .zero, maxWidth: .infinity)
     }

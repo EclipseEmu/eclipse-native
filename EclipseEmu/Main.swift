@@ -1,6 +1,7 @@
 import SwiftUI
 import EclipseKit
 import mGBAEclipseCore
+import GameController
 
 enum Destination: Hashable, Equatable {
     case settings
@@ -8,6 +9,13 @@ enum Destination: Hashable, Equatable {
     case coreSettings(CoreInfo)
     case credits
     case licenses
+
+    case keyboardProfiles
+    case controllerProfiles
+    case touchProfiles
+
+    case controllerProfileEditor(ControllerProfileEditorTarget)
+    case controllerSettings(GCController)
 
     case manageTags
     case editTag(TagObject)
@@ -108,6 +116,18 @@ struct EclipseEmuApp: App {
             GameSaveStatesView(game: game)
         case .cheats(let game):
             CheatsView(game: game, coreRegistry: coreRegistry)
+        case .controllerProfiles:
+            ControllerProfilesView()
+        case .controllerProfileEditor(let target):
+            ControllerProfileEditorView(for: target)
+        case .keyboardProfiles:
+            // FIXME: TODO
+            EmptyView()
+        case .touchProfiles:
+            // FIXME: TODO
+            EmptyView()
+        case .controllerSettings(let controller):
+            ControllerSettingsView(controller: controller)
         }
     }
 }

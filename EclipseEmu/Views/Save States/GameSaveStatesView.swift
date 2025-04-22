@@ -7,7 +7,7 @@ struct GameSaveStatesView: View {
 
     var body: some View {
         SaveStatesView(game: game, action: action)
-            .navigationTitle("Save States")
+            .navigationTitle("SAVE_STATES")
     }
 
     private func action(_ saveState: SaveStateObject) {

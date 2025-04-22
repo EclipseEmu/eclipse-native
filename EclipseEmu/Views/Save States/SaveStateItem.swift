@@ -34,9 +34,12 @@ struct SaveStateItem: View {
     var title: Text {
         switch titleValue {
         case .name:
-            Text(saveState.name ?? (saveState.isAuto ? "Automatic State" : "Unnamed State"))
+            Text(
+                verbatim: saveState.name,
+                fallback: (saveState.isAuto ? "SAVE_STATE_AUTOMATIC" : "SAVE_STATE_UNNAMED")
+            )
         case .game:
-            Text(saveState.game?.name ?? "Game")
+            Text(saveState.game?.name ?? "GAME")
         }
     }
 
@@ -54,6 +57,7 @@ struct SaveStateItem: View {
                 .aspectRatio(3 / 2, contentMode: .fit)
                 .overlay(alignment: .bottomLeading) {
                     Text("AUTO")
+                        .textCase(.uppercase)
                         .font(.caption)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 8.0)
@@ -71,18 +75,18 @@ struct SaveStateItem: View {
         .contextMenu {
             if let game = saveState.game, titleValue == .game {
                 NavigationLink(to: .game(game)) {
-                    Label("Go to Game", systemImage: "arrow.right.square")
+                    Label("GO_TO_GAME", systemImage: "arrow.right.square")
                 }
             }
             if !self.saveState.isAuto {
                 Button {
                     self.renameTarget = self.saveState
                 } label: {
-                    Label("Rename", systemImage: "character.cursor.ibeam")
+                    Label("RENAME", systemImage: "character.cursor.ibeam")
                 }
             }
             Button(role: .destructive, action: self.delete) {
-                Label("Delete", systemImage: "trash")
+                Label("DELETE", systemImage: "trash")
             }
         }
     }

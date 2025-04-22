@@ -11,9 +11,9 @@ struct RenameItemViewModifier<T: RenameableObject>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .alert(titleKey, isPresented: .isSome($item)) {
-                TextField("New Name", text: $newName)
-                Button("Cancel", role: .cancel) {}
-                Button("Rename", action: perform)
+                TextField("NEW_NAME", text: $newName)
+                Button("CANCEL", role: .cancel) {}
+                Button("RENAME", action: perform)
                     .disabled(newName.isEmpty)
             }
     }

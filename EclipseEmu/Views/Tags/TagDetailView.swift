@@ -6,15 +6,15 @@ enum TagDetailViewMode: Hashable, Equatable {
 
     var title: LocalizedStringKey {
         switch self {
-        case .create: "Create Tag"
-        case .edit: "Edit Tag"
+        case .create: "CREATE_TAG"
+        case .edit: "EDIT_TAG"
         }
     }
 
     var confirmationButton: LocalizedStringKey {
         switch self {
-        case .create: "Create"
-        case .edit: "Save"
+        case .create: "CREATE"
+        case .edit: "SAVE"
         }
     }
 }
@@ -44,22 +44,22 @@ struct TagDetailView: View {
         Form {
             Section {
                 TextField(text: $newName) {
-                    Text("Tag Name")
+                    Text("TAG_NAME")
                 }
             } header: {
-                Text("Name")
+                Text("NAME")
             }
 
             Section {
                 FixedColorPicker(selection: $newColor)
                     .listRowInsets(EdgeInsets())
             } header: {
-                Text("Color")
+                Text("COLOR")
             }
 
             if case .edit(let tag) = mode {
                 Section {
-                    Button("Delete Tag", role: .destructive) {
+                    Button("DELETE_TAG", role: .destructive) {
                         self.deleteTag = tag
                     }
                 }
@@ -72,7 +72,7 @@ struct TagDetailView: View {
         .toolbar {
             if mode == .create {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: dismissAction.callAsFunction)
+                    Button("CANCEL", action: dismissAction.callAsFunction)
                 }
             }
 
