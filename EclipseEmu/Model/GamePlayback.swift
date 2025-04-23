@@ -110,7 +110,7 @@ final class GamePlayback: ObservableObject {
                 saveState: nil,
                 romPath: game.romPath,
                 savePath: game.savePath,
-                cheats: cheats.map(OwnedCheat.init),
+                cheats: cheats.map(Cheat.init),
                 persistence: persistence
             )
             self.playbackState = .playing(viewModel)
@@ -140,7 +140,7 @@ final class GamePlayback: ObservableObject {
                 saveState: state,
                 romPath: game.romPath,
                 savePath: game.savePath,
-                cheats: cheats.map(OwnedCheat.init),
+                cheats: cheats.map(Cheat.init),
                 persistence: persistence
             )
             self.playbackState = .playing(viewModel)

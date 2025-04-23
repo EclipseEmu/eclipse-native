@@ -247,9 +247,9 @@ final actor GameCoreCoordinator {
 
     /// - Parameter cheats: A list of cheats to add
     /// - Returns: A set of the cheats that failed to set.
-    func setCheats(cheats: [OwnedCheat]) -> Set<OwnedCheat>? {
+    func setCheats(cheats: [Cheat]) -> Set<Cheat>? {
         core.clearCheats()
-        var response: Set<OwnedCheat>?
+        var response: Set<Cheat>?
         for cheat in cheats {
             guard let type = cheat.type, let code = cheat.code else { continue }
             let wasSuccessful = core.setCheat(type, code, cheat.enabled)
