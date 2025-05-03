@@ -1,9 +1,6 @@
 import SwiftUI
 
-enum TagDetailViewMode: Hashable, Equatable {
-    case edit(TagObject)
-    case create
-
+private extension EditorTarget where Item == TagObject {
     var title: LocalizedStringKey {
         switch self {
         case .create: "CREATE_TAG"
@@ -23,13 +20,13 @@ struct TagDetailView: View {
     @Environment(\.dismiss) private var dismissAction: DismissAction
     @EnvironmentObject private var persistence: Persistence
 
-    private let mode: TagDetailViewMode
+    private let mode: EditorTarget<TagObject>
 
     @State private var newName: String
     @State private var newColor: TagColor
     @State private var deleteTag: TagObject?
 
-    init(mode: TagDetailViewMode) {
+    init(mode: EditorTarget<TagObject>) {
         self.mode = mode
         if case .edit(let tag) = mode {
             newName = tag.name ?? ""
@@ -65,6 +62,7 @@ struct TagDetailView: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .navigationTitle(mode.title)
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)

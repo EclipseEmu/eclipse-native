@@ -37,7 +37,7 @@ enum GamePlaybackError: LocalizedError {
             case .rom: "The ROM file does not match the one that was originally used for this game. This may cause issues with save data, save states, and cheats."
             default: "E_HASH_MISMATCH"
             }
-        case .missingCore: "Unknown Core"
+        case .missingCore: "The core is unknown or isn't set"
         case .missingFile(let kind):
             switch kind {
             case .none: "Unknown File Missing"

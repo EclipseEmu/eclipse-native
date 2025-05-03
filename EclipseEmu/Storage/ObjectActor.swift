@@ -44,8 +44,10 @@ final actor ObjectActor {
     private let objectExecutor: ObjectActorSerialExecutor
     public nonisolated let unownedExecutor: UnownedSerialExecutor
 
-    init(objectContext: NSManagedObjectContext, fileSystem: FileSystem) {
-        self.objectContext = objectContext
+    init(container: NSPersistentContainer, fileSystem: FileSystem) {
+        objectContext = container.newBackgroundContext()
+        objectContext.automaticallyMergesChangesFromParent = true
+        objectContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         self.objectExecutor = ObjectActorSerialExecutor(objectContext: objectContext)
         self.unownedExecutor = objectExecutor.asUnownedSerialExecutor()
         self.fileSystem = fileSystem
@@ -278,6 +280,7 @@ extension ObjectActor {
                 id: id,
                 isAuto: isAuto,
                 game: game,
+                coreID: core.coreID,
                 previewID: imageID,
                 wroteImage: wroteImage,
                 fileExtension: saveStatePath.fileExtension()
@@ -291,6 +294,7 @@ extension ObjectActor {
         id: UUID,
         isAuto: Bool,
         game: ObjectBox<GameObject>,
+        coreID: String,
         previewID: UUID,
         wroteImage: Bool,
         fileExtension: String?
@@ -309,6 +313,7 @@ extension ObjectActor {
             in: objectContext,
             id: id,
             isAuto: isAuto,
+            coreID: coreID,
             stateExtension: fileExtension,
             preview: wroteImage ? ImageAssetObject.create(in: objectContext, id: previewID, fileExtension: "jpeg") : nil,
             game: game

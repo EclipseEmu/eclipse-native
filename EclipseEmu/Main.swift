@@ -5,7 +5,6 @@ import GameController
 
 enum Destination: Hashable, Equatable {
     case settings
-    case systemSettings(GameSystem)
     case coreSettings(CoreInfo)
     case credits
     case licenses
@@ -14,7 +13,6 @@ enum Destination: Hashable, Equatable {
     case controllerProfiles
     case touchProfiles
 
-    case controllerProfileEditor(ControllerProfileEditorTarget)
     case controllerSettings(GCController)
 
     case manageTags
@@ -49,7 +47,7 @@ struct EclipseEmuApp: App {
         let settings = Settings()
         self._settings = StateObject(wrappedValue: settings)
 
-        let coreRegistry = CoreRegistry(cores: [mGBACoreInfo], settings: settings)
+        let coreRegistry = CoreRegistry(cores: [mGBACoreInfo])
         self._coreRegistry = StateObject(wrappedValue: coreRegistry)
 
         let playback = GamePlayback(coreRegistry: coreRegistry)
@@ -98,8 +96,6 @@ struct EclipseEmuApp: App {
         switch destination {
         case .settings:
             SettingsView()
-        case .systemSettings(let system):
-            SystemSettingsView(coreRegistry: coreRegistry, system: system)
         case .coreSettings(let core):
             CoreSettingsView(core: core)
         case .credits:
@@ -118,11 +114,8 @@ struct EclipseEmuApp: App {
             CheatsView(game: game, coreRegistry: coreRegistry)
         case .controllerProfiles:
             ControllerProfilesView()
-        case .controllerProfileEditor(let target):
-            ControllerProfileEditorView(for: target)
         case .keyboardProfiles:
-            // FIXME: TODO
-            EmptyView()
+            KeyboardProfilesView()
         case .touchProfiles:
             // FIXME: TODO
             EmptyView()

@@ -54,6 +54,7 @@ final actor GameCoreCoordinator {
     let height: CGFloat
 
     private let core: Core
+    nonisolated let coreID: String
 
     let inputs: GameInputCoordinator
     private(set) var state: GameCoreCoordinatorState = .stopped
@@ -89,6 +90,7 @@ final actor GameCoreCoordinator {
         let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.corecoordinator")
         self.executor = BlockingSerialExecutor(queue: queue)
         self.unownedExecutor = executor.asUnownedSerialExecutor()
+        self.coreID = coreInfo.id
 
         let callbacks = CoreCallbacks()
         guard let core = Core(from: coreInfo, system: system, callbacks: callbacks) else {

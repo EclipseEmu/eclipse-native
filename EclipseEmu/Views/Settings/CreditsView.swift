@@ -70,5 +70,5 @@ struct CreditsView: View {
 
 #Preview {
     CreditsView()
-        .environmentObject(CoreRegistry(cores: [mGBACoreInfo], settings: Settings()))
+        .environmentObject(CoreRegistry(cores: [mGBACoreInfo]))
 }

@@ -107,7 +107,7 @@ struct CheatsView: View {
 #Preview(traits: .modifier(PreviewStorage())) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
-            CheatsView(game: game, coreRegistry: .init(cores: [], settings: Settings()))
+            CheatsView(game: game, coreRegistry: .init(cores: []))
         }
     }
 }

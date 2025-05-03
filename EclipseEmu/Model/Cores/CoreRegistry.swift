@@ -1,16 +1,24 @@
 import Foundation
+import SwiftUI
 import EclipseKit
+
+import mGBAEclipseCore
 
 @MainActor
 final class CoreRegistry: ObservableObject {
-    private let settings: Settings
     let cores: [CoreInfo]
-    private let coresByID: [String: CoreInfo]
-    private let coresBySystem: [GameSystem: [CoreInfo]]
 
-    init(cores: [GameCoreInfo], settings: Settings) {
+    private static let decoder: JSONDecoder = JSONDecoder()
+    private static let encoder: JSONEncoder = JSONEncoder()
+
+    @AppStorage(Settings.Keys.registeredCores.rawValue, store: Settings.defaults)
+    private var rawRegisteredCores: Data?
+
+    private let coresByID: [String: CoreInfo]
+    private let coresBySystem: [GameSystem : [CoreInfo]]
+
+    init(cores: [GameCoreInfo]) {
         self.cores = cores.map(CoreInfo.init)
-        self.settings = settings
 
         self.coresByID = self.cores.reduce(into: [:]) { dict, core in
             dict[core.id] = core
@@ -21,6 +29,16 @@ final class CoreRegistry: ObservableObject {
                 dict[system, default: [CoreInfo]()].append(core)
             }
         }
+    }
+
+    private func getRegisteredCores() -> [GameSystem : String] {
+        guard
+            let rawRegisteredCores,
+            let cores = try? Self.decoder.decode([GameSystem : String].self, from: rawRegisteredCores)
+        else {
+            return [.gba : String(cString: mGBACoreInfo.id)]
+        }
+        return cores
     }
 
     func cores(for system: GameSystem) -> [CoreInfo] {
@@ -40,10 +58,16 @@ final class CoreRegistry: ObservableObject {
     }
 
     func get(for system: GameSystem) -> CoreInfo? {
-        return if let coreID = settings.registeredCores[system], let core = self.coresByID[coreID] {
-            core
-        } else {
-            self.coresBySystem[system]?.first
-        }
+        let registeredCores = getRegisteredCores()
+        guard let coreID = registeredCores[system] else { return self.coresBySystem[system]?.first }
+        guard !coreID.isEmpty else { return nil }
+        guard let core = self.coresByID[coreID] else { return self.coresBySystem[system]?.first }
+        return core
+    }
+
+    func set(_ core: CoreInfo?, for system: GameSystem) {
+        var registeredCores = getRegisteredCores()
+        registeredCores[system] = core?.id ?? ""
+        rawRegisteredCores = try? Self.encoder.encode(registeredCores)
     }
 }

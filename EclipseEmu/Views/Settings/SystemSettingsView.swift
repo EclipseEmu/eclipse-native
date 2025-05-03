@@ -3,7 +3,7 @@ import EclipseKit
 
 private typealias OptionalCoreInfo = Optional<CoreInfo>
 
-struct SystemSettingsView: View {
+struct SystemSettingItemView: View {
     @EnvironmentObject private var coreRegistry: CoreRegistry
 
     private let system: GameSystem
@@ -19,26 +19,17 @@ struct SystemSettingsView: View {
     }
 
     var body: some View {
-        Form {
-            Section {
-                Picker("CORE", selection: $selectedCore) {
-                    Text("NONE").tag(OptionalCoreInfo.none)
-                    Divider().hidden(if: cores.isEmpty)
-                    ForEach(cores, id: \.id) { core in
-                        Text(core.name).tag(OptionalCoreInfo.some(core))
-                    }
-                }
-
-                if let selectedCore {
-                    NavigationLink(to: .coreSettings(selectedCore)) {
-                        Label("CORE_SETTINGS", systemImage: "gear")
-                    }
-                }
-            } header: {
-                Text("CORE")
+        Picker(system.string, selection: $selectedCore) {
+            Text("NONE").tag(OptionalCoreInfo.none)
+            Divider().hidden(if: cores.isEmpty)
+            ForEach(cores, id: \.id) { core in
+                Text(core.name).tag(OptionalCoreInfo.some(core))
             }
         }
-        .navigationTitle(system.string)
+        .onChange(of: selectedCore, perform: update)
+    }
+
+    func update(_ core: CoreInfo?) {
+        coreRegistry.set(selectedCore, for: system)
     }
 }
-

@@ -63,6 +63,7 @@ struct CoreSettingsView: View {
             }
             .emptyState(core.settings.items.isEmpty) { EmptyView() }
         }
+        .formStyle(.grouped)
         .navigationTitle(core.name)
     }
 }

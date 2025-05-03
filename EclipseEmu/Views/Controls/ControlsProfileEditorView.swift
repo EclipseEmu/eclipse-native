@@ -1,10 +1,34 @@
 import SwiftUI
 import EclipseKit
 
-struct ControlsProfileEditorView<PickerContent: View>: View {
+final class ControlProfileEditorControl<Binding>: ObservableObject, Equatable, Hashable {
+    let input: GameInput
+    @Published var binding: Binding?
+
+    init(input: GameInput, binding: Binding? = nil) {
+        self.input = input
+        self.binding = binding
+    }
+
+    static func ==(lhs: ControlProfileEditorControl<Binding>, rhs: ControlProfileEditorControl<Binding>) -> Bool {
+        lhs.input == rhs.input
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(input.rawValue)
+    }
+}
+
+struct ControlProfileEditorContolCollection<Binding>: Identifiable {
+    let id = UUID()
+    var items: [ControlProfileEditorControl<Binding>]
+}
+
+struct ControlsProfileEditorView<ControlBinding, PickerContent: View>: View {
     @Binding var name: String
     @Binding var system: GameSystem
-    let picker: (GameInput) -> PickerContent
+    let inputs: [ControlProfileEditorContolCollection<ControlBinding>]
+    let picker: (ControlProfileEditorControl<ControlBinding>) -> PickerContent
 
     var body: some View {
         Form {
@@ -18,10 +42,10 @@ struct ControlsProfileEditorView<PickerContent: View>: View {
                 }
             }
 
-            ForEach(GameInput.sectioned) { section in
+            ForEach(inputs) { section in
                 Section {
-                    ForEach(section.items, id: \.rawValue) { input in
-                        picker(input).hidden(if: !system.inputs.contains(input))
+                    ForEach(section.items, id: \.input.rawValue) { binding in
+                        picker(binding).hidden(if: !system.inputs.contains(binding.input))
                     }
                 }
             }

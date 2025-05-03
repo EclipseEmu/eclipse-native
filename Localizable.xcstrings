@@ -214,6 +214,16 @@
         }
       }
     },
+    "CONTROLLER_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllers"
+          }
+        }
+      }
+    },
     "CONTROLLER_VENDOR" : {
       "localizations" : {
         "en" : {
@@ -244,16 +254,6 @@
         }
       }
     },
-    "CORE" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Core"
-          }
-        }
-      }
-    },
     "CORE_DEVELOPER" : {
       "localizations" : {
         "en" : {
@@ -270,16 +270,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name"
-          }
-        }
-      }
-    },
-    "CORE_SETTINGS" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Core Settings"
           }
         }
       }
@@ -564,6 +554,16 @@
         }
       }
     },
+    "EDIT_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Profile"
+          }
+        }
+      }
+    },
     "EDIT_TAG" : {
       "localizations" : {
         "en" : {
@@ -794,6 +794,16 @@
         }
       }
     },
+    "KEYBOARD_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard"
+          }
+        }
+      }
+    },
     "LIBRARY" : {
       "localizations" : {
         "en" : {
@@ -920,6 +930,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Cheats"
+          }
+        }
+      }
+    },
+    "NO_CONNECTED_CONTROLLERS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don’t have any controllers currently connected."
+          }
+        }
+      }
+    },
+    "NO_CONNECTED_CONTROLLERS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Connected Controllers"
+          }
+        }
+      }
+    },
+    "NO_PROFILES_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven’t created any profiles. Profiles are a way to quickly switch between controller bindings."
+          }
+        }
+      }
+    },
+    "NO_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Profiles"
           }
         }
       }
@@ -1080,6 +1130,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play Game"
+          }
+        }
+      }
+    },
+    "PROFILE_UNNAMED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed Profile"
           }
         }
       }
@@ -1457,6 +1517,16 @@
         }
       }
     },
+    "SYSTEMS_SETTINGS_CORE_SELECTION_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select which core will be used for each system. Changing the core will cause incompatibilities with save states, cheats, and potentially saves. You can manage each core’s settings below."
+          }
+        }
+      }
+    },
     "TAG" : {
       "localizations" : {
         "en" : {
@@ -1507,12 +1577,42 @@
         }
       }
     },
+    "UNBIND" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbind"
+          }
+        }
+      }
+    },
+    "UNBOUND" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbound"
+          }
+        }
+      }
+    },
     "UNKNOWN" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "UNKNOWN_KEY %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown (%lld)"
           }
         }
       }

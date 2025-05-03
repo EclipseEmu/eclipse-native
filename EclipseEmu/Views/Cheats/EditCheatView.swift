@@ -73,6 +73,7 @@ struct EditCheatView: View {
                     Text("CHEAT_CORE_FORMAT_MESSAGE \"\(self.format.format.uppercased())\"")
                 }
             }
+            .formStyle(.grouped)
             .onChange(of: self.format, perform: self.formatChanged)
             .onChange(of: self.code, perform: self.codeChanged)
             .navigationTitle(self.isCreatingCheat ? "ADD_CHEAT" : "EDIT_CHEAT")

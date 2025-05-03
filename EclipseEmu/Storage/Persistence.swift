@@ -65,9 +65,6 @@ final class Persistence: Sendable, ObservableObject {
         mainContext.automaticallyMergesChangesFromParent = true
         mainContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 
-        let objectsContext = container.newBackgroundContext()
-        objectsContext.automaticallyMergesChangesFromParent = true
-        objectsContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-        objects = ObjectActor(objectContext: objectsContext, fileSystem: files)
+        objects = ObjectActor(container: container, fileSystem: files)
     }
 }

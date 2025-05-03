@@ -51,12 +51,15 @@ struct SettingsView: View {
 
             Section {
                 ForEach(GameSystem.concreteCases, id: \.self) { system in
-                    NavigationLink(to: .systemSettings(system)) {
-                        Text(system.string)
-                    }
+                    SystemSettingItemView(
+                        coreRegistry: coreRegistry,
+                        system: system
+                    )
                 }
             } header: {
                 Text("SYSTEMS")
+            } footer: {
+                Text("SYSTEMS_SETTINGS_CORE_SELECTION_DESCRIPTION")
             }
 
             Section {
@@ -164,7 +167,7 @@ struct SettingsView: View {
     let settings = Settings()
     NavigationStack {
         SettingsView()
-            .environmentObject(CoreRegistry(cores: [mGBACoreInfo], settings: settings))
+            .environmentObject(CoreRegistry(cores: [mGBACoreInfo]))
             .environmentObject(settings)
     }
 }

@@ -12,6 +12,7 @@ extension SaveStateObject {
         in context: NSManagedObjectContext,
         id: UUID = UUID(),
         isAuto: Bool,
+        coreID: String,
         stateExtension: String? = "s8",
         preview: ImageAssetObject? = nil,
         game: GameObject? = nil
@@ -21,6 +22,7 @@ extension SaveStateObject {
         model.isAuto = isAuto
         model.date = Date()
         model.preview = preview
+        model.coreID = coreID
         model.fileExtension = stateExtension
         model.game = game
         return model

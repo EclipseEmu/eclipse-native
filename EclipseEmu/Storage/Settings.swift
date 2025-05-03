@@ -1,6 +1,5 @@
 import SwiftUI
 import EclipseKit
-import mGBAEclipseCore
 
 /// How games will be ordered in the list.
 enum GameListSortingMethod: Int, RawRepresentable {
@@ -16,41 +15,19 @@ enum GameListSortingDirection: Int, RawRepresentable {
 
 @MainActor
 final class Settings: ObservableObject {
-    private static let defaults = UserDefaults.standard
-    private static let jsonDecoder: JSONDecoder = JSONDecoder()
-    private static let jsonEncoder: JSONEncoder = JSONEncoder()
+    static let defaults = UserDefaults.standard
 
     @AppStorage(Settings.Keys.listSortingMethod.rawValue, store: Settings.defaults)
     var listSortMethod: GameListSortingMethod = .name
     @AppStorage(Settings.Keys.listSortingDirection.rawValue, store: Settings.defaults)
     var listSortDirection: GameListSortingDirection = .ascending
 
-    @AppStorage(Settings.Keys.registeredCores.rawValue, store: Settings.defaults)
-    private var rawRegisteredCores: Data?
     @AppStorage(Settings.Keys.volume.rawValue, store: Settings.defaults)
     var volume: Double = 0.5
     @AppStorage(Settings.Keys.ignoreSilentMode.rawValue, store: Settings.defaults)
     var ignoreSilentMode: Bool = true
     @AppStorage(Settings.Keys.touchControlsOpacity.rawValue)
     var touchControlsOpacity: Double = 0.6
-
-    /// A dictionary of Systems -> Core IDs
-    var registeredCores: [GameSystem : String] {
-        get {
-            guard
-                let rawRegisteredCores,
-                let cores = try? Self.jsonDecoder.decode([GameSystem : String].self, from: rawRegisteredCores)
-            else {
-                return [
-                    .gba : String(cString: mGBACoreInfo.id)
-                ]
-            }
-            return cores
-        }
-        set {
-            rawRegisteredCores = try? Self.jsonEncoder.encode(newValue)
-        }
-    }
 
     enum Keys: String, RawRepresentable, CaseIterable {
         case listSortingMethod = "games.sortingMethod"

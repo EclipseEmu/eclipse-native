@@ -16,7 +16,7 @@ struct InputSourceControllerBinding: Codable, Sendable {
 
 typealias InputSourceControllerBindings = [InputSourceControllerBinding]
 
-private enum InputSourceControllerVersion: Int16, RawRepresentable {
+enum InputSourceControllerVersion: Int16, RawRepresentable {
     case v1 = 1
 }
 

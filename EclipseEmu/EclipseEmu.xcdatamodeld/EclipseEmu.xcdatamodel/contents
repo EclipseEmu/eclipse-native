@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24F5042g" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24F5053j" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CheatObject" representedClassName="CheatObject" syncable="YES" codeGenerationType="class">
         <attribute name="code" attributeType="String"/>
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -43,7 +43,20 @@
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="cover" inverseEntity="GameObject"/>
         <relationship name="saveState" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SaveStateObject" inverseName="preview" inverseEntity="SaveStateObject"/>
     </entity>
+    <entity name="InputSourceControllerProfileObject" representedClassName="InputSourceControllerProfileObject" syncable="YES" codeGenerationType="class">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="InputSourceKeyboardProfileObject" representedClassName="InputSourceKeyboardProfileObject" syncable="YES" codeGenerationType="class">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
     <entity name="SaveStateObject" representedClassName="SaveStateObject" syncable="YES" codeGenerationType="class">
+        <attribute name="coreID" optional="YES" attributeType="String"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fileExtension" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>

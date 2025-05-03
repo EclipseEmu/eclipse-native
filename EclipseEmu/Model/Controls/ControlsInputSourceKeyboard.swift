@@ -4,7 +4,7 @@ import EclipseKit
 
 typealias GameKeyboardBindings = [GCKeyCode : GameInput]
 
-private enum InputSourceKeyboardVersion: Int16, RawRepresentable {
+enum InputSourceKeyboardVersion: Int16, RawRepresentable {
     case v1 = 1
 }
 

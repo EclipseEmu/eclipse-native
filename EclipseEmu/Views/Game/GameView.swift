@@ -190,6 +190,7 @@ struct GameView: View {
                 } message: {
                     Text("NO_SAVE_STATES_MESSAGE")
                 }
+                .freestanding()
                 .padding(.bottom)
             }
         } header: {

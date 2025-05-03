@@ -55,6 +55,7 @@ struct LibraryFiltersView: View {
                 EmptyView()
             }
         }
+        .formStyle(.grouped)
         .toggleStyleCheckbox()
         .navigationTitle("FILTERS")
 #if !os(macOS)
