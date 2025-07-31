@@ -1,17 +1,17 @@
 import SwiftUI
 import EclipseKit
 
-private typealias OptionalCoreInfo = Optional<CoreInfo>
+private typealias OptionalCoreInfo = Optional<Core>
 
 struct SystemSettingItemView: View {
     @EnvironmentObject private var coreRegistry: CoreRegistry
 
-    private let system: GameSystem
-    private let cores: [CoreInfo]
+    private let system: System
+    private let cores: [Core]
 
-    @State private var selectedCore: CoreInfo?
+    @State private var selectedCore: Core?
 
-    init(coreRegistry: CoreRegistry, system: GameSystem) {
+    init(coreRegistry: CoreRegistry, system: System) {
         self.system = system
         self.cores = coreRegistry.cores(for: system)
         // NOTE: setting self.selectedCore directly was not actually setting it.
@@ -20,16 +20,16 @@ struct SystemSettingItemView: View {
 
     var body: some View {
         Picker(system.string, selection: $selectedCore) {
-            Text("NONE").tag(OptionalCoreInfo.none)
+            Text("NONE").tag(Optional<Core>.none)
             Divider().hidden(if: cores.isEmpty)
-            ForEach(cores, id: \.id) { core in
-                Text(core.name).tag(OptionalCoreInfo.some(core))
+			ForEach(cores, id: \.rawValue) { core in
+				Text(core.type.name).tag(Optional<Core>.some(core))
             }
         }
         .onChange(of: selectedCore, perform: update)
     }
 
-    func update(_ core: CoreInfo?) {
+    func update(_ core: Core?) {
         coreRegistry.set(selectedCore, for: system)
     }
 }

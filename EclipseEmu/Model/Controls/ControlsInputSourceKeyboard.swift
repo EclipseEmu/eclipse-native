@@ -2,54 +2,65 @@ import Foundation
 import GameController
 import EclipseKit
 
-typealias GameKeyboardBindings = [GCKeyCode : GameInput]
+struct KeyboardMapping: Codable {
+    let input: CoreInput
+	let direction: ControlMappingDirection
 
-enum InputSourceKeyboardVersion: Int16, RawRepresentable {
+	init(_ input: CoreInput, direction: ControlMappingDirection = .none) {
+		self.input = input
+		self.direction = direction
+	}
+}
+
+typealias KeyboardMappings = [GCKeyCode : KeyboardMapping]
+
+enum InputSourceKeyboardVersion: Int16, VersionProtocol {
     case v1 = 1
+    
+    static let latest: Self = .v1
 }
 
 struct InputSourceKeyboardDescriptor: InputSourceDescriptorProtocol {
-    typealias Bindings = GameKeyboardBindings
+    typealias Bindings = KeyboardMappings
+	typealias Object = KeyboardProfileObject
 
-    let kind: ControlsInputSourceKind = .keyboard
-    let id: String? = nil
+	static func encode(_ bindings: KeyboardMappings, encoder: JSONEncoder, into object: KeyboardProfileObject) throws {
+		object.data = try encoder.encode(bindings)
+	}
 
-    func encode(_ bindings: GameKeyboardBindings, encoder: JSONEncoder) throws -> ControlsConfigData {
-        let data = try encoder.encode(bindings)
-        return ControlsConfigData(version: InputSourceKeyboardVersion.v1.rawValue, data: data)
-    }
-
-    func decode(_ data: consuming ControlsConfigData, decoder: JSONDecoder) throws -> GameKeyboardBindings {
-        guard let version = InputSourceKeyboardVersion(rawValue: data.version) else {
-            throw ControlsInputError.unsupportedVersion
+	static func decode(_ data: KeyboardProfileObject, decoder: JSONDecoder) throws -> KeyboardMappings {
+        guard let version = data.version, let data = data.data else {
+            return [:]
         }
+		return switch version {
+		case .v1: try decoder.decode(KeyboardMappings.self, from: data)
+		}
+	}
 
-        switch version {
-        case .v1:
-            return try decoder.decode(GameKeyboardBindings.self, from: data.data)
-        }
-    }
+	func obtain(from game: GameObject, system: System, persistence: Persistence) -> KeyboardProfileObject? {
+		game.keyboardProfile
+	}
 
-    static func defaults(for system: GameSystem) -> GameKeyboardBindings {
+	func predicate(system: System) -> NSPredicate {
+		NSPredicate(format: "rawSystem = %d", system.rawValue)
+	}
+
+    static func defaults(for system: System) -> KeyboardMappings {
         switch system {
         case .gba:
             [
-                .keyZ: .faceButtonDown,
-                .keyX: .faceButtonRight,
-                .keyA: .shoulderLeft,
-                .keyS: .shoulderRight,
-                .upArrow: .dpadUp,
-                .downArrow: .dpadDown,
-                .leftArrow: .dpadLeft,
-                .rightArrow: .dpadRight,
-                .returnOrEnter: .startButton,
-                .rightShift: .selectButton
+				.keyZ: .init(.faceButtonDown),
+				.keyX: .init(.faceButtonRight),
+				.keyA: .init(.leftShoulder),
+				.keyS: .init(.rightShoulder),
+				.upArrow: .init(.dpad, direction: .fullPositiveY),
+				.downArrow: .init(.dpad, direction: .fullNegativeY),
+				.leftArrow: .init(.dpad, direction: .fullNegativeX),
+                .rightArrow: .init(.dpad, direction: .fullPositiveX),
+				.returnOrEnter: .init(.start),
+				.rightShift: .init(.select)
             ]
         default: [:]
         }
     }
-}
-
-extension GCKeyboard {
-    static let inputSourceDescriptor = InputSourceKeyboardDescriptor()
 }

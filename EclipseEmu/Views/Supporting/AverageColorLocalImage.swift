@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// A view that loads an image asynchronously and also gets its average color.
+@MainActor
 struct AverageColorLocalImage<I: View, P: View>: View {
     @State private var task: Task<Void, Never>?
 
@@ -43,10 +44,10 @@ struct AverageColorLocalImage<I: View, P: View>: View {
         }
     }
 
-    func load() {
+	func load() {
         guard let url = persistence.files.url(path: handle?.path) else { return }
 
-        self.task = Task<Void, Never>.detached(priority: .medium) {
+        self.task = Task<Void, Never>(priority: .medium) {
             await MainActor.run {
                 self.state = .empty
             }

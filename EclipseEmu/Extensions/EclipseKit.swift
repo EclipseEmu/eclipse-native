@@ -3,9 +3,10 @@ import AVFoundation
 import EclipseKit
 import Metal
 
+
 // MARK: System
 
-extension GameSystem {
+extension System: @retroactive Codable {
     var string: String {
         return switch self {
         case .unknown: String(localized: "SYSTEM_UNKNOWN")
@@ -17,6 +18,8 @@ extension GameSystem {
         @unknown default: String(localized: "SYSTEM_UNKNOWN")
         }
     }
+
+	static let concreteCases: [Self] = [.gb, .gbc, .gba, .nes, .snes]
 
     var fileType: UTType? {
         return switch self {
@@ -40,77 +43,51 @@ extension GameSystem {
         }
     }
 
-    var inputs: GameInput {
+    var inputs: CoreInput {
         switch self {
-        case .unknown: GameInput.allOn
+		case .unknown: []
         case .gb, .gbc, .nes:
-            [.dpadDown, .dpadUp, .dpadLeft, .dpadRight, .faceButtonRight, .faceButtonDown, .startButton, .selectButton]
+			[.dpad, .faceButtonRight, .faceButtonDown, .start, .select]
         case .gba:
-            [
-                .dpadDown, .dpadUp, .dpadLeft, .dpadRight,
-                .faceButtonRight, .faceButtonDown,
-                .startButton, .selectButton,
-                .shoulderLeft, .shoulderRight
-            ]
+			[.dpad, .faceButtonRight, .faceButtonDown, .start, .select, .leftShoulder, .rightShoulder]
         case .snes:
-            [
-                .dpadDown, .dpadUp, .dpadLeft, .dpadRight,
-                .faceButtonRight, .faceButtonDown, .faceButtonLeft, .faceButtonUp,
-                .startButton, .selectButton, .shoulderLeft, .shoulderRight
-            ]
+			[.dpad, .faceButtonUp, .faceButtonLeft, .faceButtonRight, .faceButtonDown, .start, .select, .leftShoulder, .rightShoulder]
         @unknown default:
             []
         }
     }
-}
 
-extension GameSystem: Codable {}
-
-extension GameSystem: @retroactive CaseIterable {
-    public static let concreteCases: [GameSystem] = [.gb, .gbc, .gba, .nes, .snes]
-    public static let allCases: [GameSystem] = [.unknown, .gb, .gbc, .gba, .nes, .snes]
-}
-
-// MARK: Video
-
-extension GameCoreVideoPixelFormat {
-    var metal: MTLPixelFormat? {
-        return switch self {
-        case .bgra8Unorm: .bgra8Unorm
-        case .rgba8Unorm: .rgba8Unorm
-        default: nil
-        }
-    }
+	var controlNamingConvention: ControlNamingConvention {
+		switch self {
+		case .gb, .gba, .gbc, .nes, .snes, .unknown: .nintendo
+		}
+	}
 }
 
 // MARK: Audio
 
-extension GameCoreCommonAudioFormat {
-    var avCommonFormat: AVAudioCommonFormat {
-        return switch self {
-        case .pcmFloat32: .pcmFormatFloat32
-        case .pcmFloat64: .pcmFormatFloat64
-        case .pcmInt16: .pcmFormatInt16
-        case .pcmInt32: .pcmFormatInt32
-        default: .otherFormat
-        }
-    }
+extension CoreAudioDescriptor {
+	func getAudioFormat() -> AVAudioFormat? {
+		let commonFormat: AVAudioCommonFormat = switch self.sampleFormat {
+		case .float32: .pcmFormatFloat32
+		case .float64: .pcmFormatFloat64
+		case .int16: .pcmFormatInt16
+		case .int32: .pcmFormatInt32
+		}
+
+		return AVAudioFormat(
+			commonFormat: commonFormat,
+			sampleRate: self.sampleRate,
+			channels: UInt32(self.channelCount),
+			interleaved: self.interlaced
+		)
+	}
 }
 
-extension GameCoreAudioFormat {
-    var avAudioFormat: AVAudioFormat? {
-        AVAudioFormat(
-            commonFormat: self.commonFormat.avCommonFormat,
-            sampleRate: self.sampleRate,
-            channels: self.channelCount,
-            interleaved: true
-        )
-    }
-}
 
 // MARK: Cheats
 
-extension GameCoreCheatCharacterSet {
+extension CoreCheatFormat.CharacterSet {
     var swiftCharacterSet: CharacterSet {
         switch self {
         case .hexadecimal: .hexadecimal
@@ -119,18 +96,84 @@ extension GameCoreCheatCharacterSet {
     }
 }
 
-// MARK: Core
-
-extension GameCoreInfo: @retroactive @unchecked Sendable {}
-
-extension GameCoreInfo: @retroactive Equatable {
-    public static func == (lhs: GameCoreInfo, rhs: GameCoreInfo) -> Bool {
-        lhs.id == rhs.id
-    }
+extension CoreCheat {
+	init?(_ cheat: CheatObject) {
+		guard let format = cheat.type, let code = cheat.code else { return nil }
+		self = CoreCheat(format: format, code: code)
+	}
 }
 
-extension GameCoreInfo: @retroactive Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
+extension CoreCheatFormat: @retroactive Equatable, @retroactive Hashable {
+	public static func == (lhs: CoreCheatFormat, rhs: CoreCheatFormat) -> Bool {
+		return lhs.id == rhs.id
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(self.id)
+	}
+
+	/// Normalize the code for storage or loading into the core
+	func normalizeCode(string: String) -> String {
+		let characterSet = self.charset.swiftCharacterSet.union(.onlyNewlineFeed)
+		return string.normalize(with: characterSet)
+	}
+
+	/// Make a formatter for this cheat format
+	func makeFormatter() -> CheatFormatter {
+		let characterSet = self.charset.swiftCharacterSet
+		return .init(format: pattern, characterSet: characterSet)
+	}
 }
+
+
+// MARK: Controls
+
+extension CoreInput: @retroactive RandomAccessCollection {
+	public typealias Index = Int
+
+	@inlinable
+	public var isEmpty: Bool { self.rawValue == 0 }
+
+	@inlinable
+	public var startIndex: Index { 0 }
+
+	@inlinable
+	public var endIndex: Index { rawValue.nonzeroBitCount }
+
+	@inlinable
+	public func index(after i: Index) -> Index { i + 1 }
+
+	@inlinable
+	public func index(before i: Index) -> Index { i - 1 }
+
+	public subscript(position: Index) -> Self {
+		precondition(position >= startIndex && position < endIndex, "oob")
+		var value = rawValue
+		for _ in 0..<position {
+			value &= value - 1
+		}
+		return Self(rawValue: 1 << value.trailingZeroBitCount)
+	}
+}
+
+extension CoreInput {
+	static func inputs(for system: System) -> Self {
+		let baseNintendo: Self = [.dpad, .faceButtonRight, .faceButtonDown, .start, .select]
+		let gbaNintendo: Self = [baseNintendo, .leftShoulder, .rightShoulder]
+		return switch system {
+		case .gb, .gbc, .nes: baseNintendo
+		case .gba: gbaNintendo
+		case .snes: [gbaNintendo, .faceButtonUp, .faceButtonLeft]
+		case .unknown: []
+		}
+	}
+
+	static func directionalInputs(for system: System) -> Self {
+		return switch system {
+		case .gb, .gbc, .nes, .gba, .snes: .dpad
+		case .unknown: []
+		}
+	}
+}
+
+

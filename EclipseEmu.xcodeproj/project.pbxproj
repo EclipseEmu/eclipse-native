@@ -8,17 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		920E993E2DB8157F00124A2A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 920E993D2DB8157F00124A2A /* Localizable.xcstrings */; };
+		922593402E2C3450001CBBCD /* Eclipse.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9225933F2E2C3450001CBBCD /* Eclipse.icon */; };
 		922F00BC2BC0C26700B419D7 /* EclipseEmuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */; };
 		922F00C62BC0C26700B419D7 /* EclipseEmuUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C52BC0C26700B419D7 /* EclipseEmuUITests.swift */; };
 		922F00C82BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922F00C72BC0C26700B419D7 /* EclipseEmuUITestsLaunchTests.swift */; };
 		92404F0D2D8CA43400A22A8A /* openvgdb-min.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 92404F0C2D8CA43400A22A8A /* openvgdb-min.sqlite */; };
 		924B218C2BE8156700ED02F4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218B2BE8156700ED02F4 /* Atomics */; };
-		924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; };
-		924B21902BE97A9000ED02F4 /* mGBAEclipseCore in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		92A5F6272BF1DDCF00DCC338 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */; };
+		9268FE592E1B659B00EFF538 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 9268FE582E1B659B00EFF538 /* mGBAEclipseCore */; };
+		928D33532E3AE30E0005AFB0 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 928D33522E3AE30E0005AFB0 /* mGBAEclipseCore */; };
 		92A5F62A2BF2600300DCC338 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6292BF2600300DCC338 /* EclipseKit */; };
 		92A5F62F2BF2BA7D00DCC338 /* EclipseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F62E2BF2BA7D00DCC338 /* EclipseKit */; };
-		92A5F6322BF2BA8F00DCC338 /* mGBAEclipseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,7 +44,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				924B21902BE97A9000ED02F4 /* mGBAEclipseCore in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		920E993D2DB8157F00124A2A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		9225933F2E2C3450001CBBCD /* Eclipse.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Eclipse.icon; sourceTree = "<group>"; };
 		922F00A12BC0C26600B419D7 /* Eclipse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Eclipse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00B72BC0C26700B419D7 /* EclipseEmuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EclipseEmuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		922F00BB2BC0C26700B419D7 /* EclipseEmuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseEmuTests.swift; sourceTree = "<group>"; };
@@ -75,7 +74,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		927A25772D6A789B004218D2 /* Cores */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Cores; sourceTree = "<group>"; };
 		927A26E02D6A7F93004218D2 /* EclipseEmu */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (927A27532D6A7F93004218D2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = EclipseEmu; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -84,10 +82,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				928D33532E3AE30E0005AFB0 /* mGBAEclipseCore in Frameworks */,
+				9268FE592E1B659B00EFF538 /* mGBAEclipseCore in Frameworks */,
 				924B218C2BE8156700ED02F4 /* Atomics in Frameworks */,
-				924B218F2BE96A4D00ED02F4 /* mGBAEclipseCore in Frameworks */,
-				92A5F6322BF2BA8F00DCC338 /* mGBAEclipseCore in Frameworks */,
-				92A5F6272BF1DDCF00DCC338 /* mGBAEclipseCore in Frameworks */,
 				92A5F62A2BF2600300DCC338 /* EclipseKit in Frameworks */,
 				92A5F62F2BF2BA7D00DCC338 /* EclipseKit in Frameworks */,
 			);
@@ -122,13 +119,13 @@
 			children = (
 				928237052BCB540C001E27B3 /* README.md */,
 				92404F0C2D8CA43400A22A8A /* openvgdb-min.sqlite */,
-				927A25772D6A789B004218D2 /* Cores */,
 				927A26E02D6A7F93004218D2 /* EclipseEmu */,
 				922F00BA2BC0C26700B419D7 /* EclipseEmuTests */,
 				922F00C42BC0C26700B419D7 /* EclipseEmuUITests */,
 				922F00A22BC0C26600B419D7 /* Products */,
 				9227F53E2BCB490700A29074 /* Frameworks */,
 				920E993D2DB8157F00124A2A /* Localizable.xcstrings */,
+				9225933F2E2C3450001CBBCD /* Eclipse.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -181,11 +178,10 @@
 			name = EclipseEmu;
 			packageProductDependencies = (
 				924B218B2BE8156700ED02F4 /* Atomics */,
-				924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */,
-				92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */,
 				92A5F6292BF2600300DCC338 /* EclipseKit */,
 				92A5F62E2BF2BA7D00DCC338 /* EclipseKit */,
-				92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */,
+				9268FE582E1B659B00EFF538 /* mGBAEclipseCore */,
+				928D33522E3AE30E0005AFB0 /* mGBAEclipseCore */,
 			);
 			productName = EclipseEmu;
 			productReference = 922F00A12BC0C26600B419D7 /* Eclipse.app */;
@@ -263,7 +259,7 @@
 			packageReferences = (
 				924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */,
-				92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */,
+				928D33512E3AE30E0005AFB0 /* XCRemoteSwiftPackageReference "core-mgba" */,
 			);
 			productRefGroup = 922F00A22BC0C26600B419D7 /* Products */;
 			projectDirPath = "";
@@ -281,6 +277,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				922593402E2C3450001CBBCD /* Eclipse.icon in Resources */,
 				920E993E2DB8157F00124A2A /* Localizable.xcstrings in Resources */,
 				92404F0D2D8CA43400A22A8A /* openvgdb-min.sqlite in Resources */,
 			);
@@ -466,8 +463,9 @@
 		922F00CC2BC0C26700B419D7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Eclipse;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EclipseEmu/EclipseEmu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -495,7 +493,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
@@ -516,8 +514,9 @@
 		922F00CD2BC0C26700B419D7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = Eclipse;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = EclipseEmu/EclipseEmu.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -545,7 +544,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.magnetar.EclipseEmu;
@@ -698,17 +697,17 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
+		928D33512E3AE30E0005AFB0 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
+			repositoryURL = "https://github.com/eclipseemu/core-mgba";
 			requirement = {
 				branch = main;
 				kind = branch;
 			};
 		};
-		92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */ = {
+		92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/eclipseemu/core-mgba.git";
+			repositoryURL = "https://github.com/eclipseemu/eclipsekit.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -722,12 +721,13 @@
 			package = 924B218A2BE8156700ED02F4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
 			productName = Atomics;
 		};
-		924B218E2BE96A4D00ED02F4 /* mGBAEclipseCore */ = {
+		9268FE582E1B659B00EFF538 /* mGBAEclipseCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = mGBAEclipseCore;
 		};
-		92A5F6262BF1DDCF00DCC338 /* mGBAEclipseCore */ = {
+		928D33522E3AE30E0005AFB0 /* mGBAEclipseCore */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 928D33512E3AE30E0005AFB0 /* XCRemoteSwiftPackageReference "core-mgba" */;
 			productName = mGBAEclipseCore;
 		};
 		92A5F6292BF2600300DCC338 /* EclipseKit */ = {
@@ -738,11 +738,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 92A5F62D2BF2BA7D00DCC338 /* XCRemoteSwiftPackageReference "eclipsekit" */;
 			productName = EclipseKit;
-		};
-		92A5F6312BF2BA8F00DCC338 /* mGBAEclipseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 92A5F6302BF2BA8F00DCC338 /* XCRemoteSwiftPackageReference "core-mgba" */;
-			productName = mGBAEclipseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

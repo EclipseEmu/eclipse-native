@@ -4,8 +4,9 @@ import CoreData
 struct KeepPlayingSection: View {
     let saveStateDateFormatter = RelativeDateTimeFormatter()
 
-    @EnvironmentObject var gamePlayback: GamePlayback
-    @EnvironmentObject var persistence: Persistence
+	@EnvironmentObject var persistence: Persistence
+    @EnvironmentObject var playback: GamePlayback
+	@EnvironmentObject var coreRegistry: CoreRegistry
 
     @FetchRequest<SaveStateObject>(sortDescriptors: [])
     var keepPlaying: FetchedResults<SaveStateObject>
@@ -71,7 +72,7 @@ struct KeepPlayingSection: View {
     func saveStateSelected(_ saveState: SaveStateObject) {
         Task { @MainActor in
             do {
-                try await gamePlayback.play(state: saveState, persistence: persistence)
+				try await playback.play(state: saveState, persistence: persistence, coreRegistry: coreRegistry)
             } catch {
                 print(error)
             }

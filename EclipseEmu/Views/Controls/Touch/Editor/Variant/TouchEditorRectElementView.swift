@@ -1,0 +1,115 @@
+#if canImport(UIKit)
+import SwiftUI
+
+struct TouchEditorRectElementView: View {
+	let title: String
+	let systemImage: String
+	@Binding var rect: TouchMappings.RelativeRect
+	@State private var isShown: Bool = false
+
+	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
+	var yOffsetID: TouchEditorVariantView.Field
+	var xOffsetID: TouchEditorVariantView.Field
+	var sizeID: TouchEditorVariantView.Field
+
+	var body: some View {
+		LabeledContent {
+			ToggleButton("Edit", value: $isShown)
+				.buttonStyle(.bordered)
+				.popover(isPresented: $isShown, content: popoverContent)
+		} label: {
+			Label(title, systemImage: systemImage)
+		}
+	}
+
+	@ViewBuilder
+	func popoverContent() -> some View {
+		TouchEditorRectFormView(rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
+			.modify { view in
+				if #available(iOS 16.4, *) {
+					view
+						.presentationCompactAdaptation(.popover)
+						.frame(minWidth: 200, idealWidth: 300, minHeight: 200)
+						.padding()
+						.formStyle(.columns)
+						.scrollContentBackground(.hidden)
+						.modify {
+							if #available(iOS 18.0, *) {
+								$0.presentationSizing(.fitted)
+							} else {
+								$0
+							}
+						}
+				} else {
+					NavigationStack {
+						view
+							.navigationTitle(title)
+							.navigationBarTitleDisplayMode(.inline)
+							.toolbar {
+								ToolbarItem(placement: .cancellationAction) {
+									DismissButton("Done")
+								}
+							}
+					}
+					.presentationDetents([.medium])
+				}
+			}
+	}
+}
+
+/// A thin wrapper around ``TouchEditorRectElementView``, which offers equatability.
+struct TouchEditorElementView: @MainActor Equatable, View {
+	@ObservedObject var viewModel: TouchEditorViewModel
+	let variant: Int
+	let element: TouchMappings.Element
+
+	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
+
+	static func == (lhs: TouchEditorElementView, rhs: TouchEditorElementView) -> Bool {
+		lhs.element.control == rhs.element.control
+	}
+
+	var body: some View {
+		let label = viewModel.label(for: element.control)
+		if let offset = viewModel.mappings.variants[variant].elements.firstIndex(of: element) {
+			TouchEditorRectElementView(
+				title: label.0,
+				systemImage: label.systemImage,
+				rect: $viewModel.mappings.variants[variant].elements[offset].rect,
+				focusTarget: $focusTarget,
+				yOffsetID: .elementOffsetY(offset),
+				xOffsetID: .elementOffsetX(offset),
+				sizeID: .elementSize(offset)
+			)
+		}
+	}
+}
+
+struct TouchEditorRectFormView: View {
+	@Binding var rect: TouchMappings.RelativeRect
+	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
+	var yOffsetID: TouchEditorVariantView.Field
+	var xOffsetID: TouchEditorVariantView.Field
+	var sizeID: TouchEditorVariantView.Field
+
+	var body: some View {
+		Form {
+			Picker("X Origin", selection: $rect.xOrigin) {
+				Text("Left").tag(TouchMappings.RelativeRect.XOrigin.left)
+				Text("Center").tag(TouchMappings.RelativeRect.XOrigin.center)
+				Text("Right").tag(TouchMappings.RelativeRect.XOrigin.right)
+			}
+
+			Picker("Y Origin", selection: $rect.yOrigin) {
+				Text("Top").tag(TouchMappings.RelativeRect.YOrigin.top)
+				Text("Center").tag(TouchMappings.RelativeRect.YOrigin.center)
+				Text("Bottom").tag(TouchMappings.RelativeRect.YOrigin.bottom)
+			}
+
+			TouchEditorPositionField("X Offset", value: $rect.xOffset, alignment: .natural, focusTarget: $focusTarget, id: xOffsetID)
+			TouchEditorPositionField("Y Offset", value: $rect.yOffset, alignment: .natural, focusTarget: $focusTarget, id: yOffsetID)
+			TouchEditorPositionField("Size", value: $rect.size, alignment: .natural, focusTarget: $focusTarget, id: sizeID)
+		}
+	}
+}
+#endif

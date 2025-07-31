@@ -7,7 +7,7 @@ extension View {
             .environment(\.managedObjectContext, persistence.mainContext)
     }
 
-    func modify<T: View>(@ViewBuilder _ modifier: (Self) -> T) -> some View {
+    func modify<T: View>(@ViewBuilder _ modifier: (Self) -> T) -> T {
         return modifier(self)
     }
 
@@ -16,10 +16,6 @@ extension View {
         if !isHidden {
             self
         }
-    }
-
-    func fullWidthFrame() -> some View {
-        self.frame(minWidth: .zero, maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -37,10 +33,5 @@ extension View {
                 self.background(Color(nsColor: .gridColor))
             }
 #endif
-    }
-
-    @available(*, deprecated, renamed: "background", message: "")
-    func backgroundGradient(color: Color) -> some View {
-        return self.background(color.gradient)
     }
 }

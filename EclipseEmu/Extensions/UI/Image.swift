@@ -1,9 +1,5 @@
 import SwiftUI
 
-/// CIImage is thread safe.
-/// > https://developer.apple.com/documentation/coreimage/cicontext
-extension CIImage: @retroactive @unchecked Sendable {}
-
 extension CGImage {
     func averageColor() -> Color? {
         let size = CGSize(width: 40, height: 40)

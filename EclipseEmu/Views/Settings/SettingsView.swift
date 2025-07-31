@@ -1,6 +1,5 @@
 import SwiftUI
 import EclipseKit
-import mGBAEclipseCore
 
 struct SettingsView: View {
     @EnvironmentObject private var coreRegistry: CoreRegistry
@@ -8,18 +7,14 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section {
-                NavigationLink(to: .manageTags) {
-                    Text("TAGS")
-                }
-            } header: {
-                Text("LIBRARY")
-            }
-
-            Section {
-                NavigationLink(to: .touchProfiles) {
+			aboutSection
+			
+			Section {
+				#if canImport(UIKit)
+				NavigationLink(to: .touchProfiles) {
                     Text("TOUCH")
                 }
+				#endif
                 NavigationLink(to: .keyboardProfiles) {
                     Text("KEYBOARD")
                 }
@@ -50,7 +45,7 @@ struct SettingsView: View {
             }
 
             Section {
-                ForEach(GameSystem.concreteCases, id: \.self) { system in
+                ForEach(System.concreteCases, id: \.self) { system in
                     SystemSettingItemView(
                         coreRegistry: coreRegistry,
                         system: system
@@ -63,16 +58,15 @@ struct SettingsView: View {
             }
 
             Section {
-                ForEach(coreRegistry.cores) { core in
+				ForEach(Core.allCases) { core in
                     NavigationLink(to: .coreSettings(core)) {
-                        Text(core.name)
+						Text(core.type.name)
                     }
                 }
             } header: {
                 Text("CORES")
             }
 
-            aboutSection
             socialSection
 
             Section {
@@ -82,13 +76,16 @@ struct SettingsView: View {
                 Text("RESET")
             }
 
+#if !os(macOS)
             versionInfoSection
+#endif
         }
         .navigationTitle("SETTINGS")
         .formStyle(.grouped)
     }
 
-    var versionInfoSection: some View {
+	#if !os(macOS)
+	var versionInfoSection: some View {
         Section {} footer: {
             VStack(alignment: .center) {
                 Rectangle()
@@ -99,6 +96,7 @@ struct SettingsView: View {
             }.frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
         }
     }
+	#endif
 
     var aboutSection: some View {
         Section {
@@ -167,7 +165,7 @@ struct SettingsView: View {
     let settings = Settings()
     NavigationStack {
         SettingsView()
-            .environmentObject(CoreRegistry(cores: [mGBACoreInfo]))
+            .environmentObject(CoreRegistry())
             .environmentObject(settings)
     }
 }

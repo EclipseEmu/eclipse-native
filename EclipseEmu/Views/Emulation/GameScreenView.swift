@@ -1,99 +1,98 @@
 import Metal
 import SwiftUI
+import EclipseKit
 
 @MainActor
-struct GameScreenView {
-    var model: EmulationViewModel
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    @MainActor
-    class Coordinator: NSObject {
-        var parent: GameScreenView
-
-        init(_ parent: GameScreenView) {
-            self.parent = parent
-            super.init()
-        }
-
-        @inlinable
-        func surfaceCreated(surface: CAMetalLayer) {
-            self.parent.model.renderingSurfaceCreated(surface: surface)
-        }
-    }
+struct GameScreenView<Core: CoreProtocol & SendableMetatype> {
+	let coordinator: CoreCoordinator<Core>
 }
 
 #if canImport(AppKit)
 extension GameScreenView: NSViewRepresentable {
-    typealias NSViewType = CustomMetalView
+	typealias NSViewType = CustomMetalView
 
-    func makeNSView(context: Context) -> CustomMetalView {
-        let view = CustomMetalView()
-        view.delegate = context.coordinator
-        context.coordinator.surfaceCreated(surface: view.metalLayer)
-        return view
-    }
+	func makeNSView(context: Context) -> CustomMetalView {
+		let view = CustomMetalView()
+		Task {
+			await self.coordinator.attach(to: view)
+		}
+		return view
+	}
 
-    func updateNSView(_ nsView: CustomMetalView, context: Context) {}
+	func updateNSView(_ nsView: CustomMetalView, context: Context) {}
 }
 
-final class CustomMetalView: NSView {
-    var delegate: GameScreenView.Coordinator?
-    var metalLayer: CAMetalLayer!
+final class CustomMetalView: NSView, MetalRenderingSurface {
+	private var metalLayer: CAMetalLayer!
 
-    init() {
-        super.init(frame: .zero)
-        self.wantsLayer = true
-        self.metalLayer = self.layer as? CAMetalLayer
-        self.metalLayer?.magnificationFilter = .nearest
-    }
+	init() {
+		super.init(frame: .zero)
+		self.wantsLayer = true
+		self.metalLayer = self.layer as? CAMetalLayer
+	}
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+	@available(*, unavailable)
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
 
-    override func makeBackingLayer() -> CALayer {
-        return CAMetalLayer()
-    }
+	override func makeBackingLayer() -> CALayer {
+		return CAMetalLayer()
+	}
+
+	func getLayer() -> CAMetalLayer? {
+		self.metalLayer
+	}
+
+	func makeStandardDisplayLink(target: Any, selector: Selector) -> CADisplayLink? {
+		self.displayLink(target: target, selector: selector)
+	}
 }
-
 #elseif canImport(UIKit)
 extension GameScreenView: UIViewRepresentable {
-    typealias UIViewType = CustomMetalView
+	typealias UIViewType = CustomMetalView<Core>
 
-    func makeUIView(context: Context) -> CustomMetalView {
-        let view = CustomMetalView()
-        view.delegate = context.coordinator
-        if let layer = view.metalLayer {
-            context.coordinator.surfaceCreated(surface: layer)
-        }
-        return view
-    }
+	func makeUIView(context: Context) -> UIViewType {
+		let view = UIViewType(coordinator: self.coordinator)
+		view.backgroundColor = .blue
+		return view
+	}
 
-    func updateUIView(_ uiView: CustomMetalView, context: Context) {}
+	func updateUIView(_ uiView: UIViewType, context: Context) {}
 }
 
-final class CustomMetalView: UIView {
-    var delegate: GameScreenView.Coordinator?
-    var metalLayer: CAMetalLayer?
+final class CustomMetalView<Core: CoreProtocol & SendableMetatype>: UIView, MetalRenderingSurface {
+	weak var coordinator: CoreCoordinator<Core>?
+	var metalLayer: CAMetalLayer?
 
-    override class var layerClass: AnyClass {
-        return CAMetalLayer.self
-    }
+	override class var layerClass: AnyClass {
+		return CAMetalLayer.self
+	}
 
-    init() {
-        super.init(frame: .zero)
-        self.metalLayer = self.layer as? CAMetalLayer
-        self.metalLayer?.magnificationFilter = .nearest
-    }
+	init(coordinator: CoreCoordinator<Core>) {
+		super.init(frame: .zero)
+		self.coordinator = coordinator
+		self.metalLayer = self.layer as? CAMetalLayer
+	}
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+	@available(*, unavailable)
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	func getLayer() -> CAMetalLayer? {
+		self.metalLayer
+	}
+
+	func makeStandardDisplayLink(target: Any, selector: Selector) -> CADisplayLink? {
+		window?.screen.displayLink(withTarget: target, selector: selector)
+	}
+
+	override func didMoveToWindow() {
+		Task {
+			await coordinator?.attach(to: self)
+		}
+	}
 }
 #else
 #error("Unsupported platform")

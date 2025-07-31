@@ -2,8 +2,8 @@ import SwiftUI
 
 struct TagsView: View {
     @EnvironmentObject var persistence: Persistence
-    @EnvironmentObject var navigationManager: NavigationManager
     @State var isCreateDialogPresented: Bool = false
+	@State var editTarget: EditorTarget<TagObject>? = nil
     @State var renameItem: TagObject?
 
     @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
@@ -20,9 +20,11 @@ struct TagsView: View {
         } else {
             List {
                 ForEach(tags) { tag in
-                    NavigationLink(to: .editTag(tag)) {
-                        Label(tag.name ?? "TAG", systemImage: "tag")
-                    }
+					EditableContent {
+						self.editTarget = .edit(tag)
+					} label: {
+						Label(tag.name ?? "TAG", systemImage: "tag")
+					}
                     .listItemTint(tag.color.color)
                 }
                 .onDelete(perform: delete)
@@ -32,25 +34,29 @@ struct TagsView: View {
 
     var body: some View {
         mainContent
+#if !os(macOS)
+			.navigationBarTitleDisplayMode(.inline)
+#endif
             .navigationTitle("TAGS")
             .toolbar {
-                #if !os(macOS)
+				ToolbarItem(placement: .cancellationAction) {
+					DismissButton("Done")
+				}
+
                 ToolbarItem {
-                    EditButton()
-                }
-                #endif
-                ToolbarItem {
-                    ToggleButton(value: $isCreateDialogPresented) {
+					Button {
+						self.editTarget = .create
+					} label: {
                         Label("CREATE_TAG", systemImage: "plus")
                     }
                 }
             }
             .renameItem("RENAME_TAG", item: $renameItem)
-            .sheet(isPresented: $isCreateDialogPresented) {
-                NavigationStack {
-                    TagDetailView(mode: .create)
-                }
-            }
+			.sheet(item: $editTarget) { item in
+				NavigationStack {
+					TagDetailView(mode: item)
+				}
+			}
     }
 
     func delete(_ indicies: IndexSet) {

@@ -1,100 +1,171 @@
 import GameController
 import EclipseKit
 
-enum InputSourceControllerInput: Codable {
-    case button(GameInput)
-    case directionPad(up: GameInput, down: GameInput, left: GameInput, right: GameInput)
-    case joystick(up: GameInput, down: GameInput, left: GameInput, right: GameInput)
-    case gyro(x: GameInput, y: GameInput, z: GameInput)
-    case touchPad(x: GameInput, y: GameInput)
-}
-
-struct InputSourceControllerBinding: Codable, Sendable {
-    let key: String
-    let input: InputSourceControllerInput
-}
-
-typealias InputSourceControllerBindings = [InputSourceControllerBinding]
-
-enum InputSourceControllerVersion: Int16, RawRepresentable {
+enum InputSourceControllerVersion: Int16, VersionProtocol {
     case v1 = 1
+    
+    static let latest: InputSourceControllerVersion = .v1
+}
+
+struct GamepadMappings: Codable {
+    let bindings: [String : Self.Index]
+    let buttons: [Self.ButtonBinding]
+    let directionals: [Self.DirectionalBinding]
+
+	enum Index: Codable {
+        case button(Int)
+        case directional(Int)
+    }
+
+	struct ButtonBinding: Codable {
+        let soft: CoreInput
+        let hard: CoreInput
+
+        init(soft: CoreInput, hard: CoreInput) {
+            self.soft = soft
+            self.hard = hard
+        }
+
+        init(_ input: CoreInput) {
+            self.soft = input
+            self.hard = input
+        }
+    }
+
+	struct DirectionalBinding: Codable {
+        let input: CoreInput
+        let deadzone: Float
+    }
 }
 
 struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
-    typealias Bindings = InputSourceControllerBindings
+    typealias Bindings = GamepadMappings
+	typealias Object = ControllerProfileObject
 
-    let kind: ControlsInputSourceKind = .controller
     let id: String?
 
-    static func defaults(for system: GameSystem) -> InputSourceControllerBindings {
+	static func encode(_ bindings: GamepadMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
+		object.data = try encoder.encode(bindings)
+	}
+
+	static func decode(_ data: ControllerProfileObject, decoder: JSONDecoder) throws -> GamepadMappings {
+        guard let version = data.version, let data = data.data else {
+            return .init(bindings: [:], buttons: [], directionals: [])
+        }
+		return switch version {
+		case .v1: try decoder.decode(GamepadMappings.self, from: data)
+		}
+	}
+
+	func obtain(from game: GameObject, system: System, persistence: Persistence) -> ControllerProfileObject? {
+		guard let profiles = game.controllerProfiles as? Set<ControllerProfileObject> else { return nil }
+        return profiles.first { profile in
+            let isSystem = profile.system == system
+            if isSystem && id != nil {
+                return true
+            }
+            
+            guard isSystem, let assignments = profile.assignments as? Set<ControllerProfileAssignmentObject> else {
+                return false
+            }
+            
+            for assignment in assignments {
+                if system == assignment.system && assignment.controllerID == id {
+                    return true
+                }
+            }
+
+            return false
+		}
+	}
+
+	func predicate(system: System) -> NSPredicate {
+		if let id {
+			NSPredicate(format: "rawSystem = %d AND controllerID = %@", system.rawValue, id)
+		} else {
+			NSPredicate(format: "rawSystem = %d", system.rawValue)
+		}
+	}
+
+    static func defaults(for system: System) -> GamepadMappings {
         switch system {
         case .gb, .gbc, .nes:
-            [
-                .init(key: GCInputButtonA, input: .button(.faceButtonRight)),
-                .init(key: GCInputButtonB, input: .button(.faceButtonDown)),
-                .init(key: GCInputButtonMenu, input: .button(.startButton)),
-                .init(key: GCInputButtonOptions, input: .button(.selectButton)),
-                .init(
-                    key: GCInputDirectionPad,
-                    input: .directionPad(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                ),
-                .init(
-                    key: GCInputLeftThumbstick,
-                    input: .joystick(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                )
-            ]
+			.init(
+				bindings: [
+					GCInputButtonA: .button(0),
+					GCInputButtonB: .button(1),
+					GCInputButtonMenu: .button(2),
+					GCInputButtonOptions: .button(3),
+					GCInputDirectionPad: .directional(0)
+				],
+				buttons: [
+					.init(.faceButtonRight),
+					.init(.faceButtonDown),
+					.init(.start),
+					.init(.select),
+				],
+				directionals: [
+					.init(input: .dpad, deadzone: 0.5)
+				]
+			)
         case .gba:
-            [
-                .init(key: GCInputButtonA, input: .button(.faceButtonRight)),
-                .init(key: GCInputButtonB, input: .button(.faceButtonDown)),
-                .init(key: GCInputButtonMenu, input: .button(.startButton)),
-                .init(key: GCInputButtonOptions, input: .button(.selectButton)),
-                .init(key: GCInputLeftShoulder, input: .button(.shoulderLeft)),
-                .init(key: GCInputRightShoulder, input: .button(.shoulderRight)),
-                .init(
-                    key: GCInputDirectionPad,
-                    input: .directionPad(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                ),
-                .init(
-                    key: GCInputLeftThumbstick,
-                    input: .joystick(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                )
-            ]
+			.init(
+				bindings: [
+					GCInputButtonA: .button(0),
+					GCInputButtonB: .button(1),
+					GCInputButtonMenu: .button(2),
+					GCInputButtonOptions: .button(3),
+					GCInputLeftShoulder: .button(4),
+					GCInputLeftTrigger: .button(4),
+					GCInputRightShoulder: .button(5),
+					GCInputRightTrigger: .button(5),
+					GCInputDirectionPad: .directional(0),
+					GCInputLeftThumbstick: .directional(0)
+				],
+				buttons: [
+					.init(.faceButtonRight),
+					.init(.faceButtonDown),
+					.init(.start),
+					.init(.select),
+					.init(.leftShoulder),
+					.init(.rightShoulder)
+				],
+				directionals: [
+					.init(input: .dpad, deadzone: 0.5)
+				]
+			)
         case .snes:
-            [
-                .init(key: GCInputButtonA, input: .button(.faceButtonRight)),
-                .init(key: GCInputButtonB, input: .button(.faceButtonDown)),
-                .init(key: GCInputButtonX, input: .button(.faceButtonUp)),
-                .init(key: GCInputButtonY, input: .button(.faceButtonLeft)),
-                .init(key: GCInputButtonMenu, input: .button(.startButton)),
-                .init(key: GCInputButtonOptions, input: .button(.selectButton)),
-                .init(key: GCInputLeftShoulder, input: .button(.shoulderLeft)),
-                .init(key: GCInputRightShoulder, input: .button(.shoulderRight)),
-                .init(
-                    key: GCInputDirectionPad,
-                    input: .directionPad(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                ),
-                .init(
-                    key: GCInputLeftThumbstick,
-                    input: .joystick(up: .dpadUp, down: .dpadDown, left: .dpadLeft, right: .dpadRight)
-                )
-            ]
-        default: []
-        }
-    }
-
-    func encode(_ bindings: InputSourceControllerBindings, encoder: JSONEncoder) throws -> ControlsConfigData {
-        let data = try encoder.encode(bindings)
-        return ControlsConfigData(version: InputSourceControllerVersion.v1.rawValue, data: data)
-    }
-
-    func decode(_ data: consuming ControlsConfigData, decoder: JSONDecoder) throws -> InputSourceControllerBindings {
-        guard let version = InputSourceControllerVersion(rawValue: data.version) else {
-            throw ControlsInputError.unsupportedVersion
-        }
-
-        switch version {
-        case .v1: return try decoder.decode(InputSourceControllerBindings.self, from: data.data)
+			.init(
+				bindings: [
+					GCInputButtonA: .button(0),
+					GCInputButtonB: .button(1),
+					GCInputButtonX: .button(2),
+					GCInputButtonY: .button(3),
+					GCInputButtonMenu: .button(4),
+					GCInputButtonOptions: .button(5),
+					GCInputLeftShoulder: .button(6),
+					GCInputLeftTrigger: .button(6),
+					GCInputRightShoulder: .button(7),
+					GCInputRightTrigger: .button(7),
+					GCInputDirectionPad: .directional(0),
+					GCInputLeftThumbstick: .directional(0)
+				],
+				buttons: [
+					.init(.faceButtonRight),
+					.init(.faceButtonDown),
+					.init(.faceButtonUp),
+					.init(.faceButtonLeft),
+					.init(.start),
+					.init(.select),
+					.init(.leftShoulder),
+					.init(.rightShoulder)
+				],
+				directionals: [
+					.init(input: .dpad, deadzone: 0.5)
+				]
+			)
+        default:
+			.init(bindings: [:], buttons: [], directionals: [])
         }
     }
 }

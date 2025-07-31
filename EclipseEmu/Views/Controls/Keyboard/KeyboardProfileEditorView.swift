@@ -87,7 +87,13 @@ private struct KeyboardProfileEditorInputView: View {
             .buttonStyle(.plain)
             .multilineTextAlignment(.leading)
 #if os(macOS)
-            .pointerStyle(.horizontalText)
+			.modify {
+				if #available(macOS 15.0, *) {
+					$0.pointerStyle(.horizontalText)
+				} else {
+					$0
+				}
+			}
 #endif
         }
         .contextMenu {
@@ -107,23 +113,23 @@ struct KeyboardProfileEditorView: View {
 
     @FocusState private var focusState: ControlProfileEditorControl<KeyboardProfileEditorBinding>?
     @State var name: String
-    @State var system: GameSystem
+    @State var system: System
     let inputs: [ControlProfileEditorContolCollection<KeyboardProfileEditorBinding>]
     @StateObject private var viewModel = KeyboardProfilesEditorViewModel()
 
-    private let existingObject: ObjectBox<InputSourceKeyboardProfileObject>?
+    private let existingObject: ObjectBox<KeyboardProfileObject>?
 
-    init(for target: EditorTarget<InputSourceKeyboardProfileObject>) {
+    init(for target: EditorTarget<KeyboardProfileObject>) {
         switch target {
         case .create:
             name = ""
             system = .unknown
-            inputs = GameInput.sectioned.map { .init(items: $0.items.map { .init(input: $0) }) }
+            inputs = CoreInput.sectioned.map { .init(items: $0.items.map { .init(input: $0) }) }
             existingObject = nil
         case .edit(let profile):
             name = profile.name ?? ""
             system = profile.system
-            inputs = GameInput.sectioned.map { .init(items: $0.items.map { .init(input: $0) }) }
+            inputs = CoreInput.sectioned.map { .init(items: $0.items.map { .init(input: $0) }) }
             existingObject = .init(profile)
         }
     }
@@ -133,17 +139,18 @@ struct KeyboardProfileEditorView: View {
             LabeledContent {
                 KeyboardProfileEditorInputView(viewModel: viewModel, control: control, focusState: $focusState)
             } label: {
-                Label(control.input.string, systemImage: control.input.systemImage)
+				let label = control.input.label(for: system.controlNamingConvention)
+				Label(label.0, systemImage: label.systemImage)
             }
         }
         .onAppear(perform: viewModel.viewAppeared)
         .onDisappear(perform: viewModel.viewDisappeared)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("CANCEL", action: dismiss)
+				CancelButton("CANCEL", action: dismiss.callAsFunction)
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button(existingObject == nil ? "CREATE" : "SAVE", action: done)
+                ConfirmButton(existingObject == nil ? "CREATE" : "SAVE", action: done)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidConnect), perform: viewModel.handleKeyboardConnected)

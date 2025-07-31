@@ -1,5 +1,4 @@
 import SwiftUI
-import mGBAEclipseCore
 
 struct PreviewStorage: PreviewModifier {
     static func makeSharedContext() throws(PersistenceError) -> Persistence {
@@ -35,7 +34,7 @@ struct PreviewStorage: PreviewModifier {
                 let saveState = SaveStateObject.create(
                     in: objectContext,
                     isAuto: j == 0,
-                    coreID: String(cString: mGBACoreInfo.id),
+					core: .testCore,
                     stateExtension: "s8"
                 )
                 saveState.game = game

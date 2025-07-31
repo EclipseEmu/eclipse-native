@@ -24,7 +24,6 @@ struct TagDetailView: View {
 
     @State private var newName: String
     @State private var newColor: TagColor
-    @State private var deleteTag: TagObject?
 
     init(mode: EditorTarget<TagObject>) {
         self.mode = mode
@@ -53,14 +52,6 @@ struct TagDetailView: View {
             } header: {
                 Text("COLOR")
             }
-
-            if case .edit(let tag) = mode {
-                Section {
-                    Button("DELETE_TAG", role: .destructive) {
-                        self.deleteTag = tag
-                    }
-                }
-            }
         }
         .formStyle(.grouped)
         .navigationTitle(mode.title)
@@ -68,18 +59,13 @@ struct TagDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
-            if mode == .create {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("CANCEL", action: dismissAction.callAsFunction)
-                }
+			ToolbarItem(placement: .cancellationAction) {
+				DismissButton("CANCEL")
             }
 
             ToolbarItem(placement: .confirmationAction) {
-                Button(mode.confirmationButton, action: handleSave)
+				ConfirmButton(mode.confirmationButton, action: handleSave)
             }
-        }
-        .deleteItem("DELETE_TAG_TITLE", item: $deleteTag, dismiss: true) { tag in
-            Text("DELETE_TAG_MESSAGE \(tag)")
         }
     }
 

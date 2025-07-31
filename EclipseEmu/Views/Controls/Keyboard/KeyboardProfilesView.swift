@@ -3,56 +3,16 @@ import EclipseKit
 import CoreData
 
 struct KeyboardProfilesView: View {
-    @State var isCreateProfileOpen: Bool = false
-    @State var editProfileTarget: InputSourceKeyboardProfileObject?
-
-    @FetchRequest(sortDescriptors: [.init(keyPath: \InputSourceKeyboardProfileObject.name, ascending: true)])
-    private var profiles: FetchedResults<InputSourceKeyboardProfileObject>
+    @EnvironmentObject private var settings: Settings
 
     var body: some View {
-        Form {
-            Section {
-                if profiles.isEmpty {
-                    EmptyMessage {
-                        Text("NO_PROFILES_TITLE")
-                    } message: {
-                        Text("NO_PROFILES_MESSAGE")
-                    }
-                    .listItem()
-                } else {
-                    ForEach(profiles) { profile in
-                        Button {
-                            editProfileTarget = profile
-                        } label: {
-                            Text(verbatim: profile.name, fallback: "PROFILE_UNNAMED")
-                        }
-                    }
-                }
-            } header: {
-                Text("PROFILES")
-            }
-        }
-        .formStyle(.grouped)
-        .navigationTitle("KEYBOARD_PROFILES_TITLE")
-        .sheet(item: $editProfileTarget) { item in
-            NavigationStack {
-                KeyboardProfileEditorView(for: .edit(item))
-                    .navigationTitle("EDIT_PROFILE")
-            }
-        }
-        .sheet(isPresented: $isCreateProfileOpen) {
-            NavigationStack {
-                KeyboardProfileEditorView(for: .create)
-                    .navigationTitle("CREATE_PROFILE")
-            }
-        }
-        .toolbar {
-#if !os(macOS)
-            EditButton()
-#endif
-            ToggleButton(value: $isCreateProfileOpen) {
-                Label("CREATE_PROFILE", systemImage: "plus")
-            }
-        }
+        ControlsProfilesView(title: "KEYBOARD_PROFILES_TITLE", settings: $settings.keyboardSystemProfiles)
+    }
+}
+
+@available(iOS 18, macOS 15, *)
+#Preview(traits: .modifier(PreviewStorage())) {
+    NavigationStack {
+        KeyboardProfilesView()
     }
 }

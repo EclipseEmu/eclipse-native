@@ -3,20 +3,20 @@ import SwiftUI
 
 struct EditCheatView: View {
     private let game: GameObject
-    private let cheatFormats: [CheatFormat]
+    private let cheatFormats: [CoreCheatFormat]
     private let cheat: CheatObject?
     private let isCreatingCheat: Bool
 
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var persistence: Persistence
     @State var label: String
-    @State var format: CheatFormat
+    @State var format: CoreCheatFormat
     @State var formatter: CheatFormatter
     @State var code: String
     @State var enabled: Bool = true
     @State var isCodeValid: Bool = false
 
-    init(cheat: CheatObject?, game: GameObject, cheatFormats: [CheatFormat]) {
+    init(cheat: CheatObject?, game: GameObject, cheatFormats: [CoreCheatFormat]) {
         self.cheat = cheat
         self.game = game
         self.cheatFormats = cheatFormats
@@ -54,7 +54,7 @@ struct EditCheatView: View {
                 Section {
                     Picker("CHEAT_FORMAT", selection: self.$format) {
                         ForEach(self.cheatFormats, id: \.id) { format in
-                            Text(format.displayName).tag(format)
+							Text(format.name).tag(format)
                         }
                     }
 
@@ -70,7 +70,7 @@ struct EditCheatView: View {
                     Text("CHEAT_CODE")
 #endif
                 } footer: {
-                    Text("CHEAT_CORE_FORMAT_MESSAGE \"\(self.format.format.uppercased())\"")
+					Text("CHEAT_CORE_FORMAT_MESSAGE \"\(self.format.pattern.uppercased())\"")
                 }
             }
             .formStyle(.grouped)
@@ -96,7 +96,7 @@ struct EditCheatView: View {
         }
     }
 
-    func formatChanged(value: CheatFormat) {
+    func formatChanged(value: CoreCheatFormat) {
         self.formatter = value.makeFormatter()
         self.code = self.formatter.formatInput(value: self.code)
         self.isCodeValid = self.formatter.validate(value: self.code)

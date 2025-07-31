@@ -6,14 +6,27 @@ struct PreviewSingleObjectView<T: NSManagedObject, Content: View>: View {
 
     let fetchRequest: NSFetchRequest<T>
     let content: (T, Persistence) -> Content
+	@State var object: T?
 
     init(_ fetchRequest: NSFetchRequest<T>, @ViewBuilder content: @escaping (T, Persistence) -> Content) {
         self.fetchRequest = fetchRequest
         self.content = content
     }
 
+	@ViewBuilder
+	var obtainedContent: some View {
+		if let object {
+			content(object, persistence)
+		} else {
+			ProgressView()
+		}
+	}
+
     var body: some View {
-        let object = persistence.obtainObject(fetchRequest)
-        return content(object, persistence)
+		obtainedContent.onAppear {
+			fetchRequest.fetchLimit = 1
+			let results = try! persistence.mainContext.fetch(fetchRequest)
+			object = results.first!
+		}
     }
 }

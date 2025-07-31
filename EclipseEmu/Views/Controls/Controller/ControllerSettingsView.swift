@@ -23,21 +23,19 @@ struct ControllerSettingsView: View {
             }
 
             Section {
-                Text("DEFAULT")
-                ForEach(GameSystem.concreteCases, id: \.rawValue) { system in
-                    Text(system.string)
-                }
-            }
-
-            Section {
-                Button("RESET", role: .destructive, action: resetController)
+                ControlsSystemProfilesView(load: loadProfile, update: setProfile)
             }
         }
         .formStyle(.grouped)
     }
-
-    func resetController() {
-
+    
+    func loadProfile(for system: System) -> ControllerProfileObject? {
+        // FIXME: TODO
+        return nil
+    }
+    
+    func setProfile(for system: System, to profile: ControllerProfileObject?) {
+        // FIXME: TODO
     }
 }
 

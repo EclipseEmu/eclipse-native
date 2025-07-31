@@ -1,5 +1,4 @@
 import SwiftUI
-import mGBAEclipseCore
 
 struct CreditsView: View {
     @EnvironmentObject var coreRegistry: CoreRegistry
@@ -26,30 +25,22 @@ struct CreditsView: View {
             }
 
             Section {
-                ForEach(coreRegistry.cores) { core in
-                    if let url = core.sourceCodeUrl {
-                        Link(destination: url) {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(core.name)
-                                        .foregroundStyle(Color.primary)
-                                    Text(core.developer)
-                                        .font(.caption)
-                                        .foregroundStyle(Color.secondary)
-                                }
-                                Spacer()
-                                Image(systemName: "arrow.up.right.square")
-                                    .foregroundStyle(Color.secondary)
-                            }
-                        }
-                    } else {
-                        VStack(alignment: .leading) {
-                            Text(core.name)
-                            Text(core.developer)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+				ForEach(Core.allCases) { core in
+					let coreInfo = core.type
+					Link(destination: coreInfo.sourceCodeRepository) {
+						HStack {
+							VStack(alignment: .leading) {
+								Text(coreInfo.name)
+									.foregroundStyle(Color.primary)
+								Text(coreInfo.developer)
+									.font(.caption)
+									.foregroundStyle(Color.secondary)
+							}
+							Spacer()
+							Image(systemName: "arrow.up.right.square")
+								.foregroundStyle(Color.secondary)
+						}
+					}
                 }
             } header: {
                 Text("CORES")
@@ -70,5 +61,5 @@ struct CreditsView: View {
 
 #Preview {
     CreditsView()
-        .environmentObject(CoreRegistry(cores: [mGBACoreInfo]))
+        .environmentObject(CoreRegistry())
 }

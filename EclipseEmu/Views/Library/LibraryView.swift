@@ -27,11 +27,14 @@ struct LibraryView: View {
     @State private var manageTagsTarget: ManageTagsTarget?
     @State private var coverPickerMethod: CoverPickerMethod?
 
-    @State var isFiltersViewPresented: Bool = false
-    @State var filteredSystems: Set<GameSystem> = Set(GameSystem.concreteCases)
-    @State var filteredTags: Set<TagObject> = []
+    @State private var isFiltersViewPresented: Bool = false
+	@State private var isTagsViewPresented: Bool = false
+    @State private var filteredSystems: Set<System> = Set(System.concreteCases)
+    @State private var filteredTags: Set<TagObject> = []
 
-    var areSystemsFiltered: Bool { filteredSystems.count != GameSystem.concreteCases.count }
+	private var areSystemsFiltered: Bool {
+		filteredSystems.count != System.concreteCases.count
+	}
 
     @ViewBuilder
     var content: some View {
@@ -102,10 +105,15 @@ struct LibraryView: View {
             .deleteItem("DELETE_GAME", item: $deleteTarget) { game in
                 Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
             }
-            .sheet(isPresented: $isFiltersViewPresented) {
-                NavigationStack {
-                    LibraryFiltersView(systems: $filteredSystems, tags: $filteredTags)
-                }.presentationDetents([.medium, .large])
+			.sheet(isPresented: $isFiltersViewPresented) {
+				NavigationStack {
+					LibraryFiltersView(systems: $filteredSystems, tags: $filteredTags)
+				}.presentationDetents([.medium, .large])
+			}
+			.sheet(isPresented: $isTagsViewPresented) {
+				NavigationStack {
+					TagsView()
+				}
             }
             .sheet(item: $manageTagsTarget) { target in
                 NavigationStack {
@@ -211,6 +219,10 @@ struct LibraryView: View {
 
                 ToggleButton(value: $isFiltersViewPresented) {
                     Label("FILTER", systemImage: "line.3.horizontal.decrease")
+                }
+
+				ToggleButton(value: $isTagsViewPresented) {
+                    Label("TAGS", systemImage: "tag")
                 }
 
                 Picker(selection: $settings.listSortMethod) {
@@ -333,7 +345,7 @@ struct LibraryView: View {
         )
 
         for tag in filteredTags {
-            predicates.append(NSPredicate(format: "tags CONTAINS %@", tag))
+            predicates.append(NSPredicate(format: "ANY tags == %@", tag))
         }
 
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)

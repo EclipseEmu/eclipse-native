@@ -1,7 +1,7 @@
 import GameController
 
 extension GCController: @retroactive Identifiable {}
-extension GCKeyCode: Codable {}
+extension GCKeyCode: @retroactive Codable {}
 
 extension GCController {
     var symbol: String {

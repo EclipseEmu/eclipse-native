@@ -7,7 +7,7 @@ struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \CheatObject.priority, ascending: true)]
 
     @ObservedObject var game: GameObject
-    let cheatFormats: [CheatFormat]
+    let cheatFormats: [CoreCheatFormat]
     @Environment(\.managedObjectContext) var viewContext
     @EnvironmentObject var persistence: Persistence
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<CheatObject>
@@ -17,7 +17,7 @@ struct CheatsView: View {
     init(game: GameObject, coreRegistry: CoreRegistry) {
         self.game = game
 
-        self.cheatFormats = coreRegistry.get(for: game)?.cheatFormats ?? []
+		self.cheatFormats = coreRegistry.cheatFormats(for: game)
 
         let request = CheatObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
@@ -107,7 +107,7 @@ struct CheatsView: View {
 #Preview(traits: .modifier(PreviewStorage())) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
-            CheatsView(game: game, coreRegistry: .init(cores: []))
+            CheatsView(game: game, coreRegistry: .init())
         }
     }
 }

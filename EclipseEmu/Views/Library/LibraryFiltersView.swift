@@ -8,13 +8,13 @@ struct LibraryFiltersView: View {
     @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
     private var allTags: FetchedResults<TagObject>
 
-    @Binding var systems: Set<GameSystem>
+    @Binding var systems: Set<System>
     @Binding var tags: Set<TagObject>
 
     var body: some View {
         Form {
             Section {
-                ForEach(GameSystem.concreteCases, id: \.rawValue) { system in
+                ForEach(System.concreteCases, id: \.rawValue) { system in
                     Toggle(isOn: .init(get: {
                         systems.contains(system)
                     }, set: { newValue in
@@ -71,7 +71,7 @@ struct LibraryFiltersView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .modifier(PreviewStorage())) {
-    @Previewable @State var systems: Set<GameSystem> = []
+    @Previewable @State var systems: Set<System> = []
     @Previewable @State var tags: Set<TagObject> = []
 
     NavigationStack {

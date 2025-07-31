@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24F5053j" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24279" systemVersion="25A5316i" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CheatObject" representedClassName="CheatObject" syncable="YES" codeGenerationType="class">
         <attribute name="code" attributeType="String"/>
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -8,14 +8,18 @@
         <attribute name="type" attributeType="String"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="cheats" inverseEntity="GameObject"/>
     </entity>
-    <entity name="ControlsConfigurationObject" representedClassName="ControlsConfigurationObject" syncable="YES" codeGenerationType="class">
+    <entity name="ControllerProfileAssignmentObject" representedClassName="ControllerProfileAssignmentObject" syncable="YES" codeGenerationType="class">
+        <attribute name="controllerID" optional="YES" attributeType="String"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ControllerProfileObject" inverseName="assignments" inverseEntity="ControllerProfileObject"/>
+    </entity>
+    <entity name="ControllerProfileObject" representedClassName="ControllerProfileObject" syncable="YES" codeGenerationType="class">
         <attribute name="data" optional="YES" attributeType="Binary"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rawKind" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="sourceID" optional="YES" attributeType="String"/>
-        <attribute name="version" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="controls" inverseEntity="GameObject"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="assignments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControllerProfileAssignmentObject" inverseName="profile" inverseEntity="ControllerProfileAssignmentObject"/>
+        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="controllerProfiles" inverseEntity="GameObject"/>
     </entity>
     <entity name="CoreSettingsObject" representedClassName="CoreSettingsObject" syncable="YES" codeGenerationType="class">
         <attribute name="coreID" optional="YES" attributeType="String"/>
@@ -27,15 +31,17 @@
         <attribute name="datePlayed" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rawSystem" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawSystem" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="romExtension" optional="YES" attributeType="String"/>
         <attribute name="saveExtension" optional="YES" attributeType="String" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="sha1" attributeType="String"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CheatObject" inverseName="game" inverseEntity="CheatObject"/>
-        <relationship name="controls" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControlsConfigurationObject" inverseName="game" inverseEntity="ControlsConfigurationObject"/>
+        <relationship name="controllerProfiles" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControllerProfileObject" inverseName="games" inverseEntity="ControllerProfileObject"/>
         <relationship name="cover" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAssetObject" inverseName="game" inverseEntity="ImageAssetObject"/>
+        <relationship name="keyboardProfile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="KeyboardProfileObject" inverseName="games" inverseEntity="KeyboardProfileObject"/>
         <relationship name="saveStates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SaveStateObject" inverseName="game" inverseEntity="SaveStateObject"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TagObject" inverseName="games" inverseEntity="TagObject"/>
+        <relationship name="touchProfile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TouchProfileObject" inverseName="games" inverseEntity="TouchProfileObject"/>
     </entity>
     <entity name="ImageAssetObject" representedClassName="ImageAssetObject" syncable="YES" codeGenerationType="class">
         <attribute name="fileExtension" optional="YES" attributeType="String"/>
@@ -43,25 +49,20 @@
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="cover" inverseEntity="GameObject"/>
         <relationship name="saveState" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SaveStateObject" inverseName="preview" inverseEntity="SaveStateObject"/>
     </entity>
-    <entity name="InputSourceControllerProfileObject" representedClassName="InputSourceControllerProfileObject" syncable="YES" codeGenerationType="class">
+    <entity name="KeyboardProfileObject" representedClassName="KeyboardProfileObject" syncable="YES" codeGenerationType="class">
         <attribute name="data" optional="YES" attributeType="Binary"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-    </entity>
-    <entity name="InputSourceKeyboardProfileObject" representedClassName="InputSourceKeyboardProfileObject" syncable="YES" codeGenerationType="class">
-        <attribute name="data" optional="YES" attributeType="Binary"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="rawSystem" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="keyboardProfile" inverseEntity="GameObject"/>
     </entity>
     <entity name="SaveStateObject" representedClassName="SaveStateObject" syncable="YES" codeGenerationType="class">
-        <attribute name="coreID" optional="YES" attributeType="String"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fileExtension" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isAuto" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawCore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="saveStates" inverseEntity="GameObject"/>
         <relationship name="preview" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAssetObject" inverseName="saveState" inverseEntity="ImageAssetObject"/>
     </entity>
@@ -69,5 +70,12 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="rawColor" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="tags" inverseEntity="GameObject"/>
+    </entity>
+    <entity name="TouchProfileObject" representedClassName="TouchProfileObject" syncable="YES" codeGenerationType="class">
+        <attribute name="data" optional="YES" attributeType="Binary"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="touchProfile" inverseEntity="GameObject"/>
     </entity>
 </model>
