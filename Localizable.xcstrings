@@ -4,26 +4,15 @@
     "" : {
 
     },
-    "0.5x" : {
-
-    },
-    "0.75x" : {
-
-    },
-    "1.5x" : {
-
-    },
-    "1.25x" : {
-
-    },
-    "1.75x" : {
-
-    },
-    "1x" : {
-
-    },
-    "2x" : {
-
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
     },
     "ABOUT" : {
       "localizations" : {
@@ -35,15 +24,6 @@
         }
       }
     },
-    "Add Button" : {
-
-    },
-    "Add Directional" : {
-
-    },
-    "Add Element" : {
-
-    },
     "ADD GAMES" : {
       "localizations" : {
         "en" : {
@@ -54,11 +34,25 @@
         }
       }
     },
-    "Add Input" : {
-
+    "ADD_BINDING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Binding"
+          }
+        }
+      }
     },
-    "Add Variant" : {
-
+    "ADD_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Button"
+          }
+        }
+      }
     },
     "ADD_CHEAT" : {
       "localizations" : {
@@ -70,8 +64,35 @@
         }
       }
     },
-    "Add..." : {
-
+    "ADD_DIRECTIONAL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Directional"
+          }
+        }
+      }
+    },
+    "ADD_ELEMENT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Element"
+          }
+        }
+      }
+    },
+    "ADD_VARIANT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Variant"
+          }
+        }
+      }
     },
     "ALL_GAMES" : {
       "localizations" : {
@@ -83,11 +104,15 @@
         }
       }
     },
-    "Are you sure you want to delete this file?" : {
-
-    },
-    "Are you sure you want to quit the game? All unsaved progress may be lost." : {
-
+    "ANY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any"
+          }
+        }
+      }
     },
     "ASCENDING" : {
       "localizations" : {
@@ -119,14 +144,25 @@
         }
       }
     },
-    "Bottom" : {
-
+    "BOTTOM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom"
+          }
+        }
+      }
     },
-    "Buttons" : {
-
-    },
-    "Cancel" : {
-
+    "BUTTONS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buttons"
+          }
+        }
+      }
     },
     "CANCEL" : {
       "localizations" : {
@@ -138,8 +174,15 @@
         }
       }
     },
-    "Center" : {
-
+    "CENTER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        }
+      }
     },
     "CHEAT_CODE" : {
       "localizations" : {
@@ -241,21 +284,6 @@
         }
       }
     },
-    "CONTROL_BUTTON_A" : {
-
-    },
-    "CONTROL_BUTTON_B" : {
-
-    },
-    "CONTROL_BUTTON_X" : {
-
-    },
-    "CONTROL_BUTTON_Y" : {
-
-    },
-    "CONTROL_DPAD" : {
-
-    },
     "CONTROL_UNBOUND" : {
       "localizations" : {
         "en" : {
@@ -265,6 +293,9 @@
           }
         }
       }
+    },
+    "CONTROLLER_" : {
+
     },
     "CONTROLLER_BATTERY" : {
       "localizations" : {
@@ -316,6 +347,30 @@
         }
       }
     },
+    "CONTROLLER_DPAD" : {
+
+    },
+    "CONTROLLER_HOME" : {
+
+    },
+    "CONTROLLER_LEFT_SHOULDER" : {
+
+    },
+    "CONTROLLER_LEFT_THUMBSTICK" : {
+
+    },
+    "CONTROLLER_LEFT_THUMBSTICK_BUTTON" : {
+
+    },
+    "CONTROLLER_LEFT_TRIGGER" : {
+
+    },
+    "CONTROLLER_MENU" : {
+
+    },
+    "CONTROLLER_OPTIONS" : {
+
+    },
     "CONTROLLER_PROFILES_TITLE" : {
       "localizations" : {
         "en" : {
@@ -326,6 +381,18 @@
         }
       }
     },
+    "CONTROLLER_RIGHT_SHOULDER" : {
+
+    },
+    "CONTROLLER_RIGHT_THUMBSTICK" : {
+
+    },
+    "CONTROLLER_RIGHT_TRIGGER" : {
+
+    },
+    "CONTROLLER_SHARE" : {
+
+    },
     "CONTROLLER_VENDOR" : {
       "localizations" : {
         "en" : {
@@ -335,6 +402,12 @@
           }
         }
       }
+    },
+    "CONTROLLER_XBOX_PADDLE_ONE" : {
+
+    },
+    "CONTROLLER_XBOX_PADDLE_TWO" : {
+
     },
     "CONTROLLERS" : {
       "localizations" : {
@@ -356,11 +429,77 @@
         }
       }
     },
-    "Copy Controls From" : {
-
+    "CONTROLS_DIRECTION_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The direction applies analog input to the button, which is useful if you're binding individual buttons to a directional input, like a thumbstick or directional pad."
+          }
+        }
+      }
+    },
+    "CONTROLS_KEY_INPUT_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The key that you press to activate this binding. You must have a keyboard connected to edit this value. You can only have one binding per key."
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Controls From"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the system default controls in this profile, copy from another profile, or start from scratch."
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_OTHER_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other Profile"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_SYSTEM_DEFAULTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Defaults"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_SYSTEM_NOWHERE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowhere"
+          }
+        }
+      }
     },
     "CORE_DEVELOPER" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -371,7 +510,6 @@
       }
     },
     "CORE_NAME" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -382,7 +520,6 @@
       }
     },
     "CORE_VERSION" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -432,9 +569,6 @@
         }
       }
     },
-    "Create Profile" : {
-
-    },
     "CREATE_PROFILE" : {
       "localizations" : {
         "en" : {
@@ -478,16 +612,22 @@
         }
       }
     },
-    "Dead Zone" : {
-
-    },
-    "DEFAULT" : {
-      "extractionState" : "stale",
+    "DEAD_ZONE" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Default"
+            "value" : "Dead Zone"
+          }
+        }
+      }
+    },
+    "DEAD_ZONE_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dead zone is the radius that inputs are ignored within."
           }
         }
       }
@@ -505,8 +645,25 @@
         }
       }
     },
-    "Delete File" : {
-
+    "DELETE_FILE_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CONTROLS_SOURCE"
+          }
+        }
+      }
+    },
+    "DELETE_FILE_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete File"
+          }
+        }
+      }
     },
     "DELETE_GAME" : {
       "localizations" : {
@@ -598,11 +755,45 @@
         }
       }
     },
-    "Direction" : {
-
+    "DIRECTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        }
+      }
     },
-    "Directionals" : {
-
+    "DIRECTIONAL_STYLE_DPAD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D-Pad"
+          }
+        }
+      }
+    },
+    "DIRECTIONAL_STYLE_JOYSTICK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Joystick"
+          }
+        }
+      }
+    },
+    "DIRECTIONALS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Directionals"
+          }
+        }
+      }
     },
     "DISCORD" : {
       "localizations" : {
@@ -614,9 +805,6 @@
         }
       }
     },
-    "Done" : {
-
-    },
     "DONE" : {
       "localizations" : {
         "en" : {
@@ -626,9 +814,6 @@
           }
         }
       }
-    },
-    "Eclipse" : {
-
     },
     "ECLIPSE_CORE_DEVELOPERS_MESSAGE" : {
       "localizations" : {
@@ -650,11 +835,15 @@
         }
       }
     },
-    "Edit Button" : {
-
-    },
-    "Edit Directional" : {
-
+    "EDIT_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Button"
+          }
+        }
+      }
     },
     "EDIT_CHEAT" : {
       "localizations" : {
@@ -662,6 +851,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit Cheat"
+          }
+        }
+      }
+    },
+    "EDIT_DIRECTIONAL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Directional"
           }
         }
       }
@@ -687,8 +886,15 @@
         }
       }
     },
-    "Elements" : {
-
+    "ELEMENTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elements"
+          }
+        }
+      }
     },
     "EMPTY_LIBRARY_MESSAGE" : {
       "localizations" : {
@@ -732,7 +938,14 @@
       }
     },
     "FIELD_REQUIRED" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Field Required"
+          }
+        }
+      }
     },
     "FILTER" : {
       "localizations" : {
@@ -844,8 +1057,15 @@
         }
       }
     },
-    "Hide Keyboard" : {
-
+    "HIDE_KEYBOARD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Keyboard"
+          }
+        }
+      }
     },
     "IGNORE_SILENT_MODE" : {
       "localizations" : {
@@ -888,7 +1108,14 @@
       }
     },
     "INFO" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
     },
     "INFORMATION" : {
       "localizations" : {
@@ -900,11 +1127,15 @@
         }
       }
     },
-    "Input" : {
-
-    },
-    "Joystick" : {
-
+    "INPUT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input"
+          }
+        }
+      }
     },
     "KEEP_PLAYING" : {
       "localizations" : {
@@ -912,6 +1143,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep Playing"
+          }
+        }
+      }
+    },
+    "KEY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key"
           }
         }
       }
@@ -938,6 +1179,16 @@
     },
     "Left" : {
 
+    },
+    "LEFT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        }
+      }
     },
     "LIBRARY" : {
       "localizations" : {
@@ -969,14 +1220,25 @@
         }
       }
     },
-    "Loading" : {
-
+    "LOADING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading"
+          }
+        }
+      }
     },
-    "Lower Volume" : {
-
-    },
-    "Manage" : {
-
+    "MANAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage"
+          }
+        }
+      }
     },
     "MANAGE_CHEATS" : {
       "localizations" : {
@@ -1095,6 +1357,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Connected Controllers"
+          }
+        }
+      }
+    },
+    "NO_KEYBINDINGS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven’t added any keybindings yet. Keybindings let you map inputs to a key press."
+          }
+        }
+      }
+    },
+    "NO_KEYBINDINGS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Keybindings"
           }
         }
       }
@@ -1232,9 +1514,6 @@
         }
       }
     },
-    "Nowhere" : {
-
-    },
     "OK" : {
       "localizations" : {
         "en" : {
@@ -1275,14 +1554,28 @@
         }
       }
     },
-    "Other Profile" : {
-
-    },
     "Pause" : {
 
     },
-    "Play" : {
-
+    "PAUSE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "PLAY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
     },
     "PLAY_GAME" : {
       "localizations" : {
@@ -1314,11 +1607,7 @@
         }
       }
     },
-    "Quit" : {
-
-    },
     "QUIT" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1328,11 +1617,7 @@
         }
       }
     },
-    "Quit Game" : {
-
-    },
     "QUIT_GAME_MESSAGE" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1343,7 +1628,6 @@
       }
     },
     "QUIT_GAME_TITLE" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1353,11 +1637,15 @@
         }
       }
     },
-    "Raise Volume" : {
-
-    },
-    "Remove" : {
-
+    "REMOVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
     },
     "RENAME" : {
       "localizations" : {
@@ -1399,8 +1687,15 @@
         }
       }
     },
-    "Replace" : {
-
+    "REPLACE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
     },
     "REPLACE_ANYWAYS" : {
       "localizations" : {
@@ -1495,8 +1790,15 @@
     "Right" : {
 
     },
-    "Save" : {
-
+    "RIGHT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right"
+          }
+        }
+      }
     },
     "SAVE" : {
       "localizations" : {
@@ -1549,8 +1851,15 @@
         }
       }
     },
-    "Screen Offset" : {
-
+    "SCREEN_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Offset"
+          }
+        }
+      }
     },
     "SEARCH_GAMES" : {
       "localizations" : {
@@ -1585,8 +1894,15 @@
         }
       }
     },
-    "Settings" : {
-
+    "SELECT_OTHER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Other"
+          }
+        }
+      }
     },
     "SETTINGS" : {
       "localizations" : {
@@ -1628,11 +1944,25 @@
         }
       }
     },
-    "Speed" : {
-
+    "SPEED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speed"
+          }
+        }
+      }
     },
-    "Style" : {
-
+    "STYLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
     },
     "SYSTEM" : {
       "localizations" : {
@@ -1643,9 +1973,6 @@
           }
         }
       }
-    },
-    "System Defaults" : {
-
     },
     "SYSTEM_GB" : {
       "localizations" : {
@@ -1757,14 +2084,15 @@
         }
       }
     },
-    "The dead zone is the radius that inputs are ignored within." : {
-
-    },
-    "The direction applies analog input to the button, which is useful if you're binding individual buttons to a directional input, like a thumbstick or directional pad." : {
-
-    },
-    "Toggle Negative" : {
-
+    "TOGGLE_NEGATIVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Negative"
+          }
+        }
+      }
     },
     "TOGGLE_PLAY_PAUSE" : {
       "extractionState" : "stale",
@@ -1777,8 +2105,15 @@
         }
       }
     },
-    "Top" : {
-
+    "TOP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
+          }
+        }
+      }
     },
     "TOUCH" : {
       "localizations" : {
@@ -1796,16 +2131,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touch"
-          }
-        }
-      }
-    },
-    "UNBIND" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unbind"
           }
         }
       }
@@ -1830,14 +2155,25 @@
         }
       }
     },
-    "UNNAMED_TOUCH_PROFILE" : {
-
+    "UNSELECTED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unselected"
+          }
+        }
+      }
     },
-    "Unselected" : {
-
-    },
-    "Upload" : {
-
+    "UPLOAD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload"
+          }
+        }
+      }
     },
     "USE" : {
       "localizations" : {
@@ -1848,9 +2184,6 @@
           }
         }
       }
-    },
-    "Use the system default controls in this profile, or start from scratch." : {
-
     },
     "USING_DEFAULT_PROFILE" : {
       "localizations" : {
@@ -1873,8 +2206,55 @@
         }
       }
     },
-    "Variants" : {
-
+    "VARIANT_IPAD_LANDSCAPE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPad Landscape"
+          }
+        }
+      }
+    },
+    "VARIANT_IPAD_PORTRAIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPad Portrait"
+          }
+        }
+      }
+    },
+    "VARIANT_IPHONE_LANDSCAPE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Landscape"
+          }
+        }
+      }
+    },
+    "VARIANT_IPHONE_PORTRAIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Portrait"
+          }
+        }
+      }
+    },
+    "VARIANTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        }
+      }
     },
     "VIEW_ALL" : {
       "localizations" : {
@@ -1886,8 +2266,15 @@
         }
       }
     },
-    "Visible" : {
-
+    "VISIBLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible"
+          }
+        }
+      }
     },
     "VOLUME" : {
       "localizations" : {
@@ -1929,11 +2316,25 @@
         }
       }
     },
-    "X Origin" : {
-
+    "X_ORIGIN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Origin"
+          }
+        }
+      }
     },
-    "Y Origin" : {
-
+    "Y_ORIGIN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Origin"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

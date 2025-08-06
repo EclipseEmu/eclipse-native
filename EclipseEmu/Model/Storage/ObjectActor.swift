@@ -508,19 +508,20 @@ enum CopyProfileControlsSource<Profile: ControlsProfileObject> {
 }
 
 extension ObjectActor {
-    private func setControlsDataFromSource<Profile: ControlsProfileObject>(
-        _ profile: inout Profile,
-        from source: CopyProfileControlsSource<Profile>,
+    private func setControlsDataFromSource<InputSource: InputSourceDescriptorProtocol>(
+        _: InputSource.Type,
+        _ profile: inout InputSource.Object,
+        from source: CopyProfileControlsSource<InputSource.Object>,
         in context: NSManagedObjectContext,
         system: System
     ) async {
         switch source {
         case .nowhere:
-            profile.version = Profile.Version.latest
+            profile.version = InputSource.Object.Version.latest
             profile.data = nil
         case .systemDefaults:
-            let data = InputSourceTouchDescriptor.defaults(for: system)
-            profile.version = Profile.Version.latest
+            let data = InputSource.defaults(for: system)
+            profile.version = InputSource.Object.Version.latest
             profile.data = try? await ControlBindingsManager.encoder.encode(data)
         case .otherProfile(let box):
             guard let other = box.tryGet(in: context) else { return }
@@ -529,17 +530,19 @@ extension ObjectActor {
         }
     }
 
-    func createProfile<Profile: ControlsProfileObject>(
+    func createProfile<InputSource: InputSourceDescriptorProtocol>(
+        _ type: InputSource.Type,
         name: String,
         system: System,
-        copying source: CopyProfileControlsSource<Profile>
-    ) async throws -> ObjectBox<Profile> {
-        var model: Profile = self.objectContext.create()
-        model.name = name
-        model.system = system
+        copying source: CopyProfileControlsSource<InputSource.Object>
+    ) async throws -> ObjectBox<InputSource.Object> {
+        var profile: InputSource.Object = self.objectContext.create()
+        profile.name = name
+        profile.system = system
         
         await self.setControlsDataFromSource(
-            &model,
+            type,
+            &profile,
             from: source,
             in: objectContext,
             system: system
@@ -547,6 +550,6 @@ extension ObjectActor {
 
         try objectContext.saveIfNeeded()
         
-        return .init(model)
+        return .init(profile)
     }
 }

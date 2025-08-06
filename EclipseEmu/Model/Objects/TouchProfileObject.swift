@@ -21,6 +21,10 @@ extension TouchProfileObject: ControlsProfileObject {
     }
     
     static func navigationDestination(_ object: TouchProfileObject) -> Destination {
+#if canImport(UIKit)
         .touchProfile(object)
+#else
+        unreachable()
+#endif
     }
 }

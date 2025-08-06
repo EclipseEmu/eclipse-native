@@ -28,3 +28,19 @@ enum ControlMappingDirection: UInt8, RawRepresentable, Codable, CaseIterable {
 		}
 	}
 }
+
+extension ControlMappingDirection {
+    var label: String {
+        switch self {
+        case .none: "None"
+        case .fullPositiveY: "Up"
+        case .halfPositiveY: "Half Up"
+        case .fullNegativeY: "Down"
+        case .halfNegativeY: "Half Down"
+        case .fullPositiveX: "Right"
+        case .halfPositiveX: "Half Right"
+        case .fullNegativeX: "Left"
+        case .halfNegativeX: "Half Left"
+        }
+    }
+}

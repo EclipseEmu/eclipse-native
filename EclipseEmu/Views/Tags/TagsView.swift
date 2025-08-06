@@ -40,7 +40,7 @@ struct TagsView: View {
             .navigationTitle("TAGS")
             .toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					DismissButton("Done")
+					DismissButton("DONE")
 				}
 
                 ToolbarItem {

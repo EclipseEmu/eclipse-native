@@ -25,7 +25,7 @@ struct ToggleButton<Label: View>: View {
 }
 
 extension ToggleButton where Label == Text {
-	init(_ label: some StringProtocol, role: ButtonRole? = nil, value: Binding<Bool>) {
+	init(_ label: LocalizedStringKey, role: ButtonRole? = nil, value: Binding<Bool>) {
 		self.role = role
 		self._value = value
 		self.label = { Text(label) }

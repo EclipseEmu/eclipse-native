@@ -34,4 +34,43 @@ extension View {
             }
 #endif
     }
+    
+    @available(iOS, deprecated: 17.0, message: "Use .onKeyPress instead.")
+    @available(macOS, deprecated: 14.0, message: "Use .onKeyPress instead.")
+    @ViewBuilder
+    func disableKeyboardFeedbackSound() -> some View {
+        if #available(iOS 17.0, macOS 10.14, *) {
+            self.onKeyPress { _ in .handled }
+        } else {
+            self
+        }
+    }
+    
+    @available(iOS, deprecated: 17.0, message: "Use .onKeyPress instead.")
+    @available(macOS, deprecated: 14.0, message: "Use .onKeyPress instead.")
+    @ViewBuilder
+    func ignoreKeyboardFeedbackSound(for key: KeyEquivalent) -> some View {
+        if #available(iOS 17.0, macOS 10.14, *) {
+            self.onKeyPress(key) { .handled }
+        } else {
+            self
+        }
+    }
+
+    @available(iOS, deprecated: 17.0, message: "Use .onKeyPress instead.")
+    @available(macOS, deprecated: 14.0, message: "Use .onKeyPress instead.")
+    @ViewBuilder
+    func ignoreKeyboardFeedbackSound(for keys: [KeyEquivalent]) -> some View {
+        if #available(iOS 17.0, macOS 10.14, *) {
+            self.onKeyPress { key in
+                if keys.contains(key.key) {
+                    .handled
+                } else {
+                    .ignored
+                }
+            }
+        } else {
+            self
+        }
+    }
 }

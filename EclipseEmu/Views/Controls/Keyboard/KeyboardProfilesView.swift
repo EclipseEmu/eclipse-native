@@ -6,7 +6,7 @@ struct KeyboardProfilesView: View {
     @EnvironmentObject private var settings: Settings
 
     var body: some View {
-        ControlsProfilesView(title: "KEYBOARD_PROFILES_TITLE", settings: $settings.keyboardSystemProfiles)
+        ControlsProfilesView<InputSourceKeyboardDescriptor, _>(title: "KEYBOARD_PROFILES_TITLE", settings: $settings.keyboardSystemProfiles)
     }
 }
 

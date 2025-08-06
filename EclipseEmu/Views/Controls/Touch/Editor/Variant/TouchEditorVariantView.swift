@@ -54,7 +54,7 @@ struct TouchEditorVariantView: View {
 						case .elementSize, .menuSize, nil: break
 						}
 					} label: {
-						Label("Toggle Negative", systemImage: "plus.forwardslash.minus")
+						Label("TOGGLE_NEGATIVE", systemImage: "plus.forwardslash.minus")
 					}
 					.disabled(focusTarget?.isFlippable != true)
 
@@ -63,7 +63,7 @@ struct TouchEditorVariantView: View {
 					Button {
 						focusTarget = nil
 					} label: {
-						Label("Hide Keyboard", systemImage: "keyboard.chevron.compact.down")
+						Label("HIDE_KEYBOARD", systemImage: "keyboard.chevron.compact.down")
 					}
 				}
 			}

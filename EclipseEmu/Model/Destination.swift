@@ -61,8 +61,7 @@ extension Destination {
 		case .keyboardProfiles:
 			KeyboardProfilesView()
         case .keyboardProfile(let profile):
-            // FIXME: TODO
-            EmptyView()
+            KeyboardProfileView(profile: profile)
         case .controllerProfiles:
             ControllerProfilesView()
         case .controllerProfile(let profile):
@@ -73,8 +72,8 @@ extension Destination {
 #if canImport(UIKit)
 		case .touchProfiles:
 			TouchProfilesView()
-		case .touchProfile(let object):
-			TouchProfileView(object: object)
+		case .touchProfile(let profile):
+			TouchProfileView(profile: profile)
 		case .touchEditorVariant(let target, let viewModel):
 			TouchEditorVariantView(viewModel: viewModel, target: target)
 #endif

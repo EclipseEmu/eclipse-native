@@ -7,7 +7,7 @@ struct TouchProfilesView: View {
     @EnvironmentObject private var settings: Settings
 
     var body: some View {
-        ControlsProfilesView(title: "TOUCH_PROFILES_TITLE", settings: $settings.touchSystemProfiles)
+        ControlsProfilesView<InputSourceTouchDescriptor, _>(title: "TOUCH_PROFILES_TITLE", settings: $settings.touchSystemProfiles)
     }
 }
 

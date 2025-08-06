@@ -25,34 +25,48 @@ struct EclipseEmuApp: App {
 		}
 #elseif os(macOS)
 		// NOTE: multiple windows can be supported, but controls will need to be reworked a little.
-		Window("Eclipse", id: "eclipse") {
+		Window("LIBRARY", id: "eclipse") {
 			RootView()
 				.persistence(persistence)
 				.environmentObject(coreRegistry)
 				.environmentObject(settings)
+                .onAppear {
+                    settings.persistenceReady(persistence)
+                }
         }
 		.commands {
 			CommandGroup(replacing: CommandGroupPlacement.appSettings) {
 				Button {
 					openWindow(id: "settings")
 				} label: {
-					Label("Settings", systemImage: "gear")
+					Label("SETTINGS", systemImage: "gear")
 				}
 				.keyboardShortcut(",", modifiers: .command)
 			}
 		}
 
-		Window("Settings", id: "settings") {
-            NavigationStack {
-                SettingsView()
-					.navigationDestination(for: Destination.self) { destination in
-						destination.navigationDestination(destination, coreRegistry: coreRegistry)
-					}
-            }
-            .persistence(persistence)
-            .environmentObject(coreRegistry)
-            .environmentObject(settings)
+		Window("SETTINGS", id: "settings") {
+            SettingsWindowRootView()
+                .persistence(persistence)
+                .environmentObject(coreRegistry)
+                .environmentObject(settings)
         }
 #endif
     }
 }
+
+private struct SettingsWindowRootView: View {
+    @EnvironmentObject private var coreRegistry: CoreRegistry
+    @StateObject private var navigationManager: NavigationManager = .init()
+    
+    var body: some View {
+        NavigationStack(path: $navigationManager.path) {
+            SettingsView()
+                .navigationDestination(for: Destination.self) { destination in
+                    destination.navigationDestination(destination, coreRegistry: coreRegistry)
+                }
+        }
+        .environmentObject(navigationManager)
+    }
+}
+

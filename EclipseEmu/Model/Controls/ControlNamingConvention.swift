@@ -7,7 +7,8 @@ enum ControlNamingConvention {
 }
 
 extension CoreInput {
-	func label(for convention: ControlNamingConvention) -> (String, systemImage: String) {
+    // FIXME: Localize
+    func label(for convention: ControlNamingConvention) -> (String, systemImage: String) {
 		switch convention {
 		case .nintendo:
 			switch self {
@@ -38,8 +39,8 @@ extension CoreInput {
 			case .dpad: ("D-Pad", systemImage: "dpad")
 			case .faceButtonRight: ("Circle", systemImage: "circle.circle")
 			case .faceButtonDown: ("Cross", systemImage: "xmark.circle")
-			case .faceButtonUp: ("X", systemImage: "triangle.circle")
-			case .faceButtonLeft: ("Y", systemImage: "square.circle")
+			case .faceButtonUp: ("Triangle", systemImage: "triangle.circle")
+			case .faceButtonLeft: ("Square", systemImage: "square.circle")
 			case .leftJoystick: ("Left Thumbstick", systemImage: "l.joystick")
 			case .leftJoystickPress: ("L3", systemImage: "l.joystick.press.down")
 			case .rightJoystick: ("Right Thumbstick", systemImage: "r.joystick")

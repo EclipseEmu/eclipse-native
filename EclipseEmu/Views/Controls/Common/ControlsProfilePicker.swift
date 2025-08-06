@@ -2,6 +2,8 @@ import SwiftUI
 import EclipseKit
 import CoreData
 
+// FIXME: This is causing an infinite loop on macOS, but is perfectly fine on iOS?
+
 struct ControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>: View {
 	@Binding private var profile: ProfileObject?
 	private let label: () -> Label
@@ -24,19 +26,19 @@ struct ControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>:
 			if profile == nil {
 				ToggleButton(value: $isPickerOpen) {
 					if profile == nil {
-						Text("Select")
+						Text("SELECT")
 					} else {
-						Text("Replace")
+						Text("REPLACE")
 					}
 				}
 			} else {
 				Menu {
-					ToggleButton("Select Other", value: $isPickerOpen)
-					Button("Remove") {
+					ToggleButton("SELECT_OTHER", value: $isPickerOpen)
+					Button("REMOVE") {
 						self.profile = nil
 					}
 				} label: {
-					Text("Replace")
+					Text("REPLACE")
 				}
 			}
 		} label: {
@@ -49,20 +51,20 @@ struct ControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>:
 		}
 		.buttonStyle(.bordered)
 		.buttonBorderShape(.capsule)
+        .disabled(loading)
 		.sheet(isPresented: $isPickerOpen) {
 			NavigationStack {
                 ControlsProfilePickerView(selection: $profile, system: system)
 			}
 		}
-        .disabled(loading)
 	}
     
     @ViewBuilder
     var sublabel: some View {
         if loading {
-            Text("Loading")
+            Text("LOADING")
         } else if let profile {
-            Text(verbatim: profile.name, fallback: "UNNAMED_TOUCH_PROFILE")
+            Text(verbatim: profile.name, fallback: "PROFILE_UNNAMED")
         } else if let defaultProfileLabel {
             Text(defaultProfileLabel)
         }
@@ -107,7 +109,7 @@ private struct ControlsProfilePickerView<ProfileObject: ControlsProfileObject>: 
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
                 } label: {
-                    Text(verbatim: profile.name, fallback: "UNNAMED_TOUCH_PROFILE")
+                    Text(verbatim: profile.name, fallback: "PROFILE_UNNAMED")
                 }
             }
         }

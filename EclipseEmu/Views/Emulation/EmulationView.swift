@@ -4,13 +4,13 @@ import SwiftUI
 extension EmulationSpeed: View {
 	var body: Text {
 		return switch self {
-		case .x0_50: Text("0.5x")
-		case .x0_75: Text("0.75x")
-		case .x1_00: Text("1x")
-		case .x1_25: Text("1.25x")
-		case .x1_50: Text("1.5x")
-		case .x1_75: Text("1.75x")
-		case .x2_00: Text("2x")
+        case .x0_50: Text(verbatim: "0.5x")
+		case .x0_75: Text(verbatim: "0.75x")
+		case .x1_00: Text(verbatim: "1x")
+		case .x1_25: Text(verbatim: "1.25x")
+		case .x1_50: Text(verbatim: "1.5x")
+		case .x1_75: Text(verbatim: "1.75x")
+		case .x2_00: Text(verbatim: "2x")
 		}
 	}
 }
@@ -158,16 +158,16 @@ struct EmulationView<Core: CoreProtocol & SendableMetatype>: View {
 		HStack(spacing: 16.0) {
 			Button(action: togglePlayPause) {
 				if isPlaying {
-					Label("Pause", systemImage: "pause.fill")
+					Label("PAUSE", systemImage: "pause.fill")
 				} else {
-					Label("Play", systemImage: "play.fill")
+					Label("PLAY", systemImage: "play.fill")
 				}
 			}
 
 			Slider(value: .constant(0.6)) {} minimumValueLabel: {
-				Label("Lower Volume", systemImage: "speaker.fill")
+				Label("VOLUME_DOWN", systemImage: "speaker.fill")
 			} maximumValueLabel: {
-				Label("Raise Volume", systemImage: "speaker.3.fill")
+				Label("VOLUME_UP", systemImage: "speaker.3.fill")
 			}
 			.frame(maxWidth: 120)
 			.controlSize(.small)
@@ -175,16 +175,16 @@ struct EmulationView<Core: CoreProtocol & SendableMetatype>: View {
 			Spacer()
 
 			Menu {
-				Picker("Speed", selection: $speed) {
+				Picker("SPEED", selection: $speed) {
 					ForEach(EmulationSpeed.allCases, id: \.rawValue) { speed in
 						speed.tag(speed)
 					}
 				}
 			} label: {
-				Label("Settings", systemImage: "gearshape.fill")
+				Label("SETTINGS", systemImage: "gearshape.fill")
 			}
 			Button(action: stop) {
-				Label("Quit Game", systemImage: "power")
+				Label("QUIT", systemImage: "power")
 			}
 			.buttonStyle(.borderedProminent)
 			.tint(.red)

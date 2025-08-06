@@ -3,9 +3,9 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 private struct HorizontalDetailText: View {
-	let title: String
+	let title: LocalizedStringKey
 	let subtitle: String
-
+    
 	var body: some View {
 		LabeledContent(title) {
 			Text(subtitle)
@@ -27,9 +27,9 @@ struct CoreSettingsView<Core: CoreProtocol & ~Copyable>: View {
 	var body: some View {
 		Form {
 			Section {
-				HorizontalDetailText(title: "CORE_NAME", subtitle: Core.name)
-				HorizontalDetailText(title: "CORE_DEVELOPER", subtitle: Core.developer)
-				HorizontalDetailText(title: "CORE_VERSION", subtitle: Core.version)
+                LabeledContent("CORE_NAME") { Text(Core.name) }
+                LabeledContent("CORE_DEVELOPER") { Text(Core.developer) }
+                LabeledContent("CORE_VERSION") { Text(Core.version) }
 				Link(destination: Core.sourceCodeRepository) {
 					Label("SOURCE_CODE", systemImage: "folder")
 				}
@@ -149,22 +149,22 @@ private struct FileSettingView<Settings: CoreSettings>: View {
 	@ViewBuilder
 	var fileInputView: some View {
 		if settings[keyPath: setting.target] != nil {
-			Menu("Manage") {
+			Menu("MANAGE") {
 				Button(action: upload) {
-					Label("Replace", systemImage: "doc")
+					Label("REPLACE", systemImage: "doc")
 				}
 				ToggleButton(role: .destructive, value: $isDeleteFileOpen) {
-					Label("Delete", systemImage: "trash")
+					Label("DELETE", systemImage: "trash")
 				}
 			}
-			.confirmationDialog("Delete File", isPresented: $isDeleteFileOpen) {
-				Button("Delete", role: .destructive, action: delete)
-				Button("Cancel", role: .cancel, action: {})
+			.confirmationDialog("DELETE_FILE_TITLE", isPresented: $isDeleteFileOpen) {
+				Button("DELETE", role: .destructive, action: delete)
+				Button("CANCEL", role: .cancel, action: {})
 			} message: {
-				Text("Are you sure you want to delete this file?")
+				Text("DELETE_FILE_MESSAGE")
 			}
 		} else {
-			Button("Upload", action: upload)
+			Button("UPLOAD", action: upload)
 		}
 	}
 

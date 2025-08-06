@@ -49,9 +49,10 @@ struct ControlsProfileLoader<InputSource: InputSourceDescriptorProtocol, Content
 
 	private func load() {
 		do {
-			let bindings = try InputSource.decode(object, decoder: ControlBindingsManager.decoder)
+            let bindings = try InputSource.decode(object, decoder: ControlBindingsManager.decoder)
             self.loadingState = .success(bindings)
 		} catch {
+            print("failed to load profile:", error)
 			self.loadingState = .failure(.decodingError(error))
 		}
 	}

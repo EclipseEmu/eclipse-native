@@ -14,16 +14,19 @@ struct TouchEditorRectElementView: View {
 
 	var body: some View {
 		LabeledContent {
-			ToggleButton("Edit", value: $isShown)
+			ToggleButton("EDIT", value: $isShown)
 				.buttonStyle(.bordered)
-				.popover(isPresented: $isShown, content: popoverContent)
+                .buttonBorderShape(.capsule)
+                .popover(isPresented: $isShown) {
+                    popoverContent
+                }
 		} label: {
 			Label(title, systemImage: systemImage)
 		}
 	}
 
 	@ViewBuilder
-	func popoverContent() -> some View {
+    var popoverContent: some View {
 		TouchEditorRectFormView(rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
 			.modify { view in
 				if #available(iOS 16.4, *) {
@@ -47,7 +50,7 @@ struct TouchEditorRectElementView: View {
 							.navigationBarTitleDisplayMode(.inline)
 							.toolbar {
 								ToolbarItem(placement: .cancellationAction) {
-									DismissButton("Done")
+									DismissButton("DONE")
 								}
 							}
 					}
@@ -94,21 +97,21 @@ struct TouchEditorRectFormView: View {
 
 	var body: some View {
 		Form {
-			Picker("X Origin", selection: $rect.xOrigin) {
-				Text("Left").tag(TouchMappings.RelativeRect.XOrigin.left)
-				Text("Center").tag(TouchMappings.RelativeRect.XOrigin.center)
-				Text("Right").tag(TouchMappings.RelativeRect.XOrigin.right)
+			Picker("X_ORIGIN", selection: $rect.xOrigin) {
+				Text("LEFT").tag(TouchMappings.RelativeRect.XOrigin.left)
+				Text("CENTER").tag(TouchMappings.RelativeRect.XOrigin.center)
+				Text("RIGHT").tag(TouchMappings.RelativeRect.XOrigin.right)
 			}
 
-			Picker("Y Origin", selection: $rect.yOrigin) {
-				Text("Top").tag(TouchMappings.RelativeRect.YOrigin.top)
-				Text("Center").tag(TouchMappings.RelativeRect.YOrigin.center)
-				Text("Bottom").tag(TouchMappings.RelativeRect.YOrigin.bottom)
+			Picker("Y_ORIGIN", selection: $rect.yOrigin) {
+				Text("TOP").tag(TouchMappings.RelativeRect.YOrigin.top)
+				Text("CENTER").tag(TouchMappings.RelativeRect.YOrigin.center)
+				Text("BOTTOM").tag(TouchMappings.RelativeRect.YOrigin.bottom)
 			}
 
-			TouchEditorPositionField("X Offset", value: $rect.xOffset, alignment: .natural, focusTarget: $focusTarget, id: xOffsetID)
-			TouchEditorPositionField("Y Offset", value: $rect.yOffset, alignment: .natural, focusTarget: $focusTarget, id: yOffsetID)
-			TouchEditorPositionField("Size", value: $rect.size, alignment: .natural, focusTarget: $focusTarget, id: sizeID)
+			TouchEditorPositionField("X_OFFSET", value: $rect.xOffset, alignment: .natural, focusTarget: $focusTarget, id: xOffsetID)
+			TouchEditorPositionField("Y_OFFSET", value: $rect.yOffset, alignment: .natural, focusTarget: $focusTarget, id: yOffsetID)
+			TouchEditorPositionField("SIZE", value: $rect.size, alignment: .natural, focusTarget: $focusTarget, id: sizeID)
 		}
 	}
 }

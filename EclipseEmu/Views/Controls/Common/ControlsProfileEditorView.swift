@@ -25,22 +25,12 @@ struct ControlProfileEditorContolCollection<Binding>: Identifiable {
 }
 
 struct ControlsProfileEditorView<ControlBinding, PickerContent: View>: View {
-    @Binding var name: String
-    @Binding var system: System
+    let system: System
     let inputs: [ControlProfileEditorContolCollection<ControlBinding>]
     let picker: (ControlProfileEditorControl<ControlBinding>) -> PickerContent
 
     var body: some View {
         Form {
-            Section {
-                TextField("NAME", text: $name)
-                Picker("SYSTEM", selection: $system) {
-                    ForEach(System.concreteCases, id: \.self) { system in
-                        Text(system.string).tag(system)
-                    }
-                }
-            }
-
             ForEach(inputs) { section in
                 Section {
                     ForEach(section.items, id: \.input.rawValue) { binding in

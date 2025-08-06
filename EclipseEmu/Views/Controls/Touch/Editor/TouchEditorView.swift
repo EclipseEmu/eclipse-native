@@ -3,13 +3,13 @@ import SwiftUI
 import EclipseKit
 
 extension TouchMappings.VariantSizing {
-	var label: (String, systemImage: String) {
+	var label: (LocalizedStringKey, systemImage: String) {
 		switch self {
-		case .any: 				("Any", systemImage: "square.dashed")
-		case .portraitCompact: 	("iPhone Portrait", systemImage: "iphone")
-		case .landscapeCompact: ("iPhone Landscape", systemImage: "iphone.landscape")
-		case .portraitRegular: 	("iPad Portrait", systemImage: "ipad")
-		case .landscapeRegular: ("iPad Landscape", systemImage: "ipad.landscape")
+		case .any: 				("ANY", systemImage: "square.dashed")
+		case .portraitCompact: 	("VARIANT_IPHONE_PORTRAIT", systemImage: "iphone")
+		case .landscapeCompact: ("VARIANT_IPHONE_LANDSCAPE", systemImage: "iphone.landscape")
+		case .portraitRegular: 	("VARIANT_IPAD_PORTRAIT", systemImage: "ipad")
+		case .landscapeRegular: ("VARIANT_IPAD_LANDSCAPE", systemImage: "ipad.landscape")
 		}
 	}
 }
@@ -27,7 +27,7 @@ struct TouchEditorView: View {
     
 	var body: some View {
 		Form {
-			Section("Variants") {
+			Section("VARIANTS") {
 				ForEach(viewModel.mappings.variants) { variant in
 					if let index = viewModel.index(of: variant) {
 						NavigationLink(value: Destination.touchEditorVariant(index, viewModel)) {
@@ -39,23 +39,23 @@ struct TouchEditorView: View {
 				.onDelete(perform: deleteVariants)
 			}
 
-			Section("Directionals") {
+			Section("DIRECTIONALS") {
 				ForEach(viewModel.mappings.directionals) { directional in
-					Button {
-						directionalEditTarget = viewModel.index(of: directional).map(TouchEditorViewModel.EditTarget.init)
-					} label: {
-						let label = viewModel.label(for: directional)
-						Label(label.0, systemImage: label.systemImage)
-					}
+                    EditableContent {
+                        directionalEditTarget = viewModel.index(of: directional).map(TouchEditorViewModel.EditTarget.init)
+                    } label: {
+                        let label = viewModel.label(for: directional)
+                        Label(label.0, systemImage: label.systemImage)
+                    }
 				}
 				.onDelete(perform: deleteDirectionals)
 			}
 
-			Section("Buttons") {
+			Section("BUTTONS") {
 				ForEach(viewModel.mappings.buttons) { button in
-					Button {
-						buttonEditTarget = viewModel.index(of: button).map(TouchEditorViewModel.EditTarget.init)
-					} label: {
+                    EditableContent {
+                        buttonEditTarget = viewModel.index(of: button).map(TouchEditorViewModel.EditTarget.init)
+                    } label: {
 						let label = viewModel.label(for: button)
 						Label(label.0, systemImage: label.systemImage)
 					}
@@ -64,24 +64,21 @@ struct TouchEditorView: View {
 			}
 		}
 		.toolbar {
-			ToolbarItem(placement: .confirmationAction) {
-				ConfirmButton("Save", action: update)
-			}
 			ToolbarItem {
 				EditButton()
 			}
 			ToolbarItem {
 				Menu {
 					Button(action: addButton) {
-						Label("Add Button", systemImage: "a.circle")
+						Label("ADD_BUTTON", systemImage: "a.circle")
 					}
 					Button(action: addDirectional) {
-						Label("Add Directional", systemImage: "dpad")
+						Label("ADD_DIRECTIONAL", systemImage: "dpad")
 					}
 					Divider()
 					addVariantMenuContents
 				} label: {
-					Label("Add...", systemImage: "plus")
+					Label("ADD_ELEMENT", systemImage: "plus")
 				}
 			}
 		}
@@ -110,7 +107,7 @@ struct TouchEditorView: View {
 				.disabled(viewModel.mappings.variants.contains(where: { $0.sizing == variant }))
 			}
 		} label: {
-			Label("Add Variant", systemImage: "iphone.sizes")
+			Label("ADD_VARIANT", systemImage: "iphone.sizes")
 		}
 		.disabled(viewModel.mappings.variants.count == TouchMappings.VariantSizing.allCases.count)
 	}

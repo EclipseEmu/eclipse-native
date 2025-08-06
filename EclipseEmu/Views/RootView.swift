@@ -12,21 +12,23 @@ struct RootView: View {
 	@StateObject private var playback = GamePlayback()
 	@StateObject private var navigationManager = NavigationManager()
 
+    // FIXME: on iOS 26, quitting out of a game messes up the layout.
 	var body: some View {
-		switch playback.playbackState {
-		case .playing(let playbackData):
-			playbackData.coreID.emulationView(with: playbackData)
-				.environmentObject(navigationManager)
-				.environmentObject(playback)
-		case .none:
-			NavigationStack(path: $navigationManager.path) {
-				LibraryViewWrapper()
-					.navigationDestination(for: Destination.self) { destination in
-						destination.navigationDestination(destination, coreRegistry: coreRegistry)
-					}
-			}
-			.environmentObject(navigationManager)
-			.environmentObject(playback)
+        Group {
+            switch playback.playbackState {
+            case .playing(let playbackData):
+                playbackData.coreID.emulationView(with: playbackData)
+            case .none:
+                NavigationStack(path: $navigationManager.path) {
+                    LibraryViewWrapper()
+                        .navigationDestination(for: Destination.self) { destination in
+                            destination.navigationDestination(destination, coreRegistry: coreRegistry)
+                        }
+                }
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            }
 		}
+        .environmentObject(navigationManager)
+        .environmentObject(playback)
 	}
 }

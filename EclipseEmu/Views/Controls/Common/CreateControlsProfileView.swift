@@ -1,8 +1,8 @@
 import SwiftUI
 import EclipseKit
 
-struct CreateControlsProfileView<ProfileObject: ControlsProfileObject>: View {
-    private typealias ControlsSource = CopyProfileControlsSource<ProfileObject>
+struct CreateControlsProfileView<InputSource: InputSourceDescriptorProtocol>: View {
+    private typealias ControlsSource = CopyProfileControlsSource<InputSource.Object>
     
     @EnvironmentObject private var persistence: Persistence
     @Environment(\.dismiss) private var dismiss: DismissAction
@@ -23,30 +23,30 @@ struct CreateControlsProfileView<ProfileObject: ControlsProfileObject>: View {
 				}
 
 				Picker("SYSTEM", selection: $system) {
-					Text("Unselected").tag(System.unknown)
+					Text("UNSELECTED").tag(System.unknown)
 					Divider()
 					ForEach(System.concreteCases, id: \.rawValue) { system in
 						Text(system.string).tag(system)
 					}
 				}
-			} footer: {
-				Text("Use the system default controls in this profile, or start from scratch.")
 			}
 
 			Section {
                 Picker(selection: $controlsSource.sourceType) {
-                    Text("Nowhere").tag(Self.ControlsSource.SourceType.nowhere)
-					Text("System Defaults").tag(Self.ControlsSource.SourceType.systemDefaults)
-					Text("Other Profile").tag(Self.ControlsSource.SourceType.otherProfile)
+                    Text("CONTROLS_SOURCE_SYSTEM_NOWHERE").tag(Self.ControlsSource.SourceType.nowhere)
+					Text("CONTROLS_SOURCE_SYSTEM_DEFAULTS").tag(Self.ControlsSource.SourceType.systemDefaults)
+					Text("CONTROLS_SOURCE_OTHER_PROFILE").tag(Self.ControlsSource.SourceType.otherProfile)
 				} label: {
-					Text("Copy Controls From")
+					Text("CONTROLS_SOURCE")
 				}
                 if controlsSource.sourceType == .otherProfile {
                     ControlsProfilePicker(profile: $controlsSource.otherProfile, system: system) {
-						Text("Other Profile")
+						Text("CONTROLS_SOURCE_OTHER_PROFILE")
 					}
 					.disabled(system == .unknown)
 				}
+            } footer: {
+                Text("CONTROLS_SOURCE_EXPLAINER")
 			}
 		}
 		.formStyle(.grouped)
@@ -59,14 +59,17 @@ struct CreateControlsProfileView<ProfileObject: ControlsProfileObject>: View {
                     .disabled(name.isEmpty || system == .unknown || (controlsSource.sourceType == .otherProfile && controlsSource.otherProfile == nil))
 			}
 		}
-		.navigationTitle("Create Profile")
-		.navigationBarTitleDisplayMode(.inline)
+		.navigationTitle("CREATE_PROFILE")
+#if canImport(UIKit)
+        .navigationBarTitleDisplayMode(.inline)
+#endif
 	}
 
 	func create() {
         Task {
             do {
                 let profileBox = try await persistence.objects.createProfile(
+                    InputSource.self,
                     name: self.name,
                     system: system,
                     copying: .init(from: self.controlsSource)
@@ -75,7 +78,7 @@ struct CreateControlsProfileView<ProfileObject: ControlsProfileObject>: View {
                 dismiss()
                 
                 if let profile = profileBox.tryGet(in: persistence.mainContext) {
-                    let destination = ProfileObject.navigationDestination(profile)
+                    let destination = InputSource.Object.navigationDestination(profile)
                     navigation.path.append(destination)
                 }
             } catch {
@@ -89,6 +92,6 @@ struct CreateControlsProfileView<ProfileObject: ControlsProfileObject>: View {
 @available(iOS 18, macOS 15, *)
 #Preview(traits: .modifier(PreviewStorage())) {
     NavigationStack {
-        CreateControlsProfileView<KeyboardProfileObject>()
+        CreateControlsProfileView<InputSourceKeyboardDescriptor>()
     }
 }

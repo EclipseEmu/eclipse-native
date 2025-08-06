@@ -44,21 +44,29 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
 
     let id: String?
 
-	static func encode(_ bindings: GamepadMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
-		object.data = try encoder.encode(bindings)
+	func predicate(system: System) -> NSPredicate {
+		if let id {
+			NSPredicate(format: "rawSystem = %d AND controllerID = %@", system.rawValue, id)
+		} else {
+			NSPredicate(format: "rawSystem = %d", system.rawValue)
+		}
 	}
+    
+    static func encode(_ bindings: GamepadMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
+        object.data = try encoder.encode(bindings)
+    }
 
-	static func decode(_ data: ControllerProfileObject, decoder: JSONDecoder) throws -> GamepadMappings {
+    static func decode(_ data: ControllerProfileObject, decoder: JSONDecoder) throws -> GamepadMappings {
         guard let version = data.version, let data = data.data else {
             return .init(bindings: [:], buttons: [], directionals: [])
         }
-		return switch version {
-		case .v1: try decoder.decode(GamepadMappings.self, from: data)
-		}
-	}
+        return switch version {
+        case .v1: try decoder.decode(GamepadMappings.self, from: data)
+        }
+    }
 
-	func obtain(from game: GameObject, system: System, persistence: Persistence) -> ControllerProfileObject? {
-		guard let profiles = game.controllerProfiles as? Set<ControllerProfileObject> else { return nil }
+    func obtain(from game: GameObject, system: System, persistence: Persistence) -> ControllerProfileObject? {
+        guard let profiles = game.controllerProfiles as? Set<ControllerProfileObject> else { return nil }
         return profiles.first { profile in
             let isSystem = profile.system == system
             if isSystem && id != nil {
@@ -76,16 +84,8 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
             }
 
             return false
-		}
-	}
-
-	func predicate(system: System) -> NSPredicate {
-		if let id {
-			NSPredicate(format: "rawSystem = %d AND controllerID = %@", system.rawValue, id)
-		} else {
-			NSPredicate(format: "rawSystem = %d", system.rawValue)
-		}
-	}
+        }
+    }
 
     static func defaults(for system: System) -> GamepadMappings {
         switch system {

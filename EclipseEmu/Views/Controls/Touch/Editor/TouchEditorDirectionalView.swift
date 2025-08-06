@@ -22,13 +22,13 @@ struct TouchEditorDirectionalView: View {
 						Label(text, systemImage: image).tag(input)
 					}
 				} label: {
-					Label("Input", systemImage: "dpad")
+					Label("INPUT", systemImage: "dpad")
 				}
 				Picker(selection: $viewModel.mappings.directionals[target].style) {
-					Label("D-Pad", systemImage: "dpad").tag(TouchMappings.Directional.Style.dpad)
-					Label("Joystick", systemImage: "l.joystick").tag(TouchMappings.Directional.Style.joystick)
+					Label("DIRECTIONAL_STYLE_DPAD", systemImage: "dpad").tag(TouchMappings.Directional.Style.dpad)
+					Label("DIRECTIONAL_STYLE_JOYSTICK", systemImage: "l.joystick").tag(TouchMappings.Directional.Style.joystick)
 				} label: {
-					Label("Style", systemImage: "paintpalette")
+					Label("STYLE", systemImage: "paintpalette")
 				}
 			}
 
@@ -37,19 +37,19 @@ struct TouchEditorDirectionalView: View {
 					Text(viewModel.mappings.directionals[target].deadzone, format: .number.precision(.fractionLength(2...2)))
 						.font(.body.monospaced())
 				} label: {
-					Label("Dead Zone", systemImage: "smallcircle.circle")
+					Label("DEAD_ZONE", systemImage: "smallcircle.circle")
 				}
 				Slider(value: $viewModel.mappings.directionals[target].deadzone, in: 0.25...0.95, step: 0.05) {}
 					.labelsHidden()
 			} footer: {
-				Text("The dead zone is the radius that inputs are ignored within.")
+				Text("DEAD_ZONE_EXPLAINER")
 			}
 		}
-		.navigationTitle("Edit Directional")
+		.navigationTitle("EDIT_DIRECTIONAL")
 		.navigationBarTitleDisplayMode(.inline)
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {
-				CancelButton("Cancel", action: dismissAction.callAsFunction)
+				CancelButton("CANCEL", action: dismissAction.callAsFunction)
 			}
 		}
 	}

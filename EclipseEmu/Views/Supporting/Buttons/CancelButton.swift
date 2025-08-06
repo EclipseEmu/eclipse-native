@@ -9,7 +9,7 @@ struct CancelButton<Content: View>: View {
 		self.action = action
 		self.label = label
 	}
-
+    
 	var body: some View {
 		if #available(iOS 26.0, macOS 26.0, *) {
 			Button(role: .cancel, action: action)
@@ -20,8 +20,13 @@ struct CancelButton<Content: View>: View {
 }
 
 extension CancelButton where Content == Text {
-	init(_ label: some StringProtocol, action: @escaping () -> Void) {
-		self.label = { Text(label) }
-		self.action = action
-	}
+    init(_ label: some StringProtocol, action: @escaping () -> Void) {
+        self.label = { Text(label) }
+        self.action = action
+    }
+    
+    init(action: @escaping () -> Void) {
+        self.action = action
+        self.label = { Text("CANCEL") }
+    }
 }

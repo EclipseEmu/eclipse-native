@@ -13,7 +13,7 @@ struct EmulationMenuView: View {
 
 	var body: some View {
 		Form {
-			Picker("Speed", selection: $speedValue) {
+			Picker("SPEED", selection: $speedValue) {
 				ForEach(EmulationSpeed.allCases, id: \.rawValue) { value in
 					value.tag(value)
 				}
@@ -21,20 +21,20 @@ struct EmulationMenuView: View {
 		}
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {
-				CancelButton("Done", action: dismissAction.callAsFunction)
+				CancelButton("DONE", action: dismissAction.callAsFunction)
 			}
 			ToolbarItem(placement: .confirmationAction) {
 				ToggleButton(role: .destructive, value: $isQuitConfirmationOpen) {
-					Label("Quit", systemImage: "power")
+					Label("QUIT", systemImage: "power")
 				}
-				.confirmationDialog("Quit Game", isPresented: $isQuitConfirmationOpen) {
-					Button("Cancel", role: .cancel, action: {})
-					Button("Quit") {
+				.confirmationDialog("QUIT_GAME_TITLE", isPresented: $isQuitConfirmationOpen) {
+					Button("CANCEL", role: .cancel, action: {})
+					Button("QUIT") {
 						dismissAction()
 						quit()
 					}
 				} message: {
-					Text("Are you sure you want to quit the game? All unsaved progress may be lost.")
+					Text("QUIT_GAME_MESSAGE")
 				}
 			}
 		}

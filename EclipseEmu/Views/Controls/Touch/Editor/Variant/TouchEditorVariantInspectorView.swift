@@ -19,14 +19,14 @@ struct TouchEditorVariantInspectorView: View {
 
 	var body: some View {
 		Form {
-			Section("Screen Offset") {
-				TouchEditorPositionField("X Offset", value: $viewModel.mappings.variants[target].screenOffset.x, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetX)
-				TouchEditorPositionField("Y Offset", value: $viewModel.mappings.variants[target].screenOffset.y, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetY)
+			Section("SCREEN_OFFSET") {
+				TouchEditorPositionField("X_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.x, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetX)
+				TouchEditorPositionField("Y_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.y, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetY)
 			}
 
-			Section("Elements") {
+			Section("ELEMENTS") {
 				TouchEditorRectElementView(
-					title: "Menu",
+					title: "MENU",
 					systemImage: "house.circle",
 					rect: $viewModel.mappings.variants[target].menu,
 					focusTarget: $focusTarget,
@@ -64,7 +64,7 @@ struct TouchEditorVariantInspectorView: View {
 						}
 					}
 				} label: {
-					Label("Add Element", systemImage: "plus")
+					Label("ADD_ELEMENT", systemImage: "plus")
 				}
 				.disabled(availableButtons.isEmpty && availableDirectionals.isEmpty)
 				.onAppear(perform: loadAvailableElements)

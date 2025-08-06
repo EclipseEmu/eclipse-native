@@ -2,11 +2,11 @@
 import SwiftUI
 
 struct TouchProfileView: View {
-	@ObservedObject var object: TouchProfileObject
+	@ObservedObject var profile: TouchProfileObject
 
 	var body: some View {
-		ControlsProfileLoader<InputSourceTouchDescriptor, _>(object) { onChange, bindings in
-            TouchEditorView(onChange: onChange, bindings: bindings, system: object.system)
+		ControlsProfileLoader<InputSourceTouchDescriptor, _>(profile) { onChange, bindings in
+            TouchEditorView(onChange: onChange, bindings: bindings, system: profile.system)
 		}
 	}
 }

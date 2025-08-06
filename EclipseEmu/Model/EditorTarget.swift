@@ -24,10 +24,10 @@ enum EditorTarget<Item: Hashable>: Hashable {
 	}
 }
 
-extension EditorTarget: Identifiable where Item: Identifiable {
-	var id: Item.ID? {
+extension EditorTarget: Identifiable {
+	var id: Item? {
 		if case .edit(let item) = self {
-			item.id
+			item
 		} else {
 			nil
 		}

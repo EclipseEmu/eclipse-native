@@ -10,17 +10,8 @@ struct CheatItemView: View {
     @Binding var editingCheat: CheatObject?
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(verbatim: cheat.label, fallback: "CHEAT_UNNAMED")
-                    .lineLimit(1)
-                Text(verbatim: cheat.code ?? "")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-            Spacer()
-            #if !os(macOS)
+        LabeledContent {
+#if !os(macOS)
             if editMode?.wrappedValue == .active {
                 Button(action: edit) {
                     Label("EDIT", systemImage: "pencil.circle")
@@ -30,10 +21,19 @@ struct CheatItemView: View {
                 Toggle("CHEAT_ENABLED", isOn: $cheat.enabled)
                     .labelsHidden()
             }
-            #else
+#else
             Toggle("CHEAT_ENABLED", isOn: $cheat.enabled)
                 .labelsHidden()
-            #endif
+#endif
+        } label: {
+            VStack(alignment: .leading) {
+                Text(verbatim: cheat.label, fallback: "CHEAT_UNNAMED")
+                    .lineLimit(1)
+                Text(verbatim: cheat.code ?? "")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
         }
         .contextMenu(ContextMenu(menuItems: {
             Button(action: edit) {
