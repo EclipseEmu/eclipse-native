@@ -279,12 +279,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connected Controls"
+            "value" : "Connected Controllers"
           }
         }
       }
     },
     "CONTROL_UNBOUND" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -294,8 +295,15 @@
         }
       }
     },
-    "CONTROLLER_" : {
-
+    "CONTROLLER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controller"
+          }
+        }
+      }
     },
     "CONTROLLER_BATTERY" : {
       "localizations" : {
@@ -348,28 +356,114 @@
       }
     },
     "CONTROLLER_DPAD" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D-Pad"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Press"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_ONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Left"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_TWO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Right"
+          }
+        }
+      }
     },
     "CONTROLLER_HOME" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
     },
     "CONTROLLER_LEFT_SHOULDER" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Shoulder"
+          }
+        }
+      }
     },
     "CONTROLLER_LEFT_THUMBSTICK" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Thumbstick"
+          }
+        }
+      }
     },
     "CONTROLLER_LEFT_THUMBSTICK_BUTTON" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Thumbstick Press"
+          }
+        }
+      }
     },
     "CONTROLLER_LEFT_TRIGGER" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Trigger"
+          }
+        }
+      }
     },
     "CONTROLLER_MENU" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        }
+      }
     },
     "CONTROLLER_OPTIONS" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
     },
     "CONTROLLER_PROFILES_TITLE" : {
       "localizations" : {
@@ -382,16 +476,84 @@
       }
     },
     "CONTROLLER_RIGHT_SHOULDER" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Shoulder"
+          }
+        }
+      }
     },
     "CONTROLLER_RIGHT_THUMBSTICK" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Thumbstick"
+          }
+        }
+      }
+    },
+    "CONTROLLER_RIGHT_THUMBSTICK_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Thumbstick Press"
+          }
+        }
+      }
     },
     "CONTROLLER_RIGHT_TRIGGER" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Trigger"
+          }
+        }
+      }
+    },
+    "CONTROLLER_SCREENSHOT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot"
+          }
+        }
+      }
+    },
+    "CONTROLLER_SELECT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
     },
     "CONTROLLER_SHARE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
+    "CONTROLLER_START" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
     },
     "CONTROLLER_VENDOR" : {
       "localizations" : {
@@ -403,11 +565,45 @@
         }
       }
     },
+    "CONTROLLER_XBOX_PADDLE_FOUR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 4"
+          }
+        }
+      }
+    },
     "CONTROLLER_XBOX_PADDLE_ONE" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 1"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX_PADDLE_THREE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 3"
+          }
+        }
+      }
     },
     "CONTROLLER_XBOX_PADDLE_TWO" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 2"
+          }
+        }
+      }
     },
     "CONTROLLERS" : {
       "localizations" : {

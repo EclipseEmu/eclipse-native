@@ -27,6 +27,7 @@ struct ControllerSettingsView: View {
             }
         }
         .formStyle(.grouped)
+        .navigationTitle("CONTROLLER")
     }
     
     func loadProfile(for system: System) -> ControllerProfileObject? {

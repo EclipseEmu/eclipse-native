@@ -7,39 +7,34 @@ enum InputSourceControllerVersion: Int16, VersionProtocol {
     static let latest: InputSourceControllerVersion = .v1
 }
 
-struct GamepadMappings: Codable {
-    let bindings: [String : Self.Index]
-    let buttons: [Self.ButtonBinding]
-    let directionals: [Self.DirectionalBinding]
+struct ControllerMappings: Codable {
+    var bindings: [String : Self.Index]
+    var buttons: [Self.ButtonBinding]
+    var directionals: [Self.DirectionalBinding]
 
 	enum Index: Codable {
         case button(Int)
         case directional(Int)
     }
 
-	struct ButtonBinding: Codable {
-        let soft: CoreInput
-        let hard: CoreInput
+	struct ButtonBinding: Hashable, Codable {
+        let input: CoreInput
+        let direction: ControlMappingDirection
 
-        init(soft: CoreInput, hard: CoreInput) {
-            self.soft = soft
-            self.hard = hard
-        }
-
-        init(_ input: CoreInput) {
-            self.soft = input
-            self.hard = input
+        init(_ input: CoreInput, direction: ControlMappingDirection = .none) {
+            self.input = input
+            self.direction = direction
         }
     }
 
-	struct DirectionalBinding: Codable {
+	struct DirectionalBinding: Hashable, Codable {
         let input: CoreInput
         let deadzone: Float
     }
 }
 
 struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
-    typealias Bindings = GamepadMappings
+    typealias Bindings = ControllerMappings
 	typealias Object = ControllerProfileObject
 
     let id: String?
@@ -52,16 +47,16 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
 		}
 	}
     
-    static func encode(_ bindings: GamepadMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
+    static func encode(_ bindings: ControllerMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
         object.data = try encoder.encode(bindings)
     }
 
-    static func decode(_ data: ControllerProfileObject, decoder: JSONDecoder) throws -> GamepadMappings {
+    static func decode(_ data: ControllerProfileObject, decoder: JSONDecoder) throws -> ControllerMappings {
         guard let version = data.version, let data = data.data else {
             return .init(bindings: [:], buttons: [], directionals: [])
         }
         return switch version {
-        case .v1: try decoder.decode(GamepadMappings.self, from: data)
+        case .v1: try decoder.decode(ControllerMappings.self, from: data)
         }
     }
 
@@ -87,7 +82,7 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
         }
     }
 
-    static func defaults(for system: System) -> GamepadMappings {
+    static func defaults(for system: System) -> ControllerMappings {
         switch system {
         case .gb, .gbc, .nes:
 			.init(

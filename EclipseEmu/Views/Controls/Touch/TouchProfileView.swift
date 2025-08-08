@@ -7,6 +7,7 @@ struct TouchProfileView: View {
 	var body: some View {
 		ControlsProfileLoader<InputSourceTouchDescriptor, _>(profile) { onChange, bindings in
             TouchEditorView(onChange: onChange, bindings: bindings, system: profile.system)
+                .navigationTitle(profile.name ?? "PROFILE_UNNAMED")
 		}
 	}
 }

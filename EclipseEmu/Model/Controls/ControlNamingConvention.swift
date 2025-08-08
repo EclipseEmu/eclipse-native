@@ -69,7 +69,7 @@ extension CoreInput {
 			case .rightJoystick: ("Right Thumbstick", systemImage: "r.joystick")
 			case .rightJoystickPress: ("Right Thumbstick Press", systemImage: "r.joystick.press.down")
 			case .leftShoulder: ("LB", systemImage: "lb.button.roundedbottom.horizontal")
-			case .leftTrigger: ("LT", systemImage: "zl.button.roundedtop.horizontal")
+			case .leftTrigger: ("LT", systemImage: "lt.button.roundedtop.horizontal")
 			case .rightShoulder: ("RB", systemImage: "rb.button.roundedbottom.horizontal")
 			case .rightTrigger: ("RT", systemImage: "rt.button.roundedtop.horizontal")
 			case .start: ("View", systemImage: "line.3.horizontal.circle")

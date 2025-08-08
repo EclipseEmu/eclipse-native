@@ -32,18 +32,7 @@ struct TouchEditorDirectionalView: View {
 				}
 			}
 
-			Section {
-				LabeledContent {
-					Text(viewModel.mappings.directionals[target].deadzone, format: .number.precision(.fractionLength(2...2)))
-						.font(.body.monospaced())
-				} label: {
-					Label("DEAD_ZONE", systemImage: "smallcircle.circle")
-				}
-				Slider(value: $viewModel.mappings.directionals[target].deadzone, in: 0.25...0.95, step: 0.05) {}
-					.labelsHidden()
-			} footer: {
-				Text("DEAD_ZONE_EXPLAINER")
-			}
+            DeadZoneEditorSectionView($viewModel.mappings.directionals[target].deadzone)
 		}
 		.navigationTitle("EDIT_DIRECTIONAL")
 		.navigationBarTitleDisplayMode(.inline)

@@ -33,4 +33,3 @@ struct ConnectedControllersView: View {
         self.connectedControllers = GCController.controllers()
     }
 }
-

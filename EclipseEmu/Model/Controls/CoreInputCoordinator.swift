@@ -244,7 +244,7 @@ extension CoreInputCoordinator {
 						isPressed: pressed
 					)
                 }
-				controls.append(.init(input: binding.hard.union(binding.soft)))
+				controls.append(.init(input: binding.input))
 				id += 1
             case .directional(let i):
                 guard let input = gamepad.dpads[key] else { continue }
@@ -277,7 +277,7 @@ extension CoreInputCoordinator {
 
     private nonisolated func controllerButtonValueHandler(
 		id: Int,
-        binding: GamepadMappings.ButtonBinding,
+        binding: ControllerMappings.ButtonBinding,
         controller: GCController?,
         value: Float,
         isPressed: Bool
@@ -288,21 +288,16 @@ extension CoreInputCoordinator {
             let player = playerIndex(for: controller)
         else { return }
 
-		let input = value > 0.5 ? binding.hard : binding.soft
-		let value = SIMD2<Float32>(
-			isPressed ? 1 : 0,
-			isPressed ? value : 0
-		)
-
+        let (x, y) = binding.direction.intoValues(isPressed: isPressed)
 		runIsolated { this in
 			this.controllerState[Int(player)]
-				.enqueue(input, value: value, control: id, player: player, deque: this.states)
+                .enqueue(binding.input, value: .init(x, y), control: id, player: player, deque: this.states)
 		}
     }
 
     private nonisolated func controllerDirectionalValueHandler(
 		id: Int,
-		binding: GamepadMappings.DirectionalBinding,
+		binding: ControllerMappings.DirectionalBinding,
         controller: GCController?,
         x: Float,
         y: Float

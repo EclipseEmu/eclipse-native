@@ -65,8 +65,7 @@ extension Destination {
         case .controllerProfiles:
             ControllerProfilesView()
         case .controllerProfile(let profile):
-            // FIXME: TODO
-            EmptyView()
+            ControllerProfileView(profile: profile)
 		case .controllerSettings(let controller):
 			ControllerSettingsView(controller: controller)
 #if canImport(UIKit)
