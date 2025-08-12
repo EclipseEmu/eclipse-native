@@ -3,6 +3,7 @@ import GameController
 import EclipseKit
 
 struct ControllerSettingsView: View {
+    @EnvironmentObject private var persistence: Persistence
     let controller: GCController
 
     var body: some View {
@@ -30,13 +31,22 @@ struct ControllerSettingsView: View {
         .navigationTitle("CONTROLLER")
     }
     
-    func loadProfile(for system: System) -> ControllerProfileObject? {
-        // FIXME: TODO
-        return nil
+    func loadProfile(for system: System) async throws -> ControllerProfileObject? {
+        let box = try await persistence.objects.getProfileForController(
+            controllerID: controller.persistentID,
+            system: system,
+            game: nil
+        )
+        return box?.tryGet(in: persistence.mainContext)
     }
     
-    func setProfile(for system: System, to profile: ControllerProfileObject?) {
-        // FIXME: TODO
+    func setProfile(for system: System, to profile: ControllerProfileObject?) async throws {
+        try await persistence.objects.setProfileForController(
+            controllerID: controller.persistentID,
+            system: system,
+            game: nil,
+            to: profile.map(ObjectBox.init)
+        )
     }
 }
 

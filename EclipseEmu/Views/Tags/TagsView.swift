@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TagsView: View {
+    @Environment(\.dismiss) var dismiss: DismissAction
     @EnvironmentObject var persistence: Persistence
     @State var isCreateDialogPresented: Bool = false
 	@State var editTarget: EditorTarget<TagObject>? = nil
@@ -40,7 +41,7 @@ struct TagsView: View {
             .navigationTitle("TAGS")
             .toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					DismissButton("DONE")
+                    CancelButton("DONE", action: dismiss.callAsFunction)
 				}
 
                 ToolbarItem {
@@ -53,7 +54,7 @@ struct TagsView: View {
             }
             .renameItem("RENAME_TAG", item: $renameItem)
 			.sheet(item: $editTarget) { item in
-				NavigationStack {
+                FormSheetView {
 					TagDetailView(mode: item)
 				}
 			}

@@ -5,7 +5,7 @@ import GameController
 final class ControllerEditorViewModel: ObservableObject {
     let onChange: ControlsProfileUpdateCallback<InputSourceControllerDescriptor>
     let system: System
-    let inputNaming: ControlNamingConvention
+    @Published var inputNaming: ControlNamingConvention
     @Published var controlsNaming: ControllerButtonNaming = .xbox
     @Published var mappings: ControllerEditorExtendedProfile {
         didSet { onChange(.init(from: mappings)) }
@@ -25,20 +25,18 @@ final class ControllerEditorViewModel: ObservableObject {
 
 struct ControllerEditorElementItemView<Value: ControllerEditorElement>: View {
     private let key: WritableKeyPath<ControllerEditorExtendedProfile, Value>
-    private let name: LocalizedStringKey
-    private let icon: String
     @Binding private var editTarget: Value?
     @ObservedObject private var viewModel: ControllerEditorViewModel
 
     init(_ control: WritableKeyPath<ControllerEditorExtendedProfile, Value>, editTarget: Binding<Value?>, viewModel: ControllerEditorViewModel) {
         self.key = control
-        (name, icon) = viewModel.mappings[keyPath: control].key.label(for: viewModel.controlsNaming)
         self._editTarget = editTarget
         self.viewModel = viewModel
     }
     
     var body: some View {
         EditableContent(action: self.edit) {
+            let (name, icon) = viewModel.mappings[keyPath: self.key].key.label(for: viewModel.controlsNaming)
             Label {
                 Text(name)
                 valueLabel
@@ -137,16 +135,28 @@ struct ControllerEditorView: View {
         }
         .formStyle(.grouped)
         .sheet(item: $buttonEditTarget) { button in
-            NavigationStack {
+            FormSheetView {
                 ControllerButtonEditorView(viewModel: viewModel, binding: button)
             }
             .presentationDetents([.medium, .large])
         }
         .sheet(item: $directionalEditTarget) { button in
-            NavigationStack {
+            FormSheetView {
                 ControllerDirectionalEditorView(viewModel: viewModel, binding: button)
             }
             .presentationDetents([.medium, .large])
+        }
+        .toolbar {
+            Menu {
+                Picker(selection: $viewModel.controlsNaming) {
+                    Text("CONTROLLER_XBOX").tag(ControllerButtonNaming.xbox)
+                    Text("CONTROLLER_NINTENDO").tag(ControllerButtonNaming.nintendo)
+                    Text("CONTROLLER_PLAYSTATION").tag(ControllerButtonNaming.playstation)
+                } label: {}
+                .labelsHidden()
+            } label: {
+                Label("CONTROL_NAMES", systemImage: "textformat")
+            }
         }
     }
 }

@@ -553,3 +553,59 @@ extension ObjectActor {
         return .init(profile)
     }
 }
+
+extension ObjectActor {
+    private func getAssignment(controllerID: String, system: System, game: ObjectBox<GameObject>?) throws -> ControllerProfileAssignmentObject? {
+        let fetchRequest = ControllerProfileAssignmentObject.fetchRequest()
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = if let game {
+            NSPredicate(format: "controllerID = %@ AND rawSystem = %d AND game.id = %@", controllerID, system.rawValue, game.id)
+        } else {
+            NSPredicate(format: "controllerID = %@ AND rawSystem = %d", controllerID, system.rawValue)
+        }
+        
+        return try self.objectContext.fetch(fetchRequest).first
+    }
+    
+    func getProfileForController(
+        controllerID: String,
+        system: System,
+        game: ObjectBox<GameObject>?
+    ) throws -> ObjectBox<ControllerProfileObject>? {
+        return try getAssignment(controllerID: controllerID, system: system, game: game)?.profile.map(ObjectBox.init)
+    }
+    
+    func setProfileForController(
+        controllerID: String,
+        system: System,
+        game: ObjectBox<GameObject>?,
+        to profileBox: ObjectBox<ControllerProfileObject>?
+    ) throws {
+        let assignment = try getAssignment(controllerID: controllerID, system: system, game: game)
+        
+        if let assignment, profileBox == nil {
+            objectContext.delete(assignment)
+            try objectContext.saveIfNeeded()
+            return
+        }
+        
+        guard let profileBox else { return }
+        let profile = try profileBox.get(in: objectContext)
+        
+        if let assignment {
+            assignment.profile = profile
+            try objectContext.saveIfNeeded()
+            return
+        }
+        
+        ControllerProfileAssignmentObject.create(
+            in: objectContext,
+            controllerID: controllerID,
+            system: system,
+            game: game?.tryGet(in: objectContext),
+            profile: profile
+        )
+        
+        try objectContext.saveIfNeeded()
+    }
+}

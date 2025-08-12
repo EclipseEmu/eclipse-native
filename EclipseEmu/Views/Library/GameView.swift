@@ -103,6 +103,7 @@ struct GameView: View {
     @State private var isManageTagsOpen: Bool = false
     @State private var fileImportRequest: FileImportType?
 
+    @State private var isControlSettingsOpen = false
     @State private var isReplaceRomConfirmationOpen = false
     @State private var isImportSaveConfirmationOpen = false
     @State private var isDeleteSavePresented: Bool = false
@@ -248,8 +249,13 @@ struct GameView: View {
 #endif
         .toolbar { toolbarContent }
         .sheet(isPresented: $isManageTagsOpen) {
-            NavigationStack {
+            FormSheetView {
                 ManageTagsView(target: .one(game))
+            }
+        }
+        .sheet(isPresented: $isControlSettingsOpen) {
+            FormSheetView {
+                GameControlSettingsView(game: game)
             }
         }
         .renameItem("RENAME_GAME", item: $renameTarget)
@@ -305,6 +311,10 @@ struct GameView: View {
 
             Button(action: manageTags) {
                 Label("MANAGE_TAGS", systemImage: "tag")
+            }
+            
+            ToggleButton(value: $isControlSettingsOpen) {
+                Label("GAME_SPECIFIC_CONTROLS", systemImage: "gamecontroller")
             }
 
             NavigationLink(to: .cheats(game)) {

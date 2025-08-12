@@ -12,7 +12,8 @@ protocol InputSourceDescriptorProtocol: Sendable {
 
 	static func defaults(for system: System) -> Self.Bindings
 
-	func obtain(from game: GameObject, system: System, persistence: Persistence) -> Self.Object?
-	func predicate(system: System) -> NSPredicate
+	func obtain(for game: GameObject) -> Self.Object?
+    
+    @MainActor
+    func obtain(for system: System, persistence: Persistence, settings: Settings) -> Self.Object?
 }
-

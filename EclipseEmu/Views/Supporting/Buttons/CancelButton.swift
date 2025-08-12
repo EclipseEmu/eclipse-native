@@ -20,7 +20,7 @@ struct CancelButton<Content: View>: View {
 }
 
 extension CancelButton where Content == Text {
-    init(_ label: some StringProtocol, action: @escaping () -> Void) {
+    init(_ label: LocalizedStringKey, action: @escaping () -> Void) {
         self.label = { Text(label) }
         self.action = action
     }

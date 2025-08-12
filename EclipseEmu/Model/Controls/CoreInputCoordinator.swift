@@ -28,7 +28,7 @@ final actor CoreInputCoordinator {
 
     init(
 		maxPlayers: UInt8,
-		bindings: ControlBindingsManager,
+		bindings: consuming ControlBindingsManager,
 		reorder reorderHandler: @escaping ReorderHandler
 	) {
         let queue = DispatchQueue(label: "dev.magnetar.eclipseemu.queue.coreinputcoordinator")

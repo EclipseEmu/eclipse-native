@@ -18,6 +18,7 @@ extension EmulationSpeed: View {
 struct EmulationLoaderView<Core: CoreProtocol & SendableMetatype>: View {
 	let data: GamePlaybackData
 	@EnvironmentObject var persistence: Persistence
+    @EnvironmentObject var settings: Settings
 
 	struct EmulationViewLoadedData {
 		let coordinator: CoreCoordinator<Core>
@@ -33,13 +34,6 @@ struct EmulationLoaderView<Core: CoreProtocol & SendableMetatype>: View {
 		Suspense(task: load) { loadedData in
 #if canImport(UIKit)
 			EmulationView(coordinator: loadedData.coordinator, touchMappings: loadedData.touchMappings, data: data)
-				.modify {
-					if #available(iOS 18.0, *) {
-						$0.toolbarVisibility(.hidden, for: .navigationBar)
-					} else {
-						$0
-					}
-				}
 #else
 			EmulationView(coordinator: loadedData.coordinator, data: data)
 #endif
@@ -47,8 +41,14 @@ struct EmulationLoaderView<Core: CoreProtocol & SendableMetatype>: View {
 	}
 
 	func load() async throws -> EmulationViewLoadedData {
-		let settings = Core.Settings()
-		let inputCoordinator = ControlBindingsManager(persistence: persistence, game: data.game, system: data.system)
+		let inputCoordinator = ControlBindingsManager(
+            persistence: persistence,
+            settings: settings,
+            game: data.game,
+            system: data.system
+        )
+        
+        let settings = Core.Settings()
 		let actor: CoreCoordinator<Core> = try await CoreCoordinator.init(
 			coreID: data.coreID,
 			system: data.system,
@@ -130,7 +130,7 @@ struct EmulationView<Core: CoreProtocol & SendableMetatype>: View {
 		.background(Color.black)
 		.background(ignoresSafeAreaEdges: .all)
 		.sheet(isPresented: $isMenuOpen) {
-			NavigationStack {
+            FormSheetView {
 				EmulationMenuView(quit: self.quit)
 			}
 			.presentationDetents([.medium, .large])

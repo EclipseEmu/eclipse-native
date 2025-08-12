@@ -80,7 +80,7 @@ final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDispl
 		coreID: Eclipse.Core,
 		system: System,
 		settings: Core.Settings,
-		bindings: ControlBindingsManager,
+		bindings: consuming ControlBindingsManager,
 		reorder: @escaping CoreInputCoordinator.ReorderHandler
 	) async throws {
 		self.coreID = coreID

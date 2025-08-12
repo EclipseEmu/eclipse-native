@@ -52,7 +52,7 @@ struct CreateControlsProfileView<InputSource: InputSourceDescriptorProtocol>: Vi
 		.formStyle(.grouped)
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {
-				DismissButton("CANCEL")
+                CancelButton("CANCEL", action: dismiss.callAsFunction)
 			}
 			ToolbarItem(placement: .confirmationAction) {
 				ConfirmButton("CREATE", action: create)

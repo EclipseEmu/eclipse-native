@@ -8,7 +8,15 @@ struct ControllerProfilesView: View {
 
     var body: some View {
         ControlsProfilesView<InputSourceControllerDescriptor, _>(title: "CONTROLLER_PROFILES_TITLE", settings: $settings.controllerSystemProfiles) {
-            ConnectedControllersView()
+            Section("CONNECTED_CONTROLLERS") {
+                ForEachConnectedControllers { controller in
+                    NavigationLink(to: .controllerSettings(controller)) {
+                        Label(controller.vendorName ?? "UNKNOWN_CONTROLLER", systemImage: controller.symbol)
+                    }
+                } isEmpty: {
+                    EmptyMessage.listItem(title: "NO_CONNECTED_CONTROLLERS_TITLE", message: "NO_CONNECTED_CONTROLLERS_MESSAGE")
+                }
+            }
         }
     }
 }

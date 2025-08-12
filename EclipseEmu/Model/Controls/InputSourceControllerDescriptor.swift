@@ -38,14 +38,6 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
 	typealias Object = ControllerProfileObject
 
     let id: String?
-
-	func predicate(system: System) -> NSPredicate {
-		if let id {
-			NSPredicate(format: "rawSystem = %d AND controllerID = %@", system.rawValue, id)
-		} else {
-			NSPredicate(format: "rawSystem = %d", system.rawValue)
-		}
-	}
     
     static func encode(_ bindings: ControllerMappings, encoder: JSONEncoder, into object: ControllerProfileObject) throws {
         object.data = try encoder.encode(bindings)
@@ -60,28 +52,32 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
         }
     }
 
-    func obtain(from game: GameObject, system: System, persistence: Persistence) -> ControllerProfileObject? {
-        guard let profiles = game.controllerProfiles as? Set<ControllerProfileObject> else { return nil }
-        return profiles.first { profile in
-            let isSystem = profile.system == system
-            if isSystem && id != nil {
-                return true
+    func obtain(for game: GameObject) -> ControllerProfileObject? {
+        if let id, let assignments = game.controllerProfileAssignments as? Set<ControllerProfileAssignmentObject> {
+            if let assignment = assignments.first(where: { $0.controllerID == id }) {
+                return assignment.profile
             }
-            
-            guard isSystem, let assignments = profile.assignments as? Set<ControllerProfileAssignmentObject> else {
-                return false
-            }
-            
-            for assignment in assignments {
-                if system == assignment.system && assignment.controllerID == id {
-                    return true
-                }
-            }
-
-            return false
         }
+        
+        return game.controllerProfile
     }
+    
+    @MainActor
+    func obtain(for system: System, persistence: Persistence, settings: Settings) -> ControllerProfileObject? {
+        if let id {
+            let request = ControllerProfileAssignmentObject.fetchRequest()
+            request.fetchLimit = 1
+            request.includesSubentities = false
+            request.sortDescriptors = [.init(keyPath: \ControllerProfileAssignmentObject.controllerID, ascending: true)]
+            request.predicate = NSPredicate(format: "rawSystem = %d AND controllerID = %@", system.rawValue, id)
+            if let assignment = try? persistence.mainContext.fetch(request).first, let profile = assignment.profile {
+                return profile
+            }
+        }
 
+        return settings.controllerSystemProfiles[system]?.tryGet(in: persistence.mainContext)
+    }
+    
     static func defaults(for system: System) -> ControllerMappings {
         switch system {
         case .gb, .gbc, .nes:
@@ -168,5 +164,9 @@ struct InputSourceControllerDescriptor: InputSourceDescriptorProtocol {
 extension GCController {
     var inputSourceDescriptor: InputSourceControllerDescriptor {
         InputSourceControllerDescriptor(id: vendorName)
+    }
+    
+    var persistentID: String {
+        vendorName ?? self.productCategory
     }
 }

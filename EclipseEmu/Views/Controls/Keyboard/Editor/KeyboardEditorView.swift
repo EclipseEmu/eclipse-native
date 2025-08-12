@@ -31,7 +31,7 @@ struct KeyboardEditorView: View {
                 }
             }
             .sheet(item: $editTarget) { target in
-                NavigationStack {
+                FormSheetView {
                     KeyboardElementEditorView(viewModel: viewModel, target: target)
                 }
             }

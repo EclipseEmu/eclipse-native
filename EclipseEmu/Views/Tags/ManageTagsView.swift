@@ -136,7 +136,7 @@ struct ManageTagsView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .sheet(isPresented: $isNewTagViewOpen) {
-            NavigationStack {
+            FormSheetView {
                 TagDetailView(mode: .create)
             }
         }

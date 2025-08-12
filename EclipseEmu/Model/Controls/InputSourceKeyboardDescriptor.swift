@@ -24,13 +24,13 @@ struct InputSourceKeyboardDescriptor: InputSourceDescriptorProtocol {
     typealias Bindings = KeyboardMappings
 	typealias Object = KeyboardProfileObject
 
-	func obtain(from game: GameObject, system: System, persistence: Persistence) -> KeyboardProfileObject? {
+	func obtain(for game: GameObject) -> KeyboardProfileObject? {
 		game.keyboardProfile
 	}
-
-	func predicate(system: System) -> NSPredicate {
-		NSPredicate(format: "rawSystem = %d", system.rawValue)
-	}
+    
+    func obtain(for system: System, persistence: Persistence, settings: Settings) -> KeyboardProfileObject? {
+        settings.keyboardSystemProfiles[system]?.tryGet(in: persistence.mainContext)
+    }
 
     static func encode(_ bindings: KeyboardMappings, encoder: JSONEncoder, into object: KeyboardProfileObject) throws {
         object.data = try encoder.encode(bindings)

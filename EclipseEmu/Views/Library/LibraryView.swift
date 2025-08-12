@@ -106,17 +106,17 @@ struct LibraryView: View {
                 Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
             }
 			.sheet(isPresented: $isFiltersViewPresented) {
-				NavigationStack {
+                FormSheetView {
 					LibraryFiltersView(systems: $filteredSystems, tags: $filteredTags)
 				}.presentationDetents([.medium, .large])
 			}
 			.sheet(isPresented: $isTagsViewPresented) {
-				NavigationStack {
+                FormSheetView {
 					TagsView()
 				}
             }
             .sheet(item: $manageTagsTarget) { target in
-                NavigationStack {
+                FormSheetView {
                     ManageTagsView(target: target)
                 }
             }
@@ -215,7 +215,6 @@ struct LibraryView: View {
                         Label("SELECT", systemImage: "checkmark.circle")
                     }
                 }
-
 
                 ToggleButton(value: $isFiltersViewPresented) {
                     Label("FILTER", systemImage: "line.3.horizontal.decrease")

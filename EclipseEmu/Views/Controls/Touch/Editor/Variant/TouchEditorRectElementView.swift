@@ -18,46 +18,56 @@ struct TouchEditorRectElementView: View {
 				.buttonStyle(.bordered)
                 .buttonBorderShape(.capsule)
                 .popover(isPresented: $isShown) {
-                    popoverContent
+                    TouchEditorRectElementPopoverView(title: title, rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
                 }
 		} label: {
 			Label(title, systemImage: systemImage)
 		}
 	}
+}
 
-	@ViewBuilder
-    var popoverContent: some View {
-		TouchEditorRectFormView(rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
-			.modify { view in
-				if #available(iOS 16.4, *) {
-					view
-						.presentationCompactAdaptation(.popover)
-						.frame(minWidth: 200, idealWidth: 300, minHeight: 200)
-						.padding()
-						.formStyle(.columns)
-						.scrollContentBackground(.hidden)
-						.modify {
-							if #available(iOS 18.0, *) {
-								$0.presentationSizing(.fitted)
-							} else {
-								$0
-							}
-						}
-				} else {
-					NavigationStack {
-						view
-							.navigationTitle(title)
-							.navigationBarTitleDisplayMode(.inline)
-							.toolbar {
-								ToolbarItem(placement: .cancellationAction) {
-									DismissButton("DONE")
-								}
-							}
-					}
-					.presentationDetents([.medium])
-				}
-			}
-	}
+private struct TouchEditorRectElementPopoverView: View {
+    @Environment(\.dismiss) private var dismiss: DismissAction
+    
+    let title: String
+    @Binding var rect: TouchMappings.RelativeRect
+    @FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
+    var yOffsetID: TouchEditorVariantView.Field
+    var xOffsetID: TouchEditorVariantView.Field
+    var sizeID: TouchEditorVariantView.Field
+    
+    var body: some View {
+        TouchEditorRectFormView(rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
+            .modify { view in
+                if #available(iOS 16.4, *) {
+                    view
+                        .presentationCompactAdaptation(.popover)
+                        .frame(minWidth: 200, idealWidth: 300, minHeight: 200)
+                        .padding()
+                        .formStyle(.columns)
+                        .scrollContentBackground(.hidden)
+                        .modify {
+                            if #available(iOS 18.0, *) {
+                                $0.presentationSizing(.fitted)
+                            } else {
+                                $0
+                            }
+                        }
+                } else {
+                    NavigationStack {
+                        view
+                            .navigationTitle(title)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    CancelButton("DONE", action: dismiss.callAsFunction)
+                                }
+                            }
+                    }
+                    .presentationDetents([.medium])
+                }
+            }
+    }
 }
 
 /// A thin wrapper around ``TouchEditorRectElementView``, which offers equatability.

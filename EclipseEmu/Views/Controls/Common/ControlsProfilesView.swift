@@ -57,7 +57,7 @@ struct ControlsProfilesView<InputSource: InputSourceDescriptorProtocol, ExtraCon
             }
         }
         .sheet(isPresented: $isCreateProfileOpen) {
-            NavigationStack {
+            FormSheetView {
                 CreateControlsProfileView<InputSource>()
             }
         }

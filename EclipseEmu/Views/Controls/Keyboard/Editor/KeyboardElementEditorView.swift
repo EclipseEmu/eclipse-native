@@ -60,7 +60,7 @@ struct KeyboardElementEditorView: View {
         .formStyle(.grouped)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                DismissButton("CANCEL")
+                CancelButton("CANCEL", action: dismiss.callAsFunction)
             }
             ToolbarItem(placement: .confirmationAction) {
                 ConfirmButton("SAVE", action: save)

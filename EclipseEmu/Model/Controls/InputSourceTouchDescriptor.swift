@@ -26,9 +26,17 @@ struct InputSourceTouchDescriptor: InputSourceDescriptorProtocol {
 		}
 	}
 
-	func obtain(from game: GameObject, system: System, persistence: Persistence) -> TouchProfileObject? {
+	func obtain(for game: GameObject) -> TouchProfileObject? {
 		game.touchProfile
 	}
+    
+    func obtain(for system: System, persistence: Persistence, settings: Settings) -> TouchProfileObject? {
+#if canImport(UIKit)
+        return settings.touchSystemProfiles[system]?.tryGet(in: persistence.mainContext)
+#else
+        return nil
+#endif
+    }
 
 	func predicate(system: System) -> NSPredicate {
 		NSPredicate(format: "rawSystem = %d", system.rawValue)
@@ -256,9 +264,9 @@ extension TouchMappings {
 	borrowing func variantIndex(for layoutClass: TouchMappings.VariantSizing) -> Int {
 		// FIXME: Test this more.
 		return variants.firstIndex(where: { $0.sizing == layoutClass })
-		?? variants.firstIndex(where: { $0.sizing.fits(in: layoutClass) })
-		?? variants.lastIndex(where: { $0.sizing == .any })
-		?? (variants.isEmpty ? -1 : 0)
+            ?? variants.firstIndex(where: { $0.sizing.fits(in: layoutClass) })
+            ?? variants.lastIndex(where: { $0.sizing == .any })
+            ?? (variants.isEmpty ? -1 : 0)
 	}
 
 	mutating func insert(_ element: inout TouchMappings.Button) -> Int {

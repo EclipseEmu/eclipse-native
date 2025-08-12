@@ -265,7 +265,7 @@ extension TouchMappings.RelativeRect {
 
 	PreviewSingleObjectView(GameObject.fetchRequest()) { game, persistence in
 		let system = System.gba
-		let bindings = ControlBindingsManager(persistence: persistence, game: .init(game), system: system)
+        let bindings = ControlBindingsManager(persistence: persistence, settings: .init(), game: .init(game), system: system)
 		let mappings = bindings.load(for: InputSourceTouchDescriptor())
 		ZStack {
 			Rectangle()

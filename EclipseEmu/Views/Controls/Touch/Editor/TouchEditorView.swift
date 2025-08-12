@@ -83,12 +83,12 @@ struct TouchEditorView: View {
 			}
 		}
 		.sheet(item: $buttonEditTarget) { editTarget in
-			NavigationStack {
+            FormSheetView {
 				TouchEditorButtonView(viewModel: viewModel, target: editTarget.id)
 			}
 		}
 		.sheet(item: $directionalEditTarget) { editTarget in
-			NavigationStack {
+            FormSheetView {
 				TouchEditorDirectionalView(viewModel: viewModel, target: editTarget.id)
 			}
 		}
@@ -141,11 +141,6 @@ struct TouchEditorView: View {
 	@inlinable
 	func deleteDirectionals(_ indices: IndexSet) {
 		viewModel.mappings.removeDirectionals(indices)
-	}
-
-	func update() {
-		// FIXME: TODO
-		dismiss()
 	}
 }
 #endif

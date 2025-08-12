@@ -7,6 +7,7 @@ struct EclipseEmuApp: App {
     @StateObject private var persistence = Persistence.shared
     @StateObject private var settings = Settings()
     @StateObject private var coreRegistry = CoreRegistry()
+    @StateObject private var connectedControllers = ConnectedControllers()
 
 #if os(macOS)
 	@Environment(\.openWindow) var openWindow: OpenWindowAction
@@ -19,9 +20,11 @@ struct EclipseEmuApp: App {
 				.persistence(persistence)
 				.environmentObject(coreRegistry)
 				.environmentObject(settings)
+                .environmentObject(connectedControllers)
                 .onAppear {
                     settings.persistenceReady(persistence)
                 }
+            
 		}
 #elseif os(macOS)
 		// NOTE: multiple windows can be supported, but controls will need to be reworked a little.
@@ -30,6 +33,7 @@ struct EclipseEmuApp: App {
 				.persistence(persistence)
 				.environmentObject(coreRegistry)
 				.environmentObject(settings)
+                .environmentObject(connectedControllers)
                 .onAppear {
                     settings.persistenceReady(persistence)
                 }
@@ -50,6 +54,7 @@ struct EclipseEmuApp: App {
                 .persistence(persistence)
                 .environmentObject(coreRegistry)
                 .environmentObject(settings)
+                .environmentObject(connectedControllers)
         }
 #endif
     }

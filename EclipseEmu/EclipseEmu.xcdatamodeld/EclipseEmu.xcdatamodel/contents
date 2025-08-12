@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24279" systemVersion="25A5316i" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24288" systemVersion="25A5327h" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CheatObject" representedClassName="CheatObject" syncable="YES" codeGenerationType="class">
         <attribute name="code" attributeType="String"/>
         <attribute name="enabled" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -11,6 +11,7 @@
     <entity name="ControllerProfileAssignmentObject" representedClassName="ControllerProfileAssignmentObject" syncable="YES" codeGenerationType="class">
         <attribute name="controllerID" optional="YES" attributeType="String"/>
         <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="game" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="GameObject" inverseName="controllerProfileAssignments" inverseEntity="GameObject"/>
         <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ControllerProfileObject" inverseName="assignments" inverseEntity="ControllerProfileObject"/>
     </entity>
     <entity name="ControllerProfileObject" representedClassName="ControllerProfileObject" syncable="YES" codeGenerationType="class">
@@ -19,7 +20,7 @@
         <attribute name="rawSystem" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="rawVersion" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="assignments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControllerProfileAssignmentObject" inverseName="profile" inverseEntity="ControllerProfileAssignmentObject"/>
-        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="controllerProfiles" inverseEntity="GameObject"/>
+        <relationship name="games" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GameObject" inverseName="controllerProfile" inverseEntity="GameObject"/>
     </entity>
     <entity name="CoreSettingsObject" representedClassName="CoreSettingsObject" syncable="YES" codeGenerationType="class">
         <attribute name="coreID" optional="YES" attributeType="String"/>
@@ -36,7 +37,8 @@
         <attribute name="saveExtension" optional="YES" attributeType="String" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="sha1" attributeType="String"/>
         <relationship name="cheats" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CheatObject" inverseName="game" inverseEntity="CheatObject"/>
-        <relationship name="controllerProfiles" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControllerProfileObject" inverseName="games" inverseEntity="ControllerProfileObject"/>
+        <relationship name="controllerProfile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ControllerProfileObject" inverseName="games" inverseEntity="ControllerProfileObject"/>
+        <relationship name="controllerProfileAssignments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ControllerProfileAssignmentObject" inverseName="game" inverseEntity="ControllerProfileAssignmentObject"/>
         <relationship name="cover" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ImageAssetObject" inverseName="game" inverseEntity="ImageAssetObject"/>
         <relationship name="keyboardProfile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="KeyboardProfileObject" inverseName="games" inverseEntity="KeyboardProfileObject"/>
         <relationship name="saveStates" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SaveStateObject" inverseName="game" inverseEntity="SaveStateObject"/>

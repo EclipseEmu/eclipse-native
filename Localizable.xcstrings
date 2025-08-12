@@ -114,6 +114,16 @@
         }
       }
     },
+    "ANY_CONTROLLER_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any Controller Profile"
+          }
+        }
+      }
+    },
     "ASCENDING" : {
       "localizations" : {
         "en" : {
@@ -284,6 +294,16 @@
         }
       }
     },
+    "CONTROL_NAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control Names"
+          }
+        }
+      }
+    },
     "CONTROL_UNBOUND" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -331,6 +351,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "B Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_CIRCLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_CROSS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cross Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_SQUARE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Square Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_TRIANGLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangle Button"
           }
         }
       }
@@ -455,12 +515,62 @@
         }
       }
     },
+    "CONTROLLER_NA" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N/A Control"
+          }
+        }
+      }
+    },
+    "CONTROLLER_NINTENDO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nintendo"
+          }
+        }
+      }
+    },
     "CONTROLLER_OPTIONS" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PLAYSTATION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PlayStation"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PROFILES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Controllers"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PROFILES_FOOTER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected controllers will appear in the list above."
           }
         }
       }
@@ -561,6 +671,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xbox"
           }
         }
       }
@@ -1193,6 +1313,16 @@
         }
       }
     },
+    "GAME_SPECIFIC_CONTROLS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game-Specific Controls"
+          }
+        }
+      }
+    },
     "GAME_UNNAMED" : {
       "localizations" : {
         "en" : {
@@ -1359,6 +1489,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keyboard"
+          }
+        }
+      }
+    },
+    "KEYBOARD_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard Profile"
           }
         }
       }
@@ -1779,6 +1919,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play Game"
+          }
+        }
+      }
+    },
+    "PROFILE_LOAD_FAILURE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load profile."
           }
         }
       }
@@ -2321,6 +2471,16 @@
         }
       }
     },
+    "TOUCH_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Profile"
+          }
+        }
+      }
+    },
     "TOUCH_PROFILES_TITLE" : {
       "localizations" : {
         "en" : {
@@ -2387,6 +2547,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Default"
+          }
+        }
+      }
+    },
+    "USING_GLOBAL_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using Global Profile"
           }
         }
       }

@@ -98,7 +98,7 @@ struct CoverPickerDatabaseView: View {
             .searchable(text: $viewModel.query)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    DismissButton("CANCEL")
+                    CancelButton("CANCEL", action: dismiss.callAsFunction)
                 }
             }
             .onReceive(viewModel.$query.debounce(for: .milliseconds(250), scheduler: RunLoop.main)) { query in

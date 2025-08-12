@@ -17,7 +17,7 @@ private extension EditorTarget where Item == TagObject {
 }
 
 struct TagDetailView: View {
-    @Environment(\.dismiss) private var dismissAction: DismissAction
+    @Environment(\.dismiss) private var dismiss: DismissAction
     @EnvironmentObject private var persistence: Persistence
 
     private let mode: EditorTarget<TagObject>
@@ -60,7 +60,7 @@ struct TagDetailView: View {
         #endif
         .toolbar {
 			ToolbarItem(placement: .cancellationAction) {
-				DismissButton("CANCEL")
+                CancelButton("CANCEL", action: dismiss.callAsFunction)
             }
 
             ToolbarItem(placement: .confirmationAction) {
@@ -75,7 +75,7 @@ struct TagDetailView: View {
             Task {
                 do {
                     try await persistence.objects.update(tag: box, name: newName, color: newColor)
-                    dismissAction()
+                    dismiss()
                 } catch {
                     // FIXME: Surface error
                     print(error)
@@ -85,7 +85,7 @@ struct TagDetailView: View {
             Task {
                 do {
                     try await persistence.objects.createTag(name: newName, color: newColor)
-                    dismissAction()
+                    dismiss()
                 } catch {
                     // FIXME: Surface error
                     print(error)
