@@ -265,8 +265,8 @@ extension TouchMappings.RelativeRect {
 
 	PreviewSingleObjectView(GameObject.fetchRequest()) { game, persistence in
 		let system = System.gba
-        let bindings = ControlBindingsManager(persistence: persistence, settings: .init(), game: .init(game), system: system)
-		let mappings = bindings.load(for: InputSourceTouchDescriptor())
+        let mappings = InputSourceTouchDescriptor.defaults(for: system)
+        
 		ZStack {
 			Rectangle()
 				.foregroundStyle(.gray)
@@ -278,7 +278,7 @@ extension TouchMappings.RelativeRect {
 				mappings: mappings,
 				coordinator: .init(
 					maxPlayers: 1,
-					bindings: bindings,
+                    bindings: .init(persistence: persistence, settings: .init(), game: .init(game), system: system),
 					reorder: { _ in }
 				),
 				namingConvention: .nintendo

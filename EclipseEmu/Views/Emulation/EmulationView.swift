@@ -41,19 +41,23 @@ struct EmulationLoaderView<Core: CoreProtocol & SendableMetatype>: View {
 	}
 
 	func load() async throws -> EmulationViewLoadedData {
-		let inputCoordinator = ControlBindingsManager(
+		let bindingManager = ControlBindingsManager(
             persistence: persistence,
             settings: settings,
             game: data.game,
             system: data.system
         )
         
+        #if canImport(UIKit)
+        let touchMappings = bindingManager.load(for: InputSourceTouchDescriptor())
+        #endif
+        
         let settings = Core.Settings()
 		let actor: CoreCoordinator<Core> = try await CoreCoordinator.init(
 			coreID: data.coreID,
 			system: data.system,
 			settings: settings,
-			bindings: inputCoordinator,
+			bindings: bindingManager,
 			reorder: { $0 }
 		)
 
@@ -64,7 +68,6 @@ struct EmulationLoaderView<Core: CoreProtocol & SendableMetatype>: View {
 		try await actor.start(romPath: romPath, savePath: savePath)
 
 		#if canImport(UIKit)
-		let touchMappings = inputCoordinator.load(for: InputSourceTouchDescriptor())
 		return .init(
 			coordinator: actor,
 			touchMappings: touchMappings,

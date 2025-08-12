@@ -20,7 +20,7 @@ struct ControlBindingsManager: ~Copyable {
         self.settings = settings
     }
 
-    func load<S: InputSourceDescriptorProtocol>(for source: S) -> S.Bindings {
+    borrowing func load<S: InputSourceDescriptorProtocol>(for source: S) -> S.Bindings {
         let config: S.Object? = if
             let game = game?.tryGet(in: persistence.mainContext),
             let config = source.obtain(for: game)
