@@ -1,13 +1,16 @@
 import Foundation
 import EclipseKit
 
-struct TestCoreSettings: CoreSettings {
+struct TestCoreSettings: CoreSettings, Codable {
 	var hello: Bool = false
 	var data: Int = 0
 	var bios: CoreSettingsFile?
-
+    
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+    
+    static let currentVersion: Int16 = 1
     static let descriptor: CoreSettingsDescriptor<Self> = .init(
-        version: 1,
         sections: [
 			.init(
 				id: 0,
@@ -29,8 +32,13 @@ struct TestCoreSettings: CoreSettings {
         ]
     )
 
-    static func migrate(_ data: Data, from oldVersion: UInt) -> TestCore.Settings {
-        .init()
+    static func decode(_ data: Data, version: Int16) throws -> TestCoreSettings {
+        guard version == 1 else { return .init() }
+        return try Self.decoder.decode(Self.self, from: data)
+    }
+    
+    func encode() throws -> Data {
+        try Self.encoder.encode(self)
     }
 }
 

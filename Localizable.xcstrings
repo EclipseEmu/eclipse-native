@@ -966,7 +966,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CONTROLS_SOURCE"
+            "value" : "Are you sure you want to delete this file?"
           }
         }
       }
@@ -1258,7 +1258,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Field Required"
+            "value" : "Required"
           }
         }
       }
@@ -2260,6 +2260,16 @@
         }
       }
     },
+    "SIZE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
     "SOCIAL" : {
       "localizations" : {
         "en" : {
@@ -2682,12 +2692,32 @@
         }
       }
     },
+    "X_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Offset"
+          }
+        }
+      }
+    },
     "X_ORIGIN" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "X Origin"
+          }
+        }
+      }
+    },
+    "Y_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Offset"
           }
         }
       }

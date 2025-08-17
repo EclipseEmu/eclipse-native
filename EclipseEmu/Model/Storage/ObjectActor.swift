@@ -609,3 +609,29 @@ extension ObjectActor {
         try objectContext.saveIfNeeded()
     }
 }
+
+// MARK: Core Settings
+
+extension ObjectActor {
+    func createCoreSettings<Core: CoreProtocol>(_ core: Core.Type) async throws -> ObjectBox<CoreSettingsObject> {
+        let settingsData = try Core.Settings().encode()
+        
+        let object: CoreSettingsObject = self.objectContext.create()
+        object.coreID = Core.id
+        object.version = Core.Settings.currentVersion
+        object.data = settingsData
+        try objectContext.saveIfNeeded()
+        
+        return .init(object)
+    }
+    
+    func updateCoreSettings<Core: CoreProtocol>(_ core: Core.Type, target: ObjectBox<CoreSettingsObject>, settings: Core.Settings) async throws {
+        let target = try target.get(in: objectContext)
+        let data = try settings.encode()
+        
+        target.version = Core.Settings.currentVersion
+        target.data = data
+        
+        try objectContext.saveIfNeeded()
+    }
+}

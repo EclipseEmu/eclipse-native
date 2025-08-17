@@ -2,14 +2,14 @@
 import SwiftUI
 
 struct TouchEditorPositionField<Field: Hashable>: View {
-	var title: String
+	var title: LocalizedStringKey
 	@Binding var value: Float
 	let alignment: NSTextAlignment
 	let id: Field
 
 	@FocusState.Binding var focusTarget: Field?
 
-	init(_ title: String, value: Binding<Float>, alignment: NSTextAlignment, focusTarget: FocusState<Field?>.Binding, id: Field) {
+	init(_ title: LocalizedStringKey, value: Binding<Float>, alignment: NSTextAlignment, focusTarget: FocusState<Field?>.Binding, id: Field) {
 		self.title = title
 		self._value = value
 		self.alignment = alignment

@@ -23,8 +23,8 @@ enum Core: Int16, RawRepresentable, Identifiable, Hashable, CaseIterable, Codabl
 	@ViewBuilder
 	var settingsView: some View {
 		switch self {
-		case .mGBA: CoreSettingsView<mGBAEclipseCore>()
-		case .testCore: CoreSettingsView<TestCore>()
+		case .mGBA: CoreView<mGBAEclipseCore>()
+		case .testCore: CoreView<TestCore>()
 		}
 	}
 

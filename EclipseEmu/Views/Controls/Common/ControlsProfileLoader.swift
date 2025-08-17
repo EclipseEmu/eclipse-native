@@ -65,7 +65,7 @@ struct ControlsProfileLoader<InputSource: InputSourceDescriptorProtocol, Content
                 try InputSource.encode(bindings, encoder: ControlsProfileLoaderEncoder.encoder, into: object)
                 try persistence.mainContext.save()
                 print("saved profile")
-            } catch {
+            } catch is CancellationError {} catch {
                 // FIXME: Surface error
                 print("failed to save profile:", error)
             }

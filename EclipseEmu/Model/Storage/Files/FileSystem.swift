@@ -3,6 +3,7 @@ import CryptoKit
 import OSLog
 import CoreImage
 
+@discardableResult
 private func createDirectory(path: String, base: URL, with fileManager: FileManager) -> URL {
     let directory = base.appendingPathComponent(path, isDirectory: true)
     if !fileManager.fileExists(atPath: directory.path) {
@@ -39,6 +40,9 @@ final actor FileSystem: Sendable {
         imageDirectory = createDirectory(path: "images", base: documentDirectory, with: fileManager)
         romDirectory = createDirectory(path: "roms", base: documentDirectory, with: fileManager)
         coreDirectory = createDirectory(path: "core", base: documentDirectory, with: fileManager)
+        for core in Core.allCases {
+            createDirectory(path: core.type.id, base: coreDirectory, with: fileManager)
+        }
     }
 
     func download(from url: URL, to destination: FileSystemPath) async throws(FileSystemError) {
@@ -162,6 +166,7 @@ final actor FileSystem: Sendable {
         case .save(let id, let ext): (id.uuidString, ext, saveDirectory)
         case .saveState(let id, let ext): (id.uuidString, ext, saveStateDirectory)
         case .image(let id, let ext): (id.uuidString, ext, imageDirectory)
+        case .coreFile(coreID: let id, fileID: let fileID, fileExtension: let ext): ("\(fileID)", ext, coreDirectory.appending(path: id, directoryHint: .isDirectory))
         case .other(_): unreachable("FileSystem.Path.other() is already handled")
         }
 
