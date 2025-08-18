@@ -12,7 +12,7 @@ enum Core: Int16, RawRepresentable, Identifiable, Hashable, CaseIterable, Codabl
 	@usableFromInline
 	var id: Int16 { self.rawValue }
 
-	var type: any (CoreProtocol & ~Copyable).Type {
+	var type: any CoreProtocol.Type {
 		switch self {
 		case .mGBA: mGBAEclipseCore.self
 		case .testCore: TestCore.self

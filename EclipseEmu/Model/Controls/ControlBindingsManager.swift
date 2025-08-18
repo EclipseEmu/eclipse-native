@@ -6,14 +6,14 @@ import CoreData
 @MainActor
 struct ControlBindingsManager: ~Copyable {
     private let persistence: Persistence
-	private let game: ObjectBox<GameObject>?
+	private let game: GameObject?
 	private let system: System
     private let settings: Settings
     
 	static let encoder: JSONEncoder = .init()
 	static let decoder: JSONDecoder = .init()
 
-    init(persistence: Persistence, settings: Settings, game: ObjectBox<GameObject>?, system: System) {
+    init(persistence: Persistence, settings: Settings, game: GameObject?, system: System) {
         self.persistence = persistence
 		self.game = game
 		self.system = system
@@ -21,10 +21,7 @@ struct ControlBindingsManager: ~Copyable {
     }
 
     borrowing func load<S: InputSourceDescriptorProtocol>(for source: S) -> S.Bindings {
-        let config: S.Object? = if
-            let game = game?.tryGet(in: persistence.mainContext),
-            let config = source.obtain(for: game)
-        {
+        let config: S.Object? = if let game, let config = source.obtain(for: game) {
             config
         } else {
             source.obtain(for: system, persistence: persistence, settings: settings)

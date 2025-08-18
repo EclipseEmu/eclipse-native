@@ -6,7 +6,7 @@ enum CoreCoordinatorError: Error {
 	case invalidAudioFormat
 }
 
-private struct CoreInstantiation<Core: SendableMetatype & CoreProtocol>: ~Copyable {
+private struct CoreInstantiation<Core: CoreProtocol>: ~Copyable {
 	let bridge: CoreCoordinator<Core>.Bridge
 	let core: Core
 }
@@ -34,7 +34,7 @@ enum EmulationSpeed: Float, CaseIterable, Equatable, Hashable {
 }
 
 @safe
-final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDisplayLinkDelegate {
+final actor CoreCoordinator<Core: CoreProtocol>: CAMetalDisplayLinkDelegate {
 	private let executor: SingleThreadedExecutor
 	let unownedExecutor: UnownedSerialExecutor
 
@@ -47,7 +47,7 @@ final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDispl
 
 	private var frameInterval: Double = 1.0
 	private var lastTimestamp: Double = .infinity
-	private var state: CoreCoordinatorState = .stopped
+	private(set) var state: CoreCoordinatorState = .stopped
 	private var initialTime: TimeInterval = 0
 	private var time: TimeInterval = 0
 	// 1000 (for ms) / 60 (for fps) / 1000 (convert to seconds)
@@ -160,7 +160,7 @@ final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDispl
 		core.stop()
 	}
 
-	func restart() async {
+	func reset() async {
 		if state == .running {
 			await audio.pause()
 			initialTime = CACurrentMediaTime()
@@ -168,9 +168,9 @@ final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDispl
 			self.displayLink?.displayLink.isPaused = true
 		}
 		await audio.clear()
-		core.reset(kind: .hard)
-		self.displayLink?.displayLink.isPaused = true
+		core.reset()
 		await audio.resume()
+        self.displayLink?.displayLink.isPaused = false
 		state = .running
 	}
 
@@ -216,8 +216,9 @@ final actor CoreCoordinator<Core: CoreProtocol & SendableMetatype>: CAMetalDispl
 		}
 	}
 
-	func setFastForward(to rate: EmulationSpeed) {
+	func setFastForward(to rate: EmulationSpeed) async {
 		self.coreFrameDuration = self.frameInterval / Double(rate.rawValue)
+        await self.audio.setRate(rate: rate.rawValue)
 	}
 
 	// MARK: Display Link Handling

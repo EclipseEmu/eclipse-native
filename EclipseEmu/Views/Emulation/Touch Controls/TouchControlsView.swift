@@ -7,14 +7,14 @@ struct TouchControlsView: UIViewControllerRepresentable {
 	let coordinator: CoreInputCoordinator
 	let namingConvention: ControlNamingConvention
 	let screenOffsetChanged: (TouchMappings.ScreenOffset) -> Void
-	let menuButtonAction: () -> Void
+    let menuButtonPlacementChanged: (CGRect) -> Void
 
     func makeUIViewController(context: Context) -> TouchControlsViewController {
         return TouchControlsViewController(
 			mappings: mappings,
 			coordinator: coordinator,
 			namingConvention: namingConvention,
-			menuButtonAction: menuButtonAction,
+            menuButtonPlacementChanged: menuButtonPlacementChanged,
 			screenOffsetChanged: screenOffsetChanged,
 		)
     }
@@ -35,7 +35,7 @@ final class TouchControlsViewController: UIViewController {
 	private let haptics: UIImpactFeedbackGenerator
 	private let touchControlsSubview: UIView
 	private let coordinator: CoreInputCoordinator
-	private let menuButton: UIButton
+    private let menuButtonPlacementChanged: (CGRect) -> Void
 	private let screenOffsetChanged: (TouchMappings.ScreenOffset) -> Void
 	var state: InputSourceState
 
@@ -43,17 +43,14 @@ final class TouchControlsViewController: UIViewController {
 		mappings: TouchMappings,
 		coordinator: CoreInputCoordinator,
 		namingConvention: ControlNamingConvention,
-		menuButtonAction: @escaping () -> Void,
+		menuButtonPlacementChanged: @escaping (CGRect) -> Void,
 		screenOffsetChanged: @escaping (TouchMappings.ScreenOffset) -> Void,
 	) {
 		self.mappings = mappings
 		self.coordinator = coordinator
-		self.menuButton = UIButton(type: .custom, primaryAction: .init { _ in menuButtonAction() })
-		menuButton.setImage(UIImage(systemName: "house.circle"), for: .normal)
-		menuButton.tintColor = .white
-		menuButton.accessibilityLabel = "Eclipse Menu"
-		self.screenOffsetChanged = screenOffsetChanged
-
+        self.menuButtonPlacementChanged = menuButtonPlacementChanged
+        self.screenOffsetChanged = screenOffsetChanged
+        
 		self.touchControlsSubview = UIView()
 		self.touchControlsSubview.translatesAutoresizingMaskIntoConstraints = false
 		self.touchControlsSubview.isMultipleTouchEnabled = true
@@ -95,7 +92,6 @@ final class TouchControlsViewController: UIViewController {
 			self.touchControlsSubview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
 		])
 
-		self.touchControlsSubview.addSubview(self.menuButton)
 		for button in buttons {
 			self.touchControlsSubview.addSubview(button)
 		}
@@ -166,10 +162,7 @@ final class TouchControlsViewController: UIViewController {
 			}
 		}
 
-		menuButton.frame = layout.menu.resolve(in: regionSize)
-		let size = menuButton.frame.height * 0.625
-		let config = UIImage.SymbolConfiguration(font: .systemFont(ofSize: size))
-		menuButton.setPreferredSymbolConfiguration(config, forImageIn: .normal)
+        menuButtonPlacementChanged(layout.menu.resolve(in: regionSize))
 		screenOffsetChanged(layout.screenOffset)
 		CATransaction.commit()
 	}
@@ -287,8 +280,8 @@ extension TouchMappings.RelativeRect {
 					width: Double(newOffset.x),
 					height: Double(newOffset.y)
 				)
-			} menuButtonAction: {
-				print("Menu Button")
+			} menuButtonPlacementChanged: { newPlacement in
+				print("Menu Button", newPlacement)
 			}
 			.padding()
 		}

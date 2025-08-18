@@ -99,7 +99,7 @@ struct TestCore: CoreProtocol {
     func play() {}
     func pause() {}
 
-    func reset(kind _: CoreResetKind) {}
+    func reset() {}
 
     func step(timestamp: CFAbsoluteTime, willRender: Bool) {
         if willRender {

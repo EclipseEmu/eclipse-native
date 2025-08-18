@@ -3,7 +3,7 @@ import SwiftUI
 import EclipseKit
 
 @MainActor
-struct GameScreenView<Core: CoreProtocol & SendableMetatype> {
+struct GameScreenView<Core: CoreProtocol> {
 	let coordinator: CoreCoordinator<Core>
 }
 
@@ -53,15 +53,13 @@ extension GameScreenView: UIViewRepresentable {
 	typealias UIViewType = CustomMetalView<Core>
 
 	func makeUIView(context: Context) -> UIViewType {
-		let view = UIViewType(coordinator: self.coordinator)
-		view.backgroundColor = .blue
-		return view
+        .init(coordinator: self.coordinator)
 	}
 
 	func updateUIView(_ uiView: UIViewType, context: Context) {}
 }
 
-final class CustomMetalView<Core: CoreProtocol & SendableMetatype>: UIView, MetalRenderingSurface {
+final class CustomMetalView<Core: CoreProtocol>: UIView, MetalRenderingSurface {
 	weak var coordinator: CoreCoordinator<Core>?
 	var metalLayer: CAMetalLayer?
 

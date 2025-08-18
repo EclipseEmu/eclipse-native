@@ -16,7 +16,7 @@
       "location" : "https://github.com/eclipseemu/core-mgba",
       "state" : {
         "branch" : "main",
-        "revision" : "127102f2e7adb478b42e9a302690d939461ce692"
+        "revision" : "df24efbfa8206640c1f7f56534322d8848f87c8d"
       }
     },
     {
@@ -25,7 +25,7 @@
       "location" : "https://github.com/eclipseemu/eclipsekit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "fb0b46f9de0eb5ce53c2e6db4b866894b3c84afc"
+        "revision" : "1b30bc0f4c70c58ea5d738aa21bc66be83fcfdec"
       }
     },
     {

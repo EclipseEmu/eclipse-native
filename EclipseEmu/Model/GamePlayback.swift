@@ -54,11 +54,12 @@ enum GamePlaybackError: LocalizedError {
     }
 }
 
-struct GamePlaybackData: Sendable {
+@MainActor
+struct GamePlaybackData {
     let coreID: Core
 	let system: System
-    let game: ObjectBox<GameObject>
-    let saveState: ObjectBox<SaveStateObject>?
+    let game: GameObject
+    let saveState: SaveStateObject?
     let romPath: FileSystemPath
     let savePath: FileSystemPath
     let cheats: [CoreCheat]
@@ -80,7 +81,7 @@ final class GamePlayback: ObservableObject {
 		let data = GamePlaybackData (
 			coreID: core,
 			system: game.system,
-			game: .init(game),
+			game: game,
 			saveState: nil,
 			romPath: game.romPath,
 			savePath: game.savePath,
@@ -107,8 +108,8 @@ final class GamePlayback: ObservableObject {
 		let data = GamePlaybackData (
 			coreID: core,
 			system: game.system,
-			game: .init(game),
-			saveState: .init(state),
+			game: game,
+			saveState: state,
 			romPath: game.romPath,
 			savePath: game.savePath,
 			cheats: cheats.compactMap(CoreCheat.init)

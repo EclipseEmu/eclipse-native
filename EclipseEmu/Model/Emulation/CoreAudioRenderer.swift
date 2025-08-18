@@ -237,9 +237,9 @@ final actor CoreAudioRenderer {
 		self.resume()
 	}
 #else
-	static func setRequireRinger(requireRinger: Bool) {
+	static func ignoreSilentMode(_ value: Bool) {
 		do {
-			try AVAudioSession.sharedInstance().setCategory(requireRinger ? .ambient : .playback)
+            try AVAudioSession.sharedInstance().setCategory(value ? .playback : .ambient)
 		} catch {
 			Logger.emulation.warning("audio renderer - failed to set audio category: \(error)")
 		}

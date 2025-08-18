@@ -110,7 +110,7 @@ final class TouchControlsDirectionalPadView: UIView, TouchControlsDirectionalVie
 		if lastX != x || lastY != y {
 			parent.state.enqueue(
 				directional.input,
-				value: .init(Float32(x), Float32(y)),
+				value: .init(Float32(x), Float32(-y)),
 				control: self.id,
 				player: 0,
 				deque: coordinator.states

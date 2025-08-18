@@ -105,7 +105,7 @@ struct InputSourceTouchDescriptor: InputSourceDescriptorProtocol {
 					)
 				],
 				directionals: [
-					.init(id: 0, input: .dpad, deadzone: 0.5, style: .dpad),
+                    .init(id: 0, input: .dpad, deadzone: 0.5, style: .dpad),
 				],
 				buttons: [
 					.init(id: 0, input: .faceButtonDown),

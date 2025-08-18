@@ -2,7 +2,7 @@ import SwiftUI
 import EclipseKit
 import CoreData
 
-struct CoreView<Core: CoreProtocol & SendableMetatype>: View {
+struct CoreView<Core: CoreProtocol>: View {
     @EnvironmentObject private var persistence: Persistence
     @State private var state: LoadingState = .loading
     

@@ -304,17 +304,6 @@
         }
       }
     },
-    "CONTROL_UNBOUND" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unbound"
-          }
-        }
-      }
-    },
     "CONTROLLER" : {
       "localizations" : {
         "en" : {
@@ -1181,17 +1170,6 @@
         }
       }
     },
-    "EDIT_PROFILE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Profile"
-          }
-        }
-      }
-    },
     "EDIT_TAG" : {
       "localizations" : {
         "en" : {
@@ -1238,17 +1216,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Save"
-          }
-        }
-      }
-    },
-    "FAST_FORWARD" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fast Forward"
           }
         }
       }
@@ -1556,6 +1523,16 @@
         }
       }
     },
+    "LOAD_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load State"
+          }
+        }
+      }
+    },
     "LOADING" : {
       "localizations" : {
         "en" : {
@@ -1607,7 +1584,6 @@
       }
     },
     "MENU" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2123,6 +2099,36 @@
         }
       }
     },
+    "RESET_GAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "RESET_GAME_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any unsaved data will be lost."
+          }
+        }
+      }
+    },
+    "RESET_GAME_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to reset?"
+          }
+        }
+      }
+    },
     "RESET_SETTINGS" : {
       "localizations" : {
         "en" : {
@@ -2157,7 +2163,6 @@
       }
     },
     "SAVE_STATE" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2450,17 +2455,6 @@
         }
       }
     },
-    "TOGGLE_PLAY_PAUSE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play/Pause"
-          }
-        }
-      }
-    },
     "TOP" : {
       "localizations" : {
         "en" : {
@@ -2658,6 +2652,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volume"
+          }
+        }
+      }
+    },
+    "VOLUME %@%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume %@%"
           }
         }
       }

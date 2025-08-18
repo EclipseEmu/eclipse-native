@@ -94,10 +94,13 @@ final class TouchControlsJoystickView: UIView, TouchControlsDirectionalViewProto
 		let location = touch.location(in: self)
 		var x = ((location.x / frame.width) * 2) - 1
 		var y = ((location.y / frame.height) * 2) - 1
+        
+        let xValue = abs(Float32(x)) >= directional.deadzone ? Float32(x) : CoreInputDelta.IGNORE_VALUE
+        let yValue = abs(Float32(y)) >= directional.deadzone ? Float32(-y) : CoreInputDelta.IGNORE_VALUE
 
-		parent.state.enqueue(
+        parent.state.enqueue(
 			directional.input,
-			value: .init(Float32(x), Float32(y)),
+			value: .init(xValue, yValue),
 			control: self.id,
 			player: 0,
 			deque: coordinator.states

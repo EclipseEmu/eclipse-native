@@ -634,4 +634,19 @@ extension ObjectActor {
         
         try objectContext.saveIfNeeded()
     }
+    
+    func loadCoreSettings<Core: CoreProtocol>(_ core: Core.Type) async -> Core.Settings {
+        let request = CoreSettingsObject.fetchRequest()
+        request.predicate = NSPredicate(format: "coreID == %@", Core.id)
+        
+        return if
+            let object = try? objectContext.fetch(request).first,
+            let data = object.data,
+            let settings = try? Core.Settings.decode(data, version: object.version)
+        {
+            settings
+        } else {
+            Core.Settings()
+        }
+    }
 }
