@@ -85,7 +85,7 @@ extension ControlsProfilesView where ExtraContent == EmptyView {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     NavigationStack {
         ControlsProfilesView<InputSourceKeyboardDescriptor, _>(title: "KEYBOARD_PROFILES_TITLE", settings: .constant([:]))
     }

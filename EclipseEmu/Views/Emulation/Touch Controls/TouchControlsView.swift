@@ -253,7 +253,7 @@ extension TouchMappings.RelativeRect {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage()), .portrait, .landscapeLeft) {
+#Preview(traits: .previewStorage, .portrait, .landscapeLeft) {
 	@Previewable @State var screenOffset: CGSize = .init(width: 0, height: 0)
 
 	PreviewSingleObjectView(GameObject.fetchRequest()) { game, persistence in

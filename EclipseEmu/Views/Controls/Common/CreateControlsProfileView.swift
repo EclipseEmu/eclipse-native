@@ -90,7 +90,7 @@ struct CreateControlsProfileView<InputSource: InputSourceDescriptorProtocol>: Vi
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     NavigationStack {
         CreateControlsProfileView<InputSourceKeyboardDescriptor>()
     }

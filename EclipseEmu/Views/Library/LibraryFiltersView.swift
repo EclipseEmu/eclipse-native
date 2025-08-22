@@ -70,7 +70,7 @@ struct LibraryFiltersView: View {
 }
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     @Previewable @State var systems: Set<System> = []
     @Previewable @State var tags: Set<TagObject> = []
 

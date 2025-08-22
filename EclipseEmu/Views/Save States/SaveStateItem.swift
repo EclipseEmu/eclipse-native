@@ -57,6 +57,7 @@ struct SaveStateItem: View {
                 .aspectRatio(3 / 2, contentMode: .fit)
                 .overlay(alignment: .bottomLeading) {
                     Text("AUTO")
+                        .font(.caption)
                         .textCase(.uppercase)
                         .font(.caption)
                         .fontWeight(.semibold)
@@ -107,7 +108,7 @@ struct SaveStateItem: View {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     @Previewable @State var renameTarget: SaveStateObject?
     @Previewable @State var deleteTarget: SaveStateObject?
 

@@ -140,7 +140,7 @@ struct EditCheatView: View {
 }
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             EditCheatView(cheat: nil, game: game, cheatFormats: [])

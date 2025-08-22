@@ -66,7 +66,7 @@ struct ControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>:
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     @Previewable @State var profile: KeyboardProfileObject?
     NavigationStack {
         ControlsProfilePicker(profile: $profile, system: .gba) {

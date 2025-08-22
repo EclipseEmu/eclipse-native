@@ -73,7 +73,7 @@ struct TagsView: View {
 }
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     NavigationStack {
         TagsView()
     }

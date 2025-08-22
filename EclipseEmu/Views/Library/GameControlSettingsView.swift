@@ -83,7 +83,7 @@ private struct GameSpecificControllerProfileView: View {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             GameControlSettingsView(game: game)

@@ -2,58 +2,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 import OSLog
 
-private enum GameViewError: LocalizedError {
-    case saveFileDoesNotExist
-    case playbackError(GamePlaybackError)
-
-    case saveFileImport(any Error)
-    case saveFileExport(any Error)
-    case saveFileDelete(FileSystemError)
-    case replaceROM(any Error)
-
-    case unknown(any Error)
-
-    var errorDescription: String? {
-        return switch self {
-        case .playbackError(let error): error.errorDescription ?? error.localizedDescription
-        case .saveFileDoesNotExist: "The save file does not exist."
-        case .saveFileDelete(let error):
-            "An error occurred while deleting the save: \(error.errorDescription ?? error.localizedDescription)"
-        case .saveFileImport(let error):
-            "An error occurred while importing the save: \((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)"
-        case .saveFileExport(let error):
-            "An error occurred while exporting the save: \((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)"
-        case .replaceROM(let error):
-            "An error occurred while replacing the ROM: \((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)"
-        case .unknown(let error):
-            "An unknown error occurred: \((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)"
-        }
-    }
-}
-
-private struct SaveFileDocument: FileDocument {
-    static let readableContentTypes = [UTType.save]
-    let data: URL
-    let fileName: String?
-
-    private struct EmptyError: Error {}
-
-    init(url: URL, fileName: String) {
-        self.data = url
-        self.fileName = fileName
-    }
-
-    init(configuration: ReadConfiguration) throws {
-        throw EmptyError()
-    }
-
-    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let wrapper = try FileWrapper(url: data)
-        wrapper.preferredFilename = self.fileName
-        return wrapper
-    }
-}
-
 private struct HeaderBackground: View {
     private let coordinateSpace: CoordinateSpace
     private let color: Color
@@ -309,7 +257,7 @@ struct GameView: View {
 
             Divider()
 
-            Button(action: manageTags) {
+            ToggleButton(value: $isManageTagsOpen) {
                 Label("MANAGE_TAGS", systemImage: "tag")
             }
             
@@ -389,15 +337,15 @@ struct GameView: View {
     private func rename() {
         self.renameTarget = self.game
     }
+}
 
-    private func manageTags() {
-        self.isManageTagsOpen = true
-    }
+// MARK: Playback
 
+extension GameView {
     private func play() {
         Task {
             do {
-				try await playback.play(game: game, persistence: persistence, coreRegistry: coreRegistry)
+                try await playback.play(game: game, persistence: persistence, coreRegistry: coreRegistry)
             } catch {
                 self.error = .playbackError(error as! GamePlaybackError)
             }
@@ -543,7 +491,7 @@ extension GameView {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             GameView(game: game, coverColor: Color.red)

@@ -60,7 +60,7 @@ struct SaveStatesView: View {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         SaveStatesView(game: game) { _ in }
     }

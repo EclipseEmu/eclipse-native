@@ -11,7 +11,7 @@ struct KeyboardProfilesView: View {
 }
 
 @available(iOS 18, macOS 15, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     NavigationStack {
         KeyboardProfilesView()
     }

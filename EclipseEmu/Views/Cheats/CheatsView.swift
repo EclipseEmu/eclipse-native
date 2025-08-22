@@ -104,7 +104,7 @@ struct CheatsView: View {
 }
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
             CheatsView(game: game, coreRegistry: .init())

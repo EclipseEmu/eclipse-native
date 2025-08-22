@@ -7,7 +7,7 @@ struct PreviewStorage: PreviewModifier {
         try persistence.mainContext.saveIfNeeded()
         return persistence
     }
-
+    
     private static func insertGames(into persistence: Persistence) {
         let objectContext = persistence.mainContext
 
@@ -45,4 +45,9 @@ struct PreviewStorage: PreviewModifier {
     func body(content: Content, context: Persistence) -> some View {
         content.persistence(context)
     }
+}
+
+@available(iOS 18.0, macOS 15.0, *)
+extension PreviewTrait where T == Preview.ViewTraits {
+    @MainActor static var previewStorage: Self = .modifier(PreviewStorage())
 }

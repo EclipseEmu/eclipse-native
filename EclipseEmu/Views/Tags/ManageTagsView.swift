@@ -150,7 +150,7 @@ struct ManageTagsView: View {
 // MARK: Preview
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
+#Preview(traits: .previewStorage) {
     @Previewable @StateObject var navigationManager = NavigationManager()
 
     NavigationStack(path: $navigationManager.path) {
