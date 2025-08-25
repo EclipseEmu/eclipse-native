@@ -10,9 +10,6 @@ struct SaveStatesView: View {
     @ObservedObject private var game: GameObject
     private let action: (SaveStateObject) -> Void
 
-    @State private var renameTarget: SaveStateObject?
-    @State private var deleteTarget: SaveStateObject?
-
     init(game: GameObject, action: @escaping (SaveStateObject) -> Void) {
         let request = SaveStateObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
@@ -33,14 +30,7 @@ struct SaveStatesView: View {
                 spacing: 16.0
             ) {
                 ForEach(saveStates) { saveState in
-                    SaveStateItem(
-                        saveState,
-                        title: .name,
-                        formatter: dateFormatter,
-                        renameTarget: $renameTarget,
-                        deleteTarget: $deleteTarget,
-                        action: action
-                    )
+                    SaveStateItem(saveState, title: .name, action: action)
                 }
             }
             .padding()
@@ -51,10 +41,6 @@ struct SaveStatesView: View {
             } description: {
                 Text("NO_SAVE_STATES_MESSAGE")
             }
-        }
-        .renameItem("RENAME_SAVE_STATE", item: $renameTarget)
-        .deleteItem("DELETE_SAVE_STATE", item: $deleteTarget) { saveState in
-            Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? String(localized: "SAVE_STATE_UNNAMED"))")
         }
     }
 }

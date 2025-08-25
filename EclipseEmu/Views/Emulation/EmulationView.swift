@@ -42,10 +42,12 @@ struct EmulationView<Core: CoreProtocol>: View {
                 namingConvention: viewModel.coordinator.system.controlNamingConvention
 			) { newScreenOffset in
 				Task { @MainActor in
-					self.screenOffset = .init(width: CGFloat(newScreenOffset.x), height: CGFloat(newScreenOffset.y))
+					screenOffset = .init(width: CGFloat(newScreenOffset.x), height: CGFloat(newScreenOffset.y))
 				}
             } menuButtonPlacementChanged: { rect in
-                menuOffset = rect
+                Task { @MainActor in
+                    menuOffset = rect
+                }
             }
 			.padding(.horizontal)
 #endif

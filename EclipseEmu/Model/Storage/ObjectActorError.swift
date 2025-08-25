@@ -1,6 +1,6 @@
 import Foundation
 
-enum GameError: LocalizedError {
+enum GameObjectError: LocalizedError {
     case failedToAccessSecurityScopedResource
     case failedToGetReadPermissions
     case unknownFileType
@@ -18,7 +18,7 @@ enum GameError: LocalizedError {
     }
 }
 
-enum SaveStateError: Error {
+enum SaveStateObjectError: Error {
     case failedToCreateSaveState
     case persistence(PersistenceError)
     case files(FileSystemError)
@@ -32,7 +32,7 @@ enum SaveStateError: Error {
     }
 }
 
-enum ImageAssetError: Error {
+enum ImageAssetObjectError: Error {
     case network(any Error)
     case persistence(PersistenceError)
     case files(FileSystemError)

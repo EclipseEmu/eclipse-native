@@ -2,20 +2,29 @@ import SwiftUI
 import EclipseKit
 import GameController
 
-struct GameControlSettingsView: View {
+struct GameSettingsView: View {
     @EnvironmentObject private var persistence: Persistence
+    @EnvironmentObject private var coreRegistry: CoreRegistry
     @Environment(\.dismiss) private var dismiss: DismissAction
     @ObservedObject var game: GameObject
 
     var body: some View {
         Form {
-#if canImport(UIKit)
-            ControlsProfilePicker(profile: $game.touchProfile, defaultProfileLabel: "USING_GLOBAL_PROFILE", system: game.system) {
-                Text("TOUCH_PROFILE")
+            Section {
+                CorePickerView("CORE_OVERRIDE", selection: $game.core, system: game.system, coreRegistry: coreRegistry)
+            } footer: {
+                Text("CORE_OVERRIDE_DESCRIPTION")
             }
+            
+            Section {
+#if canImport(UIKit)
+                ControlsProfilePicker(profile: $game.touchProfile, defaultProfileLabel: "USING_GLOBAL_PROFILE", system: game.system) {
+                    Text("TOUCH_PROFILE")
+                }
 #endif
-            ControlsProfilePicker(profile: $game.keyboardProfile, defaultProfileLabel: "USING_GLOBAL_PROFILE", system: game.system) {
-                Text("KEYBOARD_PROFILE")
+                ControlsProfilePicker(profile: $game.keyboardProfile, defaultProfileLabel: "USING_GLOBAL_PROFILE", system: game.system) {
+                    Text("KEYBOARD_PROFILE")
+                }
             }
             
             Section {
@@ -33,7 +42,7 @@ struct GameControlSettingsView: View {
         }
         .onReceive(game.objectWillChange, perform: gameUpdated)
         .formStyle(.grouped)
-        .navigationTitle("GAME_SPECIFIC_CONTROLS")
+        .navigationTitle("GAME_SETTINGS")
 #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
 #endif
@@ -86,7 +95,7 @@ private struct GameSpecificControllerProfileView: View {
 #Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
-            GameControlSettingsView(game: game)
+            GameSettingsView(game: game)
         }
     }
 }

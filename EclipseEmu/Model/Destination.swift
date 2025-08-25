@@ -24,10 +24,6 @@ enum Destination: Hashable, Equatable {
 
 	case manageTags
 	case editTag(TagObject)
-
-	case game(GameObject)
-	case saveStates(GameObject)
-	case cheats(GameObject)
 }
 
 extension NavigationLink where Label: View, Destination == Never {
@@ -52,12 +48,6 @@ extension Destination {
 			TagsView()
 		case .editTag(let tag):
 			TagDetailView(mode: .edit(tag))
-		case .game(let game):
-			GameView(game: game)
-		case .saveStates(let game):
-			GameSaveStatesView(game: game)
-		case .cheats(let game):
-			CheatsView(game: game, coreRegistry: coreRegistry)
 		case .keyboardProfiles:
 			KeyboardProfilesView()
         case .keyboardProfile(let profile):

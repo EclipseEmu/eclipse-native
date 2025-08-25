@@ -1,6 +1,27 @@
 import SwiftUI
 import CoreData
 
+struct RenameConfirmationViewModifier: ViewModifier {
+    let titleKey: LocalizedStringKey
+    @Binding var isPresented: Bool
+    let perform: (String) -> Void
+    @State private var newName: String = ""
+
+    func body(content: Content) -> some View {
+        content
+            .alert(titleKey, isPresented: $isPresented) {
+                TextField("NEW_NAME", text: $newName)
+                Button("CANCEL", role: .cancel) {}
+                Button("RENAME", action: confirm)
+                    .disabled(newName.isEmpty)
+            }
+    }
+
+    private func confirm() {
+        perform(newName)
+    }
+}
+
 struct RenameItemViewModifier<T: RenameableObject>: ViewModifier {
     let titleKey: LocalizedStringKey
 
@@ -10,15 +31,10 @@ struct RenameItemViewModifier<T: RenameableObject>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .alert(titleKey, isPresented: .isSome($item)) {
-                TextField("NEW_NAME", text: $newName)
-                Button("CANCEL", role: .cancel) {}
-                Button("RENAME", action: perform)
-                    .disabled(newName.isEmpty)
-            }
+            .modifier(RenameConfirmationViewModifier(titleKey: titleKey, isPresented: .isSome($item), perform: perform))
     }
 
-    private func perform() {
+    private func perform(newName: String) {
         guard let item else { return }
         Task {
             do {
@@ -32,6 +48,14 @@ struct RenameItemViewModifier<T: RenameableObject>: ViewModifier {
 }
 
 extension View {
+    func renameItem(
+        _ titleKey: LocalizedStringKey,
+        isPresented: Binding<Bool>,
+        perform: @escaping (String) -> Void
+    ) -> some View {
+        modifier(RenameConfirmationViewModifier(titleKey: titleKey, isPresented: isPresented, perform: perform))
+    }
+    
     func renameItem<T: RenameableObject>(_ titleKey: LocalizedStringKey, item: Binding<T?>) -> some View {
         modifier(RenameItemViewModifier(titleKey: titleKey, item: item))
     }

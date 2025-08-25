@@ -1,4 +1,5 @@
 import Combine
+import CoreData
 import EclipseKit
 import Foundation
 import SwiftUI
@@ -8,7 +9,8 @@ struct CheatsView: View {
 
     @ObservedObject var game: GameObject
     let cheatFormats: [CoreCheatFormat]
-    @Environment(\.managedObjectContext) var viewContext
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Environment(\.dismiss) var dismiss: DismissAction
     @EnvironmentObject var persistence: Persistence
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<CheatObject>
     @State var isAddViewOpen = false
@@ -49,12 +51,16 @@ struct CheatsView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                CancelButton("DONE", action: dismiss.callAsFunction)
+            }
+            
 #if !os(macOS)
             ToolbarItem {
                 EditButton()
             }
 #endif
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .primaryAction) {
                 ToggleButton(value: $isAddViewOpen) {
                     Label("ADD_CHEAT", systemImage: "plus")
                 }

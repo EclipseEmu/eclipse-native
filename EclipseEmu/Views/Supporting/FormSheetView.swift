@@ -15,6 +15,7 @@ struct FormSheetView<Content: View>: View {
     var body: some View {
         NavigationStack {
             content()
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
     #endif

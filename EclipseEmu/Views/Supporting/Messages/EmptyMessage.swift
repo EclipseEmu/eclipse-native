@@ -29,21 +29,6 @@ struct EmptyMessage: View {
     }
     
     @ViewBuilder
-    static func freestanding(title: @escaping () -> Text, message: @escaping () -> Text) -> some View {
-        EmptyMessage(title: title, message: message)
-            .padding()
-            .frame(minWidth: 0, maxWidth: .infinity)
-            .backgroundSecondary()
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
-            .padding(.horizontal)
-    }
-    
-    @ViewBuilder
-    static func freestanding(title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
-        Self.freestanding(title: { Text(title) }, message: { Text(message) })
-    }
-    
-    @ViewBuilder
     static func listItem(title: @escaping () -> Text, message: @escaping () -> Text) -> some View {
         EmptyMessage(title: title, message: message)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -54,14 +39,6 @@ struct EmptyMessage: View {
     @ViewBuilder
     static func listItem(title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
         Self.listItem(title: { Text(title) }, message: { Text(message) })
-    }
-}
-
-#Preview("Freestanding") {
-    EmptyMessage.freestanding {
-        Text("Missing Content")
-    } message: {
-        Text("Lorem ipsum dolor sunt")
     }
 }
 

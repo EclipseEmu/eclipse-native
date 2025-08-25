@@ -27,7 +27,7 @@ final class CoreRegistry: ObservableObject {
 	}
 
 	func get(for game: GameObject) -> Core? {
-		self.get(for: game.system)
+        return game.core ?? self.get(for: game.system)
 	}
 
 	func get(for system: System) -> Core? {

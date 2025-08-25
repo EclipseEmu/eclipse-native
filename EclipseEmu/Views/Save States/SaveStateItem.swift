@@ -6,31 +6,23 @@ enum SaveStateItemTitle: Equatable {
 }
 
 struct SaveStateItem: View {
+    private static let formatter: RelativeDateTimeFormatter = .init()
+    
     @EnvironmentObject private var persistence: Persistence
-
+    
     @ObservedObject private var saveState: SaveStateObject
-    @Binding private var renameTarget: SaveStateObject?
-    @Binding private var deleteTarget: SaveStateObject?
-    private let formatter: RelativeDateTimeFormatter
     private let titleValue: SaveStateItemTitle
     private let action: (SaveStateObject) -> Void
-
-    init(
-        _ saveState: SaveStateObject,
-        title: SaveStateItemTitle,
-        formatter: RelativeDateTimeFormatter,
-        renameTarget: Binding<SaveStateObject?>,
-        deleteTarget: Binding<SaveStateObject?>,
-        action: @escaping (SaveStateObject) -> Void
-    ) {
+    
+    @State private var isDeleteOpen: Bool = false
+    @State private var isRenameOpen: Bool = false
+    
+    init(_ saveState: SaveStateObject, title: SaveStateItemTitle, action: @escaping (SaveStateObject) -> Void) {
         self.saveState = saveState
-        self.formatter = formatter
         self.titleValue = title
-        self._renameTarget = renameTarget
-        self._deleteTarget = deleteTarget
         self.action = action
     }
-
+    
     var title: Text {
         switch titleValue {
         case .name:
@@ -42,10 +34,13 @@ struct SaveStateItem: View {
             Text(saveState.game?.name ?? "GAME")
         }
     }
-
+    
     var body: some View {
         Button(action: selected) {
-            DualLabeledImage(title: title, subtitle: Text(saveState.date ?? Date(), formatter: formatter)) {
+            DualLabeledImage(
+                title: title,
+                subtitle: Text(saveState.date ?? Date(), formatter: Self.formatter)
+            ) {
                 LocalImage(saveState.preview) { image in
                     image
                         .resizable()
@@ -54,7 +49,10 @@ struct SaveStateItem: View {
                     RoundedRectangle(cornerRadius: 8.0)
                         .foregroundStyle(.secondary)
                 }
-                .aspectRatio(3 / 2, contentMode: .fit)
+                .aspectRatio(
+                    CGFloat(saveState.game?.system.screenAspectRatio ?? 3 / 2),
+                    contentMode: .fit
+                )
                 .overlay(alignment: .bottomLeading) {
                     Text("AUTO")
                         .font(.caption)
@@ -74,36 +72,43 @@ struct SaveStateItem: View {
         }
         .buttonStyle(.plain)
         .contextMenu {
-            if let game = saveState.game, titleValue == .game {
-                NavigationLink(to: .game(game)) {
-                    Label("GO_TO_GAME", systemImage: "arrow.right.square")
-                }
-            }
             if !self.saveState.isAuto {
-                Button {
-                    self.renameTarget = self.saveState
-                } label: {
+                ToggleButton(value: $isRenameOpen) {
                     Label("RENAME", systemImage: "character.cursor.ibeam")
                 }
             }
-            Button(role: .destructive, action: self.delete) {
+            ToggleButton(role: .destructive, value: $isDeleteOpen) {
                 Label("DELETE", systemImage: "trash")
             }
         }
+        .renameItem("RENAME_SAVE_STATE", isPresented: $isRenameOpen, perform: rename)
+        .deleteItem("DELETE_SAVE_STATE", isPresented: $isDeleteOpen, perform: delete) {
+            Text("DELETE_SAVE_STATE_MESSAGE")
+        }
     }
-
-    private func delete() {
+    
+    private func selected() {
+        self.action(self.saveState)
+    }
+    
+    private func rename(_ newName: String) {
         Task {
             do {
-                try await persistence.objects.delete(.init(saveState))
+                try await persistence.objects.rename(.init(saveState), to: newName)
             } catch {
+                // FIXME: Surface error
                 print(error)
             }
         }
     }
-
-    private func selected() {
-        self.action(self.saveState)
+    
+    private func delete() async {
+        do {
+            try await persistence.objects.delete(.init(saveState))
+        } catch {
+            // FIXME: Surface error
+            print(error)
+        }
     }
 }
 
@@ -113,12 +118,6 @@ struct SaveStateItem: View {
     @Previewable @State var deleteTarget: SaveStateObject?
 
     PreviewSingleObjectView(SaveStateObject.fetchRequest()) { item, _ in
-        SaveStateItem(
-            item,
-            title: .name,
-            formatter: RelativeDateTimeFormatter(),
-            renameTarget: $renameTarget,
-            deleteTarget: $deleteTarget
-        ) { _ in }
+        SaveStateItem(item, title: .name) { _ in }
     }
 }

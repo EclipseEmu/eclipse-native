@@ -20,7 +20,16 @@ extension GameObject {
             self.rawSystem = Int16(newValue.rawValue)
         }
     }
-
+    
+    var core: Core? {
+        get {
+            Core(rawValue: rawCore)
+        }
+        set {
+            self.rawCore = newValue?.rawValue ?? Core.noneIntValue
+        }
+    }
+    
     @discardableResult
     static func create(
         in context: NSManagedObjectContext,

@@ -19,6 +19,10 @@ struct FileImportType: Sendable {
     ) -> Self {
         .init(types: UTType.allRomFileTypes, allowsMultipleSelection: multiple, completion: completion)
     }
+    
+    static func saveState(completion: @Sendable @escaping (Result<[URL], any Error>) -> Void) -> Self {
+        .init(types: [.saveState], allowsMultipleSelection: false, completion: completion)
+    }
 
     static func saves(completion: @Sendable @escaping (Result<[URL], any Error>) -> Void) -> Self {
         .init(types: [.save], allowsMultipleSelection: false, completion: completion)

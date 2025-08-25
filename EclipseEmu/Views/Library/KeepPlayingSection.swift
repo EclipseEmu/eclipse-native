@@ -2,25 +2,17 @@ import SwiftUI
 import CoreData
 
 struct KeepPlayingSection: View {
-    let saveStateDateFormatter = RelativeDateTimeFormatter()
-
-	@EnvironmentObject var persistence: Persistence
-    @EnvironmentObject var playback: GamePlayback
-	@EnvironmentObject var coreRegistry: CoreRegistry
-
-    @FetchRequest<SaveStateObject>(sortDescriptors: [])
-    var keepPlaying: FetchedResults<SaveStateObject>
-
-    @State private var renameSaveStateTarget: SaveStateObject?
-    @State private var deleteSaveStateTarget: SaveStateObject?
-
-    init() {
+    static let fetchRequest: NSFetchRequest = {
         let fetchRequest = SaveStateObject.fetchRequest()
         fetchRequest.fetchLimit = 10
         fetchRequest.sortDescriptors = [.init(keyPath: \SaveStateObject.date, ascending: false)]
         fetchRequest.predicate = NSPredicate(format: "isAuto == true")
-        _keepPlaying = FetchRequest(fetchRequest: fetchRequest)
-    }
+        return fetchRequest
+    }()
+    
+    @ObservedObject var viewModel: LibraryViewModel
+    @FetchRequest<SaveStateObject>(fetchRequest: Self.fetchRequest)
+    private var keepPlaying: FetchedResults<SaveStateObject>
 
     var body: some View {
         if !keepPlaying.isEmpty {
@@ -29,15 +21,7 @@ struct KeepPlayingSection: View {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing: 16.0) {
                             ForEach(keepPlaying) { saveState in
-                                SaveStateItem(
-                                    saveState,
-                                    title: .game,
-                                    formatter: self.saveStateDateFormatter,
-                                    renameTarget: $renameSaveStateTarget,
-                                    deleteTarget: $deleteSaveStateTarget,
-                                    action: self.saveStateSelected
-                                )
-                                .frame(height: 226.0)
+                                KeepPlayingItemView(saveState: saveState, viewModel: viewModel)
                             }
                         }
                         .padding([.horizontal, .bottom])
@@ -62,19 +46,38 @@ struct KeepPlayingSection: View {
                     .sectionHeaderStyle()
                     .padding([.horizontal, .top])
             }
-            .renameItem("RENAME_SAVE_STATE", item: $renameSaveStateTarget)
-            .deleteItem("DELETE_SAVE_STATE", item: $deleteSaveStateTarget) { saveState in
-                Text("DELETE_SAVE_STATE_MESSAGE \(saveState.name ?? String(localized: "SAVE_STATE_UNNAMED"))")
-            }
         }
     }
+}
 
-    func saveStateSelected(_ saveState: SaveStateObject) {
+private struct KeepPlayingItemView: View {
+    @EnvironmentObject private var persistence: Persistence
+    @EnvironmentObject private var playback: GamePlayback
+    @EnvironmentObject private var coreRegistry: CoreRegistry
+
+    @ObservedObject var saveState: SaveStateObject
+    @ObservedObject var viewModel: LibraryViewModel
+    @State private var error: GameViewError?
+
+    var body: some View {
+        SaveStateItem(saveState, title: .game, action: self.action)
+            .frame(height: 226.0)
+            .modify {
+                if let game = saveState.game {
+                    $0.gameErrorHandler(game: game, error: $error, fileImportRequest: $viewModel.fileImportRequest)
+                } else {
+                    $0
+                }
+            }
+    }
+
+    private func action(_ saveState: SaveStateObject) {
         Task { @MainActor in
             do {
-				try await playback.play(state: saveState, persistence: persistence, coreRegistry: coreRegistry)
+                try await playback.play(state: saveState, persistence: persistence, coreRegistry: coreRegistry)
             } catch {
                 print(error)
+                self.error = .playbackError(error as! GamePlaybackError)
             }
         }
     }

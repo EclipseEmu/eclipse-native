@@ -33,9 +33,9 @@ struct CoverPickerViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .photosImporter(isPresented: .isSome($photosSheet), onSelection: handleImageSelected)
-            .sheet(item: $method) { mode in
+            .sheet(item: $databaseSheet) { game in
                 FormSheetView {
-                    CoverPickerDatabaseView(game: mode.game)
+                    CoverPickerDatabaseView(game: game)
                 }
             }
     }

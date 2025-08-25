@@ -18,9 +18,10 @@ struct DualLabeledImage<Content: View>: View {
                 title
                     .font(.footnote.weight(.medium))
                     .lineLimit(1)
+                    .foregroundStyle(Color.primary)
                 subtitle
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
                     .lineLimit(1)
             }
             .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)

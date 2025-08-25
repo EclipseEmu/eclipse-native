@@ -3,27 +3,24 @@ import SwiftUI
 import EclipseKit
 
 struct LibraryFiltersView: View {
+    @ObservedObject var viewModel: LibraryViewModel
     @Environment(\.dismiss) private var dismiss: DismissAction
-
+    
     @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
     private var allTags: FetchedResults<TagObject>
-
-    @Binding var systems: Set<System>
-    @Binding var tags: Set<TagObject>
 
     var body: some View {
         Form {
             Section {
                 ForEach(System.concreteCases, id: \.rawValue) { system in
                     Toggle(isOn: .init(get: {
-                        systems.contains(system)
+                        viewModel.filteredSystems.contains(system)
                     }, set: { newValue in
                         withAnimation(.easeInOut(duration: 0.15)) {
-                            systems.toggle(system, if: newValue)
+                            viewModel.filteredSystems.toggle(system, if: newValue)
                         }
                     })) {
-                        Text(system.string)
-                            .foregroundStyle(Color.primary)
+                        Text(system.string).foregroundStyle(Color.primary)
                     }
                 }
             } header: {
@@ -33,15 +30,14 @@ struct LibraryFiltersView: View {
             Section {
                 ForEach(allTags) { tag in
                     Toggle(isOn: .init(get: {
-                        tags.contains(tag)
+                        viewModel.filteredTags.contains(tag)
                     }, set: { newValue in
                         withAnimation(.easeInOut(duration: 0.15)) {
-                            tags.toggle(tag, if: newValue)
+                            viewModel.filteredTags.toggle(tag, if: newValue)
                         }
                     })) {
                         Label {
-                            Text(verbatim: tag.name, fallback: "TAG")
-                                .foregroundStyle(Color.primary)
+                            Text(verbatim: tag.name, fallback: "TAG").foregroundStyle(Color.primary)
                         } icon: {
                             Image(systemName: "tag")
                         }
@@ -71,11 +67,9 @@ struct LibraryFiltersView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .previewStorage) {
-    @Previewable @State var systems: Set<System> = []
-    @Previewable @State var tags: Set<TagObject> = []
+    @Previewable @StateObject var viewModel: LibraryViewModel = .init()
 
     NavigationStack {
-        LibraryFiltersView(systems: $systems, tags: $tags)
+        LibraryFiltersView(viewModel: viewModel)
     }
 }
-

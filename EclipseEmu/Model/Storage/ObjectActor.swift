@@ -234,7 +234,7 @@ extension ObjectActor {
         return count < 2
     }
 
-    func updateDatePlayed(game: ObjectBox<GameObject>) throws(GameError) {
+    func updateDatePlayed(game: ObjectBox<GameObject>) throws(GameObjectError) {
         do {
             let game = try game.get(in: objectContext)
             game.datePlayed = .now
@@ -258,14 +258,14 @@ extension ObjectActor {
         isAuto: Bool,
         for game: ObjectBox<GameObject>,
         with coordinator: CoreCoordinator<Core>
-    ) async throws(SaveStateError) {
+    ) async throws(SaveStateObjectError) {
         let id = UUID()
         let saveStatePath = self.fileSystem.url(for: .saveState(fileName: id, fileExtension: "s8"))
 
 		do {
 			try await coordinator.saveState(to: saveStatePath)
 		} catch {
-			throw SaveStateError.failedToCreateSaveState
+			throw SaveStateObjectError.failedToCreateSaveState
 		}
 
         do {
@@ -340,7 +340,7 @@ extension ObjectActor {
         return asset
     }
 
-    func replaceCoverArt(game box: ObjectBox<GameObject>, fromRemote url: URL) async throws(ImageAssetError) {
+    func replaceCoverArt(game box: ObjectBox<GameObject>, fromRemote url: URL) async throws(ImageAssetObjectError) {
         do {
             let game = try box.get(in: objectContext)
             game.cover = try await self.createImage(remote: url)
@@ -354,7 +354,7 @@ extension ObjectActor {
         }
     }
 
-    func replaceCoverArt(game box: ObjectBox<GameObject>, copying url: URL) async throws(ImageAssetError) {
+    func replaceCoverArt(game box: ObjectBox<GameObject>, copying url: URL) async throws(ImageAssetObjectError) {
         do {
             let game = try box.get(in: objectContext)
             game.cover = try await createImage(copy: url)

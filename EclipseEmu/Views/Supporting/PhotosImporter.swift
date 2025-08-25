@@ -63,8 +63,8 @@ struct PhotosImporterModifier: ViewModifier {
             PhotosImporterSheet(onSelection: onSelection)
         }
         #elseif canImport(AppKit)
-        .onChange(of: isPresented) { newValue in
-            guard newValue else { return }
+        .onChange(of: isPresented) {
+            guard isPresented else { return }
             Task {
                 await self.openPicker()
             }

@@ -6,9 +6,11 @@ enum Core: Int16, RawRepresentable, Identifiable, Hashable, CaseIterable, Codabl
 	private static let decoder: JSONDecoder = JSONDecoder()
 	private static let encoder: JSONEncoder = JSONEncoder()
 
-	case testCore
-	case mGBA
-
+	case testCore = -1
+	case mGBA = 1
+    
+    static let noneIntValue: Self.RawValue = 0
+    
 	@usableFromInline
 	var id: Int16 { self.rawValue }
 
