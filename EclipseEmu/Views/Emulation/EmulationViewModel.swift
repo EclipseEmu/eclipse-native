@@ -47,6 +47,7 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
     
     @Published var volume: Float {
         didSet {
+            settings.volume = Double(volume)
             Task {
                 await coordinator.audio.setVolume(to: volume)
             }
@@ -91,6 +92,9 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
         self.stopAccessingRomFile = stopAccessingRomFile
         self.stopAccessingSaveFile = stopAccessingSaveFile
         CoreAudioRenderer.ignoreSilentMode(ignoreSilentMode)
+        Task {
+            await self.coordinator.audio.setVolume(to: self.volume)
+        }
     }
 #else
     init(
@@ -110,6 +114,9 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
         self.volume = Float(settings.volume)
         self.stopAccessingRomFile = stopAccessingRomFile
         self.stopAccessingSaveFile = stopAccessingSaveFile
+        Task {
+            await self.coordinator.audio.setVolume(to: self.volume)
+        }
     }
 #endif
 
