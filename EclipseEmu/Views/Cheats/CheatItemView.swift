@@ -35,14 +35,14 @@ struct CheatItemView: View {
                     .lineLimit(1)
             }
         }
-        .contextMenu(ContextMenu(menuItems: {
+        .contextMenu {
             Button(action: edit) {
                 Label("EDIT", systemImage: "pencil")
             }
             Button(role: .destructive, action: delete) {
                 Label("DELETE", systemImage: "trash")
             }
-        }))
+        }
         .onChange(of: cheat.enabled, perform: toggleCheat)
     }
 

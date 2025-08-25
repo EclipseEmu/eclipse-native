@@ -1,15 +1,15 @@
 import SwiftUI
 
-struct LocalImage<I: View, P: View>: View {
+struct LocalImage<Content: View, Placeholder: View>: View {
     @EnvironmentObject var persistence: Persistence
     private var handle: ImageAssetObject?
-    private let image: (Image) -> I
-    private let placeholder: () -> P
+    private let image: (Image) -> Content
+    private let placeholder: () -> Placeholder
 
     init(
         _ object: ImageAssetObject?,
-        @ViewBuilder image: @escaping (Image) -> I,
-        @ViewBuilder placeholder: @escaping () -> P
+        @ViewBuilder image: @escaping (Image) -> Content,
+        @ViewBuilder placeholder: @escaping () -> Placeholder
     ) {
         self.handle = object
         self.image = image

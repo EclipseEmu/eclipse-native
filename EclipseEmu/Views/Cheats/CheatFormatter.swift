@@ -112,7 +112,7 @@ final class CheatFormatter {
     }
 }
 
-struct LazySplitIterator<T: BidirectionalCollection> where T.Element: Equatable {
+private struct LazySplitIterator<T: BidirectionalCollection> where T.Element: Equatable {
     private let inner: T
     private let seperator: T.Element
     private var previousIndex: T.Index

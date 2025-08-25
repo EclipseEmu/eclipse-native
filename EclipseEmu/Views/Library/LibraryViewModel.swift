@@ -18,10 +18,10 @@ final class LibraryViewModel: ObservableObject {
     @Published var gameCheatsTarget: GameObject?
     @Published var gameSettingsTarget: GameObject?
     @Published var gameSaveStatesTarget: GameObject?
-    @Published var manageTagsTarget: ManageTagsTarget?
+    @Published var manageTagsTarget: TagsPickerTarget?
     @Published var coverPickerMethod: CoverPickerMethod?
 
-    @Published var fileImportRequest: FileImportType?
+    @Published var fileImportRequest: FileImportRequest?
     @Published var fileExportRequest: SaveFileExportTarget = .init()
 
     @Published var isTagsViewOpen: Bool = false

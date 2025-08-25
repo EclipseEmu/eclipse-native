@@ -6,15 +6,12 @@ struct LoadStateView: View {
     let action: (SaveStateObject) async -> Void
 
     var body: some View {
-        NavigationStack {
+        FormSheetView {
             SaveStatesView(game: game, action: saveStateSelected)
-#if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-#endif
                 .navigationTitle("LOAD_SAVE_STATE")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("CANCEL", role: .cancel, action: dismiss.callAsFunction)
+                        CancelButton(action: dismiss.callAsFunction)
                     }
                 }
         }

@@ -55,7 +55,7 @@ struct TagsView: View {
             .renameItem("RENAME_TAG", item: $renameItem)
 			.sheet(item: $editTarget) { item in
                 FormSheetView {
-					TagDetailView(mode: item)
+					EditTagView(mode: item)
 				}
 			}
     }

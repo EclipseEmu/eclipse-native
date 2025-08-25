@@ -86,7 +86,20 @@ struct GameItemView: View {
             Label("MANAGE_TAGS", systemImage: "tag")
         }
         
-        CoverPickerMenu(game: game, coverPickerMethod: $viewModel.coverPickerMethod)
+        Menu {
+            Button {
+                viewModel.coverPickerMethod = .database(game)
+            } label: {
+                Label("REPLACE_COVER_ART_FROM_DATABASE", systemImage: "cylinder.split.1x2")
+            }
+            Button {
+                viewModel.coverPickerMethod = .photos(game)
+            } label: {
+                Label("REPLACE_COVER_ART_FROM_PHOTOS", systemImage: "photo.stack")
+            }
+        } label: {
+            Label("REPLACE_COVER_ART", systemImage: "photo")
+        }
         
         Divider()
 

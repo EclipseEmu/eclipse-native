@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum ManageTagsTarget: Identifiable, Hashable {
+enum TagsPickerTarget: Identifiable, Hashable {
     var id: Int { self.hashValue }
 
     case one(GameObject)
@@ -80,7 +80,6 @@ private struct OneManageTagsItemView: View {
             do {
                 try await persistence.objects.toggleTag(tag: .init(tag), for: .init(game))
             } catch {
-                // FIXME(swiftlang): Swift 6 bug, it knows the error is a PersistenceError... but doesn't?
                 self.error = .some(error as! PersistenceError)
             }
         }
@@ -89,18 +88,18 @@ private struct OneManageTagsItemView: View {
 
 // MARK: View
 
-struct ManageTagsView: View {
+struct TagsPickerView: View {
     @EnvironmentObject var persistence: Persistence
     @Environment(\.dismiss) var dismiss: DismissAction
 
-    let target: ManageTagsTarget
+    let target: TagsPickerTarget
     @State private var isNewTagViewOpen: Bool = false
     @State private var error: PersistenceError?
 
     @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
     private var tags: FetchedResults<TagObject>
 
-    init(target: ManageTagsTarget) {
+    init(target: TagsPickerTarget) {
         self.target = target
     }
 
@@ -120,9 +119,10 @@ struct ManageTagsView: View {
             }
 
             Section {
-                Button("NEW_TAG", action: newTag)
+                ToggleButton("NEW_TAG", value: $isNewTagViewOpen)
             }
         }
+        .navigationTitle("MANAGE_TAGS")
         .toolbar {
             ToolbarItem {
                 Button("DONE", action: dismiss.callAsFunction)
@@ -131,19 +131,11 @@ struct ManageTagsView: View {
         .alert(isPresented: .isSome($error), error: error) {
             Button("OK", role:  .cancel) {}
         }
-        .navigationTitle("MANAGE_TAGS")
-        #if !os(macOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
         .sheet(isPresented: $isNewTagViewOpen) {
             FormSheetView {
-                TagDetailView(mode: .create)
+                EditTagView(mode: .create)
             }
         }
-    }
-
-    private func newTag() {
-        self.isNewTagViewOpen = true
     }
 }
 

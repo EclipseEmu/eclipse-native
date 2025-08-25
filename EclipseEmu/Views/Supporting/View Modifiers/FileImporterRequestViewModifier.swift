@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 @MainActor
-struct FileImportType: Sendable {
+struct FileImportRequest: Sendable {
     let types: [UTType]
     let allowsMultipleSelection: Bool
     let completion: @Sendable (Result<[URL], any Error>) -> Void
@@ -29,8 +29,8 @@ struct FileImportType: Sendable {
     }
 }
 
-struct MultiFileImporterViewModifier: ViewModifier {
-    @Binding var type: FileImportType?
+struct FileImporterRequestViewModifier: ViewModifier {
+    @Binding var type: FileImportRequest?
 
     func body(content: Content) -> some View {
         let type = self.type ?? .default
@@ -45,7 +45,7 @@ struct MultiFileImporterViewModifier: ViewModifier {
 }
 
 extension View {
-    func multiFileImporter(_ type: Binding<FileImportType?>) -> some View {
-        modifier(MultiFileImporterViewModifier(type: type))
+    func fileImporter(_ type: Binding<FileImportRequest?>) -> some View {
+        modifier(FileImporterRequestViewModifier(type: type))
     }
 }

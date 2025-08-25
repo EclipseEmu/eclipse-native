@@ -30,7 +30,7 @@ struct LibraryView: View {
             .toolbar(content: toolbarContent)
             .searchable(text: $viewModel.query)
             .coverPicker(presenting: $viewModel.coverPickerMethod)
-            .multiFileImporter($viewModel.fileImportRequest)
+            .fileImporter($viewModel.fileImportRequest)
             .fileExporter(
                 isPresented: .isSome($viewModel.fileExportRequest.document),
                 document: viewModel.fileExportRequest.document,
@@ -80,7 +80,7 @@ struct LibraryView: View {
             }
             .sheet(item: $viewModel.manageTagsTarget) { target in
                 FormSheetView {
-                    ManageTagsView(target: target)
+                    TagsPickerView(target: target)
                 }
             }
     }

@@ -8,7 +8,7 @@ struct GameSaveStatesView: View {
     @ObservedObject var game: GameObject
     
     @State private var error: GameViewError?
-    @State private var fileImportRequest: FileImportType?
+    @State private var fileImportRequest: FileImportRequest?
 
     var body: some View {
         SaveStatesView(game: game, action: action)

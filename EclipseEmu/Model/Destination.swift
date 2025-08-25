@@ -47,7 +47,7 @@ extension Destination {
 		case .manageTags:
 			TagsView()
 		case .editTag(let tag):
-			TagDetailView(mode: .edit(tag))
+			EditTagView(mode: .edit(tag))
 		case .keyboardProfiles:
 			KeyboardProfilesView()
         case .keyboardProfile(let profile):

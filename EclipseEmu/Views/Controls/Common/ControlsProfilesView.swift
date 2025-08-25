@@ -28,7 +28,7 @@ struct ControlsProfilesView<InputSource: InputSourceDescriptorProtocol, ExtraCon
             
             if sections.isEmpty {
                 Section("PROFILES") {
-                    EmptyMessage.listItem(title: "NO_PROFILES_TITLE", message: "NO_PROFILES_MESSAGE")
+                    EmptyMessage(title: "NO_PROFILES_TITLE", message: "NO_PROFILES_MESSAGE")
                 }
             } else {
                 ForEach(sections) { section in

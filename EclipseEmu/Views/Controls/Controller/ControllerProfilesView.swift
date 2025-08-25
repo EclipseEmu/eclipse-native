@@ -14,7 +14,7 @@ struct ControllerProfilesView: View {
                         Label(controller.vendorName ?? "UNKNOWN_CONTROLLER", systemImage: controller.symbol)
                     }
                 } isEmpty: {
-                    EmptyMessage.listItem(title: "NO_CONNECTED_CONTROLLERS_TITLE", message: "NO_CONNECTED_CONTROLLERS_MESSAGE")
+                    EmptyMessage(title: "NO_CONNECTED_CONTROLLERS_TITLE", message: "NO_CONNECTED_CONTROLLERS_MESSAGE")
                 }
             }
         }

@@ -8,9 +8,7 @@ struct EmulationLoaderView<Core: CoreProtocol>: View {
     @EnvironmentObject var settings: Settings
 
 	var body: some View {
-		Suspense(task: load) { viewModel in
-			EmulationView(viewModel: viewModel)
-		}
+        Suspense(task: load, view: EmulationView.init)
 	}
 
 	func load() async throws -> EmulationViewModel<Core> {

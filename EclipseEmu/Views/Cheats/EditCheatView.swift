@@ -77,22 +77,18 @@ struct EditCheatView: View {
             .onChange(of: self.format, perform: self.formatChanged)
             .onChange(of: self.code, perform: self.codeChanged)
             .navigationTitle(self.isCreatingCheat ? "ADD_CHEAT" : "EDIT_CHEAT")
-#if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-#else
-                .padding()
+#if os(macOS)
+            .padding()
 #endif
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("CANCEL", role: .cancel) {
-                            self.dismiss()
-                        }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("DONE", action: self.save)
-                            .disabled(self.label.isEmpty || !self.isCodeValid)
-                    }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton(action: dismiss.callAsFunction)
                 }
+                ToolbarItem(placement: .confirmationAction) {
+                    ConfirmButton("DONE", action: self.save)
+                        .disabled(self.label.isEmpty || !self.isCodeValid)
+                }
+            }
         }
     }
 

@@ -6,12 +6,12 @@ struct CoreSettingsFileView<Settings: CoreSettings>: View {
     private let coreID: String
     @EnvironmentObject var persistence: Persistence
 	@Binding private var settings: Settings
-	@Binding private var fileImportType: FileImportType?
+	@Binding private var fileImportType: FileImportRequest?
 	private let setting: CoreFileSettingDescriptor<Settings>
 	private let fileType: UTType
 	@State private var isDeleteFileOpen: Bool = false
 
-    init(coreID: String, settings: Binding<Settings>, setting: CoreFileSettingDescriptor<Settings>, fileImportType: Binding<FileImportType?>) {
+    init(coreID: String, settings: Binding<Settings>, setting: CoreFileSettingDescriptor<Settings>, fileImportType: Binding<FileImportRequest?>) {
         self.coreID = coreID
         self._settings = settings
 		self.setting = setting

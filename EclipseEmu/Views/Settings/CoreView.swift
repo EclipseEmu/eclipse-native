@@ -82,7 +82,7 @@ private struct CoreSettingsView2<Core: CoreProtocol>: View {
     @EnvironmentObject private var persistence: Persistence
     @ObservedObject private var object: CoreSettingsObject
     @State private var settings: Core.Settings
-    @State private var fileImportType: FileImportType?
+    @State private var fileImportType: FileImportRequest?
     @State private var updateTask: Task<Void, Never>?
     
     private let descriptor: CoreSettingsDescriptor<Core.Settings> = Core.Settings.descriptor
@@ -112,7 +112,7 @@ private struct CoreSettingsView2<Core: CoreProtocol>: View {
                 }
             }
         }
-        .multiFileImporter($fileImportType)
+        .fileImporter($fileImportType)
         .onChange(of: settings, perform: save)
     }
     

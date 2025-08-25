@@ -16,7 +16,7 @@ private extension EditorTarget where Item == TagObject {
     }
 }
 
-struct TagDetailView: View {
+struct EditTagView: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
     @EnvironmentObject private var persistence: Persistence
 
@@ -38,26 +38,16 @@ struct TagDetailView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section("NAME") {
                 TextField(text: $newName) {
                     Text("TAG_NAME")
                 }
-            } header: {
-                Text("NAME")
             }
 
-            Section {
-                FixedColorPicker(selection: $newColor)
-                    .listRowInsets(EdgeInsets())
-            } header: {
-                Text("COLOR")
-            }
+            Section("COLOR", content: colorPicker)
         }
         .formStyle(.grouped)
         .navigationTitle(mode.title)
-        #if !os(macOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
         .toolbar {
 			ToolbarItem(placement: .cancellationAction) {
                 CancelButton("CANCEL", action: dismiss.callAsFunction)
@@ -68,7 +58,30 @@ struct TagDetailView: View {
             }
         }
     }
-
+    
+    @ViewBuilder
+    private func colorPicker() -> some View {
+        LazyVGrid(columns: [.init(.adaptive(minimum: 36, maximum: 48), spacing: 16.0)], spacing: 16.0) {
+            ForEach(TagColor.allCases, id: \.self) { color in
+                Button {
+                    withAnimation {
+                        newColor = color
+                    }
+                } label: {
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: 2)
+                            .opacity(newColor == color ? 1.0 : 0.0)
+                        Circle()
+                            .padding(newColor == color ? 3.0 : 0.0)
+                    }
+                    .foregroundStyle(color.color)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+    
     func handleSave() {
         if case .edit(let tag) = mode {
             let box = ObjectBox(tag)
@@ -96,7 +109,7 @@ struct TagDetailView: View {
 }
 
 #Preview {
-    NavigationStack {
-        TagDetailView(mode: .create)
+    FormSheetView {
+        EditTagView(mode: .create)
     }
 }

@@ -13,18 +13,16 @@ struct DualLabeledImage<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                image()
-                title
-                    .font(.footnote.weight(.medium))
-                    .lineLimit(1)
-                    .foregroundStyle(Color.primary)
-                subtitle
-                    .font(.caption)
-                    .foregroundStyle(Color.secondary)
-                    .lineLimit(1)
-            }
-            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            image()
+            title
+                .font(.footnote.weight(.medium))
+                .lineLimit(1)
+                .foregroundStyle(Color.primary)
+            subtitle
+                .font(.caption)
+                .foregroundStyle(Color.secondary)
+                .lineLimit(1)
         }
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
     }
 }
