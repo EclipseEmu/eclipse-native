@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1620"
+   LastUpgradeVersion = "2600"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "922F00A02BC0C26600B419D7"
-               BuildableName = "EclipseEmu.app"
+               BuildableName = "Eclipse.app"
                BlueprintName = "EclipseEmu"
                ReferencedContainer = "container:EclipseEmu.xcodeproj">
             </BuildableReference>
@@ -69,11 +69,17 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "922F00A02BC0C26600B419D7"
-            BuildableName = "EclipseEmu.app"
+            BuildableName = "Eclipse.app"
             BlueprintName = "EclipseEmu"
             ReferencedContainer = "container:EclipseEmu.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-com.apple.CoreData.ConcurrencyDebug 1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -86,7 +92,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "922F00A02BC0C26600B419D7"
-            BuildableName = "EclipseEmu.app"
+            BuildableName = "Eclipse.app"
             BlueprintName = "EclipseEmu"
             ReferencedContainer = "container:EclipseEmu.xcodeproj">
          </BuildableReference>

@@ -1,126 +1,92 @@
 import SwiftUI
-
-struct SettingsLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack {
-            ZStack {
-                configuration.icon
-                    .imageScale(.medium)
-                    .foregroundColor(.white).padding(6.0)
-                    .aspectRatio(1.0, contentMode: .fit)
-            }
-            .frame(width: 36, height: 36)
-            .background(RoundedRectangle(cornerRadius: 8))
-            .foregroundStyle(.black)
-            .padding(.trailing, 4.0)
-            .padding(.vertical, 1.0)
-            configuration.title
-        }
-    }
-}
+import EclipseKit
 
 struct SettingsView: View {
-    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject private var coreRegistry: CoreRegistry
+    @EnvironmentObject private var settings: Settings
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    NavigationLink(destination: SettingsGeneralView()) {
-                        Label("General", systemImage: "gear")
-                            .labelStyle(SettingsLabelStyle())
-                    }
-                    NavigationLink(destination: SettingsEmulationView()) {
-                        Label("Emulation", systemImage: "cpu.fill")
-                            .labelStyle(SettingsLabelStyle())
-                    }
-                    NavigationLink(destination: SettingsControlsView()) {
-                        Label("Controls", systemImage: "gamecontroller.fill")
-                            .labelStyle(SettingsLabelStyle())
-                    }
+        Form {
+			Section("CONTROLS") {
+				#if canImport(UIKit)
+				NavigationLink("TOUCH", to: .touchProfiles)
+				#endif
+                NavigationLink("KEYBOARD", to: .keyboardProfiles)
+                NavigationLink("CONTROLLERS", to: .controllerProfiles)
+            }
+
+            Section {
+                Slider(value: settings.$volume, in: 0 ... 1) {
+                    Text("VOLUME")
+                } minimumValueLabel: {
+                    Label("VOLUME_DOWN", systemImage: "speaker.fill")
+                        .foregroundStyle(.secondary)
+                } maximumValueLabel: {
+                    Label("VOLUME_UP", systemImage: "speaker.wave.3.fill")
+                        .foregroundStyle(.secondary)
                 }
+                .labelStyle(.iconOnly)
 
-                Section {
-                    Link(destination: URL(string: "https://eclipseemu.me/")!) {
-                        HStack {
-                            Label("Help & Guides", systemImage: "questionmark")
-                                .labelStyle(SettingsLabelStyle())
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    Link(destination: URL(string: "https://eclipseemu.me/")!) {
-                        HStack {
-                            Label("What's New", systemImage: "sparkle")
-                                .labelStyle(SettingsLabelStyle())
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    Link(destination: URL(string: "https://eclipseemu.me/")!) {
-                        HStack {
-                            Label("Credits", systemImage: "person.fill")
-                                .labelStyle(SettingsLabelStyle())
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }.buttonStyle(.plain)
+                Toggle("IGNORE_SILENT_MODE", isOn: settings.$ignoreSilentMode)
+            } header: {
+                Text("AUDIO")
+            } footer: {
+                Text("IGNORE_SILENT_MODE_DESCRIPTION")
+            }
 
-                Section {
-                    Link(destination: URL(string: "https://discord.gg/Mx2W9nec4Z")!) {
-                        HStack {
-                            Label("Discord", systemImage: "app.dashed")
-                                .labelStyle(SettingsLabelStyle())
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    Link(destination: URL(string: "https://github.com/EclipseEmu")!) {
-                        HStack {
-                            Label("GitHub", systemImage: "app.dashed")
-                                .labelStyle(SettingsLabelStyle())
-                            Spacer()
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }.buttonStyle(.plain)
+            Section {
+                ForEach(System.concreteCases, id: \.self, content: SystemCorePickerView.init)
+            } header: {
+                Text("SYSTEMS")
+            } footer: {
+                Text("SYSTEMS_SETTINGS_CORE_SELECTION_DESCRIPTION")
+            }
 
-                Section {
-                    Button(role: .destructive) {} label: {
-                        Text("Reset Library")
-                    }
-                    Button(role: .destructive) {} label: {
-                        Text("Reset Controls")
-                    }
-                    Button(role: .destructive) {} label: {
-                        Text("Reset Settings")
-                    }
-                    Button(role: .destructive) {} label: {
-                        Text("Reset All Content & Settings")
-                    }
-                }
-
-                Section {} footer: {
-                    VStack(alignment: .center) {
-                        Rectangle()
-                            .overlay { AppIconView() }
-                            .frame(width: 44, height: 44)
-                            .clipShape(RoundedRectangle(cornerRadius: 11.0))
-                        Text("v\(Bundle.main.releaseVersionNumber ?? "") (\(Bundle.main.buildVersionNumber ?? ""))")
-                    }.frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+            Section("CORES") {
+				ForEach(Core.allCases) { core in
+                    NavigationLink(verbatim: core.type.name, to: .coreSettings(core))
                 }
             }
-            .navigationTitle("Settings")
+
+            Section("ABOUT") {
+                NavigationLink("CREDITS", systemImage: "person", to: .credits)
+                LinkItemView("HELP_AND_GUIDES", systemImage: "questionmark", to: URL(string: "https://eclipseemu.me/")!)
+                LinkItemView("WHATS_NEW", systemImage: "doc.badge.clock", to: URL(string: "https://eclipseemu.me/")!)
+                LinkItemView("DISCORD", systemImage: "app.dashed", to: URL(string: "https://discord.gg/Mx2W9nec4Z")!)
+                LinkItemView("GITHUB", systemImage: "app.dashed", to: URL(string: "https://github.com/EclipseEmu")!)
+            }
+            .buttonStyle(.borderless)
+            .labelStyle(.titleOnly)
+
+#if !os(macOS)
+            Section {} footer: {
+                versionInfoSection
+            }
+#endif
         }
+        .navigationTitle("SETTINGS")
+        .formStyle(.grouped)
     }
+
+	#if !os(macOS)
+	var versionInfoSection: some View {
+        VStack(alignment: .center) {
+            Rectangle()
+                .overlay { AppIconView() }
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 11.0))
+            Text("v\(Bundle.main.releaseVersionNumber ?? "") (\(Bundle.main.buildVersionNumber ?? ""))")
+        }
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+    }
+	#endif
 }
 
 #Preview {
-    SettingsView()
+    let settings = Settings()
+    NavigationStack {
+        SettingsView()
+            .environmentObject(CoreRegistry())
+            .environmentObject(settings)
+    }
 }

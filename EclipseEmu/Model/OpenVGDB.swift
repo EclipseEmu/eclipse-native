@@ -32,14 +32,14 @@ enum OpenVGDBError: LocalizedError {
 }
 
 struct OpenVGDBItem: Sendable, Identifiable {
-    let id = UUID()
+    let id = RuntimeUID()
     let name: String
-    let system: GameSystem
+    let system: System
     let region: String
     let cover: URL?
 }
 
-private extension GameSystem {
+private extension System {
     init(openVGDBString: String) {
         self = switch openVGDBString {
         case "GB": .gb
@@ -63,6 +63,18 @@ private extension GameSystem {
     }
 }
 
+struct DatabaseResources: ~Copyable {
+	let database: OpaquePointer
+	let sha1Statement: OpaquePointer
+	let searchStatement: OpaquePointer
+
+	deinit {
+		sqlite3_finalize(self.sha1Statement)
+		sqlite3_finalize(self.searchStatement)
+		sqlite3_close(self.database)
+	}
+}
+
 final actor OpenVGDB {
     static let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     private static let sha1StatementString =
@@ -70,9 +82,7 @@ final actor OpenVGDB {
     private static let searchStatementString =
     "SELECT * FROM games WHERE cover IS NOT NULL AND name MATCH(?) AND (system = ?) ORDER BY RANK LIMIT 50;"
 
-    private let database: UnsafeSendable<OpaquePointer>
-    private let sha1Statement: UnsafeSendable<OpaquePointer>
-    private let searchStatement: UnsafeSendable<OpaquePointer>
+    private let resources: DatabaseResources
 
     init() throws(OpenVGDBError) {
         guard let dbPath = Bundle.main.url(forResource: "openvgdb-min", withExtension: "sqlite") else {
@@ -103,20 +113,11 @@ final actor OpenVGDB {
             throw .failedToPrepareSearchStatement
         }
 
-        self.database = .init(databasePtr)
-        self.sha1Statement = .init(sha1Statment)
-        self.searchStatement = .init(searchStatement)
+		self.resources = .init(database: databasePtr, sha1Statement: sha1Statment, searchStatement: searchStatement)
     }
 
-    deinit {
-        sqlite3_finalize(self.sha1Statement.value)
-        sqlite3_finalize(self.searchStatement.value)
-        sqlite3_close(self.database.value)
-    }
-
-    func get(sha1: String, system: GameSystem) async throws(OpenVGDBError) -> OpenVGDBItem? {
-        let statementInt = UInt(bitPattern: sha1Statement.value)
-        let statement = OpaquePointer(bitPattern: statementInt)
+    func get(sha1: String, system: System) async throws(OpenVGDBError) -> OpenVGDBItem? {
+		let statement = resources.sha1Statement
 
         guard
             let sha1String = sha1.uppercased().cString(using: .ascii),
@@ -137,16 +138,9 @@ final actor OpenVGDB {
         return entry
     }
 
-    func search(query: String, system: GameSystem) async throws(OpenVGDBError) -> [OpenVGDBItem] {
-        // FIXME: The API uses FTS5, which I am pretty confident the SQLite3 library on iOS/macOS does not come with.
-        //  Ideally we'd use FTS in some form, but will probably need to figure out something like FTS3/4,
-        //  and if a device doesn't support it then just disable searching for boxart.
-        //  See: https://github.com/EclipseEmu/api/blob/main/src/endpoints/boxart.rs
-
-        let queryString = query + "*"
-
-        let statementInt = UInt(bitPattern: searchStatement.value)
-        let statement = OpaquePointer(bitPattern: statementInt)
+    func search(query: String, system: System) async throws(OpenVGDBError) -> [OpenVGDBItem] {
+		let statement = resources.searchStatement
+		let queryString = query + "*"
 
         guard
             let queryString = queryString.cString(using: .utf8),
@@ -173,15 +167,15 @@ final actor OpenVGDB {
             let regionCStr = sqlite3_column_text(statement, 2)
         else { return nil }
 
-        let coverUrl: URL? = if let boxartCStr = sqlite3_column_text(statement, 3) {
-            URL(string: String(cString: boxartCStr))
+        let coverUrl: URL? = if let cString = sqlite3_column_text(statement, 3) {
+            URL(string: String(cString: cString))
         } else {
             nil
         }
 
         let entry = OpenVGDBItem(
             name: String(cString: nameCStr),
-            system: GameSystem(openVGDBString: String(cString: systemCStr)),
+            system: System(openVGDBString: String(cString: systemCStr)),
             region: String(cString: regionCStr),
             cover: coverUrl
         )

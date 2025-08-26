@@ -2,7 +2,15 @@ import CoreData
 import OSLog
 import SwiftUI
 
+@available(*, unavailable)
+extension NSManagedObject: @retroactive Sendable {}
+
 extension NSManagedObjectContext {
+    func create<T: NSManagedObject>() -> T {
+        let name = String(describing: T.self)
+        return NSEntityDescription.insertNewObject(forEntityName: name, into: self) as! T
+    }
+
     func saveIfNeeded() throws(PersistenceError) {
         guard hasChanges else { return }
         do {
@@ -10,7 +18,7 @@ extension NSManagedObjectContext {
             try save()
         } catch {
             Logger.coredata.error("failed to save managed object context: \(error.localizedDescription)")
-            throw .saveError(error)
+            throw .save(error)
         }
     }
 }

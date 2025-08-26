@@ -1,0 +1,2701 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "ABOUT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        }
+      }
+    },
+    "ADD_BINDING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Binding"
+          }
+        }
+      }
+    },
+    "ADD_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Button"
+          }
+        }
+      }
+    },
+    "ADD_CHEAT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Cheat"
+          }
+        }
+      }
+    },
+    "ADD_DIRECTIONAL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Directional"
+          }
+        }
+      }
+    },
+    "ADD_ELEMENT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Element"
+          }
+        }
+      }
+    },
+    "ADD_GAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Games"
+          }
+        }
+      }
+    },
+    "ADD_VARIANT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Variant"
+          }
+        }
+      }
+    },
+    "ALL_GAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Games"
+          }
+        }
+      }
+    },
+    "ANY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any"
+          }
+        }
+      }
+    },
+    "ANY_CONTROLLER_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any Controller Profile"
+          }
+        }
+      }
+    },
+    "ASCENDING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascending"
+          }
+        }
+      }
+    },
+    "AUDIO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "AUTO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
+    "BOTTOM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom"
+          }
+        }
+      }
+    },
+    "BUTTONS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buttons"
+          }
+        }
+      }
+    },
+    "CANCEL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "CENTER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        }
+      }
+    },
+    "CHEAT_CODE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        }
+      }
+    },
+    "CHEAT_CORE_FORMAT_MESSAGE \"%@\"" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The code must be formatted as “%@”"
+          }
+        }
+      }
+    },
+    "CHEAT_ENABLED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enabled"
+          }
+        }
+      }
+    },
+    "CHEAT_FORMAT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      }
+    },
+    "CHEAT_NAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "CHEAT_NAME_AND_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name & State"
+          }
+        }
+      }
+    },
+    "CHEAT_UNNAMED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed Cheat"
+          }
+        }
+      }
+    },
+    "CHEATS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cheats"
+          }
+        }
+      }
+    },
+    "COLOR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
+    "CONNECTED_CONTROLLERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Controllers"
+          }
+        }
+      }
+    },
+    "CONTROL_NAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control Names"
+          }
+        }
+      }
+    },
+    "CONTROLLER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controller"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BATTERY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battery"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_A" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_B" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_CIRCLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_CROSS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cross Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_SQUARE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Square Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_TRIANGLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangle Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_X" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_BUTTON_Y" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Button"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DPAD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D-Pad"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Press"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_ONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Left"
+          }
+        }
+      }
+    },
+    "CONTROLLER_DUALSHOCK_TOUCHPAD_TWO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Pad Right"
+          }
+        }
+      }
+    },
+    "CONTROLLER_HOME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "CONTROLLER_LEFT_SHOULDER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Shoulder"
+          }
+        }
+      }
+    },
+    "CONTROLLER_LEFT_THUMBSTICK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Thumbstick"
+          }
+        }
+      }
+    },
+    "CONTROLLER_LEFT_THUMBSTICK_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Thumbstick Press"
+          }
+        }
+      }
+    },
+    "CONTROLLER_LEFT_TRIGGER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left Trigger"
+          }
+        }
+      }
+    },
+    "CONTROLLER_MENU" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        }
+      }
+    },
+    "CONTROLLER_NA" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "N/A Control"
+          }
+        }
+      }
+    },
+    "CONTROLLER_NINTENDO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nintendo"
+          }
+        }
+      }
+    },
+    "CONTROLLER_OPTIONS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PLAYSTATION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PlayStation"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PROFILES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Controllers"
+          }
+        }
+      }
+    },
+    "CONTROLLER_PROFILES_FOOTER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected controllers will appear in the list above."
+          }
+        }
+      }
+    },
+    "CONTROLLER_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllers"
+          }
+        }
+      }
+    },
+    "CONTROLLER_RIGHT_SHOULDER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Shoulder"
+          }
+        }
+      }
+    },
+    "CONTROLLER_RIGHT_THUMBSTICK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Thumbstick"
+          }
+        }
+      }
+    },
+    "CONTROLLER_RIGHT_THUMBSTICK_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Thumbstick Press"
+          }
+        }
+      }
+    },
+    "CONTROLLER_RIGHT_TRIGGER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Trigger"
+          }
+        }
+      }
+    },
+    "CONTROLLER_SCREENSHOT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot"
+          }
+        }
+      }
+    },
+    "CONTROLLER_SELECT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
+    "CONTROLLER_SHARE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        }
+      }
+    },
+    "CONTROLLER_START" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
+    },
+    "CONTROLLER_VENDOR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xbox"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX_PADDLE_FOUR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 4"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX_PADDLE_ONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 1"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX_PADDLE_THREE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 3"
+          }
+        }
+      }
+    },
+    "CONTROLLER_XBOX_PADDLE_TWO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paddle 2"
+          }
+        }
+      }
+    },
+    "CONTROLLERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controllers"
+          }
+        }
+      }
+    },
+    "CONTROLS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controls"
+          }
+        }
+      }
+    },
+    "CONTROLS_DIRECTION_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The direction applies analog input to the button, which is useful if you're binding individual buttons to a directional input, like a thumbstick or directional pad."
+          }
+        }
+      }
+    },
+    "CONTROLS_KEY_INPUT_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The key that you press to activate this binding. You must have a keyboard connected to edit this value. You can only have one binding per key."
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Controls From"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the system default controls in this profile, copy from another profile, or start from scratch."
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_OTHER_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other Profile"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_SYSTEM_DEFAULTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Defaults"
+          }
+        }
+      }
+    },
+    "CONTROLS_SOURCE_SYSTEM_NOWHERE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowhere"
+          }
+        }
+      }
+    },
+    "CORE_DEVELOPER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer"
+          }
+        }
+      }
+    },
+    "CORE_NAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "CORE_OVERRIDE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Core Override"
+          }
+        }
+      }
+    },
+    "CORE_OVERRIDE_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By default, the game will use the same core as the system. You can override it to use another compatible core."
+          }
+        }
+      }
+    },
+    "CORE_VERSION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        }
+      }
+    },
+    "CORES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cores"
+          }
+        }
+      }
+    },
+    "COVER_ART" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cover Art"
+          }
+        }
+      }
+    },
+    "COVER_ART_SEARCH_FOR_GAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for games to find cover art."
+          }
+        }
+      }
+    },
+    "CREATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        }
+      }
+    },
+    "CREATE_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Profile"
+          }
+        }
+      }
+    },
+    "CREATE_TAG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Tag"
+          }
+        }
+      }
+    },
+    "CREDITS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credits"
+          }
+        }
+      }
+    },
+    "D-Pad" : {
+
+    },
+    "DATE_ADDED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Added"
+          }
+        }
+      }
+    },
+    "DEAD_ZONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dead Zone"
+          }
+        }
+      }
+    },
+    "DEAD_ZONE_EXPLAINER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The dead zone is the radius that inputs are ignored within."
+          }
+        }
+      }
+    },
+    "Delete" : {
+
+    },
+    "DELETE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "DELETE_FILE_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this file?"
+          }
+        }
+      }
+    },
+    "DELETE_FILE_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete File"
+          }
+        }
+      }
+    },
+    "DELETE_GAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Game"
+          }
+        }
+      }
+    },
+    "DELETE_GAME_MESSAGE %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete \"%@\"? Its saves, save states, and cover art will all be deleted. This can't be undone."
+          }
+        }
+      }
+    },
+    "DELETE_GAMES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Games"
+          }
+        }
+      }
+    },
+    "DELETE_GAMES_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete these games? All of their saves, save states, and cheats will be deleted."
+          }
+        }
+      }
+    },
+    "DELETE_SAVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Save"
+          }
+        }
+      }
+    },
+    "DELETE_SAVE_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this game's save file? This can't be undone."
+          }
+        }
+      }
+    },
+    "DELETE_SAVE_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Save State"
+          }
+        }
+      }
+    },
+    "DELETE_SAVE_STATE_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this save state? This can’t be undone."
+          }
+        }
+      }
+    },
+    "DESCENDING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descending"
+          }
+        }
+      }
+    },
+    "DEVELOPER_MAGNETAR_ROLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lead Developer & Designer"
+          }
+        }
+      }
+    },
+    "DEVELOPERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developers"
+          }
+        }
+      }
+    },
+    "DIRECTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        }
+      }
+    },
+    "DIRECTIONAL_STYLE_DPAD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D-Pad"
+          }
+        }
+      }
+    },
+    "DIRECTIONAL_STYLE_JOYSTICK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Joystick"
+          }
+        }
+      }
+    },
+    "DIRECTIONALS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Directionals"
+          }
+        }
+      }
+    },
+    "DISCORD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discord"
+          }
+        }
+      }
+    },
+    "Dismiss" : {
+
+    },
+    "DONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "ECLIPSE_CORE_DEVELOPERS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eclipse would not be possible without the core developers. Please support them however you can."
+          }
+        }
+      }
+    },
+    "EDIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "EDIT_BUTTON" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Button"
+          }
+        }
+      }
+    },
+    "EDIT_CHEAT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Cheat"
+          }
+        }
+      }
+    },
+    "EDIT_DIRECTIONAL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Directional"
+          }
+        }
+      }
+    },
+    "EDIT_TAG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Tag"
+          }
+        }
+      }
+    },
+    "ELEMENTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elements"
+          }
+        }
+      }
+    },
+    "EMPTY_LIBRARY_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your library doesn’t have any games in it. Press the + button to add some."
+          }
+        }
+      }
+    },
+    "EMPTY_LIBRARY_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Games"
+          }
+        }
+      }
+    },
+    "EXPORT_SAVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Save"
+          }
+        }
+      }
+    },
+    "FIELD_REQUIRED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Required"
+          }
+        }
+      }
+    },
+    "FILTER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        }
+      }
+    },
+    "FILTERS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filters"
+          }
+        }
+      }
+    },
+    "GAME_SETTINGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Settings"
+          }
+        }
+      }
+    },
+    "GAME_UNNAMED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed Game"
+          }
+        }
+      }
+    },
+    "GENERIC_ERROR_MESSAGE_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong."
+          }
+        }
+      }
+    },
+    "GENERIC_ERROR_MESSAGE_UNKNOWN_ERROR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An unknown error occurred."
+          }
+        }
+      }
+    },
+    "GITHUB" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        }
+      }
+    },
+    "Hello, world" : {
+
+    },
+    "HELP_AND_GUIDES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help & Guides"
+          }
+        }
+      }
+    },
+    "HIDE_KEYBOARD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Keyboard"
+          }
+        }
+      }
+    },
+    "IGNORE_SILENT_MODE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore Silent Mode"
+          }
+        }
+      }
+    },
+    "IGNORE_SILENT_MODE_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, Ignore Silent Mode will allow game audio to keep playing when your device's Silent Mode is on."
+          }
+        }
+      }
+    },
+    "IMPORT_SAVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Save"
+          }
+        }
+      }
+    },
+    "IMPORT_SAVE_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By importing a save, you will overwrite any existing save for this game. This cannot be undone."
+          }
+        }
+      }
+    },
+    "INFO" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "INPUT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Input"
+          }
+        }
+      }
+    },
+    "KEEP_PLAYING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep Playing"
+          }
+        }
+      }
+    },
+    "KEY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key"
+          }
+        }
+      }
+    },
+    "KEYBOARD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard"
+          }
+        }
+      }
+    },
+    "KEYBOARD_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard Profile"
+          }
+        }
+      }
+    },
+    "KEYBOARD_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard"
+          }
+        }
+      }
+    },
+    "Left" : {
+
+    },
+    "LEFT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        }
+      }
+    },
+    "LIBRARY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Library"
+          }
+        }
+      }
+    },
+    "LICENSES" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licenses"
+          }
+        }
+      }
+    },
+    "LOAD_SAVE_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load State"
+          }
+        }
+      }
+    },
+    "LOAD_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load State"
+          }
+        }
+      }
+    },
+    "LOADING" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading"
+          }
+        }
+      }
+    },
+    "MANAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage"
+          }
+        }
+      }
+    },
+    "MANAGE_CHEATS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Cheats"
+          }
+        }
+      }
+    },
+    "MANAGE_SAVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Save"
+          }
+        }
+      }
+    },
+    "MANAGE_TAGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Tags"
+          }
+        }
+      }
+    },
+    "MENU" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        }
+      }
+    },
+    "NAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "NEW_NAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Name"
+          }
+        }
+      }
+    },
+    "NEW_TAG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Tag"
+          }
+        }
+      }
+    },
+    "NO_CHEATS_MESSAGE %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don’t have any cheats for “%@”. You can add some with the + button."
+          }
+        }
+      }
+    },
+    "NO_CHEATS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Cheats"
+          }
+        }
+      }
+    },
+    "NO_CONNECTED_CONTROLLERS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don’t have any controllers currently connected."
+          }
+        }
+      }
+    },
+    "NO_CONNECTED_CONTROLLERS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Connected Controllers"
+          }
+        }
+      }
+    },
+    "NO_KEYBINDINGS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven’t added any keybindings yet. Keybindings let you map inputs to a key press."
+          }
+        }
+      }
+    },
+    "NO_KEYBINDINGS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Keybindings"
+          }
+        }
+      }
+    },
+    "NO_PROFILES_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven’t created any profiles. Profiles let you define and switch between custom controls on a system or game basis."
+          }
+        }
+      }
+    },
+    "NO_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Profiles"
+          }
+        }
+      }
+    },
+    "NO_RESULTS_FILTERED_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All results have been filtered out."
+          }
+        }
+      }
+    },
+    "NO_RESULTS_FILTERED_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Results"
+          }
+        }
+      }
+    },
+    "NO_RESULTS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There were no results for that query. Check your spelling or try a different search."
+          }
+        }
+      }
+    },
+    "NO_RESULTS_TITLE \"%@\"" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Results for “%@”"
+          }
+        }
+      }
+    },
+    "NO_SAVE_STATES_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven’t created any save states for this game."
+          }
+        }
+      }
+    },
+    "NO_SAVE_STATES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Save States"
+          }
+        }
+      }
+    },
+    "NO_SUPPORTED_CHEATS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The core does not support any cheats for this game."
+          }
+        }
+      }
+    },
+    "NO_SUPPORTED_CHEATS_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Supported Cheats"
+          }
+        }
+      }
+    },
+    "NO_TAGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Tags"
+          }
+        }
+      }
+    },
+    "NO_TAGS_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven't made any tags yet."
+          }
+        }
+      }
+    },
+    "None" : {
+
+    },
+    "NONE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "OPEN_SOURCE_LICENSES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Source Licenses"
+          }
+        }
+      }
+    },
+    "OPTIONS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options"
+          }
+        }
+      }
+    },
+    "ORDER_BY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Order By"
+          }
+        }
+      }
+    },
+    "Pause" : {
+
+    },
+    "PAUSE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "PLAY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
+    },
+    "PROFILE_LOAD_FAILURE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load profile."
+          }
+        }
+      }
+    },
+    "PROFILE_UNNAMED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed Profile"
+          }
+        }
+      }
+    },
+    "PROFILES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profiles"
+          }
+        }
+      }
+    },
+    "QUIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit"
+          }
+        }
+      }
+    },
+    "QUIT_GAME_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any unsaved progress will be lost."
+          }
+        }
+      }
+    },
+    "QUIT_GAME_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to quit?"
+          }
+        }
+      }
+    },
+    "REMOVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "RENAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "RENAME_GAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Game"
+          }
+        }
+      }
+    },
+    "RENAME_SAVE_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename State"
+          }
+        }
+      }
+    },
+    "RENAME_TAG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Tag"
+          }
+        }
+      }
+    },
+    "REPLACE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
+    },
+    "REPLACE_ANYWAYS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repalce Anyways"
+          }
+        }
+      }
+    },
+    "REPLACE_COVER_ART" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Cover Art"
+          }
+        }
+      }
+    },
+    "REPLACE_COVER_ART_FROM_DATABASE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Database"
+          }
+        }
+      }
+    },
+    "REPLACE_COVER_ART_FROM_PHOTOS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From Photos"
+          }
+        }
+      }
+    },
+    "REPLACE_ROM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace ROM"
+          }
+        }
+      }
+    },
+    "REPLACE_ROM_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By replacing the ROM, you will overwrite the existing ROM for this game. This may cause issues with save and save state compatibility and cannot be undone."
+          }
+        }
+      }
+    },
+    "RESET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "RESET_EVERYTHING" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset All Content & Settings"
+          }
+        }
+      }
+    },
+    "RESET_GAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "RESET_GAME_MESSAGE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any unsaved data will be lost."
+          }
+        }
+      }
+    },
+    "RESET_GAME_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to reset?"
+          }
+        }
+      }
+    },
+    "RESET_SETTINGS" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Settings"
+          }
+        }
+      }
+    },
+    "Right" : {
+
+    },
+    "RIGHT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right"
+          }
+        }
+      }
+    },
+    "SAVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "SAVE_STATE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save State"
+          }
+        }
+      }
+    },
+    "SAVE_STATE_AUTOMATIC" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic State"
+          }
+        }
+      }
+    },
+    "SAVE_STATE_UNNAMED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed State"
+          }
+        }
+      }
+    },
+    "SAVE_STATES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save States"
+          }
+        }
+      }
+    },
+    "SCREEN_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Offset"
+          }
+        }
+      }
+    },
+    "Select" : {
+
+    },
+    "SELECT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
+          }
+        }
+      }
+    },
+    "SELECT_FILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select File"
+          }
+        }
+      }
+    },
+    "SELECT_OTHER" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Other"
+          }
+        }
+      }
+    },
+    "SETTINGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "SIZE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "SOCIAL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Social"
+          }
+        }
+      }
+    },
+    "SORT_BY" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By"
+          }
+        }
+      }
+    },
+    "SOURCE_CODE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Code"
+          }
+        }
+      }
+    },
+    "SPEED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speed"
+          }
+        }
+      }
+    },
+    "STYLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
+    },
+    "SYSTEM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        }
+      }
+    },
+    "SYSTEM_GB" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Boy"
+          }
+        }
+      }
+    },
+    "SYSTEM_GBA" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Boy Advance"
+          }
+        }
+      }
+    },
+    "SYSTEM_GBC" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Boy Color"
+          }
+        }
+      }
+    },
+    "SYSTEM_NES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nintendo Entertainment System"
+          }
+        }
+      }
+    },
+    "SYSTEM_SNES" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Super Nintendo"
+          }
+        }
+      }
+    },
+    "SYSTEM_UNKNOWN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown System"
+          }
+        }
+      }
+    },
+    "SYSTEMS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systems"
+          }
+        }
+      }
+    },
+    "SYSTEMS_SETTINGS_CORE_SELECTION_DESCRIPTION" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select which core will be used for each system. Changing the core will cause incompatibilities with save states, cheats, and potentially saves. You can manage each core’s settings below."
+          }
+        }
+      }
+    },
+    "TAG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
+          }
+        }
+      }
+    },
+    "TAG_NAME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "TAGS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        }
+      }
+    },
+    "TOGGLE_NEGATIVE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Negative"
+          }
+        }
+      }
+    },
+    "TOP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
+          }
+        }
+      }
+    },
+    "TOUCH" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch"
+          }
+        }
+      }
+    },
+    "TOUCH_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch Profile"
+          }
+        }
+      }
+    },
+    "TOUCH_PROFILES_TITLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch"
+          }
+        }
+      }
+    },
+    "UNBOUND" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbound"
+          }
+        }
+      }
+    },
+    "UNKNOWN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        }
+      }
+    },
+    "UNSELECTED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unselected"
+          }
+        }
+      }
+    },
+    "UPLOAD" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload"
+          }
+        }
+      }
+    },
+    "USE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use"
+          }
+        }
+      }
+    },
+    "USING_DEFAULT_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        }
+      }
+    },
+    "USING_GLOBAL_PROFILE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Using Global Profile"
+          }
+        }
+      }
+    },
+    "v%@ (%@)" : {
+      "comment" : "Version & Build",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "v%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "VARIANT_IPAD_LANDSCAPE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPad Landscape"
+          }
+        }
+      }
+    },
+    "VARIANT_IPAD_PORTRAIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPad Portrait"
+          }
+        }
+      }
+    },
+    "VARIANT_IPHONE_LANDSCAPE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Landscape"
+          }
+        }
+      }
+    },
+    "VARIANT_IPHONE_PORTRAIT" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone Portrait"
+          }
+        }
+      }
+    },
+    "VARIANTS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        }
+      }
+    },
+    "VISIBLE" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible"
+          }
+        }
+      }
+    },
+    "VOLUME" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        }
+      }
+    },
+    "VOLUME %@%%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume %@%"
+          }
+        }
+      }
+    },
+    "VOLUME_DOWN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume Down"
+          }
+        }
+      }
+    },
+    "VOLUME_UP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume Up"
+          }
+        }
+      }
+    },
+    "WHATS_NEW" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What’s New"
+          }
+        }
+      }
+    },
+    "X_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Offset"
+          }
+        }
+      }
+    },
+    "X_ORIGIN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X Origin"
+          }
+        }
+      }
+    },
+    "Y_OFFSET" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Offset"
+          }
+        }
+      }
+    },
+    "Y_ORIGIN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y Origin"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

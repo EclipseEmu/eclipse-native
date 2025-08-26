@@ -1,164 +1,148 @@
-import SwiftUI
-import AVFoundation
 import EclipseKit
-
-enum EmulationViewState {
-    case loading
-    case quitting
-    case error(Error)
-    case loaded(GameCoreCoordinator)
-}
-
-enum EmulationViewError: LocalizedError {
-    case romMissing
-    case romBadAccess
-
-    var errorDescription: String? {
-        switch self {
-        case .romBadAccess:
-            "Failed to get access to the ROM. Check if the file has been moved or deleted."
-        case .romMissing:
-            "This game does not have a ROM associated with it."
-        }
-    }
-}
+import Foundation
 
 @MainActor
-final class EmulationViewModel: ObservableObject {
-    @Published var state: EmulationViewState = .loading
-    @Published var aspectRatio: CGFloat = 1.0
+final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
+    @Published var game: GameObject
+    let persistence: Persistence
+    let settings: Settings
+    let coordinator: CoreCoordinator<Core>
+    let playback: GamePlayback
+    
+#if canImport(UIKit)
+    let touchMappings: TouchMappings
+#endif
+    let stopAccessingRomFile: Bool
+    let stopAccessingSaveFile: Bool
+    
+#if os(macOS)
+    @Published var menuBarIsVisible: Bool = true
+    @Published var menuBarHideTask: Task<Void, Never>?
+    @Published var menuBarHideTaskInstant: ContinuousClock.Instant = .now
+#endif
 
-    @Published var isQuitConfirmationShown = false
-    @Published var isSaveStateViewShown = false
-
-    @Published var volume: Float = 0.0 {
+    @Published var isLoadStateViewOpen: Bool = false {
         didSet {
             Task {
-                guard case .loaded(let core) = state else { return }
-                await core.audio.setVolume(to: self.volume)
+                if isLoadStateViewOpen {
+                    await coordinator.pause(reason: .pendingUserInput)
+                } else {
+                    await coordinator.play(reason: .pendingUserInput)
+                }
             }
         }
     }
 
-    @Published var isFastForwarding: Bool = false {
+    @Published var isPlaying: Bool = true {
         didSet {
             Task {
-                guard case .loaded(let core) = state else { return }
-                await core.setFastForward(enabled: self.isFastForwarding)
+                if isPlaying {
+                    await coordinator.play(reason: .paused)
+                } else {
+                    await coordinator.pause(reason: .paused)
+                }
             }
         }
     }
-
-    private(set) var startTask: Task<Void, Never>?
-
-    private let coreInfo: GameCoreInfo
-    let game: Game
-    private var initialSaveState: SaveState?
-    private let persistence: Persistence
-    private let emulationData: EmulationData
-
+    
+    @Published var volume: Float {
+        didSet {
+            settings.volume = Double(volume)
+            Task {
+                await coordinator.audio.setVolume(to: volume)
+            }
+        }
+    }
+    
+#if os(iOS)
+    @Published var ignoreSilentMode: Bool {
+        didSet {
+            CoreAudioRenderer.ignoreSilentMode(ignoreSilentMode)
+        }
+    }
+#endif
+    
+    @Published var speed: EmulationSpeed = .x1_00 {
+        didSet {
+            Task {
+                await coordinator.setFastForward(to: speed)
+            }
+        }
+    }
+    
+#if canImport(UIKit)
     init(
-        coreInfo: GameCoreInfo,
-        game: Game,
-        saveState: SaveState?,
-        emulationData: EmulationData,
-        persistence: Persistence
+        game: GameObject,
+        persistence: Persistence,
+        settings: Settings,
+        coordinator: CoreCoordinator<Core>,
+        playback: GamePlayback,
+        touchMappings: TouchMappings,
+        stopAccessingRomFile: Bool,
+        stopAccessingSaveFile: Bool
     ) {
-        self.coreInfo = coreInfo
         self.game = game
         self.persistence = persistence
-        self.initialSaveState = saveState
-        self.emulationData = emulationData
-    }
-
-    func renderingSurfaceCreated(surface: CAMetalLayer) {
-        let system = game.system
-        self.startTask = Task {
-            do {
-                let core = try await GameCoreCoordinator(coreInfo: self.coreInfo, system: system, reorderControls: self.reorderControllers)
-                core.attach(surface: surface)
-
-                self.aspectRatio = core.width / core.height
-                self.volume = 0.5
-                self.state = .loaded(core)
-
-                await core.start(gamePath: self.emulationData.romPath, savePath: self.emulationData.savePath)
-                if let failedCheats = await core.setCheats(cheats: self.emulationData.cheats) {
-                    // FIXME: figure out what to do with these
-                    print("failed to set the following cheats:", failedCheats)
-                }
-                if let initialSaveState = self.initialSaveState {
-                    _ = await core.loadState(for: self.persistence.files.url(for: initialSaveState.path))
-                    self.initialSaveState = nil
-                }
-                try await self.persistence.objects.updateDatePlayed(game: .init(self.game))
-            } catch {
-                self.state = .error(error)
-            }
+        self.settings = settings
+        self.coordinator = coordinator
+        self.playback = playback
+        self.touchMappings = touchMappings
+        self.ignoreSilentMode = settings.ignoreSilentMode
+        self.volume = Float(settings.volume)
+        self.stopAccessingRomFile = stopAccessingRomFile
+        self.stopAccessingSaveFile = stopAccessingSaveFile
+        CoreAudioRenderer.ignoreSilentMode(ignoreSilentMode)
+        Task {
+            await self.coordinator.audio.setVolume(to: self.volume)
         }
     }
-
-    func quit(playAction: PlayGameAction) async {
-        if case .loaded(let core) = self.state {
-            try? await persistence.objects.createSaveState(isAuto: true, for: .init(self.game), with: core)
-            await core.stop()
+#else
+    init(
+        game: GameObject,
+        persistence: Persistence,
+        settings: Settings,
+        coordinator: CoreCoordinator<Core>,
+        playback: GamePlayback,
+        stopAccessingRomFile: Bool,
+        stopAccessingSaveFile: Bool
+    ) {
+        self.game = game
+        self.persistence = persistence
+        self.settings = settings
+        self.coordinator = coordinator
+        self.playback = playback
+        self.volume = Float(settings.volume)
+        self.stopAccessingRomFile = stopAccessingRomFile
+        self.stopAccessingSaveFile = stopAccessingSaveFile
+        Task {
+            await self.coordinator.audio.setVolume(to: self.volume)
         }
-        self.state = .quitting
-        await playAction.closeGame()
     }
+#endif
 
     func sceneMadeActive() async {
-        guard case .loaded(let core) = self.state else { return }
-        await core.play(reason: .backgrounded)
+        await coordinator.play(reason: .backgrounded)
     }
-
+    
     func sceneHidden() async {
-        guard
-            case .loaded(let core) = self.state,
-            await core.state != .backgrounded
-        else { return }
-
-        await core.pause(reason: .backgrounded)
-
-        guard await core.state == .backgrounded else { return }
-
+        guard await coordinator.state != .backgrounded else { return }
+        await coordinator.pause(reason: .backgrounded)
+        guard await coordinator.state == .backgrounded else { return }
+        try? await saveState(isAuto: true)
+    }
+    
+    func saveState(isAuto: Bool = false) async throws {
         do {
-            try await persistence.objects.createSaveState(isAuto: true, for: .init(self.game), with: core)
+            try await persistence.objects.createSaveState(isAuto: isAuto, for: .init(game), with: coordinator)
         } catch {
-            print("creating save state failed:", error)
+            print("creating auto save state failed:", error)
+            throw error
         }
     }
-
-    func reorderControllers(players: inout [GameInputPlayer], maxPlayers: UInt8) async {
-        guard case .loaded(let core) = self.state else { return }
-        await core.pause(reason: .pendingUserInput)
-        await core.play(reason: .pendingUserInput)
-    }
-
-    func togglePlayPause() async {
-        guard case .loaded(let core) = self.state else { return }
-        if await core.state == .running {
-            await core.pause(reason: .paused)
-        } else {
-            await core.play(reason: .paused)
-        }
-    }
-
-    func saveState() {
-        guard case .loaded(let core) = self.state else { return }
-
-        Task {
-            // FIXME: show a message here
-            do {
-                try await persistence.objects.createSaveState(
-                    isAuto: false,
-                    for: .init(self.game),
-                    with: core
-                )
-            } catch {
-                print("creating save state failed:", error)
-            }
-        }
+    
+    func quit() async {
+        try? await saveState(isAuto: true)
+        await coordinator.stop()
+        playback.closeGame()
     }
 }
-

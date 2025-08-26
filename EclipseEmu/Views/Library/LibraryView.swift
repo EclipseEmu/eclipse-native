@@ -1,179 +1,261 @@
-import CoreData
-import EclipseKit
 import SwiftUI
-import UniformTypeIdentifiers
+import EclipseKit
 
-private enum LibraryViewError: LocalizedError {
-    case gameManager(GameError)
-    case playAction(PlayGameError)
+struct LibraryView: View {
+    @StateObject private var viewModel: LibraryViewModel = .init()
+    
+    @EnvironmentObject private var settings: Settings
+    @EnvironmentObject private var persistence: Persistence
+    
+    @FetchRequest<GameObject>(
+        sortDescriptors: LibraryViewModel.getSortDescriptors(),
+        animation: .default
+    )
+    private var games: FetchedResults<GameObject>
+    
+    #if os(macOS)
+    let minItemWidth: CGFloat = 160
+    let maxItemWidth: CGFloat = 240
+    #else
+    let minItemWidth: CGFloat = 120
+    let maxItemWidth: CGFloat = 240
+    #endif
+    let itemSpacing: CGFloat = 16
 
-    var errorDescription: String? {
-        switch self {
-        case .gameManager(let error): error.errorDescription
-        case .playAction(let error): error.errorDescription
+    var body: some View {
+        content
+            .navigationTitle("LIBRARY")
+            .toolbar(content: toolbarContent)
+            .searchable(text: $viewModel.query)
+            .coverPicker(presenting: $viewModel.coverPickerMethod)
+            .fileImporter($viewModel.fileImportRequest)
+            .fileExporter(
+                isPresented: .isSome($viewModel.fileExportRequest.document),
+                document: viewModel.fileExportRequest.document,
+                contentType: .save,
+                defaultFilename: viewModel.fileExportRequest.document?.fileName,
+                onCompletion: viewModel.handleFileExport
+            )
+            .onChange(of: settings.listSortMethod, perform: updateSortDescriptor)
+            .onChange(of: settings.listSortDirection, perform: updateSortDescriptor)
+            .onChange(of: viewModel.query, perform: updatePredicate)
+            .onChange(of: viewModel.filteredTags, perform: updatePredicate)
+            .onChange(of: viewModel.filteredSystems, perform: updatePredicate)
+            .onSubmit(of: .search) {
+                self.updatePredicate(())
+            }
+            .onAppear {
+                self.updatePredicate(())
+                self.updateSortDescriptor(())
+            }
+            .sheet(isPresented: $viewModel.isFiltersViewOpen) {
+                FormSheetView {
+                    LibraryFiltersView(viewModel: viewModel)
+                }
+                .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $viewModel.isTagsViewOpen) {
+                FormSheetView {
+                    TagsView()
+                }
+            }
+            .sheet(item: $viewModel.gameCheatsTarget) { game in
+                FormSheetView {
+                    CheatsView(game: game)
+                }
+            }
+            .sheet(item: $viewModel.gameSaveStatesTarget) { game in
+                FormSheetView {
+                    GameSaveStatesView(game: game)
+                }
+                .presentationDetents([.medium, .large])
+            }
+            .sheet(item: $viewModel.gameSettingsTarget) { game in
+                FormSheetView {
+                    GameSettingsView(game: game)
+                }
+                .presentationDetents([.medium, .large])
+            }
+            .sheet(item: $viewModel.manageTagsTarget) { target in
+                FormSheetView {
+                    TagsPickerView(target: target)
+                }
+            }
+    }
+    
+    @ViewBuilder
+    var content: some View {
+        let showExtraContent = !viewModel.isSelecting && viewModel.query.isEmpty
+        let hasNoGames = games.isEmpty
+        
+        if !hasNoGames {
+            ScrollView {
+                LazyVStack {
+                    if showExtraContent {
+                        KeepPlayingSection(viewModel: viewModel)
+                    }
+                    
+                    Section {
+                        gameList.padding([.horizontal, .bottom])
+                    } header: {
+                        if showExtraContent {
+                            Text("ALL_GAMES")
+                                .sectionHeaderStyle()
+                                .padding([.horizontal, .top])
+                        }
+                    }
+                }
+            }
+        } else if hasNoGames && !viewModel.query.isEmpty {
+            ContentUnavailableMessage.search(text: viewModel.query)
+        } else if hasNoGames && (viewModel.areSystemsFiltered || !viewModel.filteredTags.isEmpty) {
+            ContentUnavailableMessage("NO_RESULTS_FILTERED_TITLE", systemImage: "line.3.horizontal.decrease.circle", description: "NO_RESULTS_FILTERED_MESSAGE")
+        } else {
+            ContentUnavailableMessage("EMPTY_LIBRARY_TITLE", systemImage: "books.vertical", description: "EMPTY_LIBRARY_MESSAGE")
+        }
+    }
+    
+    @ViewBuilder
+    var gameList: some View {
+        LazyVGrid(
+            columns: [GridItem(
+                .adaptive(minimum: minItemWidth, maximum: maxItemWidth),
+                spacing: itemSpacing,
+                alignment: .top
+            )],
+            spacing: itemSpacing
+        ) {
+            ForEach(games) { game in
+                GameItemView(game: game, viewModel: viewModel)
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    func toolbarContent() -> some ToolbarContent {
+        ToolbarItem {
+            Menu("OPTIONS", systemImage: "ellipsis") {
+                if !viewModel.isSelecting {
+                    ToggleButton("SELECT", systemImage: "checkmark.circle", value: $viewModel.isSelecting)
+                }
+                
+                ToggleButton("FILTER", systemImage: "line.3.horizontal.decrease", value: $viewModel.isFiltersViewOpen)
+                ToggleButton("TAGS", systemImage: "tag", value: $viewModel.isTagsViewOpen)
+                
+                Picker("SORT_BY", systemImage: "arrow.up.arrow.down", selection: $settings.listSortMethod) {
+                    Text("NAME").tag(GameListSortingMethod.name)
+                    Text("DATE_ADDED").tag(GameListSortingMethod.dateAdded)
+                }
+                
+                Picker("ORDER_BY", systemImage: "arrow.up.arrow.down", selection: $settings.listSortDirection) {
+                    Text("ASCENDING").tag(GameListSortingDirection.ascending)
+                    Text("DESCENDING").tag(GameListSortingDirection.descending)
+                }
+            }
+        }
+        
+        if #available(iOS 26.0, macOS 26.0, *) {
+            ToolbarSpacer()
+        }
+        
+        
+        if !viewModel.isSelecting {
+            ToolbarItem(placement: .primaryAction) {
+                Button("ADD_GAMES", systemImage: "plus", action: self.addGames)
+            }
+        }
+
+        #if !os(macOS)
+        ToolbarItem(placement: .topBarLeading) {
+            NavigationLink("SETTINGS", systemImage: "gear", to: .settings)
+        }
+        if viewModel.isSelecting {
+            ToolbarItemGroup(placement: .bottomBar) {
+                let hasSelection = viewModel.selection.isEmpty
+                
+                ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $viewModel.isDeleteGamesConfirmationOpen)
+                    .disabled(hasSelection)
+                    .deleteItem("DELETE_GAMES", isPresented: $viewModel.isDeleteGamesConfirmationOpen, perform: deleteGames) {
+                        Text("DELETE_GAMES_MESSAGE")
+                    }
+
+                Spacer()
+
+                Button("MANAGE_TAGS", systemImage: "tag", action: manageTags)
+                    .disabled(hasSelection)
+            }
+
+            ToolbarItem(placement: .confirmationAction) {
+                ConfirmButton("DONE", action: finishSelection)
+            }
+        }
+        #endif
+    }
+}
+
+extension LibraryView {
+    private func addGames() {
+        viewModel.fileImportRequest = .roms(multiple: true, completion: handleUploadedRoms)
+    }
+    
+    @Sendable
+    private nonisolated func handleUploadedRoms(result: Result<[URL], any Error>) {
+        Task {
+            do {
+                let roms = try result.get()
+                let failedGames = try await persistence.objects.createGames(for: roms)
+                // FIXME: Present failed games
+                print(failedGames)
+            } catch {
+                // FIXME: Surface error
+                print(error)
+            }
         }
     }
 }
 
-struct LibraryView: View {
-    static let recentlyPlayedRequest: NSFetchRequest<SaveState> = {
-        let request = SaveState.fetchRequest()
-        request.fetchLimit = 10
-        request.predicate = NSPredicate(format: "isAuto == true")
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \SaveState.date, ascending: false)
-        ]
-        return request
-    }()
-
-    static let romFileTypes: [UTType] = [.romGB, .romGBC, .romGBA, .romNES, .romSNES]
-
-    @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject private var persistence: Persistence
-    @Environment(\.playGame) private var playGame
-    @StateObject private var viewModel: GameListViewModel = .init(filter: .none)
-
-    @State private var isRomPickerOpen: Bool = false
-    @State private var isErrorDialogOpen = false
-    @State private var error: LibraryViewError?
-
-    @FetchRequest(
-        fetchRequest: Self.recentlyPlayedRequest,
-        animation: .default
-    )
-    private var recentlyPlayed: FetchedResults<SaveState>
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                Section {
-                    GameKeepPlayingScroller(
-                        saveStates: self.recentlyPlayed,
-                        viewModel: self.viewModel,
-                        onPlayError: onPlayFailure
-                    )
-                } header: {
-                    SectionHeader("Keep Playing")
-                        .padding([.horizontal, .top])
-                }
-                .isHidden(
-                    self.viewModel.isSelecting ||
-                        self.recentlyPlayed.isEmpty ||
-                        !self.viewModel.searchQuery.isEmpty
-                )
-
-                Section {
-                    GameList(viewModel: self.viewModel)
-                } header: {
-                    SectionHeader("All Games")
-                        .padding([.horizontal, .top])
-                        .padding(.bottom, -8)
-                }
-            }
-            .allowsHitTesting(!self.viewModel.isEmpty)
-            .opacity(Double(!self.viewModel.isEmpty))
-            .overlay {
-                EmptyGameListMessage(filter: self.viewModel.filter)
-                    .opacity(Double(self.viewModel.isEmpty))
-                    .allowsHitTesting(false)
-            }
-            .searchable(text: self.$viewModel.searchQuery)
-            .alert(isPresented: self.$isErrorDialogOpen, error: self.error) {
-                Button("Cancel", role: .cancel) {}
-            }
-            .fileImporter(
-                isPresented: self.$isRomPickerOpen,
-                allowedContentTypes: Self.romFileTypes,
-                onCompletion: self.fileImported
-            )
-            .navigationTitle("Library")
-            .toolbar {
-                ToolbarItem {
-                    if !self.viewModel.isSelecting {
-                        Button {
-                            self.isRomPickerOpen = true
-                        } label: {
-                            Label("Add Game", systemImage: "plus")
-                        }
-                    }
-                }
-
-                ToolbarItem {
-                    if !self.viewModel.isSelecting {
-                        Menu {
-                            GameListMenuItems(viewModel: self.viewModel)
-                        } label: {
-                            Label("List Options", systemImage: "ellipsis.circle")
-                        }
-                    }
-                }
-
-                #if !os(macOS)
-                GameListToolbarItems(viewModel: self.viewModel)
-                #endif
-            }
-            .sheet(item: self.$viewModel.target) { game in
-                GameView(game: game)
-                #if os(macOS)
-                    .frame(minWidth: 240.0, idealWidth: 500.0, minHeight: 240.0, idealHeight: 600.0)
-                #endif
-            }
+extension LibraryView {
+    private func deleteGames() async {
+        let boxes = viewModel.selection.map(ObjectBox.init)
+        do {
+            try await persistence.objects.deleteMany(boxes)
+        } catch {
+            // FIXME: Surface error
+            print(error)
         }
     }
-
-    private func fileImported(result: Result<URL, Error>) {
-        switch result {
-        case .success(let url):
-            Task.detached(priority: .userInitiated) {
-                guard url.startAccessingSecurityScopedResource() else {
-                    return await self.reportError(error: .gameManager(.failedToGetReadPermissions))
-                }
-                defer { url.stopAccessingSecurityScopedResource() }
-
-                let fileType = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType
-
-                let system = if let fileType {
-                    GameSystem(fileType: fileType)
-                } else {
-                    GameSystem.unknown
-                }
-
-                guard system != .unknown else {
-                    return await self.reportError(error: .gameManager(.unknownFileType))
-                }
-
-                let (name, romExtension) = url.fileNameAndExtension()
-
-                do {
-                    try await persistence.objects.createGame(
-                        name: name,
-                        system: system,
-                        romPath: url,
-                        romExtension: romExtension
-                    )
-                } catch {
-                    return await self.reportError(error: .gameManager(error as! GameError))
-                }
-            }
-        case .failure(let err):
-            print(err)
+    
+    private func manageTags() {
+        viewModel.manageTagsTarget = if viewModel.selection.count == 1 {
+            .one(viewModel.selection.first!)
+        } else {
+            .many(viewModel.selection)
         }
     }
-
-    private func onPlayFailure(error: PlayGameError, game: Game) {
-        print(error, game)
-        self.reportError(error: .playAction(error))
+    
+    private func finishSelection() {
+        withAnimation {
+            viewModel.isSelecting = false
+            viewModel.selection.removeAll()
+        }
     }
+}
 
-    @MainActor
-    private func reportError(error: LibraryViewError) {
-        self.error = error
-        self.isErrorDialogOpen = true
+extension LibraryView {
+    private func updatePredicate<T>(_: T) {
+        games.nsPredicate = viewModel.predicate(for: viewModel.query)
+    }
+    
+    private func updateSortDescriptor<T>(_: T) {
+        games.nsSortDescriptors = viewModel.getSortDescriptors(settings: settings)
     }
 }
 
 @available(iOS 18.0, macOS 15.0, *)
-#Preview(traits: .modifier(PreviewStorage())) {
-    LibraryView()
+#Preview(traits: .previewStorage) {
+    NavigationStack {
+        LibraryView()
+    }
+    .environmentObject(CoreRegistry())
+    .environmentObject(Settings())
 }
-

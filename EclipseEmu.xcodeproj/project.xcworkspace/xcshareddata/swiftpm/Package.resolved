@@ -1,13 +1,22 @@
 {
-  "originHash" : "680ba842e2b62f653751e95e1dc578d5665f8e498325ea4bed5cf5d72d8760b5",
+  "originHash" : "f904403a6d80dc0e1e94c4e5cf03eddcc7e2442ec37986bd313433414add0960",
   "pins" : [
+    {
+      "identity" : "atomic-compat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/magnetardev/atomic-compat",
+      "state" : {
+        "revision" : "fd9db27ebac00f5a0533bbdd3b6ae1984bb706cc",
+        "version" : "1.0.0"
+      }
+    },
     {
       "identity" : "core-mgba",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/eclipseemu/core-mgba.git",
+      "location" : "https://github.com/eclipseemu/core-mgba",
       "state" : {
         "branch" : "main",
-        "revision" : "5c18822f3e5d9fead91d67f5b4cb14adaf04ad5a"
+        "revision" : "df24efbfa8206640c1f7f56534322d8848f87c8d"
       }
     },
     {
@@ -16,7 +25,7 @@
       "location" : "https://github.com/eclipseemu/eclipsekit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "ff40632228a1833f8bd22408f673f372786490f2"
+        "revision" : "1b30bc0f4c70c58ea5d738aa21bc66be83fcfdec"
       }
     },
     {
@@ -24,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-atomics.git",
       "state" : {
-        "revision" : "cd142fd2f64be2100422d658e7411e39489da985",
-        "version" : "1.2.0"
+        "revision" : "b601256eab081c0f92f059e12818ac1d4f178ff7",
+        "version" : "1.3.0"
       }
     }
   ],

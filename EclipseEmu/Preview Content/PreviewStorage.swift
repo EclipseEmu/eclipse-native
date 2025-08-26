@@ -7,37 +7,37 @@ struct PreviewStorage: PreviewModifier {
         try persistence.mainContext.saveIfNeeded()
         return persistence
     }
-
+    
     private static func insertGames(into persistence: Persistence) {
-        let ctx = persistence.mainContext
+        let objectContext = persistence.mainContext
 
         let tags = [
-            Tag(name: "Collection 0", color: .mint),
-            Tag(name: "Collection 1", color: .cyan),
-            Tag(name: "Collection 2", color: .green),
-            Tag(name: "Collection 3", color: .blue),
+            TagObject.create(in: objectContext, name: "Collection 0", color: .mint),
+            TagObject.create(in: objectContext, name: "Collection 1", color: .cyan),
+            TagObject.create(in: objectContext, name: "Collection 2", color: .green),
+            TagObject.create(in: objectContext, name: "Collection 3", color: .blue),
         ]
 
-        for tag in tags {
-            ctx.insert(tag)
-        }
-
         for i in 0..<32 {
-            let game = Game(
+            let game = GameObject.create(
+                in: objectContext,
                 name: "Game \(i)",
                 system: .gba,
                 sha1: "abcdef1234567890",
                 romExtension: "gba",
-                saveExtension: "sav",
-                boxart: nil
+                saveExtension: "sav"
             )
-            ctx.insert(game)
 
             let randIdx = i & 3
             tags[randIdx].addToGames(game)
             for j in (0...randIdx) {
-                let saveState = SaveState(isAuto: j == 0, stateExtension: "s8", preview: nil, game: game)
-                ctx.insert(saveState)
+                let saveState = SaveStateObject.create(
+                    in: objectContext,
+                    isAuto: j == 0,
+					core: .testCore,
+                    stateExtension: "s8"
+                )
+                saveState.game = game
             }
         }
     }
@@ -45,4 +45,9 @@ struct PreviewStorage: PreviewModifier {
     func body(content: Content, context: Persistence) -> some View {
         content.persistence(context)
     }
+}
+
+@available(iOS 18.0, macOS 15.0, *)
+extension PreviewTrait where T == Preview.ViewTraits {
+    @MainActor static var previewStorage: Self = .modifier(PreviewStorage())
 }

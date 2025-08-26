@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="614px" height="300px" viewBox="0 0 614 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Stack</title>
+    <defs>
+        <path d="M0,0 L614,0 L614,300 L0,300 L0,0 Z" id="path-1"></path>
+    </defs>
+    <g id="Stack" stroke="none" fill="none" xlink:href="#path-1" fill-rule="evenodd">
+        <g id="Group" stroke-width="1" transform="translate(364, 37)" fill="#000000">
+            <circle id="Oval" cx="62.5" cy="163.5" r="62.5"></circle>
+            <circle id="Oval" cx="187.5" cy="62.5" r="62.5"></circle>
+        </g>
+        <path d="M172,0 C187.463973,0 200,12.536027 200,28 L200,100 L272,100 C287.463973,100 300,112.536027 300,128 L300,172 C300,187.463973 287.463973,200 272,200 L200,200 L200,272 C200,287.463973 187.463973,300 172,300 L128,300 C112.536027,300 100,287.463973 100,272 L100,200 L28,200 C12.536027,200 0,187.463973 0,172 L0,128 C-3.55271368e-15,112.536027 12.536027,100 28,100 L100,100 L100,28 C100,12.536027 112.536027,0 128,0 L172,0 Z" id="Combined-Shape" fill="#000000"></path>
+    </g>
+</svg>
