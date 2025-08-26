@@ -147,15 +147,13 @@ struct ControllerEditorView: View {
             .presentationDetents([.medium, .large])
         }
         .toolbar {
-            Menu {
+            Menu("CONTROL_NAMES", systemImage: "textformat") {
                 Picker(selection: $viewModel.controlsNaming) {
                     Text("CONTROLLER_XBOX").tag(ControllerButtonNaming.xbox)
                     Text("CONTROLLER_NINTENDO").tag(ControllerButtonNaming.nintendo)
                     Text("CONTROLLER_PLAYSTATION").tag(ControllerButtonNaming.playstation)
                 } label: {}
                 .labelsHidden()
-            } label: {
-                Label("CONTROL_NAMES", systemImage: "textformat")
             }
         }
     }

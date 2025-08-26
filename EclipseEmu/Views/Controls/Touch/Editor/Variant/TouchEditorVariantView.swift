@@ -37,34 +37,10 @@ struct TouchEditorVariantView: View {
 		content
 			.toolbar {
 				ToolbarItemGroup(placement: .keyboard) {
-					Button {
-						switch focusTarget {
-						case .screenOffsetX:
-							viewModel.mappings.variants[target].screenOffset.x *= -1
-						case .screenOffsetY:
-							viewModel.mappings.variants[target].screenOffset.y *= -1
-						case .menuOffsetX:
-							viewModel.mappings.variants[target].menu.xOffset *= -1
-						case .menuOffsetY:
-							viewModel.mappings.variants[target].menu.yOffset *= -1
-						case .elementOffsetX(let index):
-							viewModel.mappings.variants[target].elements[index].rect.xOffset *= -1
-						case .elementOffsetY(let index):
-							viewModel.mappings.variants[target].elements[index].rect.yOffset *= -1
-						case .elementSize, .menuSize, nil: break
-						}
-					} label: {
-						Label("TOGGLE_NEGATIVE", systemImage: "plus.forwardslash.minus")
-					}
-					.disabled(focusTarget?.isFlippable != true)
-
+                    Button("TOGGLE_NEGATIVE", systemImage: "plus.forwardslash.minus", action: toggleNegative)
+                        .disabled(focusTarget?.isFlippable != true)
 					Spacer()
-
-					Button {
-						focusTarget = nil
-					} label: {
-						Label("HIDE_KEYBOARD", systemImage: "keyboard.chevron.compact.down")
-					}
+                    Button("HIDE_KEYBOARD", systemImage: "keyboard.chevron.compact.down", action: hideKeyboard)
 				}
 			}
 	}
@@ -91,10 +67,32 @@ struct TouchEditorVariantView: View {
 			.padding(32)
 			.background(Color(uiColor: .systemGray4))
 	}
-
-	@ViewBuilder
-	var form: some View {
-		TouchEditorVariantInspectorView(viewModel: viewModel, target: target, focusTarget: $focusTarget)
-	}
+    
+    @ViewBuilder
+    var form: some View {
+        TouchEditorVariantInspectorView(viewModel: viewModel, target: target, focusTarget: $focusTarget)
+    }
+    
+    func toggleNegative() {
+        switch focusTarget {
+        case .screenOffsetX:
+            viewModel.mappings.variants[target].screenOffset.x *= -1
+        case .screenOffsetY:
+            viewModel.mappings.variants[target].screenOffset.y *= -1
+        case .menuOffsetX:
+            viewModel.mappings.variants[target].menu.xOffset *= -1
+        case .menuOffsetY:
+            viewModel.mappings.variants[target].menu.yOffset *= -1
+        case .elementOffsetX(let index):
+            viewModel.mappings.variants[target].elements[index].rect.xOffset *= -1
+        case .elementOffsetY(let index):
+            viewModel.mappings.variants[target].elements[index].rect.yOffset *= -1
+        case .elementSize, .menuSize, nil: break
+        }
+    }
+    
+    func hideKeyboard() {
+        focusTarget = nil
+    }
 }
 #endif

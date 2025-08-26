@@ -47,7 +47,7 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
                 
                 Spacer()
                 
-                Menu {
+                Menu("SETTINGS", systemImage: "gearshape.fill") {
                     speedPicker
                         .labelStyle(.titleOnly)
                     Divider()
@@ -58,8 +58,6 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
                         loadStateButton
                             .labelStyle(.titleOnly)
                     }
-                } label: {
-                    Label("SETTINGS", systemImage: "gearshape.fill")
                 }
                 
                 HStack {
@@ -102,11 +100,9 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
     var body: some View {
         Menu {
             playPauseButton
-            Menu {
+            Menu("AUDIO", systemImage: "speaker.2") {
                 requireRingerToggle
                 volumeSlider
-            } label: {
-                Label("AUDIO", systemImage: "speaker.2")
             }
             
             speedPicker.pickerStyle(.menu)
@@ -140,51 +136,39 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
 
     @ViewBuilder
     var quitButton: some View {
-        ToggleButton(role: .destructive, value: $isQuitConfirmationOpen) {
-            Label("QUIT", systemImage: "power")
-        }
+        ToggleButton("QUIT", systemImage: "power", role: .destructive, value: $isQuitConfirmationOpen)
     }
     
     @ViewBuilder
     var resetButton: some View {
-        ToggleButton(role: .destructive, value: $isResetConfirmationOpen) {
-            Label("RESET_GAME", systemImage: "arrow.clockwise")
-        }
+        ToggleButton("RESET_GAME", systemImage: "arrow.clockwise", role: .destructive, value: $isResetConfirmationOpen)
     }
     
     @ViewBuilder
     var playPauseButton: some View {
+        let titleKey: LocalizedStringKey = viewModel.isPlaying ? "PAUSE" : "PLAY"
 #if os(macOS)
-        let pauseImageName = "pause.fill"
-        let playImageName = "play.fill"
+        let systemImage : String = viewModel.isPlaying ? "pause.fill" : "play.fill"
 #else
-        let pauseImageName = "pause"
-        let playImageName = "play"
+        let systemImage : String = viewModel.isPlaying ? "pause" : "play"
 #endif
-        ToggleButton(value: $viewModel.isPlaying) {
-            if viewModel.isPlaying {
-                Label("PAUSE", systemImage: pauseImageName)
-            } else {
-                Label("PLAY", systemImage: playImageName)
+
+        ToggleButton(titleKey, systemImage: systemImage, value: $viewModel.isPlaying)
+            .modify {
+                if #available(iOS 17.0, *) {
+                    $0.contentTransition(.symbolEffect)
+                } else {
+                    $0
+                }
             }
-        }
-        .modify {
-            if #available(iOS 17.0, *) {
-                $0.contentTransition(.symbolEffect)
-            } else {
-                $0
-            }
-        }
     }
     
     @ViewBuilder
     var speedPicker: some View {
-        Picker(selection: $viewModel.speed) {
+        Picker("SPEED", systemImage: "speedometer", selection: $viewModel.speed) {
             ForEach(EmulationSpeed.allCases, id: \.rawValue) { value in
                 value.tag(value)
             }
-        } label: {
-            Label("SPEED", systemImage: "speedometer")
         }
     }
     
@@ -205,27 +189,21 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
     #if os(iOS)
     @ViewBuilder
     var requireRingerToggle: some View {
-        Toggle(isOn: $viewModel.ignoreSilentMode) {
-            Label("IGNORE_SILENT_MODE", systemImage: "bell")
-        }
+        Toggle("IGNORE_SILENT_MODE", systemImage: "bell", isOn: $viewModel.ignoreSilentMode)
     }
     #endif
     
     @ViewBuilder
     var loadStateButton: some View {
-        ToggleButton(value: $viewModel.isLoadStateViewOpen) {
-            Label("LOAD_STATE", systemImage: "square.and.arrow.up")
-        }
+        ToggleButton("LOAD_STATE", systemImage: "square.and.arrow.up", value: $viewModel.isLoadStateViewOpen)
     }
     
     @ViewBuilder
     var saveStateButton: some View {
-        Button {
+        Button("SAVE_STATE", systemImage: "square.and.arrow.down") {
             Task {
                 try await viewModel.saveState()
             }
-        } label: {
-            Label("SAVE_STATE", systemImage: "square.and.arrow.down")
         }
     }
     

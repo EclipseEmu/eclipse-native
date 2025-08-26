@@ -1,14 +1,15 @@
 import EclipseKit
 import SwiftUI
 
-struct EditCheatView: View {
-    private let game: GameObject
-    private let cheatFormats: [CoreCheatFormat]
-    private let cheat: CheatObject?
-    private let isCreatingCheat: Bool
-
+struct CheatEditorView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var persistence: Persistence
+
+    private let game: GameObject
+    private let cheatFormats: [CoreCheatFormat]
+    private let target: EditorTarget<CheatObject>
+    private let title: LocalizedStringKey
+
     @State var label: String
     @State var format: CoreCheatFormat
     @State var formatter: CheatFormatter
@@ -16,35 +17,39 @@ struct EditCheatView: View {
     @State var enabled: Bool = true
     @State var isCodeValid: Bool = false
 
-    init(cheat: CheatObject?, game: GameObject, cheatFormats: [CoreCheatFormat]) {
-        self.cheat = cheat
+    init(target: EditorTarget<CheatObject>, game: GameObject, cheatFormats: [CoreCheatFormat]) {
         self.game = game
         self.cheatFormats = cheatFormats
-        self.isCreatingCheat = cheat == nil
-
-        if let cheat {
-            let format = cheatFormats.first { $0.id == cheat.type }!
-            self.format = format
-            self.formatter = format.makeFormatter()
+        self.target = target
+        
+        var format: CoreCheatFormat
+        switch target {
+        case .create:
+            self.title = "ADD_CHEAT"
+            
+            format = cheatFormats[0]
+            self.label = ""
+            self.code = ""
+        case .edit(let cheat):
+            self.title = "EDIT_CHEAT"
+            
+            format = cheatFormats.first { $0.id == cheat.type }!
             self.label = cheat.label ?? ""
             self.code = cheat.code ?? ""
             self.enabled = cheat.enabled
-            self.isCodeValid = true
-        } else {
-            let format = cheatFormats[0]
-            self.format = cheatFormats[0]
-            self.formatter = format.makeFormatter()
-            self.label = ""
-            self.code = ""
         }
+        
+        self.format = cheatFormats[0]
+        self.formatter = format.makeFormatter()
+        self.isCodeValid = formatter.validate(value: code)
     }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("CHEAT_NAME", text: self.$label)
-                    Toggle("CHEAT_ENABLED", isOn: self.$enabled)
+                    TextField("CHEAT_NAME", text: $label)
+                    Toggle("CHEAT_ENABLED", isOn: $enabled)
                 } header: {
 #if !os(macOS)
                     Text("CHEAT_NAME_AND_STATE")
@@ -52,31 +57,31 @@ struct EditCheatView: View {
                 }
 
                 Section {
-                    Picker("CHEAT_FORMAT", selection: self.$format) {
-                        ForEach(self.cheatFormats, id: \.id) { format in
+                    Picker("CHEAT_FORMAT", selection: $format) {
+                        ForEach(cheatFormats, id: \.id) { format in
 							Text(format.name).tag(format)
                         }
                     }
 
 #if os(macOS)
                     LabeledContent("CHEAT_CODE") {
-                        CheatCodeField(value: self.$code, formatter: self.$formatter)
+                        CheatCodeField(value: $code, formatter: $formatter)
                     }
 #else
-                    CheatCodeField(value: self.$code, formatter: self.$formatter)
+                    CheatCodeField(value: $code, formatter: $formatter)
 #endif
                 } header: {
 #if !os(macOS)
                     Text("CHEAT_CODE")
 #endif
                 } footer: {
-					Text("CHEAT_CORE_FORMAT_MESSAGE \"\(self.format.pattern.uppercased())\"")
+					Text("CHEAT_CORE_FORMAT_MESSAGE \"\(format.pattern.uppercased())\"")
                 }
             }
             .formStyle(.grouped)
-            .onChange(of: self.format, perform: self.formatChanged)
-            .onChange(of: self.code, perform: self.codeChanged)
-            .navigationTitle(self.isCreatingCheat ? "ADD_CHEAT" : "EDIT_CHEAT")
+            .onChange(of: format, perform: formatChanged)
+            .onChange(of: code, perform: codeChanged)
+            .navigationTitle(title)
 #if os(macOS)
             .padding()
 #endif
@@ -85,8 +90,8 @@ struct EditCheatView: View {
                     CancelButton(action: dismiss.callAsFunction)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    ConfirmButton("DONE", action: self.save)
-                        .disabled(self.label.isEmpty || !self.isCodeValid)
+                    ConfirmButton("DONE", action: save)
+                        .disabled(label.isEmpty || !isCodeValid)
                 }
             }
         }
@@ -94,31 +99,24 @@ struct EditCheatView: View {
 
     func formatChanged(value: CoreCheatFormat) {
         self.formatter = value.makeFormatter()
-        self.code = self.formatter.formatInput(value: self.code)
-        self.isCodeValid = self.formatter.validate(value: self.code)
+        self.code = formatter.formatInput(value: code)
+        self.isCodeValid = formatter.validate(value: code)
     }
 
     func codeChanged(value: String) {
-        self.isCodeValid = self.formatter.validate(value: value)
+        self.isCodeValid = formatter.validate(value: value)
     }
 
     func save() {
-        guard self.isCodeValid && !self.label.isEmpty else { return }
+        guard isCodeValid && !label.isEmpty else { return }
 
         let format = self.format.id
         let normalizedCode = self.format.normalizeCode(string: self.code)
 
         Task {
             do {
-                if let cheat {
-                    try await persistence.objects.update(
-                        cheat: .init(cheat),
-                        name: self.label,
-                        code: self.format.normalizeCode(string: self.code),
-                        format: self.format.id,
-                        enabled: self.enabled
-                    )
-                } else {
+                switch target {
+                case .create:
                     try await persistence.objects.createCheat(
                         name: self.label,
                         code: normalizedCode,
@@ -126,9 +124,18 @@ struct EditCheatView: View {
                         isEnabled: self.enabled,
                         for: .init(self.game)
                     )
+                case .edit(let cheat):
+                    try await persistence.objects.update(
+                        cheat: .init(cheat),
+                        name: self.label,
+                        code: self.format.normalizeCode(string: self.code),
+                        format: self.format.id,
+                        enabled: self.enabled
+                    )
                 }
                 self.dismiss()
             } catch {
+                // FIXME: Surface error
                 print(error)
             }
         }
@@ -139,7 +146,7 @@ struct EditCheatView: View {
 #Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
-            EditCheatView(cheat: nil, game: game, cheatFormats: [])
+            CheatEditorView(target: .create, game: game, cheatFormats: [])
         }
     }
 }

@@ -1,8 +1,11 @@
-@MainActor
-struct LicenseItem: Identifiable {
+struct LicenseItem: Identifiable, Hashable {
     let id: Int
     let name: String
     let content: String
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 @MainActor

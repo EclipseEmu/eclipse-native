@@ -16,7 +16,7 @@ private extension EditorTarget where Item == TagObject {
     }
 }
 
-struct EditTagView: View {
+struct TagEditorView: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
     @EnvironmentObject private var persistence: Persistence
 
@@ -110,6 +110,6 @@ struct EditTagView: View {
 
 #Preview {
     FormSheetView {
-        EditTagView(mode: .create)
+        TagEditorView(mode: .create)
     }
 }

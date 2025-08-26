@@ -18,7 +18,7 @@ struct GameItemView: View {
     @State private var isImportSaveConfirmationOpen: Bool = false
     @State private var isDeleteSaveConfirmationOpen: Bool = false
 
-    var isSelected: Bool {
+    private var isSelected: Bool {
         viewModel.selection.contains(game)
     }
     
@@ -28,14 +28,11 @@ struct GameItemView: View {
         Button(action: action) {
             DualLabeledImage(
                 title: Text(verbatim: game.name, fallback: "GAME_UNNAMED"),
-                subtitle: Text(game.system.string)
+                subtitle: Text(game.system.string),
+                image: game.cover,
+                overlayAlignment: .bottomTrailing
             ) {
-                CoverArtView(game.cover)
-                    .overlay(alignment: .bottomTrailing) {
-                        GameItemCheckbox(isSelected: isSelected)
-                            .opacity(Double(viewModel.isSelecting))
-                            .padding(8.0)
-                    }
+                checkbox(isSelected: isSelected)
             }
             .contentShape(Rectangle())
             .opacity(viewModel.isSelecting && !isSelected ? 0.5 : 1.0)
@@ -64,97 +61,81 @@ struct GameItemView: View {
     }
     
     @ViewBuilder
+    private func checkbox(isSelected: Bool) -> some View {
+        ZStack {
+            Circle()
+                .foregroundStyle(isSelected ? AnyShapeStyle(.selection) : AnyShapeStyle(.background))
+            Image(systemName: "checkmark")
+                .foregroundStyle(.white)
+                .imageScale(.small)
+                .frame(width: 24, height: 24)
+                .opacity(Double(isSelected))
+            Circle()
+                .stroke(lineWidth: 2)
+                .foregroundStyle(isSelected ? .white.opacity(1) : .gray.opacity(0.8))
+        }
+        .compositingGroup()
+        .frame(width: 24, height: 24)
+        .opacity(Double(viewModel.isSelecting))
+        .padding(8.0)
+    }
+    
+    @ViewBuilder
     private func menuItems() -> some View {
-        Button(action: play) {
-            Label("PLAY", systemImage: "play")
-        }
-        Button {
-            viewModel.gameSaveStatesTarget = game
-        } label: {
-            Label("SAVE_STATES", systemImage: "rectangle.stack.badge.play")
+        ControlGroup {
+            Button("PLAY", systemImage: "play.fill", action: play)
+            Button("SAVE_STATES", systemImage: "rectangle.stack.badge.play.fill") {
+                viewModel.gameSaveStatesTarget = game
+            }
         }
         
-        Divider()
-        
-        ToggleButton(value: $isRenameGameConfirmationOpen) {
-            Label("RENAME", systemImage: "text.cursor")
-        }
+        ToggleButton("RENAME", systemImage: "text.cursor", value: $isRenameGameConfirmationOpen)
 
-        Button {
+        Button("MANAGE_TAGS", systemImage: "tag") {
             viewModel.manageTagsTarget = .one(game)
-        } label: {
-            Label("MANAGE_TAGS", systemImage: "tag")
         }
         
-        Menu {
-            Button {
+        Menu("REPLACE_COVER_ART", systemImage: "photo") {
+            Button("REPLACE_COVER_ART_FROM_DATABASE", systemImage: "cylinder.split.1x2") {
                 viewModel.coverPickerMethod = .database(game)
-            } label: {
-                Label("REPLACE_COVER_ART_FROM_DATABASE", systemImage: "cylinder.split.1x2")
             }
-            Button {
+            Button("REPLACE_COVER_ART_FROM_PHOTOS", systemImage: "photo.stack") {
                 viewModel.coverPickerMethod = .photos(game)
-            } label: {
-                Label("REPLACE_COVER_ART_FROM_PHOTOS", systemImage: "photo.stack")
             }
-        } label: {
-            Label("REPLACE_COVER_ART", systemImage: "photo")
         }
         
         Divider()
 
-        ToggleButton(value: $isReplaceRomConfirmationOpen) {
-            Label("REPLACE_ROM", systemImage: "rectangle.2.swap")
-        }
+        ToggleButton("REPLACE_ROM", systemImage: "rectangle.2.swap", value: $isReplaceRomConfirmationOpen)
         
-        Menu {
-            ToggleButton(value: $isImportSaveConfirmationOpen) {
-                Label("IMPORT_SAVE", systemImage: "square.and.arrow.down")
-            }
-            Button(action: exportSave) {
-                Label("EXPORT_SAVE", systemImage: "square.and.arrow.up")
-            }
+        Menu("MANAGE_SAVE", systemImage: "doc") {
+            ToggleButton("IMPORT_SAVE", systemImage: "square.and.arrow.down", value: $isImportSaveConfirmationOpen)
+            Button("EXPORT_SAVE", systemImage: "square.and.arrow.up", action: exportSave)
             Divider()
-            ToggleButton(role: .destructive, value: $isDeleteSaveConfirmationOpen) {
-                Label("DELETE_SAVE", systemImage: "trash")
-            }
-        } label: {
-            Label("MANAGE_SAVE", systemImage: "doc")
+            ToggleButton("DELETE_SAVE", systemImage: "trash", role: .destructive, value: $isDeleteSaveConfirmationOpen)
         }
         
-        Button {
+        Button("MANAGE_CHEATS", systemImage: "memorychip") {
             viewModel.gameCheatsTarget = game
-        } label: {
-            Label("MANAGE_CHEATS", systemImage: "memorychip")
         }
-        Button {
+        Button("SETTINGS", systemImage: "gear") {
             viewModel.gameSettingsTarget = game
-        } label: {
-            Label("SETTINGS", systemImage: "gear")
         }
         Divider()
         
-        ToggleButton(role: .destructive, value: $isDeleteGameConfirmationOpen) {
-            Label("DELETE", systemImage: "trash")
-        }
+        ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $isDeleteGameConfirmationOpen)
     }
     
     @ViewBuilder
     private func preview() -> some View {
-        VStack(spacing: 12.0) {
-            CoverArtView(game.cover)
-                .frame(minWidth: 0, idealWidth: 192.0, maxWidth: .infinity, alignment: .leading)
-            VStack(alignment: .leading) {
-                Text(verbatim: game.name, fallback: "GAME_UNNAMED")
-                    .font(.footnote)
-                    .lineLimit(1)
-                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                Text(game.system.string)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            }
+        DualLabeledImage(
+            title: Text(verbatim: game.name, fallback: "GAME_UNNAMED"),
+            subtitle: Text(game.system.string),
+            image: game.cover,
+            idealWidth: 192.0,
+            overlayAlignment: .bottomTrailing
+        ) {
+            EmptyView()
         }
         .padding()
         .environmentObject(persistence)

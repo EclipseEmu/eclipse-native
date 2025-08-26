@@ -44,7 +44,7 @@ struct CoverPickerDatabaseView: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @EnvironmentObject var persistence: Persistence
 
-    @ObservedObject private var viewModel: CoverPickerDatabaseViewModel
+    @StateObject private var viewModel: CoverPickerDatabaseViewModel = .init()
 
     @ObservedObject private var game: GameObject
     let system: System
@@ -52,7 +52,6 @@ struct CoverPickerDatabaseView: View {
     init(game: GameObject) {
         self.game = game
         self.system = game.system
-        self.viewModel = CoverPickerDatabaseViewModel()
     }
     
     var body: some View {
@@ -64,9 +63,9 @@ struct CoverPickerDatabaseView: View {
                     CancelButton("CANCEL", action: dismiss.callAsFunction)
                 }
             }
-            .task {
-                let query = game.name?.normalize(with: .alphanumerics.union(.whitespaces)) ?? ""
-                viewModel.search(for: query, system: game.system)
+            .onAppear {
+                viewModel.query = game.name?.normalize(with: .alphanumerics.union(.whitespaces)) ?? ""
+                viewModel.search(for: viewModel.query, system: game.system)
             }
             .onReceive(viewModel.$query.debounce(for: .milliseconds(250), scheduler: RunLoop.main)) { query in
                 viewModel.search(for: query, system: game.system)
@@ -81,53 +80,38 @@ struct CoverPickerDatabaseView: View {
         case .failure(let failure):
             ContentUnavailableMessage.error(error: failure)
         case .noQuery:
-            ContentUnavailableMessage {
-                Label("COVER_ART_SEARCH_FOR_GAMES", systemImage: "magnifyingglass")
-            }
+            ContentUnavailableMessage("COVER_ART_SEARCH_FOR_GAMES", systemImage: "magnifyingglass")
+        case .results(let results) where results.isEmpty:
+            ContentUnavailableMessage.search(text: viewModel.query)
         case .results(let results):
-            if results.isEmpty {
-                ContentUnavailableMessage.search(text: viewModel.query)
-            } else {
-                List(results, rowContent: listItem)
-            }
+            List(results, rowContent: listItem)
         }
     }
     
     @ViewBuilder
     private func listItem(_ item: OpenVGDBItem) -> some View {
-        HStack(alignment: .center, spacing: 12.0) {
-            AsyncImage(url: item.cover) { image in
-                image
-                    .resizable()
-                    .clipShape(RoundedRectangle(cornerRadius: 2.0))
-                    .scaledToFit()
-            } placeholder: {
-                RoundedRectangle(cornerRadius: 8.0)
-                    .foregroundStyle(.secondary)
-            }
-            .aspectRatio(1.0, contentMode: .fit)
-            .frame(width: 52.0, height: 52.0)
-
-            VStack(alignment: .leading) {
-                Text(item.name).lineLimit(2)
-                Text(item.region)
-                    .lineLimit(1)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            
-            Spacer()
-            
+        LabeledContent {
             Button("USE") {
                 setCoverArt(item)
             }
             .textCase(.uppercase)
-            .fontWeight(.semibold)
             .buttonStyle(.bordered)
-#if !os(macOS)
-            .buttonBorderShape(.capsule)
-#endif
+            .layoutPriority(1)
+        } label: {
+            HStack(alignment: .center, spacing: 12.0) {
+                RemoteImageView(item.cover, aspectRatio: 1.0, cornerRadius: 4.0)
+                    .frame(width: 52.0, height: 52.0)
+                
+                VStack(alignment: .leading) {
+                    Text(item.name).lineLimit(2)
+                    Text(item.region)
+                        .lineLimit(1)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
+        .labeledContentStyle(.noWrap)
     }
     
     func setCoverArt(_ item: OpenVGDBItem) {

@@ -23,12 +23,10 @@ struct ControllerButtonEditorView: View {
             Section {
                 InputPickerView(inputs: $inputs, availableInputs: viewModel.system.inputs, namingConvention: viewModel.inputNaming)
                 
-                Picker(selection: $direction) {
+                Picker("DIRECTION", systemImage: "chevron.compact.up.chevron.compact.right.chevron.compact.down.chevron.compact.left", selection: $direction) {
                     ForEach(ControlMappingDirection.allCases, id: \.rawValue) { direction in
                         Text(direction.label).tag(direction)
                     }
-                } label: {
-                    Label("DIRECTION", systemImage: "chevron.compact.up.chevron.compact.right.chevron.compact.down.chevron.compact.left")
                 }
             } footer: {
                 Text("CONTROLS_DIRECTION_EXPLAINER")

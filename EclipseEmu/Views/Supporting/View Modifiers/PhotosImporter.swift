@@ -145,10 +145,8 @@ extension View {
                 EmptyView()
             }
 
-            Button {
+            Button("Pick Image", systemImage: "photo") {
                 self.isPickerOpen = true
-            } label: {
-                Label("Pick Image", systemImage: "photo")
             }
             .photosImporter(isPresented: $isPickerOpen) { result in
                 self.result = result

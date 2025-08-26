@@ -8,6 +8,27 @@ struct EditableContent<Label: View>: View {
 		self.action = action
 		self.label = label
 	}
+    
+    init(_ titleKey: LocalizedStringKey, systemImage: String, action: @escaping () -> Void) where Label == SwiftUI.Label<Text, Image> {
+        self.action = action
+        self.label = { Label(titleKey, systemImage: systemImage) }
+    }
+    
+    init(verbatim titleKey: String, systemImage: String, action: @escaping () -> Void) where Label == SwiftUI.Label<Text, Image> {
+        self.action = action
+        self.label = { Label(titleKey, systemImage: systemImage) }
+    }
+    
+    init(verbatim titleKey: String?, fallback: LocalizedStringKey, systemImage: String, action: @escaping () -> Void) where Label == SwiftUI.Label<Text, Image> {
+        self.action = action
+        self.label = {
+            Label {
+                Text(verbatim: titleKey, fallback: fallback)
+            } icon: {
+                Image(systemName: systemImage)
+            }
+        }
+    }
 
 	var body: some View {
 		LabeledContent(content: {

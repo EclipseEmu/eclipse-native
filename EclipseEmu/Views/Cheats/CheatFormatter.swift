@@ -1,6 +1,6 @@
 import Foundation
 
-final class CheatFormatter {
+struct CheatFormatter {
     struct FormattedText {
         static let zero = Self(formattedText: "", cursorOffset: 0)
 

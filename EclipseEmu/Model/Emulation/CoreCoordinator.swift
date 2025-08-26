@@ -53,7 +53,6 @@ final actor CoreCoordinator<Core: CoreProtocol>: CAMetalDisplayLinkDelegate {
 	// 1000 (for ms) / 60 (for fps) / 1000 (convert to seconds)
 	private var coreFrameDuration: TimeInterval = 0.0
 
-
 	nonisolated let screen: CGSize
 	nonisolated(unsafe) private let pixelFormat: CoreVideoDescriptor.PixelFormat
 
@@ -70,9 +69,9 @@ final actor CoreCoordinator<Core: CoreProtocol>: CAMetalDisplayLinkDelegate {
 		}
 
 		func didSave() {
-			guard let instance else { return }
-			_onFastPath()
-			print(instance)
+            Task { @MainActor in
+                NotificationCenter.default.post(name: .EKGameCoreDidSave, object: nil)
+            }
 		}
 	}
 
@@ -280,8 +279,6 @@ final actor CoreCoordinator<Core: CoreProtocol>: CAMetalDisplayLinkDelegate {
 		let layer = unsafe layer.inner
 		let displayLink = CAMetalDisplayLink(metalLayer: layer)
 		self.displayLink = .init(layer: layer, displayLink: displayLink)
-		//        displayLink.preferredFrameRateRange = .init(minimum: 120.0, maximum: 120.0, preferred: 120.0)
-		//        displayLink.preferredFrameLatency = 2
 		displayLink.isPaused = false
 		displayLink.delegate = self
 		self.executor.addTimer(displayLink, forMode: .default)

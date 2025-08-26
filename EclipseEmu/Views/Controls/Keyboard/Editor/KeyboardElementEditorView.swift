@@ -46,12 +46,14 @@ struct KeyboardElementEditorView: View {
             Section {
                 InputPickerView(inputs: $mapping.input, availableInputs: viewModel.system.inputs, namingConvention: self.viewModel.namingConvention)
                 
-                Picker(selection: $mapping.direction) {
+                Picker(
+                    "DIRECTION",
+                    systemImage: "chevron.compact.up.chevron.compact.right.chevron.compact.down.chevron.compact.left",
+                    selection: $mapping.direction
+                ) {
                     ForEach(ControlMappingDirection.allCases, id: \.rawValue) { direction in
                         Text(direction.label).tag(direction)
                     }
-                } label: {
-                    Label("DIRECTION", systemImage: "chevron.compact.up.chevron.compact.right.chevron.compact.down.chevron.compact.left")
                 }
             } footer: {
                 Text("CONTROLS_DIRECTION_EXPLAINER")

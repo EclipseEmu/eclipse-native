@@ -20,21 +20,17 @@ struct TouchEditorButtonView: View {
 			Section {
                 InputPickerView(inputs: $viewModel.mappings.buttons[target].input, availableInputs: viewModel.system.inputs, namingConvention: viewModel.namingConvention)
                 
-				Picker(selection: $viewModel.mappings.buttons[target].direction) {
+				Picker("DIRECTION", systemImage: "dpad", selection: $viewModel.mappings.buttons[target].direction) {
 					ForEach(ControlMappingDirection.allCases, id: \.rawValue) { direction in
 						Text(direction.label).tag(direction)
 					}
-				} label: {
-					Label("DIRECTION", systemImage: "dpad")
 				}
 			} footer: {
 				Text("CONTROLS_DIRECTION_EXPLAINER")
 			}
             
             Section {
-                Toggle(isOn: $viewModel.mappings.buttons[target].visible) {
-                    Label("VISIBLE", systemImage: "eye")
-                }
+                Toggle("VISIBLE", systemImage: "eye", isOn: $viewModel.mappings.buttons[target].visible)
             }
 		}
 		.navigationTitle("EDIT_BUTTON")

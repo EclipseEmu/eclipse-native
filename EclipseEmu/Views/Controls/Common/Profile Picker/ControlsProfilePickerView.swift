@@ -24,11 +24,7 @@ struct ControlsProfilePickerView<ProfileObject: ControlsProfileObject>: View {
     @ViewBuilder
     var content: some View {
         if profiles.isEmpty && query.isEmpty {
-            ContentUnavailableMessage {
-                Label("NO_PROFILES_TITLE", systemImage: "magnifyingglass")
-            } description: {
-                Text("NO_PROFILES_MESSAGE")
-            }
+            ContentUnavailableMessage("NO_PROFILES_TITLE", systemImage: "magnifyingglass", description: "NO_PROFILES_MESSAGE")
         } else if profiles.isEmpty {
             ContentUnavailableMessage.search(text: query)
         } else {

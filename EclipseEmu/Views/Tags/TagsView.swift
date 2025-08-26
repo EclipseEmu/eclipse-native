@@ -13,18 +13,12 @@ struct TagsView: View {
     @ViewBuilder
     var mainContent: some View {
         if tags.isEmpty {
-            ContentUnavailableMessage {
-                Label("NO_TAGS", systemImage: "tag")
-            } description: {
-                Text("NO_TAGS_MESSAGE")
-            }
+            ContentUnavailableMessage("NO_TAGS", systemImage: "tag", description: "NO_TAGS_MESSAGE")
         } else {
             List {
                 ForEach(tags) { tag in
-					EditableContent {
+                    EditableContent(verbatim: tag.name, fallback: "TAG", systemImage: "tag") {
 						self.editTarget = .edit(tag)
-					} label: {
-						Label(tag.name ?? "TAG", systemImage: "tag")
 					}
                     .listItemTint(tag.color.color)
                 }
@@ -45,17 +39,15 @@ struct TagsView: View {
 				}
 
                 ToolbarItem {
-					Button {
+					Button("CREATE_TAG", systemImage: "plus") {
 						self.editTarget = .create
-					} label: {
-                        Label("CREATE_TAG", systemImage: "plus")
                     }
                 }
             }
             .renameItem("RENAME_TAG", item: $renameItem)
 			.sheet(item: $editTarget) { item in
                 FormSheetView {
-					EditTagView(mode: item)
+					TagEditorView(mode: item)
 				}
 			}
     }

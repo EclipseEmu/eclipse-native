@@ -99,7 +99,6 @@ struct GameErrorHandlerViewModifier: ViewModifier {
                 }
             }
         }
-        
     }
     
     @MainActor

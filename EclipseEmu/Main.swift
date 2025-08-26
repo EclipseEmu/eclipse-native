@@ -40,10 +40,8 @@ struct EclipseEmuApp: App {
         }
 		.commands {
 			CommandGroup(replacing: CommandGroupPlacement.appSettings) {
-				Button {
+				Button("SETTINGS", systemImage: "gear") {
 					openWindow(id: "settings")
-				} label: {
-					Label("SETTINGS", systemImage: "gear")
 				}
 				.keyboardShortcut(",", modifiers: .command)
 			}

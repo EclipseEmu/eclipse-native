@@ -7,7 +7,7 @@ enum Destination: Hashable, Equatable {
 	case settings
 	case coreSettings(Core)
 	case credits
-	case licenses
+    case license(LicenseItem)
 
 	case keyboardProfiles
     case keyboardProfile(KeyboardProfileObject)
@@ -26,10 +26,35 @@ enum Destination: Hashable, Equatable {
 	case editTag(TagObject)
 }
 
-extension NavigationLink where Label: View, Destination == Never {
-	init(to value: Eclipse.Destination, @ViewBuilder label: () -> Label) {
-		self = .init(value: value, label: label)
-	}
+extension NavigationLink {
+    init(to value: Eclipse.Destination, @ViewBuilder label: () -> Label) where Label: View, Destination == Never {
+        self = .init(value: value, label: label)
+    }
+
+    init(_ titleKey: LocalizedStringKey, systemImage: String, to value: Eclipse.Destination) where Label == SwiftUI.Label<Text, Image>, Destination == Never {
+        self = .init(value: value) {
+            Label(titleKey, systemImage: systemImage)
+        }
+    }
+    
+    init<S: StringProtocol>(verbatim content: S, systemImage: String, to value: Eclipse.Destination) where Label == SwiftUI.Label<Text, Image>, Destination == Never {
+        self = .init(value: value) {
+            Label(content, systemImage: systemImage)
+        }
+    }
+    
+
+    init(_ titleKey: LocalizedStringKey, to value: Eclipse.Destination) where Label == Text, Destination == Never {
+        self = .init(value: value) {
+            Text(titleKey)
+        }
+    }
+    
+    init<S: StringProtocol>(verbatim content: S, to value: Eclipse.Destination) where Label == Text, Destination == Never {
+        self = .init(value: value) {
+            Text(content)
+        }
+    }
 }
 
 extension Destination {
@@ -42,12 +67,12 @@ extension Destination {
 			core.settingsView
 		case .credits:
 			CreditsView()
-		case .licenses:
-			LicensesView()
+        case .license(let license):
+            LicenseView(license: license)
 		case .manageTags:
 			TagsView()
 		case .editTag(let tag):
-			EditTagView(mode: .edit(tag))
+			TagEditorView(mode: .edit(tag))
 		case .keyboardProfiles:
 			KeyboardProfilesView()
         case .keyboardProfile(let profile):

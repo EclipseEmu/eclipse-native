@@ -127,13 +127,12 @@ final class TouchControlsViewController: UIViewController {
 			horizontalClass: traitCollection.horizontalSizeClass,
 			verticalClass: traitCollection.verticalSizeClass
 		))
-		print(variantIndex)
+		print("using touch controls variant:", variantIndex)
 		self.setVariant(variantIndex)
 	}
 
 	func setVariant(_ index: Int) {
 		guard index != variantIndex, index != -1 else { return }
-		print("passed guard", index)
 		variantIndex = index
 		layoutElements()
 	}

@@ -45,26 +45,20 @@ struct TouchEditorVariantInspectorView: View {
 				EditButton()
 			}
 			ToolbarItem {
-				Menu {
+				Menu("ADD_ELEMENT", systemImage: "plus") {
 					ForEach(availableDirectionals) { control in
-						Button {
+						Button(control.text, systemImage: control.image) {
 							insertElement(for: .directional(control.id))
-						} label: {
-							Label(control.text, systemImage: control.image)
 						}
 					}
 					if !availableButtons.isEmpty && !availableDirectionals.isEmpty {
 						Divider()
 					}
 					ForEach(availableButtons) { control in
-						Button {
+						Button(control.text, systemImage: control.image) {
 							insertElement(for: .button(control.id))
-						} label: {
-							Label(control.text, systemImage: control.image)
 						}
 					}
-				} label: {
-					Label("ADD_ELEMENT", systemImage: "plus")
 				}
 				.disabled(availableButtons.isEmpty && availableDirectionals.isEmpty)
 				.onAppear(perform: loadAvailableElements)

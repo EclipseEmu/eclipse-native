@@ -34,11 +34,9 @@ private struct ManyManageTagsItemView: View {
     }
 
     var body: some View {
-        Toggle(sources: $sources, isOn: \.isSelected) {
-            Label(tag.name ?? "TAG", systemImage: "tag")
-        }
-        .onChange(of: sources.first?.isSelected ?? false, perform: update)
-        .listItemTint(tag.color.color)
+        Toggle(tag.name ?? "TAG", systemImage: "tag", sources: $sources, isOn: \.isSelected)
+            .onChange(of: sources.first?.isSelected ?? false, perform: update)
+            .listItemTint(tag.color.color)
     }
 
     private func update(_ isEnabled: Bool) {
@@ -68,11 +66,9 @@ private struct OneManageTagsItemView: View {
     }
 
     var body: some View {
-        Toggle(isOn: $isOn) {
-            Label(tag.name ?? "TAG", systemImage: "tag")
-        }
-        .onChange(of: isOn, perform: update)
-        .listItemTint(tag.color.color)
+        Toggle(tag.name ?? "TAG", systemImage: "tag", isOn: $isOn)
+            .onChange(of: isOn, perform: update)
+            .listItemTint(tag.color.color)
     }
 
     private func update(_ newValue: Bool) {
@@ -133,7 +129,7 @@ struct TagsPickerView: View {
         }
         .sheet(isPresented: $isNewTagViewOpen) {
             FormSheetView {
-                EditTagView(mode: .create)
+                TagEditorView(mode: .create)
             }
         }
     }
@@ -143,11 +139,8 @@ struct TagsPickerView: View {
 
 @available(iOS 18.0, macOS 15.0, *)
 #Preview(traits: .previewStorage) {
-    @Previewable @StateObject var navigationManager = NavigationManager()
-
-    NavigationStack(path: $navigationManager.path) {
+    NavigationStack {
         LibraryView()
     }
-    .environmentObject(navigationManager)
     .environmentObject(Settings())
 }

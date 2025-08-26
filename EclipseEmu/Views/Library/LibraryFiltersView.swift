@@ -11,55 +11,37 @@ struct LibraryFiltersView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section("SYSTEM") {
                 ForEach(System.concreteCases, id: \.rawValue) { system in
-                    Toggle(isOn: .init(get: {
-                        viewModel.filteredSystems.contains(system)
-                    }, set: { newValue in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            viewModel.filteredSystems.toggle(system, if: newValue)
-                        }
-                    })) {
+                    Toggle(isOn: .isInSet(system, set: $viewModel.filteredSystems)) {
                         Text(system.string).foregroundStyle(Color.primary)
                     }
                 }
-            } header: {
-                Text("SYSTEM")
             }
 
-            Section {
-                ForEach(allTags) { tag in
-                    Toggle(isOn: .init(get: {
-                        viewModel.filteredTags.contains(tag)
-                    }, set: { newValue in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            viewModel.filteredTags.toggle(tag, if: newValue)
+            Section("TAGS") {
+                if !allTags.isEmpty {
+                    ForEach(allTags) { tag in
+                        Toggle(isOn: .isInSet(tag, set: $viewModel.filteredTags)) {
+                            Label {
+                                Text(verbatim: tag.name, fallback: "TAG").foregroundStyle(Color.primary)
+                            } icon: {
+                                Image(systemName: "tag")
+                            }
                         }
-                    })) {
-                        Label {
-                            Text(verbatim: tag.name, fallback: "TAG").foregroundStyle(Color.primary)
-                        } icon: {
-                            Image(systemName: "tag")
-                        }
+                        .listItemTint(tag.color.color)
                     }
-                    .listItemTint(tag.color.color)
+                } else {
+                    EmptyMessage(title: "NO_TAGS", message: "NO_TAGS_MESSAGE")
                 }
-            } header: {
-                Text("TAGS")
-            }
-            .emptyState(allTags.isEmpty) {
-                EmptyView()
             }
         }
         .formStyle(.grouped)
         .toggleStyleCheckbox()
         .navigationTitle("FILTERS")
-#if !os(macOS)
-        .navigationBarTitleDisplayMode(.inline)
-#endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("DONE", action: dismiss.callAsFunction)
+                ConfirmButton("DONE", action: dismiss.callAsFunction)
             }
         }
     }
@@ -69,7 +51,7 @@ struct LibraryFiltersView: View {
 #Preview(traits: .previewStorage) {
     @Previewable @StateObject var viewModel: LibraryViewModel = .init()
 
-    NavigationStack {
+    FormSheetView {
         LibraryFiltersView(viewModel: viewModel)
     }
 }

@@ -50,15 +50,7 @@ private struct InputPickerPopoverView: View {
         Form {
             ForEach(availableInputs, id: \.rawValue) { input in
                 let (text, icon) = input.label(for: namingConvention)
-                Toggle(isOn: .init(get: {
-                    inputs.contains(input)
-                }, set: { newValue in
-                    if newValue {
-                        inputs.insert(input)
-                    } else {
-                        inputs.remove(input)
-                    }
-                })) {
+                Toggle(isOn: .isInSet(input, set: $inputs)) {
                     Label(text, systemImage: icon)
                 }
             }

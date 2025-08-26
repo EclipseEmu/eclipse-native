@@ -24,23 +24,20 @@ struct SaveStatesView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVGrid(
-                columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)],
-                spacing: 16.0
-            ) {
-                ForEach(saveStates) { saveState in
-                    SaveStateItem(saveState, title: .name, action: action)
+        if !saveStates.isEmpty {
+            ScrollView {
+                LazyVGrid(
+                    columns: [.init(.adaptive(minimum: 160.0, maximum: 240.0), spacing: 16.0, alignment: .top)],
+                    spacing: 16.0
+                ) {
+                    ForEach(saveStates) { saveState in
+                        SaveStateItem(saveState, title: .name, action: action)
+                    }
                 }
+                .padding()
             }
-            .padding()
-        }
-        .emptyState(saveStates.isEmpty) {
-            ContentUnavailableMessage {
-                Label("NO_SAVE_STATES_TITLE", systemImage: "rectangle.grid.2x2")
-            } description: {
-                Text("NO_SAVE_STATES_MESSAGE")
-            }
+        } else {
+            ContentUnavailableMessage("NO_SAVE_STATES_TITLE", systemImage: "rectangle.grid.2x2", description: "NO_SAVE_STATES_MESSAGE")
         }
     }
 }

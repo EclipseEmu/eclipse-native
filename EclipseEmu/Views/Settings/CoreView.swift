@@ -1,6 +1,5 @@
 import SwiftUI
 import EclipseKit
-import CoreData
 
 struct CoreView<Core: CoreProtocol>: View {
     @EnvironmentObject private var persistence: Persistence
@@ -44,7 +43,7 @@ struct CoreView<Core: CoreProtocol>: View {
         case .failure(let error):
             Text(error.localizedDescription)
         case .success(target: let object, settings: let settings):
-            CoreSettingsView2<Core>(object: object, settings: settings)
+            CoreSettingsView<Core>(object: object, settings: settings)
         }
     }
     
@@ -75,59 +74,6 @@ struct CoreView<Core: CoreProtocol>: View {
         print("creating new object")
         let objectBox = try await persistence.objects.createCoreSettings(Core.self)
         return try objectBox.get(in: persistence.mainContext)
-    }
-}
-
-private struct CoreSettingsView2<Core: CoreProtocol>: View {
-    @EnvironmentObject private var persistence: Persistence
-    @ObservedObject private var object: CoreSettingsObject
-    @State private var settings: Core.Settings
-    @State private var fileImportType: FileImportRequest?
-    @State private var updateTask: Task<Void, Never>?
-    
-    private let descriptor: CoreSettingsDescriptor<Core.Settings> = Core.Settings.descriptor
-
-    init(object: CoreSettingsObject, settings: Core.Settings) {
-        self.object = object
-        self.settings = settings
-    }
-    
-    var body: some View {
-        Group {
-            ForEach(descriptor.sections) { section in
-                Section {
-                    ForEach(section.settings) { setting in
-                        switch setting {
-                        case .bool(let inner):
-                            CoreSettingsBoolView(settings: $settings, setting: inner)
-                        case .file(let inner):
-                            CoreSettingsFileView(coreID: Core.id, settings: $settings, setting: inner, fileImportType: $fileImportType)
-                        case .radio(let inner):
-                            CoreSettingsRadioView(settings: $settings, setting: inner)
-                        @unknown default: EmptyView()
-                        }
-                    }
-                } header: {
-                    Text(section.title)
-                }
-            }
-        }
-        .fileImporter($fileImportType)
-        .onChange(of: settings, perform: save)
-    }
-    
-    func save(_ newValue: Core.Settings) {
-        self.updateTask?.cancel()
-        self.updateTask = Task {
-            do {
-                try await Task.sleep(for: .seconds(1))
-                try await persistence.objects.updateCoreSettings(Core.self, target: .init(object), settings: newValue)
-                print("saved core settings")
-            } catch is CancellationError {} catch {
-                // FIXME: Surface error
-                print("failed to save core settings:", error)
-            }
-        }
     }
 }
 

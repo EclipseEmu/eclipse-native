@@ -27,7 +27,35 @@ struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: 
         self.description = description
         self.actions = actions
     }
-
+    
+    init(
+        _ titleKey: LocalizedStringKey,
+        systemImage: String,
+        @ViewBuilder description: @escaping () -> Description
+    ) where Label == SwiftUI.Label<Text, Image>, Action == EmptyView {
+        self.label = { Label(titleKey, systemImage: systemImage) }
+        self.description = description
+        self.actions = { EmptyView() }
+    }
+    
+    init(_ titleKey: LocalizedStringKey, systemImage: String)
+    where Label == SwiftUI.Label<Text, Image>, Description == EmptyView, Action == EmptyView
+    {
+        self.label = { Label(titleKey, systemImage: systemImage) }
+        self.description = { EmptyView() }
+        self.actions = { EmptyView() }
+    }
+    
+    init(
+        _ titleKey: LocalizedStringKey,
+        systemImage: String,
+        description: LocalizedStringKey
+    ) where Label == SwiftUI.Label<Text, Image>, Description == Text, Action == EmptyView {
+        self.label = { Label(titleKey, systemImage: systemImage) }
+        self.description = { Text(description) }
+        self.actions = { EmptyView() }
+    }
+    
     var body: some View {
         if #available(iOS 17.0, macOS 14.0, *) {
             ContentUnavailableView(
@@ -56,25 +84,18 @@ where
     Description == Text,
     Action == EmptyView
 {
+
     @ViewBuilder
     static func search(text: String) -> some View {
         if #available(iOS 17.0, macOS 14.0, *) {
             ContentUnavailableView.search(text: text)
         } else {
-            ContentUnavailableMessage<SwiftUI.Label, Text, EmptyView> {
-                SwiftUI.Label("NO_RESULTS_TITLE \"\(text)\"", systemImage: "magnifyingglass")
-            } description: {
-                Text("NO_RESULTS_MESSAGE")
-            } actions: {
-                EmptyView()
-            }
+            Self("NO_RESULTS_TITLE \"\(text)\"", systemImage: "magnifyingglass", description: "NO_RESULTS_MESSAGE")
         }
     }
 
     static func error(error: some LocalizedError) -> ContentUnavailableMessage {
-        ContentUnavailableMessage {
-            Label("GENERIC_ERROR_MESSAGE_TITLE", systemImage: "exclamationmark.triangle")
-        } description: {
+        ContentUnavailableMessage("GENERIC_ERROR_MESSAGE_TITLE", systemImage: "exclamationmark.triangle") {
             Text(verbatim: error.errorDescription, fallback: "GENERIC_ERROR_MESSAGE_UNKNOWN_ERROR")
         }
     }

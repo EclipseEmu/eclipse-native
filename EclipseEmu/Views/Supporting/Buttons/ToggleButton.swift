@@ -20,7 +20,9 @@ struct ToggleButton<Label: View>: View {
     }
 
     private func action() {
-        self.value.toggle()
+        withAnimation {
+            self.value.toggle()
+        }
     }
 }
 
@@ -30,4 +32,12 @@ extension ToggleButton where Label == Text {
 		self._value = value
 		self.label = { Text(label) }
 	}
+}
+
+extension ToggleButton where Label == SwiftUI.Label<Text, Image> {
+    init(_ titleKey: LocalizedStringKey, systemImage: String, role: ButtonRole? = nil, value: Binding<Bool>) {
+        self.role = role
+        self._value = value
+        self.label = { Label(titleKey, systemImage: systemImage) }
+    }
 }

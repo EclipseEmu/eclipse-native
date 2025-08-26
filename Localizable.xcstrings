@@ -1150,6 +1150,9 @@
         }
       }
     },
+    "Dismiss" : {
+
+    },
     "DONE" : {
       "localizations" : {
         "en" : {
@@ -1340,6 +1343,9 @@
         }
       }
     },
+    "Hello, world" : {
+
+    },
     "HELP_AND_GUIDES" : {
       "localizations" : {
         "en" : {
@@ -1494,6 +1500,7 @@
       }
     },
     "LICENSES" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1788,7 +1795,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You haven't created any tags to organize your games yet."
+            "value" : "You haven't made any tags yet."
           }
         }
       }
@@ -2060,6 +2067,7 @@
       }
     },
     "RESET_EVERYTHING" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2100,6 +2108,7 @@
       }
     },
     "RESET_SETTINGS" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2236,6 +2245,7 @@
       }
     },
     "SOCIAL" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

@@ -21,15 +21,13 @@ struct ControllerDirectionalEditorView: View {
     var body: some View {
         Form {
             Section {
-                Picker(selection: $inputs) {
+                Picker("INPUT", systemImage: "dpad", selection: $inputs) {
                     Text("NONE").tag(CoreInput())
                     Divider()
                     ForEach(CoreInput.directionalInputs(for: viewModel.system), id: \.rawValue) { input in
                         let (text, image) = input.label(for: viewModel.inputNaming)
                         Label(text, systemImage: image).tag(input)
                     }
-                } label: {
-                    Label("INPUT", systemImage: "dpad")
                 }
             }
             

@@ -7,20 +7,18 @@ import SwiftUI
 struct CheatsView: View {
     static let sortCheatsBy = [NSSortDescriptor(keyPath: \CheatObject.priority, ascending: true)]
 
-    @ObservedObject var game: GameObject
-    let cheatFormats: [CoreCheatFormat]
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
-    @Environment(\.dismiss) var dismiss: DismissAction
     @EnvironmentObject var persistence: Persistence
+    @EnvironmentObject var coreRegistry: CoreRegistry
+    @Environment(\.dismiss) var dismiss: DismissAction
+
+    @ObservedObject private var game: GameObject
+    @State private var cheatFormats: [CoreCheatFormat] = []
+    @State private var editorTarget: EditorTarget<CheatObject>?
+
     @FetchRequest(sortDescriptors: Self.sortCheatsBy) var cheats: FetchedResults<CheatObject>
-    @State var isAddViewOpen = false
-    @State var editingCheat: CheatObject?
 
-    init(game: GameObject, coreRegistry: CoreRegistry) {
+    init(game: GameObject) {
         self.game = game
-
-		self.cheatFormats = coreRegistry.cheatFormats(for: game)
-
         let request = CheatObject.fetchRequest()
         request.predicate = NSPredicate(format: "game == %@", game)
         request.includesSubentities = false
@@ -29,61 +27,56 @@ struct CheatsView: View {
     }
 
     var body: some View {
-        List {
-            ForEach(self.cheats) { cheat in
-                CheatItemView(cheat: cheat, editingCheat: $editingCheat)
+        self.content
+            .onAppear {
+                self.cheatFormats = coreRegistry.cheatFormats(for: game)
             }
-            .onDelete(perform: self.deleteCheats)
-            .onMove(perform: self.moveCheat)
-        }
-        .emptyState(cheats.isEmpty) {
-            ContentUnavailableMessage {
-                Label("NO_CHEATS_TITLE", systemImage: "memorychip.fill")
-            } description: {
-                Text("NO_CHEATS_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
-            }
-        }
-        .emptyState(cheatFormats.isEmpty) {
-            ContentUnavailableMessage {
-                Label("NO_SUPPORTED_CHEATS_TITLE", systemImage: "nosign")
-            } description: {
-                Text("NO_SUPPORTED_CHEATS_MESSAGE")
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                CancelButton("DONE", action: dismiss.callAsFunction)
-            }
-            
-#if !os(macOS)
-            ToolbarItem {
-                EditButton()
-            }
-#endif
-            ToolbarItem(placement: .primaryAction) {
-                ToggleButton(value: $isAddViewOpen) {
-                    Label("ADD_CHEAT", systemImage: "plus")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton("DONE", action: dismiss.callAsFunction)
                 }
-                .disabled(self.cheatFormats.isEmpty)
+                
+#if !os(macOS)
+                ToolbarItem(content: EditButton.init)
+#endif
+                ToolbarItem(placement: .primaryAction) {
+                    Button("ADD_CHEAT", systemImage: "plus") {
+                        editorTarget = .create
+                    }
+                    .disabled(self.cheatFormats.isEmpty)
+                }
             }
-        }
-        .navigationTitle("CHEATS")
-        .sheet(item: $editingCheat) { cheat in
-            EditCheatView(
-                cheat: cheat,
-                game: game,
-                cheatFormats: cheatFormats
+            .navigationTitle("CHEATS")
+            .sheet(item: $editorTarget) { target in
+                CheatEditorView(
+                    target: target,
+                    game: game,
+                    cheatFormats: cheatFormats
+                )
+            }
+    }
+    
+    @ViewBuilder
+    var content: some View {
+        if cheatFormats.isEmpty {
+            ContentUnavailableMessage("NO_SUPPORTED_CHEATS_TITLE", systemImage: "nosign", description: "NO_SUPPORTED_CHEATS_MESSAGE")
+        } else if cheats.isEmpty {
+            ContentUnavailableMessage(
+                "NO_CHEATS_TITLE",
+                systemImage: "memorychip.fill",
+                description: "NO_CHEATS_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))"
             )
-        }
-        .sheet(isPresented: $isAddViewOpen) {
-            EditCheatView(
-                cheat: nil,
-                game: game,
-                cheatFormats: cheatFormats
-            )
+        } else {
+            List {
+                ForEach(self.cheats) { cheat in
+                    CheatItemView(cheat: cheat, editorTarget: $editorTarget)
+                }
+                .onDelete(perform: self.deleteCheats)
+                .onMove(perform: self.moveCheat)
+            }
         }
     }
-
+    
     func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
         let cheats = cheats.map { ObjectBox($0) }
         Task {
@@ -113,7 +106,7 @@ struct CheatsView: View {
 #Preview(traits: .previewStorage) {
     PreviewSingleObjectView(GameObject.fetchRequest()) { game, _ in
         NavigationStack {
-            CheatsView(game: game, coreRegistry: .init())
+            CheatsView(game: game)
         }
     }
 }

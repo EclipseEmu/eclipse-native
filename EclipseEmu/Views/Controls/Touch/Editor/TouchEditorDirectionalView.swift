@@ -16,19 +16,15 @@ struct TouchEditorDirectionalView: View {
 	var body: some View {
 		Form {
 			Section {
-				Picker(selection: $viewModel.mappings.directionals[target].input) {
+				Picker("INPUT", systemImage: "dpad", selection: $viewModel.mappings.directionals[target].input) {
 					ForEach(CoreInput.directionalInputs(for: viewModel.system), id: \.rawValue) { input in
 						let (text, image) = viewModel.mappings.directionals[target].input.label(for: viewModel.namingConvention)
 						Label(text, systemImage: image).tag(input)
 					}
-				} label: {
-					Label("INPUT", systemImage: "dpad")
 				}
-				Picker(selection: $viewModel.mappings.directionals[target].style) {
+				Picker("STYLE", systemImage: "paintpalette", selection: $viewModel.mappings.directionals[target].style) {
 					Label("DIRECTIONAL_STYLE_DPAD", systemImage: "dpad").tag(TouchMappings.Directional.Style.dpad)
 					Label("DIRECTIONAL_STYLE_JOYSTICK", systemImage: "l.joystick").tag(TouchMappings.Directional.Style.joystick)
-				} label: {
-					Label("STYLE", systemImage: "paintpalette")
 				}
 			}
 

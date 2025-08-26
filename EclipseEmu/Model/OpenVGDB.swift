@@ -32,7 +32,7 @@ enum OpenVGDBError: LocalizedError {
 }
 
 struct OpenVGDBItem: Sendable, Identifiable {
-    let id = UUID()
+    let id = RuntimeUID()
     let name: String
     let system: System
     let region: String

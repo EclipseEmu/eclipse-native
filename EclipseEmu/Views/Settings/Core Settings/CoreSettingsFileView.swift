@@ -24,7 +24,10 @@ struct CoreSettingsFileView<Settings: CoreSettings>: View {
 	var body: some View {
 		LabeledContent {
 			fileInputView
-		} label: {
+                .menuStyle(.button)
+                .menuIndicator(.hidden)
+                .buttonStyle(.bordered)
+        } label: {
 			if setting.required {
 				Text(setting.displayName)
 				Text("FIELD_REQUIRED")
@@ -40,12 +43,8 @@ struct CoreSettingsFileView<Settings: CoreSettings>: View {
 	private var fileInputView: some View {
 		if settings[keyPath: setting.target] != nil {
 			Menu("MANAGE") {
-				Button(action: upload) {
-					Label("REPLACE", systemImage: "doc")
-				}
-				ToggleButton(role: .destructive, value: $isDeleteFileOpen) {
-					Label("DELETE", systemImage: "trash")
-				}
+				Button("REPLACE", systemImage: "doc", action: upload)
+				ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $isDeleteFileOpen)
 			}
 			.confirmationDialog("DELETE_FILE_TITLE", isPresented: $isDeleteFileOpen) {
 				Button("DELETE", role: .destructive, action: delete)

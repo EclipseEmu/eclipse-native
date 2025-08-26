@@ -23,10 +23,8 @@ struct KeyboardEditorView: View {
         self.content
             .toolbar {
                 ToolbarItem {
-                    Button {
+                    Button("ADD_BINDING", systemImage: "plus") {
                         self.editTarget = .create
-                    } label: {
-                        Label("ADD_BINDING", systemImage: "plus")
                     }
                 }
             }
@@ -40,11 +38,7 @@ struct KeyboardEditorView: View {
     @ViewBuilder
     var content: some View {
         if viewModel.elements.isEmpty {
-            ContentUnavailableMessage {
-                Label("NO_KEYBINDINGS_TITLE", systemImage: "keyboard")
-            } description: {
-                Text("NO_KEYBINDINGS_MESSAGE")
-            }
+            ContentUnavailableMessage("NO_KEYBINDINGS_TITLE", systemImage: "keyboard", description: "NO_KEYBINDINGS_MESSAGE")
         } else {
             List {
                 ForEach(viewModel.elements) { element in

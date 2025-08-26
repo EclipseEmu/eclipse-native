@@ -7,16 +7,14 @@ struct CheatItemView: View {
     #endif
 
     @ObservedObject var cheat: CheatObject
-    @Binding var editingCheat: CheatObject?
+    @Binding var editorTarget: EditorTarget<CheatObject>?
 
     var body: some View {
         LabeledContent {
 #if !os(macOS)
             if editMode?.wrappedValue == .active {
-                Button(action: edit) {
-                    Label("EDIT", systemImage: "pencil.circle")
-                        .labelStyle(.iconOnly)
-                }
+                Button("EDIT", systemImage: "pencil.circle", action: edit)
+                    .labelStyle(.iconOnly)
             } else {
                 Toggle("CHEAT_ENABLED", isOn: $cheat.enabled)
                     .labelsHidden()
@@ -36,14 +34,14 @@ struct CheatItemView: View {
             }
         }
         .contextMenu {
-            Button(action: edit) {
-                Label("EDIT", systemImage: "pencil")
-            }
-            Button(role: .destructive, action: delete) {
-                Label("DELETE", systemImage: "trash")
-            }
+            Button("EDIT", systemImage: "pencil", action: edit)
+            Button("DELETE", systemImage: "trash", role: .destructive, action: delete)
         }
         .onChange(of: cheat.enabled, perform: toggleCheat)
+    }
+    
+    func edit() {
+        self.editorTarget = .edit(cheat)
     }
 
     func toggleCheat(newValue: Bool) {
@@ -55,10 +53,6 @@ struct CheatItemView: View {
                 print(error)
             }
         }
-    }
-
-    func edit() {
-        self.editingCheat = cheat
     }
 
     func delete() {

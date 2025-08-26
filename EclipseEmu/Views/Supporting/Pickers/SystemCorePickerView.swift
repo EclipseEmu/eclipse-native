@@ -1,18 +1,14 @@
 import SwiftUI
 import EclipseKit
 
-private typealias OptionalCoreInfo = Optional<Core>
-
-struct SystemSettingItemView: View {
+struct SystemCorePickerView: View {
+    @EnvironmentObject private var coreRegistry: CoreRegistry
     private let system: System
     @State private var selection: Core?
-    private var coreRegistry: CoreRegistry
-    private let cores: [Core]
+    @State private var cores: [Core] = []
 
-    init(coreRegistry: CoreRegistry, system: System) {
+    init(_ system: System) {
         self.system = system
-        self.cores = coreRegistry.cores(for: system)
-        self.coreRegistry = coreRegistry
     }
 
     var body: some View {
@@ -24,11 +20,12 @@ struct SystemSettingItemView: View {
         )
         .onChange(of: selection, perform: update)
         .onAppear {
+            cores = coreRegistry.cores(for: system)
             selection = coreRegistry.get(for: system)
         }
     }
 
-    func update(_ core: Core?) {
+    private func update(_ core: Core?) {
         coreRegistry.set(selection, for: system)
     }
 }

@@ -6,8 +6,6 @@ struct LibraryView: View {
     
     @EnvironmentObject private var settings: Settings
     @EnvironmentObject private var persistence: Persistence
-    @EnvironmentObject private var coreRegistry: CoreRegistry
-    @EnvironmentObject private var navigation: NavigationManager
     
     @FetchRequest<GameObject>(
         sortDescriptors: LibraryViewModel.getSortDescriptors(),
@@ -63,7 +61,7 @@ struct LibraryView: View {
             }
             .sheet(item: $viewModel.gameCheatsTarget) { game in
                 FormSheetView {
-                    CheatsView(game: game, coreRegistry: coreRegistry)
+                    CheatsView(game: game)
                 }
             }
             .sheet(item: $viewModel.gameSaveStatesTarget) { game in
@@ -111,17 +109,9 @@ struct LibraryView: View {
         } else if hasNoGames && !viewModel.query.isEmpty {
             ContentUnavailableMessage.search(text: viewModel.query)
         } else if hasNoGames && (viewModel.areSystemsFiltered || !viewModel.filteredTags.isEmpty) {
-            ContentUnavailableMessage {
-                Label("NO_RESULTS_FILTERED_TITLE", systemImage: "line.3.horizontal.decrease.circle")
-            } description: {
-                Text("NO_RESULTS_FILTERED_MESSAGE")
-            }
+            ContentUnavailableMessage("NO_RESULTS_FILTERED_TITLE", systemImage: "line.3.horizontal.decrease.circle", description: "NO_RESULTS_FILTERED_MESSAGE")
         } else {
-            ContentUnavailableMessage {
-                Label("EMPTY_LIBRARY_TITLE", systemImage: "books.vertical")
-            } description: {
-                Text("EMPTY_LIBRARY_MESSAGE")
-            }
+            ContentUnavailableMessage("EMPTY_LIBRARY_TITLE", systemImage: "books.vertical", description: "EMPTY_LIBRARY_MESSAGE")
         }
     }
     
@@ -143,72 +133,56 @@ struct LibraryView: View {
     
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
-        if !viewModel.isSelecting {
-            ToolbarItem(placement: .primaryAction) {
-                Button(action: self.addGames) {
-                    Label("ADD_GAMES", systemImage: "plus")
-                }
-            }
-        }
-        
         ToolbarItem {
-            Menu {
+            Menu("OPTIONS", systemImage: "ellipsis") {
                 if !viewModel.isSelecting {
-                    ToggleButton(value: $viewModel.isSelecting) {
-                        Label("SELECT", systemImage: "checkmark.circle")
-                    }
+                    ToggleButton("SELECT", systemImage: "checkmark.circle", value: $viewModel.isSelecting)
                 }
                 
-                ToggleButton(value: $viewModel.isFiltersViewOpen) {
-                    Label("FILTER", systemImage: "line.3.horizontal.decrease")
-                }
+                ToggleButton("FILTER", systemImage: "line.3.horizontal.decrease", value: $viewModel.isFiltersViewOpen)
+                ToggleButton("TAGS", systemImage: "tag", value: $viewModel.isTagsViewOpen)
                 
-                ToggleButton(value: $viewModel.isTagsViewOpen) {
-                    Label("TAGS", systemImage: "tag")
-                }
-                
-                Picker(selection: $settings.listSortMethod) {
+                Picker("SORT_BY", systemImage: "arrow.up.arrow.down", selection: $settings.listSortMethod) {
                     Text("NAME").tag(GameListSortingMethod.name)
                     Text("DATE_ADDED").tag(GameListSortingMethod.dateAdded)
-                } label: {
-                    Label("SORT_BY", systemImage: "arrow.up.arrow.down")
                 }
                 
-                Picker(selection: $settings.listSortDirection) {
+                Picker("ORDER_BY", systemImage: "arrow.up.arrow.down", selection: $settings.listSortDirection) {
                     Text("ASCENDING").tag(GameListSortingDirection.ascending)
                     Text("DESCENDING").tag(GameListSortingDirection.descending)
-                } label: {
-                    Label("ORDER_BY", systemImage: "arrow.up.arrow.down")
                 }
-            } label: {
-                Label("OPTIONS", systemImage: "ellipsis.circle")
             }
         }
         
+        if #available(iOS 26.0, macOS 26.0, *) {
+            ToolbarSpacer()
+        }
+        
+        
+        if !viewModel.isSelecting {
+            ToolbarItem(placement: .primaryAction) {
+                Button("ADD_GAMES", systemImage: "plus", action: self.addGames)
+            }
+        }
+
         #if !os(macOS)
         ToolbarItem(placement: .topBarLeading) {
-            NavigationLink(to: .settings) {
-                Label("SETTINGS", systemImage: "gear")
-            }
+            NavigationLink("SETTINGS", systemImage: "gear", to: .settings)
         }
         if viewModel.isSelecting {
             ToolbarItemGroup(placement: .bottomBar) {
                 let hasSelection = viewModel.selection.isEmpty
                 
-                ToggleButton(role: .destructive, value: $viewModel.isDeleteGamesConfirmationOpen) {
-                    Label("DELETE", systemImage: "trash")
-                }
-                .disabled(hasSelection)
-                .deleteItem("DELETE_GAMES", isPresented: $viewModel.isDeleteGamesConfirmationOpen, perform: deleteGames) {
-                    Text("DELETE_GAMES_MESSAGE")
-                }
+                ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $viewModel.isDeleteGamesConfirmationOpen)
+                    .disabled(hasSelection)
+                    .deleteItem("DELETE_GAMES", isPresented: $viewModel.isDeleteGamesConfirmationOpen, perform: deleteGames) {
+                        Text("DELETE_GAMES_MESSAGE")
+                    }
 
                 Spacer()
 
-                Button(action: manageTags) {
-                    Label("MANAGE_TAGS", systemImage: "tag")
-                }
-                .disabled(hasSelection)
+                Button("MANAGE_TAGS", systemImage: "tag", action: manageTags)
+                    .disabled(hasSelection)
             }
 
             ToolbarItem(placement: .confirmationAction) {

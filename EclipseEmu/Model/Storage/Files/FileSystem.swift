@@ -136,7 +136,13 @@ final actor FileSystem: Sendable {
             hasher.update(data: buf[..<amount])
             await Task.yield()
         }
-        return hasher.finalize().hexString()
+        let bytes = hasher.finalize()
+        
+        var string = ""
+        for byte in bytes {
+            string += (byte > 15 ? "" : "0") + String(byte, radix: 16).uppercased()
+        }
+        return string
     }
 
     func exists(path: FileSystemPath) -> Bool {
