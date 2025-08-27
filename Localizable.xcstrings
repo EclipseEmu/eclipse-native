@@ -1150,8 +1150,15 @@
         }
       }
     },
-    "Dismiss" : {
-
+    "DISMISS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        }
+      }
     },
     "DONE" : {
       "localizations" : {
@@ -1343,9 +1350,6 @@
         }
       }
     },
-    "Hello, world" : {
-
-    },
     "HELP_AND_GUIDES" : {
       "localizations" : {
         "en" : {
@@ -1495,17 +1499,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Library"
-          }
-        }
-      }
-    },
-    "LICENSES" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Licenses"
           }
         }
       }
@@ -1976,16 +1969,6 @@
         }
       }
     },
-    "RENAME_TAG" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename Tag"
-          }
-        }
-      }
-    },
     "REPLACE" : {
       "localizations" : {
         "en" : {
@@ -2066,17 +2049,6 @@
         }
       }
     },
-    "RESET_EVERYTHING" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset All Content & Settings"
-          }
-        }
-      }
-    },
     "RESET_GAME" : {
       "localizations" : {
         "en" : {
@@ -2103,17 +2075,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to reset?"
-          }
-        }
-      }
-    },
-    "RESET_SETTINGS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset Settings"
           }
         }
       }
@@ -2240,17 +2201,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Size"
-          }
-        }
-      }
-    },
-    "SOCIAL" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Social"
           }
         }
       }

@@ -15,7 +15,7 @@ struct ToasterViewModifier: ViewModifier {
                         }
                         .padding(.leading, 4.0)
                         Spacer()
-                        Button("Dismiss", systemImage: "xmark", role: .destructive, action: toaster.dismissToast)
+                        Button("DISMISS", systemImage: "xmark", role: .destructive, action: toaster.dismissToast)
                             .labelStyle(.iconOnly)
                             .modify {
                                 if #available(iOS 26.0, macOS 26.0, *) {
@@ -71,7 +71,7 @@ extension View {
         }
         .toolbar {
             Button {
-                toaster.push(.init("Hello, world", systemImage: "gear"))
+                toaster.push(.init("DISMISS", systemImage: "gear"))
             } label: {
                 Text(verbatim: "Show Toast")
             }

@@ -1,6 +1,8 @@
 import CoreData
 
 protocol RenameableObject: NSManagedObject {
+    var name: String? { get set }
+    
     func rename(to newName: String) -> Void
 }
 

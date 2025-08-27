@@ -39,7 +39,7 @@ struct GameItemView: View {
         }
         .buttonStyle(.borderless)
         .contextMenu(menuItems: menuItems, preview: preview)
-        .renameItem("RENAME_GAME", isPresented: $isRenameGameConfirmationOpen, perform: renameGame)
+        .renameItem("RENAME_GAME", item: game, isPresented: $isRenameGameConfirmationOpen)
         .deleteItem("DELETE_GAME", isPresented: $isDeleteGameConfirmationOpen, perform: deleteGame) {
             Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
         }
@@ -163,17 +163,6 @@ struct GameItemView: View {
         viewModel.selection.toggle(game, if: !isSelected)
     }
     
-    private func renameGame(newName: String) {
-        Task {
-            do {
-                try await persistence.objects.rename(.init(game), to: newName)
-            } catch {
-                // FIXME: Surface error
-                print(error)
-            }
-        }
-    }
-
     private func deleteGame() async {
         viewModel.selection.remove(game)
         do {

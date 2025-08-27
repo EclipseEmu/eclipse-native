@@ -21,9 +21,6 @@ enum Destination: Hashable, Equatable {
 	case touchProfile(TouchProfileObject)
 	case touchEditorVariant(Int, TouchEditorViewModel)
 #endif
-
-	case manageTags
-	case editTag(TagObject)
 }
 
 extension NavigationLink {
@@ -69,10 +66,6 @@ extension Destination {
 			CreditsView()
         case .license(let license):
             LicenseView(license: license)
-		case .manageTags:
-			TagsView()
-		case .editTag(let tag):
-			TagEditorView(mode: .edit(tag))
 		case .keyboardProfiles:
 			KeyboardProfilesView()
         case .keyboardProfile(let profile):

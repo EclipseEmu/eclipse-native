@@ -46,7 +46,7 @@ struct SaveStateItem: View {
         }
         .buttonStyle(.plain)
         .contextMenu(menuItems: menuItems, preview: preview)
-        .renameItem("RENAME_SAVE_STATE", isPresented: $isRenameOpen, perform: rename)
+        .renameItem("RENAME_SAVE_STATE", item: saveState, isPresented: $isRenameOpen)
         .deleteItem("DELETE_SAVE_STATE", isPresented: $isDeleteOpen, perform: delete) {
             Text("DELETE_SAVE_STATE_MESSAGE")
         }
@@ -93,17 +93,6 @@ struct SaveStateItem: View {
     
     private func selected() {
         self.action(self.saveState)
-    }
-    
-    private func rename(_ newName: String) {
-        Task {
-            do {
-                try await persistence.objects.rename(.init(saveState), to: newName)
-            } catch {
-                // FIXME: Surface error
-                print(error)
-            }
-        }
     }
     
     private func delete() async {
