@@ -2,20 +2,20 @@ import EclipseKit
 import SwiftUI
 
 struct CheatEditorView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var persistence: Persistence
+    @Environment(\.dismiss) private var dismiss: DismissAction
+    @EnvironmentObject private var persistence: Persistence
 
     private let game: GameObject
     private let cheatFormats: [CoreCheatFormat]
     private let target: EditorTarget<CheatObject>
     private let title: LocalizedStringKey
 
-    @State var label: String
-    @State var format: CoreCheatFormat
-    @State var formatter: CheatFormatter
-    @State var code: String
-    @State var enabled: Bool = true
-    @State var isCodeValid: Bool = false
+    @State private var label: String
+    @State private var format: CoreCheatFormat
+    @State private var formatter: CheatFormatter
+    @State private var code: String
+    @State private var enabled: Bool = true
+    @State private var isCodeValid: Bool = false
 
     init(target: EditorTarget<CheatObject>, game: GameObject, cheatFormats: [CoreCheatFormat]) {
         self.game = game
@@ -97,17 +97,17 @@ struct CheatEditorView: View {
         }
     }
 
-    func formatChanged(value: CoreCheatFormat) {
+    private func formatChanged(value: CoreCheatFormat) {
         self.formatter = value.makeFormatter()
         self.code = formatter.formatInput(value: code)
         self.isCodeValid = formatter.validate(value: code)
     }
 
-    func codeChanged(value: String) {
+    private func codeChanged(value: String) {
         self.isCodeValid = formatter.validate(value: value)
     }
 
-    func save() {
+    private func save() {
         guard isCodeValid && !label.isEmpty else { return }
 
         let format = self.format.id

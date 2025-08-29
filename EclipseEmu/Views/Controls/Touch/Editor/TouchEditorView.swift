@@ -15,13 +15,17 @@ extension TouchMappings.VariantSizing {
 }
 
 struct TouchEditorView: View {
-	@StateObject var viewModel: TouchEditorViewModel
-	@Environment(\.dismiss) var dismiss: DismissAction
+	@Environment(\.dismiss) private var dismiss: DismissAction
 
-	@State var buttonEditTarget: TouchEditorViewModel.EditTarget?
-	@State var directionalEditTarget: TouchEditorViewModel.EditTarget?
+    @StateObject private var viewModel: TouchEditorViewModel
+	@State private var buttonEditTarget: TouchEditorViewModel.EditTarget?
+	@State private var directionalEditTarget: TouchEditorViewModel.EditTarget?
     
-    init(onChange: @escaping ControlsProfileUpdateCallback<InputSourceTouchDescriptor>, bindings: TouchMappings, system: System) {
+    init(
+        onChange: @escaping ControlsProfileUpdateCallback<InputSourceTouchDescriptor>,
+        bindings: TouchMappings,
+        system: System
+    ) {
         self._viewModel = .init(wrappedValue: { .init(mappings: bindings, system: system, onChange: onChange) }())
     }
     
@@ -83,7 +87,7 @@ struct TouchEditorView: View {
 	}
 
 	@ViewBuilder
-	var addVariantMenuContents: some View {
+	private var addVariantMenuContents: some View {
 		Menu("ADD_VARIANT", systemImage: "iphone.sizes") {
 			ForEach(TouchMappings.VariantSizing.allCases, id: \.rawValue) { variant in
                 let (text, image) = variant.label
@@ -96,34 +100,31 @@ struct TouchEditorView: View {
 		.disabled(viewModel.mappings.variants.count == TouchMappings.VariantSizing.allCases.count)
 	}
 
-	func addButton() {
+	private func addButton() {
 		var button = TouchMappings.Button.init(id: 0, input: [])
 		let index = viewModel.mappings.insert(&button)
 		buttonEditTarget = .init(id: index)
 	}
 
-	func addDirectional() {
+	private func addDirectional() {
 		var directional = TouchMappings.Directional.init(id: 0, input: [], deadzone: 0.5, style: .dpad)
 		let index = viewModel.mappings.insert(&directional)
 		directionalEditTarget = .init(id: index)
 	}
 
-	func createLayout(sizing: TouchMappings.VariantSizing) {
+	private func createLayout(sizing: TouchMappings.VariantSizing) {
 		viewModel.mappings.insertVariant(for: sizing)
 	}
 
-	@inlinable
-	func deleteVariants(_ indices: IndexSet) {
+	private func deleteVariants(_ indices: IndexSet) {
 		viewModel.mappings.variants.remove(atOffsets: indices)
 	}
 
-	@inlinable
-	func deleteButtons(_ indices: IndexSet) {
+	private func deleteButtons(_ indices: IndexSet) {
 		viewModel.mappings.removeButtons(indices)
 	}
 
-	@inlinable
-	func deleteDirectionals(_ indices: IndexSet) {
+	private func deleteDirectionals(_ indices: IndexSet) {
 		viewModel.mappings.removeDirectionals(indices)
 	}
 }

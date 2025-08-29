@@ -5,8 +5,8 @@ import EclipseKit
 struct TouchEditorDirectionalView: View {
 	@Environment(\.dismiss) var dismissAction: DismissAction
 
-	@ObservedObject var viewModel: TouchEditorViewModel
-	let target: Int
+	@ObservedObject private var viewModel: TouchEditorViewModel
+	private let target: Int
 
 	init(viewModel: TouchEditorViewModel, target: Int) {
 		self.viewModel = viewModel

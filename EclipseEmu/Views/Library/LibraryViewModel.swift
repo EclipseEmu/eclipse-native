@@ -53,7 +53,7 @@ final class LibraryViewModel: ObservableObject {
     }
 
     @inlinable
-    func getSortDescriptors(settings: Settings) -> [NSSortDescriptor] {
+    static func getSortDescriptors(settings: Settings) -> [NSSortDescriptor] {
         Self.getSortDescriptors(for: settings.listSortDirection, method: settings.listSortMethod)
     }
     

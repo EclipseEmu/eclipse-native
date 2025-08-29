@@ -5,9 +5,8 @@ import EclipseKit
 struct TouchEditorButtonView: View {
 	@Environment(\.dismiss) var dismissAction: DismissAction
 
-	@ObservedObject var viewModel: TouchEditorViewModel
-	let target: Int
-
+	@ObservedObject private var viewModel: TouchEditorViewModel
+	private let target: Int
 	@State private var isAddInputPopoverOpen: Bool = false
 
 	init(viewModel: TouchEditorViewModel, target: Int) {
@@ -42,7 +41,7 @@ struct TouchEditorButtonView: View {
 		}
 	}
 
-	func removeInputs(_ indices: IndexSet) {
+	private func removeInputs(_ indices: IndexSet) {
 		var remove: CoreInput = []
 		for i in indices {
 			let input = viewModel.mappings.buttons[target].input[i]

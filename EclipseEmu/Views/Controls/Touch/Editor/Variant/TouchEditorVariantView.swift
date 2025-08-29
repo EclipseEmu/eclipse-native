@@ -2,16 +2,19 @@
 import SwiftUI
 
 struct TouchEditorVariantView: View {
-	@ObservedObject var viewModel: TouchEditorViewModel
-	let target: Int
+    @Environment(\.dismiss) var dismiss: DismissAction
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
 
-	@Environment(\.dismiss) var dismiss: DismissAction
-
+    @ObservedObject private var viewModel: TouchEditorViewModel
+	private let target: Int
 	@State private var isInspectorShown = true
 	@FocusState private var focusTarget: Field?
-
-	@Environment(\.horizontalSizeClass) var horizontalSizeClass
-	@Environment(\.verticalSizeClass) var verticalSizeClass
+    
+    init(viewModel: TouchEditorViewModel, target: Int) {
+        self.viewModel = viewModel
+        self.target = target
+    }
 
 	enum Field: Hashable {
 		case screenOffsetX
@@ -46,7 +49,7 @@ struct TouchEditorVariantView: View {
 	}
 
 	@ViewBuilder
-	var content: some View {
+	private var content: some View {
 		let isWide = horizontalSizeClass == .regular || verticalSizeClass == .compact
 		let layout = isWide ? AnyLayout(HStackLayout(spacing: 0.0)) : AnyLayout(VStackLayout(spacing: 0.0))
 
@@ -62,18 +65,18 @@ struct TouchEditorVariantView: View {
 	}
 
 	@ViewBuilder
-	var preview: some View {
+	private var preview: some View {
 		TouchEditorVariantPreviewView(viewModel: viewModel, variant: $viewModel.mappings.variants[target])
 			.padding(32)
 			.background(Color(uiColor: .systemGray4))
 	}
     
     @ViewBuilder
-    var form: some View {
+    private var form: some View {
         TouchEditorVariantInspectorView(viewModel: viewModel, target: target, focusTarget: $focusTarget)
     }
     
-    func toggleNegative() {
+    private func toggleNegative() {
         switch focusTarget {
         case .screenOffsetX:
             viewModel.mappings.variants[target].screenOffset.x *= -1
@@ -91,7 +94,7 @@ struct TouchEditorVariantView: View {
         }
     }
     
-    func hideKeyboard() {
+    private func hideKeyboard() {
         focusTarget = nil
     }
 }

@@ -1,18 +1,17 @@
 import SwiftUI
 import EclipseKit
+import CoreData
 
 struct LibraryView: View {
-    @StateObject private var viewModel: LibraryViewModel = .init()
-    
     @EnvironmentObject private var settings: Settings
     @EnvironmentObject private var persistence: Persistence
     
-    @FetchRequest<GameObject>(
-        sortDescriptors: LibraryViewModel.getSortDescriptors(),
-        animation: .default
-    )
+    @StateObject private var viewModel: LibraryViewModel = .init()
+    @FetchRequest<SaveStateObject>(fetchRequest: Self.keepPlayingFetchRequest)
+    private var keepPlaying: FetchedResults<SaveStateObject>
+    @FetchRequest<GameObject>(sortDescriptors: LibraryViewModel.getSortDescriptors(), animation: .default)
     private var games: FetchedResults<GameObject>
-    
+
     #if os(macOS)
     let minItemWidth: CGFloat = 160
     let maxItemWidth: CGFloat = 240
@@ -91,8 +90,14 @@ struct LibraryView: View {
         if !hasNoGames {
             ScrollView {
                 LazyVStack {
-                    if showExtraContent {
-                        KeepPlayingSection(viewModel: viewModel)
+                    if showExtraContent && !keepPlaying.isEmpty {
+                        Section {
+                            keepPlayingList
+                        } header: {
+                            Text("KEEP_PLAYING")
+                                .sectionHeaderStyle()
+                                .padding([.horizontal, .top])
+                        }
                     }
                     
                     Section {
@@ -131,6 +136,33 @@ struct LibraryView: View {
         }
     }
     
+    @ViewBuilder
+    var keepPlayingList: some View {
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 16.0) {
+                ForEach(keepPlaying) { saveState in
+                    KeepPlayingItemView(saveState: saveState, viewModel: viewModel)
+                }
+            }
+            .padding([.horizontal, .bottom])
+            .modify {
+                if #available(iOS 17.0, macOS 14.0, *) {
+                    $0.scrollTargetLayout()
+                } else {
+                    $0
+                }
+            }
+        }
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+        .modify {
+            if #available(iOS 17.0, macOS 14.0, *) {
+                $0.scrollTargetBehavior(.viewAligned)
+            } else {
+                $0
+            }
+        }
+    }
+    
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem {
@@ -152,19 +184,19 @@ struct LibraryView: View {
                     Text("DESCENDING").tag(GameListSortingDirection.descending)
                 }
             }
+            .menuIndicator(.hidden)
         }
         
         if #available(iOS 26.0, macOS 26.0, *) {
             ToolbarSpacer()
         }
         
-        
         if !viewModel.isSelecting {
             ToolbarItem(placement: .primaryAction) {
                 Button("ADD_GAMES", systemImage: "plus", action: self.addGames)
             }
         }
-
+        
         #if !os(macOS)
         ToolbarItem(placement: .topBarLeading) {
             NavigationLink("SETTINGS", systemImage: "gear", to: .settings)
@@ -247,8 +279,18 @@ extension LibraryView {
     }
     
     private func updateSortDescriptor<T>(_: T) {
-        games.nsSortDescriptors = viewModel.getSortDescriptors(settings: settings)
+        games.nsSortDescriptors = LibraryViewModel.getSortDescriptors(settings: settings)
     }
+}
+
+extension LibraryView {
+    private static let keepPlayingFetchRequest: NSFetchRequest = {
+        let fetchRequest = SaveStateObject.fetchRequest()
+        fetchRequest.fetchLimit = 10
+        fetchRequest.sortDescriptors = [.init(keyPath: \SaveStateObject.date, ascending: false)]
+        fetchRequest.predicate = NSPredicate(format: "isAuto == true")
+        return fetchRequest
+    }()
 }
 
 @available(iOS 18.0, macOS 15.0, *)

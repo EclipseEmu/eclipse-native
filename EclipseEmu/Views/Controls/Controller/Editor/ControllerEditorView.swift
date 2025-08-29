@@ -28,7 +28,11 @@ struct ControllerEditorElementItemView<Value: ControllerEditorElement>: View {
     @Binding private var editTarget: Value?
     @ObservedObject private var viewModel: ControllerEditorViewModel
 
-    init(_ control: WritableKeyPath<ControllerEditorExtendedProfile, Value>, editTarget: Binding<Value?>, viewModel: ControllerEditorViewModel) {
+    init(
+        _ control: WritableKeyPath<ControllerEditorExtendedProfile, Value>,
+        editTarget: Binding<Value?>,
+        viewModel: ControllerEditorViewModel
+    ) {
         self.key = control
         self._editTarget = editTarget
         self.viewModel = viewModel
@@ -49,7 +53,7 @@ struct ControllerEditorElementItemView<Value: ControllerEditorElement>: View {
     }
     
     @ViewBuilder
-    var valueLabel: some View {
+    private var valueLabel: some View {
         if let binding = viewModel.mappings[keyPath: self.key].label(inputNaming: viewModel.inputNaming) {
             Text(binding)
         } else {
@@ -57,7 +61,7 @@ struct ControllerEditorElementItemView<Value: ControllerEditorElement>: View {
         }
     }
     
-    func edit() {
+    private func edit() {
         self.editTarget = viewModel.mappings[keyPath: self.key]
     }
 }

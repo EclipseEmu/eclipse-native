@@ -4,7 +4,7 @@ import PhotosUI
 struct CoverPickerViewModifier: ViewModifier {
     @EnvironmentObject private var persistence: Persistence
 
-    @Binding var method: CoverPickerMethod?
+    @Binding private var method: CoverPickerMethod?
     @Binding private var photosSheet: GameObject?
     @Binding private var databaseSheet: GameObject?
 
@@ -40,7 +40,7 @@ struct CoverPickerViewModifier: ViewModifier {
             }
     }
 
-    func handleImageSelected(selection: Result<URL, any Error>) {
+    private func handleImageSelected(selection: Result<URL, any Error>) {
         guard let game = photosSheet, case .success(let url) = selection else {
             return
         }

@@ -11,19 +11,15 @@ struct GameItemView: View {
     @ObservedObject var viewModel: LibraryViewModel
     
     @State private var error: GameViewError?
-    @State private var isRenameGameConfirmationOpen: Bool = false
-    @State private var isDeleteGameConfirmationOpen: Bool = false
+    @State private var isRenameOpen: Bool = false
+    @State private var isDeleteOpen: Bool = false
 
     @State private var isReplaceRomConfirmationOpen: Bool = false
     @State private var isImportSaveConfirmationOpen: Bool = false
     @State private var isDeleteSaveConfirmationOpen: Bool = false
-
-    private var isSelected: Bool {
-        viewModel.selection.contains(game)
-    }
     
     var body: some View {
-        let isSelected = self.isSelected
+        let isSelected = viewModel.selection.contains(game)
         
         Button(action: action) {
             DualLabeledImage(
@@ -39,8 +35,8 @@ struct GameItemView: View {
         }
         .buttonStyle(.borderless)
         .contextMenu(menuItems: menuItems, preview: preview)
-        .renameItem("RENAME_GAME", item: game, isPresented: $isRenameGameConfirmationOpen)
-        .deleteItem("DELETE_GAME", isPresented: $isDeleteGameConfirmationOpen, perform: deleteGame) {
+        .renameItem("RENAME_GAME", item: game, isPresented: $isRenameOpen)
+        .deleteItem("DELETE_GAME", isPresented: $isDeleteOpen, perform: deleteGame) {
             Text("DELETE_GAME_MESSAGE \(game.name ?? String(localized: "GAME_UNNAMED"))")
         }
         .deleteItem("DELETE_SAVE", isPresented: $isDeleteSaveConfirmationOpen, perform: deleteSave) {
@@ -89,7 +85,7 @@ struct GameItemView: View {
             }
         }
         
-        ToggleButton("RENAME", systemImage: "text.cursor", value: $isRenameGameConfirmationOpen)
+        ToggleButton("RENAME", systemImage: "text.cursor", value: $isRenameOpen)
 
         Button("MANAGE_TAGS", systemImage: "tag") {
             viewModel.manageTagsTarget = .one(game)
@@ -123,7 +119,7 @@ struct GameItemView: View {
         }
         Divider()
         
-        ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $isDeleteGameConfirmationOpen)
+        ToggleButton("DELETE", systemImage: "trash", role: .destructive, value: $isDeleteOpen)
     }
     
     @ViewBuilder
@@ -160,7 +156,7 @@ struct GameItemView: View {
     }
 
     private func toggleSelection() {
-        viewModel.selection.toggle(game, if: !isSelected)
+        viewModel.selection.toggle(game, if: !viewModel.selection.contains(game))
     }
     
     private func deleteGame() async {

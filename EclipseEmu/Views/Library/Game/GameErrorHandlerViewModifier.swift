@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct GameErrorHandlerViewModifier: ViewModifier {
+    @EnvironmentObject private var persistence: Persistence
+
     @ObservedObject var game: GameObject
     @Binding var error: GameViewError?
     @Binding var fileImportRequest: FileImportRequest?
     @Binding var isReplaceRomConfirmationOpen: Bool
-
-    @EnvironmentObject private var persistence: Persistence
 
     func body(content: Content) -> some View {
         content
@@ -149,17 +149,22 @@ struct GameErrorHandlerViewModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func gameErrorHandler(
-        game: GameObject,
+        game: GameObject?,
         error: Binding<GameViewError?>,
         fileImportRequest: Binding<FileImportRequest?>,
         isReplaceRomConfirmationOpen: Binding<Bool> = .constant(false)
     ) -> some View {
-        self.modifier(GameErrorHandlerViewModifier(
-            game: game,
-            error: error,
-            fileImportRequest: fileImportRequest,
-            isReplaceRomConfirmationOpen: isReplaceRomConfirmationOpen
-        ))
+        if let game {
+            self.modifier(GameErrorHandlerViewModifier(
+                game: game,
+                error: error,
+                fileImportRequest: fileImportRequest,
+                isReplaceRomConfirmationOpen: isReplaceRomConfirmationOpen
+            ))
+        } else {
+            self
+        }
     }
 }

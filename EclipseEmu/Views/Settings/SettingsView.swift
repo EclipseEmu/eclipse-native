@@ -2,7 +2,6 @@ import SwiftUI
 import EclipseKit
 
 struct SettingsView: View {
-    @EnvironmentObject private var coreRegistry: CoreRegistry
     @EnvironmentObject private var settings: Settings
 
     var body: some View {

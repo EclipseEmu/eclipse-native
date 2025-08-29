@@ -27,7 +27,9 @@ struct CorePickerView<Label: View>: View {
     var body: some View {
         Picker(selection: $selectedCore) {
             Text("NONE").tag(Optional<Core>.none)
-            Divider().hidden(if: cores.isEmpty)
+            if !cores.isEmpty {
+                Divider()
+            }
             ForEach(cores, id: \.rawValue) { core in
                 Text(core.type.name).tag(Optional<Core>.some(core))
             }

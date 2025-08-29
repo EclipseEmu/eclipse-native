@@ -8,7 +8,11 @@ final class KeyboardEditorViewModel: ObservableObject {
     
     @Published var elements: [KeyboardEditorElement]
     
-    init(onChange: @escaping ControlsProfileUpdateCallback<InputSourceKeyboardDescriptor>, bindings: KeyboardMappings, system: System) {
+    init(
+        onChange: @escaping ControlsProfileUpdateCallback<InputSourceKeyboardDescriptor>,
+        bindings: KeyboardMappings,
+        system: System
+    ) {
         self.onChange = onChange
         self.system = system
         self.namingConvention = system.controlNamingConvention

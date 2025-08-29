@@ -41,13 +41,12 @@ private final class CoverPickerDatabaseViewModel: ObservableObject {
 }
 
 struct CoverPickerDatabaseView: View {
-    @Environment(\.dismiss) var dismiss: DismissAction
-    @EnvironmentObject var persistence: Persistence
+    @Environment(\.dismiss) private var dismiss: DismissAction
+    @EnvironmentObject private var persistence: Persistence
 
     @StateObject private var viewModel: CoverPickerDatabaseViewModel = .init()
-
     @ObservedObject private var game: GameObject
-    let system: System
+    private let system: System
 
     init(game: GameObject) {
         self.game = game
@@ -73,7 +72,7 @@ struct CoverPickerDatabaseView: View {
     }
 
     @ViewBuilder
-    var content: some View {
+    private var content: some View {
         switch viewModel.state {
         case .loading:
             ProgressView()
@@ -114,7 +113,7 @@ struct CoverPickerDatabaseView: View {
         .labeledContentStyle(.noWrap)
     }
     
-    func setCoverArt(_ item: OpenVGDBItem) {
+    private func setCoverArt(_ item: OpenVGDBItem) {
         guard let cover = item.cover else { return }
         let box = ObjectBox(game)
         Task {

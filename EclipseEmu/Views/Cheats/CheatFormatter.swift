@@ -18,6 +18,7 @@ struct CheatFormatter {
 
     @inlinable
     func formatInput(value: String) -> String {
+        // FIXME: is this supposed to be startIndex..<startIndex?
         return formatInput(
             value: value,
             range: value.startIndex ..< value.startIndex,

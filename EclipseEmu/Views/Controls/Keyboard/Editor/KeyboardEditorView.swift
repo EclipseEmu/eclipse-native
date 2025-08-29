@@ -4,7 +4,7 @@ import GameController
 
 struct KeyboardEditorView: View {
     @StateObject private var viewModel: KeyboardEditorViewModel
-    let namingConvention: ControlNamingConvention
+    private let namingConvention: ControlNamingConvention
     @FocusState private var focusState: KeyboardEditorElement?
     @State private var editTarget: EditorTarget<Int>?
     
@@ -36,7 +36,7 @@ struct KeyboardEditorView: View {
     }
     
     @ViewBuilder
-    var content: some View {
+    private var content: some View {
         if viewModel.elements.isEmpty {
             ContentUnavailableMessage("NO_KEYBINDINGS_TITLE", systemImage: "keyboard", description: "NO_KEYBINDINGS_MESSAGE")
         } else {

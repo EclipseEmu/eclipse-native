@@ -57,7 +57,7 @@ struct CheatsView: View {
     }
     
     @ViewBuilder
-    var content: some View {
+    private var content: some View {
         if cheatFormats.isEmpty {
             ContentUnavailableMessage("NO_SUPPORTED_CHEATS_TITLE", systemImage: "nosign", description: "NO_SUPPORTED_CHEATS_MESSAGE")
         } else if cheats.isEmpty {
@@ -77,7 +77,7 @@ struct CheatsView: View {
         }
     }
     
-    func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
+    private func moveCheat(fromOffsets: IndexSet, toOffset: Int) {
         let cheats = cheats.map { ObjectBox($0) }
         Task {
             do {
@@ -89,7 +89,7 @@ struct CheatsView: View {
         }
     }
 
-    func deleteCheats(offsets: IndexSet) {
+    private func deleteCheats(offsets: IndexSet) {
         let cheats = cheats.boxedItems(for: offsets)
         Task {
             do {

@@ -27,13 +27,7 @@ struct ToasterViewModifier: ViewModifier {
                     }
                     .frame(minWidth: 0, maxWidth: 256)
                     .padding(.all, 12.0)
-                    .modify {
-                        if #available(iOS 26.0, macOS 26.0, *) {
-                            $0.glassEffect(.regular.interactive(), in: .capsule)
-                        } else {
-                            $0.background(Material.ultraThick).clipShape(RoundedRectangle(cornerRadius: 99.0))
-                        }
-                    }
+                    .glassyBackground(.capsule)
                     .padding(.bottom)
                 }
             }

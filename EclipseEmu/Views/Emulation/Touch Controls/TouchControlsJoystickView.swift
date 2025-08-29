@@ -90,7 +90,7 @@ final class TouchControlsJoystickView: UIView, TouchControlsDirectionalViewProto
 		handleTouchUp()
 	}
 
-	func handleTouchDown(touch: UITouch) {
+	private func handleTouchDown(touch: UITouch) {
 		let location = touch.location(in: self)
 		var x = ((location.x / frame.width) * 2) - 1
 		var y = ((location.y / frame.height) * 2) - 1
@@ -115,7 +115,7 @@ final class TouchControlsJoystickView: UIView, TouchControlsDirectionalViewProto
 		self.stick.transform = .identity.translatedBy(x: x * frame.width * 0.5, y: y * frame.height * 0.5)
 	}
 
-	func handleTouchUp() {
+	private func handleTouchUp() {
 		parent.state.enqueue(directional.input, value: .zero, control: self.id, player: 0, deque: coordinator.states)
 
 		self.stick.transform = .identity
@@ -125,7 +125,7 @@ final class TouchControlsJoystickView: UIView, TouchControlsDirectionalViewProto
 		}
 	}
 
-    static func transform(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) -> CGAffineTransform {
+    private static func transform(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) -> CGAffineTransform {
         let distance = sqrt(pow(x, 2) + pow(y, 2))
         var xDistance = x
         var yDistance = y

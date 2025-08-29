@@ -1,27 +1,42 @@
 import SwiftUI
+import EclipseKit
 
-struct LoadStateView: View {
+typealias Foo = Void
+
+struct LoadStateView<Core: CoreProtocol>: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
-    @ObservedObject var game: GameObject
-    let action: (SaveStateObject) async -> Void
 
-    var body: some View {
-        FormSheetView {
-            SaveStatesView(game: game, action: saveStateSelected)
-                .navigationTitle("LOAD_SAVE_STATE")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        CancelButton(action: dismiss.callAsFunction)
-                    }
-                }
-        }
+    @ObservedObject private var viewModel: EmulationViewModel<Core>
+
+    init(viewModel: EmulationViewModel<Core>) {
+        self.viewModel = viewModel
     }
 
-    func saveStateSelected(_ saveState: SaveStateObject) {
+    var body: some View {
+        SaveStatesView(game: viewModel.game, action: selected)
+            .navigationTitle("LOAD_SAVE_STATE")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton(action: dismiss.callAsFunction)
+                }
+            }
+    }
+
+    private func selected(_ saveState: SaveStateObject) {
+        let url = viewModel.persistence.files.url(for: saveState.path)
         Task {
-            await self.action(saveState)
+            await loadState(url)
             dismiss()
         }
     }
+    
+    // NOTE: This is seperate from `selected` because the compiler doesn't think the return type is sendable... when its Void?
+    private func loadState(_ url: URL) async {
+        do {
+            try await viewModel.coordinator.loadState(from: url)
+        } catch {
+            // FIXME: Surface error
+            print("failed to load save state:", error)
+        }
+    }
 }
-

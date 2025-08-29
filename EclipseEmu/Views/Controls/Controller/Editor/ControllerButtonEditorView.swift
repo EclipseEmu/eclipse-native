@@ -2,9 +2,9 @@ import SwiftUI
 import EclipseKit
 
 struct ControllerButtonEditorView: View {
-    @ObservedObject private var viewModel: ControllerEditorViewModel
     @Environment(\.dismiss) private var dismiss: DismissAction
     
+    @ObservedObject private var viewModel: ControllerEditorViewModel
     private let title: LocalizedStringKey
     private let control: ControllerControl
     @State private var inputs: CoreInput
@@ -47,7 +47,7 @@ struct ControllerButtonEditorView: View {
 #endif
     }
     
-    func save() {
+    private func save() {
         viewModel.mappings.update(.init(key: control, binding: .init(inputs, direction: direction)))
         dismiss()
     }

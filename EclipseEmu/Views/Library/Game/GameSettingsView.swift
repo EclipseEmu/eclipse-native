@@ -6,6 +6,7 @@ struct GameSettingsView: View {
     @EnvironmentObject private var persistence: Persistence
     @EnvironmentObject private var coreRegistry: CoreRegistry
     @Environment(\.dismiss) private var dismiss: DismissAction
+    
     @ObservedObject var game: GameObject
 
     var body: some View {

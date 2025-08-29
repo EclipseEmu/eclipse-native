@@ -100,7 +100,7 @@ final class TouchControlsDirectionalPadView: UIView, TouchControlsDirectionalVie
 		handleTouchUp()
 	}
 
-	func handleTouchDown(touch: UITouch) {
+	private func handleTouchDown(touch: UITouch) {
 		let location = touch.location(in: self)
 		let bareX = ((location.x / self.frame.width) * 2) - 1
 		let bareY = ((location.y / self.frame.height) * 2) - 1
@@ -126,7 +126,7 @@ final class TouchControlsDirectionalPadView: UIView, TouchControlsDirectionalVie
 		lastY = y
 	}
 
-	func handleTouchUp() {
+	private func handleTouchUp() {
 		parent.state.enqueue(directional.input, value: .zero, control: self.id, player: 0, deque: coordinator.states)
 
 		setGradient(start: .zero, end: .zero)
@@ -135,8 +135,7 @@ final class TouchControlsDirectionalPadView: UIView, TouchControlsDirectionalVie
 		lastY = 0
 	}
 
-	@inlinable
-	func setGradient(start: CGPoint, end: CGPoint) {
+	private func setGradient(start: CGPoint, end: CGPoint) {
 		CATransaction.begin()
 		CATransaction.setDisableActions(true)
 		backgroundLayer.startPoint = start

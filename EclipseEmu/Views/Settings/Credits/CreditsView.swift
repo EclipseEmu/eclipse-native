@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct CreditsView: View {
-    @EnvironmentObject var coreRegistry: CoreRegistry
-
     var body: some View {
         Form {
             Section("DEVELOPERS") {

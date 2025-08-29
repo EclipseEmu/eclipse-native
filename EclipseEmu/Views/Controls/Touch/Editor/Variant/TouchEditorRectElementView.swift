@@ -6,12 +6,29 @@ struct TouchEditorRectElementView: View {
 	let systemImage: String
 	@Binding var rect: TouchMappings.RelativeRect
 	@State private var isShown: Bool = false
-
 	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
 	var yOffsetID: TouchEditorVariantView.Field
 	var xOffsetID: TouchEditorVariantView.Field
 	var sizeID: TouchEditorVariantView.Field
-
+    
+    init(
+        title: String,
+        systemImage: String,
+        rect: Binding<TouchMappings.RelativeRect>,
+        focusTarget: FocusState<TouchEditorVariantView.Field?>.Binding,
+        yOffsetID: TouchEditorVariantView.Field,
+        xOffsetID: TouchEditorVariantView.Field,
+        sizeID: TouchEditorVariantView.Field
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self._rect = rect
+        self._focusTarget = focusTarget
+        self.yOffsetID = yOffsetID
+        self.xOffsetID = xOffsetID
+        self.sizeID = sizeID
+    }
+    
 	var body: some View {
 		LabeledContent {
 			ToggleButton("EDIT", value: $isShown)
@@ -29,42 +46,41 @@ struct TouchEditorRectElementView: View {
 private struct TouchEditorRectElementPopoverView: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
     
-    let title: String
-    @Binding var rect: TouchMappings.RelativeRect
-    @FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
-    var yOffsetID: TouchEditorVariantView.Field
-    var xOffsetID: TouchEditorVariantView.Field
-    var sizeID: TouchEditorVariantView.Field
+    private let title: String
+    @Binding private var rect: TouchMappings.RelativeRect
+    @FocusState.Binding private var focusTarget: TouchEditorVariantView.Field?
+    private var yOffsetID: TouchEditorVariantView.Field
+    private var xOffsetID: TouchEditorVariantView.Field
+    private var sizeID: TouchEditorVariantView.Field
+    
+    init(
+        title: String,
+        rect: Binding<TouchMappings.RelativeRect>,
+        focusTarget: FocusState<TouchEditorVariantView.Field?>.Binding,
+        yOffsetID: TouchEditorVariantView.Field,
+        xOffsetID: TouchEditorVariantView.Field,
+        sizeID: TouchEditorVariantView.Field
+    ) {
+        self.title = title
+        self._rect = rect
+        self._focusTarget = focusTarget
+        self.yOffsetID = yOffsetID
+        self.xOffsetID = xOffsetID
+        self.sizeID = sizeID
+    }
     
     var body: some View {
         TouchEditorRectFormView(rect: $rect, focusTarget: $focusTarget, yOffsetID: yOffsetID, xOffsetID: xOffsetID, sizeID: sizeID)
-            .modify { view in
-                if #available(iOS 16.4, *) {
-                    view
-                        .presentationCompactAdaptation(.popover)
-                        .frame(minWidth: 200, idealWidth: 300, minHeight: 200)
-                        .padding()
-                        .formStyle(.columns)
-                        .scrollContentBackground(.hidden)
-                        .modify {
-                            if #available(iOS 18.0, *) {
-                                $0.presentationSizing(.fitted)
-                            } else {
-                                $0
-                            }
-                        }
+            .presentationCompactAdaptation(.popover)
+            .frame(minWidth: 200, idealWidth: 300, minHeight: 200)
+            .padding()
+            .formStyle(.columns)
+            .scrollContentBackground(.hidden)
+            .modify {
+                if #available(iOS 18.0, *) {
+                    $0.presentationSizing(.fitted)
                 } else {
-                    NavigationStack {
-                        view
-                            .navigationTitle(title)
-                            .navigationBarTitleDisplayMode(.inline)
-                            .toolbar {
-                                ToolbarItem(placement: .cancellationAction) {
-                                    CancelButton("DONE", action: dismiss.callAsFunction)
-                                }
-                            }
-                    }
-                    .presentationDetents([.medium])
+                    $0
                 }
             }
     }
@@ -72,12 +88,23 @@ private struct TouchEditorRectElementPopoverView: View {
 
 /// A thin wrapper around ``TouchEditorRectElementView``, which offers equatability.
 struct TouchEditorElementView: @MainActor Equatable, View {
-	@ObservedObject var viewModel: TouchEditorViewModel
-	let variant: Int
-	let element: TouchMappings.Element
-
-	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
-
+	@ObservedObject private var viewModel: TouchEditorViewModel
+	private let variant: Int
+	private let element: TouchMappings.Element
+	@FocusState.Binding private var focusTarget: TouchEditorVariantView.Field?
+    
+    init(
+        viewModel: TouchEditorViewModel,
+        variant: Int,
+        element: TouchMappings.Element,
+        focusTarget: FocusState<TouchEditorVariantView.Field?>.Binding
+    ) {
+        self.viewModel = viewModel
+        self.variant = variant
+        self.element = element
+        self._focusTarget = focusTarget
+    }
+    
 	static func == (lhs: TouchEditorElementView, rhs: TouchEditorElementView) -> Bool {
 		lhs.element.control == rhs.element.control
 	}
@@ -99,12 +126,26 @@ struct TouchEditorElementView: @MainActor Equatable, View {
 }
 
 struct TouchEditorRectFormView: View {
-	@Binding var rect: TouchMappings.RelativeRect
-	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
-	var yOffsetID: TouchEditorVariantView.Field
-	var xOffsetID: TouchEditorVariantView.Field
-	var sizeID: TouchEditorVariantView.Field
-
+	@Binding private var rect: TouchMappings.RelativeRect
+	@FocusState.Binding private var focusTarget: TouchEditorVariantView.Field?
+	private let yOffsetID: TouchEditorVariantView.Field
+	private let xOffsetID: TouchEditorVariantView.Field
+	private let sizeID: TouchEditorVariantView.Field
+    
+    init(
+        rect: Binding<TouchMappings.RelativeRect>,
+        focusTarget: FocusState<TouchEditorVariantView.Field?>.Binding,
+        yOffsetID: TouchEditorVariantView.Field,
+        xOffsetID: TouchEditorVariantView.Field,
+        sizeID: TouchEditorVariantView.Field
+    ) {
+        self._rect = rect
+        self._focusTarget = focusTarget
+        self.yOffsetID = yOffsetID
+        self.xOffsetID = xOffsetID
+        self.sizeID = sizeID
+    }
+    
 	var body: some View {
 		Form {
 			Picker("X_ORIGIN", selection: $rect.xOrigin) {
@@ -119,9 +160,9 @@ struct TouchEditorRectFormView: View {
 				Text("BOTTOM").tag(TouchMappings.RelativeRect.YOrigin.bottom)
 			}
 
-			TouchEditorPositionField("X_OFFSET", value: $rect.xOffset, alignment: .natural, focusTarget: $focusTarget, id: xOffsetID)
-			TouchEditorPositionField("Y_OFFSET", value: $rect.yOffset, alignment: .natural, focusTarget: $focusTarget, id: yOffsetID)
-			TouchEditorPositionField("SIZE", value: $rect.size, alignment: .natural, focusTarget: $focusTarget, id: sizeID)
+			TouchEditorPositionField("X_OFFSET", value: $rect.xOffset, focusTarget: $focusTarget, id: xOffsetID)
+			TouchEditorPositionField("Y_OFFSET", value: $rect.yOffset, focusTarget: $focusTarget, id: yOffsetID)
+			TouchEditorPositionField("SIZE", value: $rect.size, focusTarget: $focusTarget, id: sizeID)
 		}
 	}
 }

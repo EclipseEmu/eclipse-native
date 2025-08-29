@@ -1,11 +1,15 @@
 import SwiftUI
 
 struct KeyboardEditorElementView: View {
-    @ObservedObject var viewModel: KeyboardEditorViewModel
-    var element: KeyboardEditorElement
-    @Binding var editTarget: EditorTarget<Int>?
+    @ObservedObject private var viewModel: KeyboardEditorViewModel
+    private let element: KeyboardEditorElement
+    @Binding private var editTarget: EditorTarget<Int>?
     
-    init(_ element: KeyboardEditorElement, viewModel: KeyboardEditorViewModel, editTarget: Binding<EditorTarget<Int>?>) {
+    init(
+        _ element: KeyboardEditorElement,
+        viewModel: KeyboardEditorViewModel,
+        editTarget: Binding<EditorTarget<Int>?>
+    ) {
         self.element = element
         self.viewModel = viewModel
         self._editTarget = editTarget
@@ -27,7 +31,7 @@ struct KeyboardEditorElementView: View {
         }
     }
     
-    static func keybindingButtonLabel(_ text: String, direction: ControlMappingDirection) -> Text {
+    private static func keybindingButtonLabel(_ text: String, direction: ControlMappingDirection) -> Text {
         if direction == .none {
             Text(text)
         } else {
@@ -35,7 +39,7 @@ struct KeyboardEditorElementView: View {
         }
     }
     
-    func edit() {
+    private func edit() {
         guard let index = viewModel.elements.firstIndex(where: { $0.keycode == element.keycode }) else {
             return
         }

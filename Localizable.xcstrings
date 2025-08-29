@@ -1583,6 +1583,26 @@
         }
       }
     },
+    "MSG_GAME_SAVED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game Saved"
+          }
+        }
+      }
+    },
+    "MSG_SAVE_STATE_CREATED" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved State"
+          }
+        }
+      }
+    },
     "NAME" : {
       "localizations" : {
         "en" : {

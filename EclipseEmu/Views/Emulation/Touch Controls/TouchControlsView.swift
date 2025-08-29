@@ -121,7 +121,7 @@ final class TouchControlsViewController: UIViewController {
 		updateLayout()
 	}
 
-	func updateLayout() {
+	private func updateLayout() {
 		let variantIndex = mappings.variantIndex(for: .init(
 			screenBounds: view.window?.screen.bounds.size ?? .zero,
 			horizontalClass: traitCollection.horizontalSizeClass,
@@ -131,7 +131,7 @@ final class TouchControlsViewController: UIViewController {
 		self.setVariant(variantIndex)
 	}
 
-	func setVariant(_ index: Int) {
+	private func setVariant(_ index: Int) {
 		guard index != variantIndex, index != -1 else { return }
 		variantIndex = index
 		layoutElements()
@@ -186,7 +186,7 @@ extension TouchControlsViewController {
 		handleTouchUp(touches: touches)
 	}
 
-	func handleTouchDown(touches: Set<UITouch>) {
+	private func handleTouchDown(touches: Set<UITouch>) {
 		CATransaction.begin()
 		outer: for button in buttons {
 			let currentState = button.isActive
@@ -205,7 +205,7 @@ extension TouchControlsViewController {
 		CATransaction.commit()
 	}
 
-	func handleTouchUp(touches: Set<UITouch>) {
+	private func handleTouchUp(touches: Set<UITouch>) {
 		CATransaction.begin()
 		outer: for button in buttons {
 			for touch in touches {
@@ -220,7 +220,7 @@ extension TouchControlsViewController {
 		CATransaction.commit()
 	}
 
-	func buttonPressed(button: TouchControlsButtonView) {
+	private func buttonPressed(button: TouchControlsButtonView) {
 		let (x, y) = button.button.direction.intoValues(isPressed: true)
 		state.enqueue(button.button.input, value: .init(x, y), control: button.id, player: 0, deque: coordinator.states)
 
@@ -228,7 +228,7 @@ extension TouchControlsViewController {
 		self.haptics.impactOccurred()
 	}
 
-	func buttonReleased(button: TouchControlsButtonView) {
+	private func buttonReleased(button: TouchControlsButtonView) {
 		state.enqueue(button.button.input, value: .zero, control: button.id, player: 0, deque: coordinator.states)
 		button.isActive = false
 	}

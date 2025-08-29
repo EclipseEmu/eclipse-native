@@ -2,11 +2,16 @@ import EclipseKit
 import SwiftUI
 
 struct EmulationLoaderView<Core: CoreProtocol>: View {
-	let data: GamePlaybackData
-	@EnvironmentObject var persistence: Persistence
-    @EnvironmentObject var playback: GamePlayback
-    @EnvironmentObject var settings: Settings
-
+    @EnvironmentObject private var persistence: Persistence
+    @EnvironmentObject private var playback: GamePlayback
+    @EnvironmentObject private var settings: Settings
+    
+    private let data: GamePlaybackData
+    
+    init(data: GamePlaybackData) {
+        self.data = data
+    }
+    
 	var body: some View {
         Suspense(task: load, view: EmulationView.init)
 	}
@@ -21,6 +26,8 @@ struct EmulationLoaderView<Core: CoreProtocol>: View {
         
         #if canImport(UIKit)
         let touchMappings = bindingManager.load(for: InputSourceTouchDescriptor())
+        #else
+        let touchMappings: EmulationViewModel<Core>.TouchMappingsHandle = ()
         #endif
         
         let settings = await persistence.objects.loadCoreSettings(Core.self)
@@ -45,7 +52,6 @@ struct EmulationLoaderView<Core: CoreProtocol>: View {
             try? await coordinator.loadState(from: path)
         }
         
-		#if canImport(UIKit)
 		return .init(
             game: data.game,
             persistence: persistence,
@@ -56,16 +62,5 @@ struct EmulationLoaderView<Core: CoreProtocol>: View {
 			stopAccessingRomFile: stopAccessingRomFile,
 			stopAccessingSaveFile: stopAccessingSaveFile
 		)
-		#else
-		return .init(
-            game: data.game,
-            persistence: persistence,
-            settings: self.settings,
-            coordinator: coordinator,
-            playback: playback,
-			stopAccessingRomFile: stopAccessingRomFile,
-			stopAccessingSaveFile: stopAccessingSaveFile
-		)
-		#endif
 	}
 }

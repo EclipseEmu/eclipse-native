@@ -2,9 +2,14 @@ import EclipseKit
 import SwiftUI
 
 struct CheatCodeField {
-    @Binding var value: String
-    @Binding var formatter: CheatFormatter
-
+    @Binding private var value: String
+    @Binding private var formatter: CheatFormatter
+    
+    init(value: Binding<String>, formatter: Binding<CheatFormatter>) {
+        self._value = value
+        self._formatter = formatter
+    }
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(value: self.$value, formatter: self.$formatter)
     }

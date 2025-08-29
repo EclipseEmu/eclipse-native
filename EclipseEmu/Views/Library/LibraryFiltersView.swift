@@ -3,9 +3,9 @@ import SwiftUI
 import EclipseKit
 
 struct LibraryFiltersView: View {
-    @ObservedObject var viewModel: LibraryViewModel
     @Environment(\.dismiss) private var dismiss: DismissAction
     
+    @ObservedObject var viewModel: LibraryViewModel
     @FetchRequest<TagObject>(sortDescriptors: [NSSortDescriptor(keyPath: \TagObject.name, ascending: true)])
     private var allTags: FetchedResults<TagObject>
 

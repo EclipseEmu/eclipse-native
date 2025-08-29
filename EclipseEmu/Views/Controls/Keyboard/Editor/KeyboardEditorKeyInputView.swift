@@ -3,12 +3,18 @@ import EclipseKit
 import GameController
 
 struct KeyboardEditorKeyInputView: View {
+    /// NOTE: This is needed because `.const(value)` can be detected by some views, making them disabled.
     static let textFieldBinding: Binding<String> = .init(get: { "" }, set: { _ in })
     
-    @StateObject var viewModel: KeyboardEditorKeyInputViewModel = .init()
-    @Binding var keycode: GCKeyCode?
+    @StateObject private var viewModel: KeyboardEditorKeyInputViewModel = .init()
+    @Binding private var keycode: GCKeyCode?
+    @Binding private var isDuplicate: Bool
     @FocusState private var isFocused: Bool
-    @Binding var isDuplicate: Bool
+
+    init(keycode: Binding<GCKeyCode?>, isDuplicate: Binding<Bool>) {
+        self._keycode = keycode
+        self._isDuplicate = isDuplicate
+    }
     
     var body: some View {
         ZStack {
@@ -24,26 +30,12 @@ struct KeyboardEditorKeyInputView: View {
                    viewModel.isFocused = newValue
                }
 
-            Button {
-                withAnimation {
-                    viewModel.selected = $keycode
-                    viewModel.isFocused = true
-                    isFocused = true
-                }
-            } label: {
+            Button(action: focus) {
                 Text(verbatim: keycode?.displayName, fallback: "UNBOUND")
                     .padding(.vertical, 4.0)
                     .padding(.horizontal, 4.0)
                     .contentShape(Rectangle())
-                    .foregroundStyle(
-                        viewModel.isFocused
-                            ? Color.accentColor
-                            : isDuplicate
-                                ? Color.red
-                                : keycode == nil
-                                    ? Color.secondary
-                                    : Color.primary
-                    )
+                    .foregroundStyle(color)
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .trailing)
                     .contentShape(.rect)
             }
@@ -63,6 +55,26 @@ struct KeyboardEditorKeyInputView: View {
                 }
             }
 #endif
+        }
+    }
+    
+    private var color: Color {
+        if viewModel.isFocused {
+            Color.accentColor
+        } else if isDuplicate {
+            Color.red
+        } else if keycode == nil {
+            Color.secondary
+        } else {
+            Color.primary
+        }
+    }
+    
+    private func focus() {
+        withAnimation {
+            viewModel.selected = $keycode
+            viewModel.isFocused = true
+            isFocused = true
         }
     }
 }

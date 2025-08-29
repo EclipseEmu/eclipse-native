@@ -8,7 +8,12 @@ struct CheatItemView: View {
 
     @ObservedObject var cheat: CheatObject
     @Binding var editorTarget: EditorTarget<CheatObject>?
-
+    
+    init(cheat: CheatObject, editorTarget: Binding<EditorTarget<CheatObject>?>) {
+        self.cheat = cheat
+        self._editorTarget = editorTarget
+    }
+    
     var body: some View {
         LabeledContent {
 #if !os(macOS)
@@ -40,11 +45,11 @@ struct CheatItemView: View {
         .onChange(of: cheat.enabled, perform: toggleCheat)
     }
     
-    func edit() {
+    private func edit() {
         self.editorTarget = .edit(cheat)
     }
 
-    func toggleCheat(newValue: Bool) {
+    private func toggleCheat(newValue: Bool) {
         Task {
             do {
                 try await persistence.objects.setCheatStatus(cheat: .init(cheat), isEnabled: newValue)
@@ -55,7 +60,7 @@ struct CheatItemView: View {
         }
     }
 
-    func delete() {
+    private func delete() {
         Task {
             do {
                 try await persistence.objects.delete(.init(cheat))

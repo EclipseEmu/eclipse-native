@@ -13,6 +13,8 @@ struct ContentUnavailableLabelStyle: LabelStyle {
     }
 }
 
+@available(iOS, deprecated: 17.0, renamed: "ContentUnavailableView", message: "This is a polyfill of ContentUnavailableView.")
+@available(macOS, deprecated: 15.0, renamed: "ContentUnavailableView", message: "This is a polyfill of ContentUnavailableView.")
 struct ContentUnavailableMessage<Label: View, Description: View, Action: View>: View {
     private let label: () -> Label
     private let description: () -> Description

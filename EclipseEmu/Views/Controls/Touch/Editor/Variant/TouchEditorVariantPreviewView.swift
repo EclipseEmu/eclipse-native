@@ -3,13 +3,13 @@ import SwiftUI
 import EclipseKit
 
 struct TouchEditorVariantPreviewView: View {
-	@ObservedObject var viewModel: TouchEditorViewModel
-	@Binding var variant: TouchMappings.Variant
-	let namingConvention: ControlNamingConvention
-	let allInputs: [CoreInput]
-	let screenAspectRatio: CGFloat
+	@ObservedObject private var viewModel: TouchEditorViewModel
+	@Binding private var variant: TouchMappings.Variant
+	private let namingConvention: ControlNamingConvention
+	private let allInputs: [CoreInput]
+	private let screenAspectRatio: CGFloat
 
-	var previewSize: CGSize {
+	private var previewSize: CGSize {
 		switch variant.sizing {
 		case .any: .init(width: 390, height: 390)
 		case .landscapeCompact: .init(width: 844, height: 390)

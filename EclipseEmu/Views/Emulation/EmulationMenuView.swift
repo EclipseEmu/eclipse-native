@@ -80,13 +80,7 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
             .labelStyle(.iconOnly)
             .padding(.horizontal)
             .padding(.vertical, 8.0)
-            .modify {
-                if #available(macOS 26.0, *) {
-                    $0.glassEffect(.regular.interactive())
-                } else {
-                    $0.background(Material.regular).clipShape(RoundedRectangle(cornerRadius: 12.0))
-                }
-            }
+            .glassyBackground(.capsule)
             .frame(maxWidth: 360)
             .compositingGroup()
             .opacity(viewModel.menuBarIsVisible ? 1.0 : 0.0)
@@ -135,17 +129,17 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
 #endif
 
     @ViewBuilder
-    var quitButton: some View {
+    private var quitButton: some View {
         ToggleButton("QUIT", systemImage: "power", role: .destructive, value: $isQuitConfirmationOpen)
     }
     
     @ViewBuilder
-    var resetButton: some View {
+    private var resetButton: some View {
         ToggleButton("RESET_GAME", systemImage: "arrow.clockwise", role: .destructive, value: $isResetConfirmationOpen)
     }
     
     @ViewBuilder
-    var playPauseButton: some View {
+    private var playPauseButton: some View {
         let titleKey: LocalizedStringKey = viewModel.isPlaying ? "PAUSE" : "PLAY"
 #if os(macOS)
         let systemImage : String = viewModel.isPlaying ? "pause.fill" : "play.fill"
@@ -164,7 +158,7 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
     }
     
     @ViewBuilder
-    var speedPicker: some View {
+    private var speedPicker: some View {
         Picker("SPEED", systemImage: "speedometer", selection: $viewModel.speed) {
             ForEach(EmulationSpeed.allCases, id: \.rawValue) { value in
                 value.tag(value)
@@ -173,7 +167,7 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
     }
     
     @ViewBuilder
-    var volumeSlider: some View {
+    private var volumeSlider: some View {
         Slider(value: $viewModel.volume) {
             #if os(iOS)
             Text("VOLUME \(viewModel.volume * 100, format: .number.precision(.fractionLength(0)))%")
@@ -188,18 +182,18 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
     
     #if os(iOS)
     @ViewBuilder
-    var requireRingerToggle: some View {
+    private var requireRingerToggle: some View {
         Toggle("IGNORE_SILENT_MODE", systemImage: "bell", isOn: $viewModel.ignoreSilentMode)
     }
     #endif
     
     @ViewBuilder
-    var loadStateButton: some View {
+    private var loadStateButton: some View {
         ToggleButton("LOAD_STATE", systemImage: "square.and.arrow.up", value: $viewModel.isLoadStateViewOpen)
     }
     
     @ViewBuilder
-    var saveStateButton: some View {
+    private var saveStateButton: some View {
         Button("SAVE_STATE", systemImage: "square.and.arrow.down") {
             Task {
                 try await viewModel.saveState()
@@ -207,13 +201,13 @@ struct EmulationMenuView<Core: CoreProtocol>: View {
         }
     }
     
-    func quit() {
+    private func quit() {
         Task {
             await viewModel.quit()
         }
     }
 
-    func reset() {
+    private func reset() {
         Task {
             await viewModel.coordinator.reset()
         }

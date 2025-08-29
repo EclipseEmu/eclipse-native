@@ -8,20 +8,28 @@ private struct AvailableControl: Identifiable {
 }
 
 struct TouchEditorVariantInspectorView: View {
-	@ObservedObject var viewModel: TouchEditorViewModel
-	let target: Int
-
-	@FocusState.Binding var focusTarget: TouchEditorVariantView.Field?
-
+	@ObservedObject private var viewModel: TouchEditorViewModel
+	private let target: Int
+	@FocusState.Binding private var focusTarget: TouchEditorVariantView.Field?
 	@State private var proxy: ScrollViewProxy?
 	@State private var availableButtons: [AvailableControl] = []
 	@State private var availableDirectionals: [AvailableControl] = []
-
+    
+    init(
+        viewModel: TouchEditorViewModel,
+        target: Int,
+        focusTarget: FocusState<TouchEditorVariantView.Field?>.Binding,
+    ) {
+        self.viewModel = viewModel
+        self.target = target
+        self._focusTarget = focusTarget
+    }
+    
 	var body: some View {
 		Form {
 			Section("SCREEN_OFFSET") {
-				TouchEditorPositionField("X_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.x, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetX)
-				TouchEditorPositionField("Y_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.y, alignment: .right, focusTarget: $focusTarget, id: .screenOffsetY)
+				TouchEditorPositionField("X_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.x, focusTarget: $focusTarget, id: .screenOffsetX)
+				TouchEditorPositionField("Y_OFFSET", value: $viewModel.mappings.variants[target].screenOffset.y, focusTarget: $focusTarget, id: .screenOffsetY)
 			}
 
 			Section("ELEMENTS") {
@@ -66,17 +74,17 @@ struct TouchEditorVariantInspectorView: View {
 		}
 	}
 
-	func insertElement(for control: TouchMappings.ControlIndex) {
+	private func insertElement(for control: TouchMappings.ControlIndex) {
 		viewModel.mappings.variants[target].insert(control: control)
 		loadAvailableElements()
 	}
 
-	func deleteElements(_ indices: IndexSet) {
+	private func deleteElements(_ indices: IndexSet) {
 		viewModel.mappings.variants[target].elements.remove(atOffsets: indices)
 		loadAvailableElements()
 	}
 
-	func loadAvailableElements() {
+	private func loadAvailableElements() {
 		let availableControls = viewModel.mappings.availableControls(for: target)
 		let namingConvention = viewModel.namingConvention
 		self.availableButtons = availableControls.buttons.map { index in

@@ -32,9 +32,19 @@ struct EmulationView<Core: CoreProtocol>: View {
 		ZStack {
             GameScreenView(coordinator: viewModel.coordinator)
                 .aspectRatio(viewModel.coordinator.screen.width / viewModel.coordinator.screen.height, contentMode: .fit)
+                .overlay(alignment: .topLeading) {
+                    if let message = viewModel.message {
+                        Text(message)
+                            .font(.caption2)
+                            .padding(.horizontal, 6.0)
+                            .padding(.vertical, 4.0)
+                            .glassyBackground(.capsule)
+                            .padding()
+                    }
+                }
 				.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
 				.ignoresSafeArea(.all, edges: .bottom)
-				.offset(screenOffset)
+                .offset(screenOffset)
 #if !os(macOS)
 			TouchControlsView(
                 mappings: viewModel.touchMappings,
@@ -58,24 +68,19 @@ struct EmulationView<Core: CoreProtocol>: View {
 		.background(ignoresSafeAreaEdges: .all)
 		.persistentSystemOverlays(.hidden)
         .onChange(of: scenePhase, perform: scenePhaseChanged)
-        .onReceive(NotificationCenter.default.publisher(for: .EKGameCoreDidSave), perform: gameSaved)
+        .onReceive(NotificationCenter.default.publisher(for: .EKGameCoreDidSave), perform: viewModel.gameSaved)
         .sheet(isPresented: $viewModel.isLoadStateViewOpen) {
-            LoadStateView(game: viewModel.game, action: saveStateSelected)
-                .presentationDetents([.medium, .large])
+            FormSheetView {
+                LoadStateView(viewModel: viewModel)
+                    .presentationDetents([.medium, .large])
+            }
         }
+        .makeFocusable()
+        .disableKeyboardFeedbackSound()
         .focused($focusState)
 #if os(macOS)
         .onContinuousHover(coordinateSpace: .global, perform: handleHoverPhase)
 #endif
-		.modify {
-			if #available(macOS 14.0, iOS 17.0, *) {
-				$0.focusable().focusEffectDisabled()
-			} else {
-				// FIXME: Figure out how to disable the funk sound on older versions.
-				$0
-			}
-		}
-        .disableKeyboardFeedbackSound()
 	}
     
     private func scenePhaseChanged(_ newPhase: ScenePhase) {
@@ -86,23 +91,6 @@ struct EmulationView<Core: CoreProtocol>: View {
             default:
                 await viewModel.sceneHidden()
             }
-        }
-    }
-    
-    private func gameSaved(_: Notification) {
-        // FIXME: Show some visual indication
-        print("game saved")
-    }
-}
-
-extension EmulationView {
-    private func saveStateSelected(_ saveState: SaveStateObject) async {
-        do {
-            let url = viewModel.persistence.files.url(for: saveState.path)
-            try await viewModel.coordinator.loadState(from: url)
-        } catch {
-            // FIXME: Surface error
-            print("failed to load save state:", error)
         }
     }
 }

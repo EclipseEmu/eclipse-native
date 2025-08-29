@@ -2,13 +2,12 @@ import SwiftUI
 import GameController
 
 final class KeyboardEditorKeyInputViewModel: ObservableObject {
-    var previousKeyboardHandler: GCKeyboardValueChangedHandler?
+    private var previousKeyboardHandler: GCKeyboardValueChangedHandler?
     @Published var selected: Binding<GCKeyCode?>?
     @Published var isFocused: Bool = false
     @Published var currentKeyboard: GCKeyboard? = GCKeyboard.coalesced
     
-    @inlinable
-    var currentKeyboardInput: GCKeyboardInput? {
+    private var currentKeyboardInput: GCKeyboardInput? {
         currentKeyboard?.keyboardInput
     }
     

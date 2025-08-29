@@ -1,26 +1,32 @@
 import EclipseKit
-import Foundation
+import SwiftUI
 
 @MainActor
 final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
+#if canImport(UIKit)
+    typealias TouchMappingsHandle = TouchMappings
+#else
+    typealias TouchMappingsHandle = Void
+#endif
+    
     @Published var game: GameObject
     let persistence: Persistence
     let settings: Settings
     let coordinator: CoreCoordinator<Core>
     let playback: GamePlayback
-    
-#if canImport(UIKit)
-    let touchMappings: TouchMappings
-#endif
+    let touchMappings: TouchMappingsHandle
     let stopAccessingRomFile: Bool
     let stopAccessingSaveFile: Bool
+    
+    @Published var message: LocalizedStringKey? = nil
+    @Published var messageHideTask: Task<Void, Never>?
     
 #if os(macOS)
     @Published var menuBarIsVisible: Bool = true
     @Published var menuBarHideTask: Task<Void, Never>?
     @Published var menuBarHideTaskInstant: ContinuousClock.Instant = .now
 #endif
-
+    
     @Published var isLoadStateViewOpen: Bool = false {
         didSet {
             Task {
@@ -32,7 +38,7 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
             }
         }
     }
-
+    
     @Published var isPlaying: Bool = true {
         didSet {
             Task {
@@ -70,14 +76,13 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
         }
     }
     
-#if canImport(UIKit)
     init(
         game: GameObject,
         persistence: Persistence,
         settings: Settings,
         coordinator: CoreCoordinator<Core>,
         playback: GamePlayback,
-        touchMappings: TouchMappings,
+        touchMappings: TouchMappingsHandle,
         stopAccessingRomFile: Bool,
         stopAccessingSaveFile: Bool
     ) {
@@ -87,39 +92,18 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
         self.coordinator = coordinator
         self.playback = playback
         self.touchMappings = touchMappings
+        self.volume = Float(settings.volume)
+        self.stopAccessingRomFile = stopAccessingRomFile
+        self.stopAccessingSaveFile = stopAccessingSaveFile
+#if os(iOS)
         self.ignoreSilentMode = settings.ignoreSilentMode
-        self.volume = Float(settings.volume)
-        self.stopAccessingRomFile = stopAccessingRomFile
-        self.stopAccessingSaveFile = stopAccessingSaveFile
         CoreAudioRenderer.ignoreSilentMode(ignoreSilentMode)
-        Task {
-            await self.coordinator.audio.setVolume(to: self.volume)
-        }
-    }
-#else
-    init(
-        game: GameObject,
-        persistence: Persistence,
-        settings: Settings,
-        coordinator: CoreCoordinator<Core>,
-        playback: GamePlayback,
-        stopAccessingRomFile: Bool,
-        stopAccessingSaveFile: Bool
-    ) {
-        self.game = game
-        self.persistence = persistence
-        self.settings = settings
-        self.coordinator = coordinator
-        self.playback = playback
-        self.volume = Float(settings.volume)
-        self.stopAccessingRomFile = stopAccessingRomFile
-        self.stopAccessingSaveFile = stopAccessingSaveFile
-        Task {
-            await self.coordinator.audio.setVolume(to: self.volume)
-        }
-    }
 #endif
-
+        Task {
+            await self.coordinator.audio.setVolume(to: self.volume)
+        }
+    }
+    
     func sceneMadeActive() async {
         await coordinator.play(reason: .backgrounded)
     }
@@ -134,6 +118,7 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
     func saveState(isAuto: Bool = false) async throws {
         do {
             try await persistence.objects.createSaveState(isAuto: isAuto, for: .init(game), with: coordinator)
+            self.showMessage("MSG_SAVE_STATE_CREATED")
         } catch {
             print("creating auto save state failed:", error)
             throw error
@@ -144,5 +129,21 @@ final class EmulationViewModel<Core: CoreProtocol>: ObservableObject {
         try? await saveState(isAuto: true)
         await coordinator.stop()
         playback.closeGame()
+    }
+    
+    @inlinable
+    func gameSaved(_: Notification) {
+        self.showMessage("MSG_GAME_SAVED")
+    }
+    
+    func showMessage(_ message: LocalizedStringKey, duration: ContinuousClock.Duration = .seconds(2)) {
+        self.message = message
+        self.messageHideTask?.cancel()
+        self.messageHideTask = Task {
+            do {
+                try await Task.sleep(for: duration)
+                self.message = nil
+            } catch {}
+        }
     }
 }

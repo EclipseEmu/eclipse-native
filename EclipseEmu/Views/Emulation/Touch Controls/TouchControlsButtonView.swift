@@ -50,8 +50,8 @@ final class TouchControlsButtonView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-	func setActive(newValue: Bool) {
-		let scale = isActive ? 0.9 : 1.0
+	private func setActive(newValue: Bool) {
+        let scale = isActive ? 0.9 : 1.0
 		CATransaction.begin()
 		self.backgroundColor = UIColor.white.withAlphaComponent(isActive ? 0.5 : 0)
 		image.transform = .identity.scaledBy(x: scale, y: scale)

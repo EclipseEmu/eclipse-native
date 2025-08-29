@@ -4,8 +4,12 @@ import EclipseKit
 
 struct ControllerSettingsView: View {
     @EnvironmentObject private var persistence: Persistence
-    let controller: GCController
-
+    private let controller: GCController
+    
+    init(controller: GCController) {
+        self.controller = controller
+    }
+    
     var body: some View {
         Form {
             Section {
@@ -31,7 +35,7 @@ struct ControllerSettingsView: View {
         .navigationTitle("CONTROLLER")
     }
     
-    func loadProfile(for system: System) async throws -> ControllerProfileObject? {
+    private func loadProfile(for system: System) async throws -> ControllerProfileObject? {
         let box = try await persistence.objects.getProfileForController(
             controllerID: controller.persistentID,
             system: system,
@@ -40,7 +44,7 @@ struct ControllerSettingsView: View {
         return box?.tryGet(in: persistence.mainContext)
     }
     
-    func setProfile(for system: System, to profile: ControllerProfileObject?) async throws {
+    private func setProfile(for system: System, to profile: ControllerProfileObject?) async throws {
         try await persistence.objects.setProfileForController(
             controllerID: controller.persistentID,
             system: system,

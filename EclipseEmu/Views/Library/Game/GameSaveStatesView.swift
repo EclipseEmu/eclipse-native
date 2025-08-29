@@ -5,8 +5,8 @@ struct GameSaveStatesView: View {
     @EnvironmentObject private var persistence: Persistence
     @EnvironmentObject private var playback: GamePlayback
 	@EnvironmentObject private var coreRegistry: CoreRegistry
-    @ObservedObject var game: GameObject
     
+    @ObservedObject var game: GameObject
     @State private var error: GameViewError?
     @State private var fileImportRequest: FileImportRequest?
 
