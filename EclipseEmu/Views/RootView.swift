@@ -28,9 +28,7 @@ struct RootView: View {
             NavigationStack(path: $navigationManager.path) {
                 LibraryViewWrapper()
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    .navigationDestination(for: Destination.self) { destination in
-                        destination.navigationDestination(destination, coreRegistry: coreRegistry)
-                    }
+                    .navigationDestination(for: Destination.self, destination: Destination.navigationDestination)
             }
         }
     }

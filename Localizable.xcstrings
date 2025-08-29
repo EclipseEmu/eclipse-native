@@ -1260,6 +1260,9 @@
         }
       }
     },
+    "EMULATION" : {
+
+    },
     "EXPORT_SAVE" : {
       "localizations" : {
         "en" : {
@@ -1319,6 +1322,12 @@
           }
         }
       }
+    },
+    "General" : {
+
+    },
+    "GENERAL" : {
+
     },
     "GENERIC_ERROR_MESSAGE_TITLE" : {
       "localizations" : {
@@ -2221,6 +2230,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Size"
+          }
+        }
+      }
+    },
+    "SOCIAL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Social"
           }
         }
       }

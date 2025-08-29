@@ -56,7 +56,7 @@ extension NavigationLink {
 
 extension Destination {
 	@ViewBuilder
-	func navigationDestination(_ destination: Destination, coreRegistry: CoreRegistry) -> some View {
+	static func navigationDestination(_ destination: Destination) -> some View {
 		switch destination {
 		case .settings:
 			SettingsView()

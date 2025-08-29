@@ -58,18 +58,3 @@ struct EclipseEmuApp: App {
     }
 }
 
-private struct SettingsWindowRootView: View {
-    @EnvironmentObject private var coreRegistry: CoreRegistry
-    @StateObject private var navigationManager: NavigationManager = .init()
-    
-    var body: some View {
-        NavigationStack(path: $navigationManager.path) {
-            SettingsView()
-                .navigationDestination(for: Destination.self) { destination in
-                    destination.navigationDestination(destination, coreRegistry: coreRegistry)
-                }
-        }
-        .environmentObject(navigationManager)
-    }
-}
-
