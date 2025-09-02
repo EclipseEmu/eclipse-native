@@ -1,7 +1,7 @@
 import GameController
 import EclipseKit
 
-enum InputSourceControllerVersion: Int16, VersionProtocol {
+enum InputSourceControllerVersion: Int16, InputSourceVersionProtocol {
     case v1 = 1
     
     static let latest: InputSourceControllerVersion = .v1

@@ -14,7 +14,7 @@ struct KeyboardMapping: Codable {
 
 typealias KeyboardMappings = [GCKeyCode : KeyboardMapping]
 
-enum InputSourceKeyboardVersion: Int16, VersionProtocol {
+enum InputSourceKeyboardVersion: Int16, InputSourceVersionProtocol {
     case v1 = 1
     
     static let latest: Self = .v1

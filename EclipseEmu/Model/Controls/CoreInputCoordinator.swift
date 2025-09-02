@@ -137,20 +137,14 @@ final actor CoreInputCoordinator {
 
 extension CoreInputCoordinator {
     private func listenForKeyboardConnections(_ center: NotificationCenter) async {
-        let iter = unsafe center
-            .notifications(named: .GCKeyboardDidConnect)
-            .compactMap { unsafe ($0.object as? GCKeyboard).map(UnsafeCopyableSend.init) }
-
+        let iter = unsafe center.objects(for: .GCKeyboardDidConnect, as: GCKeyboard.self)
         for await unsafe source in unsafe iter {
             unsafe await attachKeyboard(keyboard: source.inner)
         }
     }
 
     private func listenForKeyboardDisconnections(_ center: NotificationCenter) async {
-        let iter = unsafe center
-            .notifications(named: .GCKeyboardDidDisconnect)
-            .compactMap { unsafe ($0.object as? GCKeyboard).map(UnsafeCopyableSend.init) }
-
+        let iter = unsafe center.objects(for: .GCKeyboardDidDisconnect, as: GCKeyboard.self)
         for await unsafe source in unsafe iter {
             unsafe detachKeyboard(keyboard: source.inner)
         }
@@ -191,9 +185,7 @@ extension CoreInputCoordinator {
 
 extension CoreInputCoordinator {
     private func listenForControllerConnections(_ center: NotificationCenter) async {
-        let iter = unsafe center
-            .notifications(named: .GCControllerDidConnect)
-            .compactMap { unsafe ($0.object as? GCController).map(UnsafeCopyableSend.init) }
+        let iter = unsafe center.objects(for: .GCControllerDidConnect, as: GCController.self)
 
         for await unsafe source in unsafe iter {
 			let controller = source.inner
@@ -203,9 +195,7 @@ extension CoreInputCoordinator {
     }
 
     private func listenForControllerDisconnections(_ center: NotificationCenter) async {
-        let iter = unsafe center
-            .notifications(named: .GCControllerDidDisconnect)
-            .compactMap { unsafe ($0.object as? GCController).map(UnsafeCopyableSend.init) }
+        let iter = unsafe center.objects(for: .GCControllerDidDisconnect, as: GCController.self)
         for await unsafe source in unsafe iter {
 			let controller = source.inner
             detachController(controller: controller)

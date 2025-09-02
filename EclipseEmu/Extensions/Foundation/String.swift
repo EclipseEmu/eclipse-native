@@ -1,4 +1,5 @@
 import Foundation
+
 extension String {
     struct CharacterCounts {
         let inSet: Int

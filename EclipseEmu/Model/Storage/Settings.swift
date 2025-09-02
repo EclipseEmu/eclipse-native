@@ -21,7 +21,7 @@ final class Settings: ObservableObject {
     
     static let defaults = UserDefaults.standard
     
-    typealias ControlsSystemsProfiles<ProfileObject: ControlsProfileObject> = [System : ObjectBox<ProfileObject>]
+    typealias ControlsSystemsProfiles<ProfileObject: InputSourceProfileObject> = [System : ObjectBox<ProfileObject>]
 
     @AppStorage(Settings.Keys.listSortingMethod.rawValue, store: Settings.defaults)
     var listSortMethod: GameListSortingMethod = .name

@@ -2,7 +2,7 @@ import SwiftUI
 import EclipseKit
 import CoreData
 
-struct LazyControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>: View {
+struct LazyControlsProfilePicker<ProfileObject: InputSourceProfileObject, Label: View>: View {
     private let label: () -> Label
     private let system: System
     private let defaultProfileLabel: LocalizedStringKey?

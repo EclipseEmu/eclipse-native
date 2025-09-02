@@ -2,7 +2,7 @@ import SwiftUI
 import EclipseKit
 import CoreData
 
-struct ControlsProfilePicker<ProfileObject: ControlsProfileObject, Label: View>: View {
+struct ControlsProfilePicker<ProfileObject: InputSourceProfileObject, Label: View>: View {
 	@Binding private var profile: ProfileObject?
 	private let system: System
     private let defaultProfileLabel: LocalizedStringKey?

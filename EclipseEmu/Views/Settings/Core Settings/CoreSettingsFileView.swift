@@ -74,7 +74,8 @@ struct CoreSettingsFileView<Settings: CoreSettings>: View {
 				}
 
 				if !setting.sha1.isEmpty {
-					let hash = try await persistence.files.sha1(for: sourceURL)
+					let digest = try await persistence.files.sha1(for: sourceURL)
+                    let hash = digest.hexString()
 					guard setting.sha1.contains(hash) else {
 						// FIXME: Surface error
                         print("hash mismatch", hash, setting.sha1)

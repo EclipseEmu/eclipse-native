@@ -2,7 +2,7 @@ import SwiftUI
 import EclipseKit
 import CoreData
 
-struct ControlsProfilePickerView<ProfileObject: ControlsProfileObject>: View {
+struct ControlsProfilePickerView<ProfileObject: InputSourceProfileObject>: View {
 	@Environment(\.dismiss) private var dismiss: DismissAction
 
 	@Binding private var selection: ProfileObject?

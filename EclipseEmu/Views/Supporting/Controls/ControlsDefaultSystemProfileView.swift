@@ -1,7 +1,7 @@
 import SwiftUI
 import EclipseKit
 
-struct ControlsSystemProfilesView<ProfileObject: ControlsProfileObject>: View {
+struct ControlsSystemProfilesView<ProfileObject: InputSourceProfileObject>: View {
     let load: (System) async throws -> ProfileObject?
     let update: (System, ProfileObject?) async throws -> Void
     

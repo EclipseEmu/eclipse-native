@@ -5,7 +5,7 @@ import CoreData
 
 protocol InputSourceDescriptorProtocol: Sendable {
     associatedtype Bindings: Codable & Sendable
-	associatedtype Object: ControlsProfileObject
+	associatedtype Object: InputSourceProfileObject
 
 	static func encode(_ bindings: Bindings, encoder: JSONEncoder, into object: Self.Object) throws
 	static func decode(_ data: Self.Object, decoder: JSONDecoder) throws -> Self.Bindings

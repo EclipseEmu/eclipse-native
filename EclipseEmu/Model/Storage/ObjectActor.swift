@@ -119,7 +119,8 @@ extension ObjectActor {
         // Hash the game
         let sha1: String
         do {
-            sha1 = try await fileSystem.sha1(for: file)
+            let digest = try await fileSystem.sha1(for: file)
+            sha1 = digest.hexString()
         } catch {
             return (file, .failure(.hashingFailed(error)))
         }
@@ -470,7 +471,7 @@ extension ObjectActor {
 
 // MARK: Controls
 
-enum CopyProfileControlsSource<Profile: ControlsProfileObject> {
+enum CopyProfileControlsSource<Profile: InputSourceProfileObject> {
     case nowhere
     case systemDefaults
     case otherProfile(ObjectBox<Profile>)

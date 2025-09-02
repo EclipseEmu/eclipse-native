@@ -82,8 +82,9 @@ struct GameErrorHandlerViewModifier: ViewModifier {
                     }
                 }
 
-                let actualHash = try await persistence.files.sha1(for: sourceURL)
-
+                let digest = try await persistence.files.sha1(for: sourceURL)
+                let actualHash = digest.hexString()
+                
                 guard expectedHash == actualHash else {
                     throw GameViewError.playbackError(.hashMismatch(.rom(game), actualHash, sourceURL))
                 }

@@ -127,7 +127,7 @@ final actor FileSystem: Sendable {
         return self.fileManager.createFile(atPath: url.path(percentEncoded: false), contents: contents)
     }
 
-    func sha1(for file: URL) async throws(FileSystemError) -> String {
+    func sha1(for file: URL) async throws(FileSystemError) -> Insecure.SHA1Digest {
         let stream = try FileStream(at: file)
         await Task.yield()
         var hasher = Insecure.SHA1()
@@ -136,13 +136,7 @@ final actor FileSystem: Sendable {
             hasher.update(data: buf[..<amount])
             await Task.yield()
         }
-        let bytes = hasher.finalize()
-        
-        var string = ""
-        for byte in bytes {
-            string += (byte > 15 ? "" : "0") + String(byte, radix: 16).uppercased()
-        }
-        return string
+        return hasher.finalize()
     }
 
     func exists(path: FileSystemPath) -> Bool {

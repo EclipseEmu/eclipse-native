@@ -7,11 +7,6 @@ enum SettingsDestination: Hashable {
     case keyboard
     case controllers
     case core(Core)
-    
-    @MainActor
-    @ViewBuilder
-    func view() -> some View {
-    }
 }
 
 private struct SettingsNavigationRoot<Content: View>: View {

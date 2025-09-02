@@ -8,6 +8,7 @@ struct EclipseEmuApp: App {
     @StateObject private var settings = Settings()
     @StateObject private var coreRegistry = CoreRegistry()
     @StateObject private var connectedControllers = ConnectedControllers()
+    @StateObject private var playback = GamePlayback()
 
 #if os(macOS)
 	@Environment(\.openWindow) var openWindow: OpenWindowAction
@@ -21,19 +22,21 @@ struct EclipseEmuApp: App {
 				.environmentObject(coreRegistry)
 				.environmentObject(settings)
                 .environmentObject(connectedControllers)
+                .environmentObject(playback)
                 .onAppear {
                     settings.persistenceReady(persistence)
                 }
             
 		}
 #elseif os(macOS)
-		// NOTE: multiple windows can be supported, but controls will need to be reworked a little.
+		// NOTE: multiple windows can be supported, but controls will need to be reworked.
 		Window("LIBRARY", id: "eclipse") {
 			RootView()
 				.persistence(persistence)
 				.environmentObject(coreRegistry)
 				.environmentObject(settings)
                 .environmentObject(connectedControllers)
+                .environmentObject(playback)
                 .onAppear {
                     settings.persistenceReady(persistence)
                 }

@@ -1,7 +1,7 @@
 import CoreData
 import EclipseKit
 
-extension ControllerProfileObject: ControlsProfileObject {
+extension ControllerProfileObject: InputSourceProfileObject {
     var system: System {
         get {
             System(rawValue: UInt16(self.rawSystem)) ?? .unknown

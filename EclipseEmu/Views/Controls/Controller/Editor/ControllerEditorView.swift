@@ -158,6 +158,7 @@ struct ControllerEditorView: View {
                     Text("CONTROLLER_PLAYSTATION").tag(ControllerButtonNaming.playstation)
                 } label: {}
                 .labelsHidden()
+                .pickerStyle(.inline)
             }
         }
     }

@@ -9,13 +9,12 @@ private struct LibraryViewWrapper: View {
 struct RootView: View {
 	@EnvironmentObject private var persistence: Persistence
 	@EnvironmentObject private var coreRegistry: CoreRegistry
-	@StateObject private var playback = GamePlayback()
+    @EnvironmentObject private var playback: GamePlayback
+    
 	@StateObject private var navigationManager = NavigationManager()
 
 	var body: some View {
-        content
-            .environmentObject(navigationManager)
-            .environmentObject(playback)
+        content.environmentObject(navigationManager)
 	}
     
     // FIXME: on iOS 26, quitting out of a game messes up the layout.

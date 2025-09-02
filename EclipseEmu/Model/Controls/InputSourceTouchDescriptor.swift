@@ -2,7 +2,7 @@ import Foundation
 import GameController
 import EclipseKit
 
-enum InputSourceTouchVersion: Int16, VersionProtocol {
+enum InputSourceTouchVersion: Int16, InputSourceVersionProtocol {
     case v1 = 1
     
     static let latest: Self = .v1
